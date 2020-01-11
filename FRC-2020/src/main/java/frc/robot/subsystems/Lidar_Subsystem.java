@@ -19,15 +19,34 @@ public class Lidar_Subsystem extends SubsystemBase {
    */
 
   private TimeOfFlight front_left_lidar;
+  private TimeOfFlight front_right_lidar;
+  private double left_lidar_range;
+  private double right_lidar_range;
+  private long lastLidarTime;
 
   public Lidar_Subsystem() {
 
+    lastLidarTime = System.currentTimeMillis();
+
     front_left_lidar = new TimeOfFlight(Constants.FRONT_LEFT_LIDAR);
+    front_right_lidar = new TimeOfFlight(Constants.FRONT_RIGHT_LIDAR);
+
+    front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Medium, Constants.LIDAR_SAMPLE_TIME);
+    front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Medium, Constants.LIDAR_SAMPLE_TIME);
 
   }
 
-  public void log() {
-    SmartDashboard.putNumber("Front Left Lidar", front_left_lidar.getRange());
+  public void updateLidar(){
+    if ((lastLidarTime + Constants.LIDAR_SAMPLE_TIME + 10) < System.currentTimeMillis()){ //dont check lidar faster than it's sample rate, with 10ms buffer
+      left_lidar_range = front_left_lidar.getRange();
+      right_lidar_range = front_right_lidar.getRange();
+      lastLidarTime = System.currentTimeMillis();
+    }
+  }
+
+  public void printLog() {
+    SmartDashboard.putNumber("Front Left Lidar", left_lidar_range);
+    SmartDashboard.putNumber("Front Right Lidar", right_lidar_range);
   }
 
   @Override

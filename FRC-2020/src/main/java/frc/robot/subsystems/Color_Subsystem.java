@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,12 +34,14 @@ public class Color_Subsystem extends SubsystemBase {
   private Color detectedColor;
   private ColorMatchResult match;
   private int proximity;
+  private double lastSensorCheckTime;
 
   public Color_Subsystem() {
     m_colorMatcher.addColorMatch(kBlueTarget);
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
-    m_colorMatcher.addColorMatch(kYellowTarget);  
+    m_colorMatcher.addColorMatch(kYellowTarget);
+    lastSensorCheckTime = System.currentTimeMillis();  
   }
 
   @Override
@@ -47,9 +50,12 @@ public class Color_Subsystem extends SubsystemBase {
   }
 
   public void updateColorSensor(){
-    detectedColor = m_colorSensor.getColor();
-    match = m_colorMatcher.matchClosestColor(detectedColor);
-    proximity = m_colorSensor.getProximity();
+    if ((lastSensorCheckTime + Constants.COLOR_SAMPLE_TIME) < System.currentTimeMillis()) { //don't check color sensor too often
+      detectedColor = m_colorSensor.getColor();
+      match = m_colorMatcher.matchClosestColor(detectedColor);
+      proximity = m_colorSensor.getProximity();
+      lastSensorCheckTime = System.currentTimeMillis();
+    }
   }
 
 

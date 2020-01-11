@@ -24,6 +24,7 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
   private Color_Subsystem m_color;
+  private long lastLogTime;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -35,6 +36,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     m_color = new Color_Subsystem();
+    lastLogTime = System.currentTimeMillis();
   }
 
   /**
@@ -52,7 +54,12 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     m_color.updateColorSensor();
-    m_color.printLog();
+    
+    if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
+      m_color.printLog();
+      lastLogTime = System.currentTimeMillis();
+    }
+
    
   }
 

@@ -5,8 +5,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import static frc.robot.Constants.*;
 
 public class GearShifter implements Subsystem {
-    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(GEARSHIFT_PCM_ID, GEARSHIFTUP_SOLENOID_PCM,
-            GEARSHIFTDOWN_SOLENOID_PCM);
+    
 
     public enum Gear {
         HIGH_GEAR(DoubleSolenoid.Value.kForward), // ### need to check right order
@@ -23,13 +22,21 @@ public class GearShifter implements Subsystem {
         }
     }
 
+    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(GEARSHIFT_PCM_ID, GEARSHIFTUP_SOLENOID_PCM,
+            GEARSHIFTDOWN_SOLENOID_PCM);
+
     // State
-    Gear curGear = Gear.LOW_GEAR;
+    private Gear curGear = Gear.LOW_GEAR;
+    private boolean autoShiftEnabled;
+    private double shiftPoint;
 
     public GearShifter() {
 
     }
     
+    public Gear getCurGear() {
+        return curGear;
+    }
 
     public void shiftUp() {
         gearShiftSolenoid.set(Gear.HIGH_GEAR.solenoidCmd());

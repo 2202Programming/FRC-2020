@@ -1,22 +1,24 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Robot;
+import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;
 
 public class ShiftGear extends InstantCommand {
     private Gear g;
+    private GearShifter shifter;
 
-    public ShiftGear(Gear g) {
-        requires(Robot.gearShifter);
+    public ShiftGear(GearShifter shifter, Gear g) {
+        this.shifter = shifter;
         this.g = g;
     }
 
-    protected void execute() {
+    public void execute() {
         if (g == Gear.HIGH_GEAR) {
-            Robot.gearShifter.shiftUp();
+            shifter.shiftUp();
         } else {
-            Robot.gearShifter.shiftDown();
+            shifter.shiftDown();
         }
     }
 }

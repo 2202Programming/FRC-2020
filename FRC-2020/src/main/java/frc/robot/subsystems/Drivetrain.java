@@ -30,8 +30,4 @@ public class Drivetrain implements Subsystem {
         public void arcadeDrive(double xSpeed, double rotationSpeed) {
                 drive.arcadeDrive(xSpeed, rotationSpeed);
         }
-
-        public void initDefaultCommand() {
-                setDefaultCommand(new ArcadeDrive());
-        }
 }

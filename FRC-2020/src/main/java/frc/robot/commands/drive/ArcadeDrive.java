@@ -1,5 +1,6 @@
 package frc.robot.commands.drive;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -33,8 +34,9 @@ public class ArcadeDrive implements Command {
 
     @Override
     public Set<Subsystem> getRequirements() {
-        // TODO Auto-generated method stub
-        return null;
+        Set<Subsystem> subs = new HashSet<Subsystem>();
+        subs.add(drive);
+        return subs;
     }
 
 }

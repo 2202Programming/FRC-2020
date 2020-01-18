@@ -27,7 +27,7 @@ public final class Constants {
 
     public static final int FL_SPARKMAX_CANID = 11;
     public static final int ML_SPARKMAX_CANID = 12;
-    public static final int BL_SPARKMAX_CANID = 13;
+    public static final int BL_SPARKMAX_CANID = 41;
     public static final int FR_SPARKMAX_CANID = 24;
     public static final int MR_SPARKMAX_CANID = 22;
     public static final int BR_SPARKMAX_CANID = 23;

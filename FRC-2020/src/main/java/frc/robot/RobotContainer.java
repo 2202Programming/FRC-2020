@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.ArcadeDrive;
+import frc.robot.commands.drive.MechanumDrive;
 import frc.robot.commands.drive.shift.ShiftGear;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.GearShifter;
+import frc.robot.subsystems.Mechanum_Drivetrain;
 import frc.robot.subsystems.GearShifter.Gear;
 
 /**
@@ -28,10 +30,12 @@ import frc.robot.subsystems.GearShifter.Gear;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain driveTrain = new Drivetrain();
-  private final GearShifter gearShifter = new GearShifter();
+  //private final Drivetrain driveTrain = new Drivetrain();
+  private final Mechanum_Drivetrain drivetrain = new Mechanum_Drivetrain();
+  //private final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
-  private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
+  //private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
+  
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -39,7 +43,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
+    CommandScheduler.getInstance().setDefaultCommand(drivetrain, new MechanumDrive(drivetrain, driver));
   }
 
   /**
@@ -49,8 +53,8 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(driver, 4).whenPressed(() -> new ShiftGear(gearShifter, Gear.HIGH_GEAR));
-    new JoystickButton(driver, 1).whenPressed(() -> new ShiftGear(gearShifter, Gear.LOW_GEAR));
+  //  new JoystickButton(driver, 4).whenPressed(() -> new ShiftGear(gearShifter, Gear.HIGH_GEAR));
+  //  new JoystickButton(driver, 1).whenPressed(() -> new ShiftGear(gearShifter, Gear.LOW_GEAR));
   }
 
   /**

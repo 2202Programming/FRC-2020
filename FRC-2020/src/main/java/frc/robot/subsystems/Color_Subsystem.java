@@ -20,7 +20,8 @@ import com.revrobotics.ColorMatch;
 
 public class Color_Subsystem extends SubsystemBase {
   /**
-   * Creates a new Color_Subsystem.
+   * Creates a new Color_Subsystem.  
+   * Used to detect and figure out the color on the control panel.
    */
 
   private final I2C.Port i2cPort = I2C.Port.kOnboard;

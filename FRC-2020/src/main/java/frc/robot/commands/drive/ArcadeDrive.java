@@ -3,6 +3,7 @@ package frc.robot.commands.drive;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -14,21 +15,25 @@ public class ArcadeDrive implements Command {
     private ExpoShaper speedShaper;
     private ExpoShaper rotationShaper;
     private Drivetrain drive;
+    private XboxController xbox;
 
     @Override
     public boolean isFinished() {
         return false;
     }
 
-    public ArcadeDrive(Drivetrain drive) {
+    public ArcadeDrive(Drivetrain drive, XboxController controller) {
         this.drive = drive;
+        xbox = controller;
+        speedShaper = new ExpoShaper(0.1);
+        rotationShaper = new ExpoShaper(0.1);
     }
 
     public void execute() {
         // Robot.driveTrain.ArcadeDrive(0.90, 0, true);
-        double s = speedShaper.expo(RobotContainer.driver.getY(Hand.kLeft));
+        double s = speedShaper.expo(xbox.getY(Hand.kLeft));
         // soften the input by limiting the max input
-        double rot = rotationShaper.expo(0.8 * RobotContainer.driver.getX(Hand.kRight));
+        double rot = rotationShaper.expo(0.8 * xbox.getX(Hand.kRight));
         drive.arcadeDrive(s, rot);
     }
 

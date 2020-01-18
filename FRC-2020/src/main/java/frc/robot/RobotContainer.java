@@ -30,10 +30,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drivetrain driveTrain = new Drivetrain();
   private final GearShifter gearShifter = new GearShifter();
-
-  private final ArcadeDrive arcade = new ArcadeDrive(driveTrain);
-
   public static final XboxController driver = new XboxController(0);
+  private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

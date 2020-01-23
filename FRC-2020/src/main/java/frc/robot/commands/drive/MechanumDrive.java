@@ -20,6 +20,7 @@ public class MechanumDrive implements Command {
 
   private Mechanum_Drivetrain drive;
   private XboxController xbox;
+  public double x_speed = 0.1;
 
   public MechanumDrive(Mechanum_Drivetrain drive, XboxController controller) {
     this.drive = drive;
@@ -32,7 +33,7 @@ public class MechanumDrive implements Command {
   // Called repeatedly when this Command is scheduled to run
 
   public void execute() {
-      drive.driveCartesian(xbox.getX(Hand.kRight), ((xbox.getX(Hand.kLeft)/3)*-1), ((xbox.getY(Hand.kLeft)/3)*-1));
+      drive.driveCartesian(0, 0, x_speed);
   }
 
   

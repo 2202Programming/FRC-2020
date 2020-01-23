@@ -7,11 +7,14 @@
 
 package frc.robot;
 
+import com.playingwithfusion.TimeOfFlight;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Color_Subsystem;
+import frc.robot.subsystems.Lidar_Subsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -25,6 +28,7 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private Color_Subsystem m_color;
   private long lastLogTime;
+  private Lidar_Subsystem m_lidar_subsystem;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -37,6 +41,7 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     // m_color = new Color_Subsystem();
     lastLogTime = System.currentTimeMillis();
+    m_lidar_subsystem = new Lidar_Subsystem();
   }
 
   /**
@@ -54,14 +59,16 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     // m_color.updateColorSensor();
-    
-    if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
-      // m_color.printLog();
+    m_lidar_subsystem.updateLidar();
+    if (m_lidar_subsystem.getAverageRange() < 500){
+      m_robotContainer.m_mechanumdrive.x_speed = 0;
+    } else m_robotContainer.m_mechanumdrive.x_speed = 0.1;
+
+      m_lidar_subsystem.printLog();
       lastLogTime = System.currentTimeMillis();
     }
 
     
-  }
 
   /**
    * This function is called once each time the robot enters Disabled mode.

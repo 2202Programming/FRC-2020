@@ -12,14 +12,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.drive.MechanumDrive;
-import frc.robot.commands.drive.shift.ShiftGear;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Mechanum_Drivetrain;
-import frc.robot.subsystems.GearShifter.Gear;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -31,11 +26,11 @@ import frc.robot.subsystems.GearShifter.Gear;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //private final Drivetrain driveTrain = new Drivetrain();
-  private final Mechanum_Drivetrain drivetrain = new Mechanum_Drivetrain();
+  public final Mechanum_Drivetrain drivetrain = new Mechanum_Drivetrain();
   //private final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
   //private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
-  
+  public MechanumDrive m_mechanumdrive = new MechanumDrive(drivetrain, driver);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -43,7 +38,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    CommandScheduler.getInstance().setDefaultCommand(drivetrain, new MechanumDrive(drivetrain, driver));
+    CommandScheduler.getInstance().setDefaultCommand(drivetrain, m_mechanumdrive);
   }
 
   /**

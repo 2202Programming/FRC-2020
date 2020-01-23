@@ -36,6 +36,9 @@ public class Lidar_Subsystem extends SubsystemBase {
 
   }
 
+  public double getAverageRange() {
+    return ((left_lidar_range+right_lidar_range)/2);
+  }
   public void updateLidar(){
     if ((lastLidarTime + Constants.LIDAR_SAMPLE_TIME + 10) < System.currentTimeMillis()){ //dont check lidar faster than it's sample rate, with 10ms buffer
       left_lidar_range = front_left_lidar.getRange();

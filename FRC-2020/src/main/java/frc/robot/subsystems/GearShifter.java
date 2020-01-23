@@ -6,7 +6,6 @@ import static frc.robot.Constants.*;
 
 public class GearShifter implements Subsystem {
     
-
     public enum Gear {
         HIGH_GEAR(DoubleSolenoid.Value.kForward), // ### need to check right order
         LOW_GEAR(DoubleSolenoid.Value.kReverse);

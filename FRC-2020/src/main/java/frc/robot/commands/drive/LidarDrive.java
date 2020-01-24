@@ -10,21 +10,17 @@ package frc.robot.commands.drive;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import frc.robot.subsystems.Mechanum_Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
-public class MechanumDrive implements Command {
+public class LidarDrive implements Command {
 
   private Mechanum_Drivetrain drive;
-  private XboxController xbox;
   public double x_speed = 0.1;
 
-  public MechanumDrive(Mechanum_Drivetrain drive, XboxController controller) {
+  public LidarDrive(Mechanum_Drivetrain drive) {
     this.drive = drive;
-    xbox = controller;
     // Use requires() here to declare subsystem dependencies
     // eg. requires(chassis);
   }
@@ -32,9 +28,8 @@ public class MechanumDrive implements Command {
 
   // Called repeatedly when this Command is scheduled to run
 
-
-  public void execute(){
-    drive.driveCartesian(xbox.getX(Hand.kRight), ((xbox.getX(Hand.kLeft)/3)*-1),((xbox.getY(Hand.kLeft) / 3) * -1));
+  public void execute() {
+      drive.driveCartesian(0, 0, x_speed);
   }
 
   

@@ -61,8 +61,8 @@ public class Robot extends TimedRobot {
     // m_color.updateColorSensor();
     m_lidar_subsystem.updateLidar();
     if (m_lidar_subsystem.getAverageRange() < 500){
-      m_robotContainer.m_mechanumdrive.x_speed = 0;
-    } else m_robotContainer.m_mechanumdrive.x_speed = 0.1;
+      m_robotContainer.m_lidardrive.x_speed = 0;
+    } else m_robotContainer.m_lidardrive.x_speed = 0.1;
 
       m_lidar_subsystem.printLog();
       lastLogTime = System.currentTimeMillis();

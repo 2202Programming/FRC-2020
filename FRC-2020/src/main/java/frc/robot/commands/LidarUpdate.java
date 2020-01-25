@@ -34,7 +34,7 @@ public class LidarUpdate extends CommandBase {
     
     if (m_lidarsubsystem.getAverageRange() < 500){
      m_lidardrive.x_speed = 0;
-    } else m_lidardrive.x_speed = 0.1;
+    } else m_lidardrive.x_speed = m_lidarsubsystem.getAverageRange()*0.0001;
 
     m_lidarsubsystem.printLog();
 

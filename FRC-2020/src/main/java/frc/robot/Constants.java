@@ -22,4 +22,15 @@ public final class Constants {
     public static final double LIDAR_SAMPLE_TIME = 100; //in ms
     public static final double COLOR_SAMPLE_TIME = 100; //in ms
     public static final int LOG_REFRESH_RATE = 100; //in ms
+
+    //Intake
+    public static final int INTAKE_UP_DIO = 4;
+    public static final int INTAKE_DOWN_DIO = 4;
+    public static final int INTAKE_TALON_CAN = 20;
+    public static final int MAGAZINE_TALON_CAN = 21;
+    public static final int UPPER_SHOOTER_TALON_CAN = 22;
+    public static final int LOWER_SHOOTER_TALON_CAN = 23;
+    public static final int ELEVATOR_TALON_CAN = 24;
+    
+    
 }

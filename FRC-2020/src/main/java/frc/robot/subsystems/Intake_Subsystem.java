@@ -24,8 +24,7 @@ public class Intake_Subsystem extends SubsystemBase {
   // Put methods for controlling this subsystem
   // here. Call these from Commands.
 
-  public DigitalInput intake_up_sensor = new DigitalInput(Constants.INTAKE_UP_DIO);
-  public DigitalInput intake_down_sensor = new DigitalInput(Constants.INTAKE_DOWN_DIO);
+
 
 
   //Intake
@@ -33,6 +32,10 @@ public class Intake_Subsystem extends SubsystemBase {
   
   public DoubleSolenoid elevatorSolenoid = new DoubleSolenoid(Constants.ELEVATOR_PCM_ID, 
           Constants.ELEVATOR_UP_SOLENOID_PCM, Constants.ELEVATOR_DOWN_SOLENOID_PCM);
+  
+  //Intake Pneumatic Sensors
+  public DigitalInput intake_up_sensor = new DigitalInput(Constants.INTAKE_UP_DIO);
+  public DigitalInput intake_down_sensor = new DigitalInput(Constants.INTAKE_DOWN_DIO);
 
   //magazine
   public WPI_TalonSRX magazine_talon = new WPI_TalonSRX(Constants.MAGAZINE_TALON_CAN);

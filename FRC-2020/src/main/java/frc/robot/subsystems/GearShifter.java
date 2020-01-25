@@ -46,4 +46,8 @@ public class GearShifter implements Subsystem {
         gearShiftSolenoid.set(Gear.LOW_GEAR.solenoidCmd());
         curGear = Gear.LOW_GEAR;
     }
+
+    public void setAutoShift(boolean autoShifting) {
+        autoShiftEnabled = autoShifting;
+    }
 }

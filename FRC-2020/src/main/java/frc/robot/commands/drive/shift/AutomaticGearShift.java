@@ -48,7 +48,7 @@ public class AutomaticGearShift implements Command {
         }
 
         if (curGear == Gear.LOW_GEAR) {
-            // Disable automatic upshift
+            // Disable automatic upshift (aka only auto downshift)
             // if (curSpeed > shiftSpeed) {
             // new AutomaticUpShiftCommand().start();
             // }

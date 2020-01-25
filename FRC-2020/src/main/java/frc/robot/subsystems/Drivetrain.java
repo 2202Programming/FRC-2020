@@ -44,8 +44,8 @@ public class Drivetrain implements Subsystem {
 
 	}
 
-	public void arcadeDrive(double xSpeed, double rotationSpeed) {
-		drive.arcadeDrive(xSpeed, -rotationSpeed);
+	public void arcadeDrive(double xSpeed, double rotationSpeed, boolean squareInputs) {
+		drive.arcadeDrive(xSpeed, -rotationSpeed, squareInputs);
 	}
 
 	public double getLeftPos() {

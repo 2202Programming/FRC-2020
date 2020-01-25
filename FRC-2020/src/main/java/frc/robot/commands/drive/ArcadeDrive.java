@@ -25,8 +25,8 @@ public class ArcadeDrive implements Command {
     public ArcadeDrive(Drivetrain drive, XboxController controller) {
         this.drive = drive;
         xbox = controller;
-        speedShaper = new ExpoShaper(0.1);
-        rotationShaper = new ExpoShaper(0.1);
+        speedShaper = new ExpoShaper(0.6);
+        rotationShaper = new ExpoShaper(0.5);
     }
 
     public void execute() {
@@ -34,7 +34,7 @@ public class ArcadeDrive implements Command {
         double s = speedShaper.expo(xbox.getY(Hand.kLeft));
         // soften the input by limiting the max input
         double rot = rotationShaper.expo(0.8 * xbox.getX(Hand.kRight));
-        drive.arcadeDrive(s, rot);
+        drive.arcadeDrive(s, rot, false);
     }
 
     @Override

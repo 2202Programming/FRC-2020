@@ -31,6 +31,7 @@ public final class Constants {
     public static final int UPPER_SHOOTER_TALON_CAN = 22;
     public static final int LOWER_SHOOTER_TALON_CAN = 23;
     public static final int ELEVATOR_TALON_CAN = 24;
-    
-    
+    public static final int ELEVATOR_PCM_ID = 1;
+    public static final int ELEVATOR_UP_SOLENOID_PCM = 1;    
+    public static final int ELEVATOR_DOWN_SOLENOID_PCM = 2;
 }

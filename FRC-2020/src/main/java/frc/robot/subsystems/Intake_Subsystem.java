@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Constants;
@@ -30,6 +31,9 @@ public class Intake_Subsystem extends SubsystemBase {
   //Intake
   public WPI_TalonSRX intake_talon = new WPI_TalonSRX(Constants.INTAKE_TALON_CAN);
   
+  public DoubleSolenoid elevatorSolenoid = new DoubleSolenoid(Constants.ELEVATOR_PCM_ID, 
+          Constants.ELEVATOR_UP_SOLENOID_PCM, Constants.ELEVATOR_DOWN_SOLENOID_PCM);
+
   //magazine
   public WPI_TalonSRX magazine_talon = new WPI_TalonSRX(Constants.MAGAZINE_TALON_CAN);
   //shooters
@@ -51,6 +55,14 @@ public class Intake_Subsystem extends SubsystemBase {
 
   public Intake_Subsystem(){
 
+  }
+
+  public void intakeUp() {
+    elevatorSolenoid.set(DoubleSolenoid.Value.kForward);
+  }
+
+  public void intakeDown() {
+    elevatorSolenoid.set(DoubleSolenoid.Value.kReverse);
   }
 
   public boolean isIntakeUp(){

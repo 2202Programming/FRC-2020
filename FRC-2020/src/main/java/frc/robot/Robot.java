@@ -39,9 +39,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    // m_color = new Color_Subsystem();
-    lastLogTime = System.currentTimeMillis();
-    m_lidar_subsystem = new Lidar_Subsystem();
+
   }
 
   /**
@@ -59,13 +57,7 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     // m_color.updateColorSensor();
-    m_lidar_subsystem.updateLidar();
-    if (m_lidar_subsystem.getAverageRange() < 500){
-      m_robotContainer.m_lidardrive.x_speed = 0;
-    } else m_robotContainer.m_lidardrive.x_speed = 0.1;
 
-      m_lidar_subsystem.printLog();
-      lastLogTime = System.currentTimeMillis();
     }
 
     

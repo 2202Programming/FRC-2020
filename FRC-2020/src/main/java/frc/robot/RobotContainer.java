@@ -13,8 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.LidarUpdate;
 import frc.robot.commands.drive.LidarDrive;
 import frc.robot.commands.drive.MechanumDrive;
+import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Mechanum_Drivetrain;
 
 
@@ -31,6 +33,8 @@ public class RobotContainer {
   public static final XboxController driver = new XboxController(0);
   public MechanumDrive m_mechanumdrive = new MechanumDrive(drivetrain, driver);
   public LidarDrive m_lidardrive = new LidarDrive(drivetrain);
+  public Lidar_Subsystem m_lidar_subsystem = new Lidar_Subsystem();
+  public LidarUpdate m_lidarupdate = new LidarUpdate(m_lidar_subsystem, m_lidardrive);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -38,7 +42,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    //CommandScheduler.getInstance().setDefaultCommand(drivetrain, m_mechanumdrive);
+    CommandScheduler.getInstance().setDefaultCommand(m_lidar_subsystem, m_lidarupdate);
+    CommandScheduler.getInstance().setDefaultCommand(drivetrain, m_mechanumdrive);
   }
 
   /**

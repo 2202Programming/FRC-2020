@@ -5,10 +5,14 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import static frc.robot.Constants.*;
 
 public class GearShifter implements Subsystem {
-    
+    // define the gear ratios for high and low gear
+    private final double K_shaft = (12.0 /30.0) * (24.0 / 60.0); //motor and output stage
+    //shifter stage with 
+    public final double K_high = 1.0 * K_shaft;
+    public final double K_low = (1.0 / 2.65) * K_shaft; 
 
     public enum Gear {
-        HIGH_GEAR(DoubleSolenoid.Value.kForward), // ### need to check right order
+        HIGH_GEAR(DoubleSolenoid.Value.kForward), 
         LOW_GEAR(DoubleSolenoid.Value.kReverse);
 
         private final DoubleSolenoid.Value gearCode;
@@ -27,8 +31,6 @@ public class GearShifter implements Subsystem {
 
     // State
     private Gear curGear = Gear.LOW_GEAR;
-    private boolean autoShiftEnabled;
-    private double shiftPoint;
 
     public GearShifter() {
 
@@ -47,4 +49,15 @@ public class GearShifter implements Subsystem {
         gearShiftSolenoid.set(Gear.LOW_GEAR.solenoidCmd());
         curGear = Gear.LOW_GEAR;
     }
+
+    //current gear ratio
+    public double getGearRatio() { 
+        return (Gear.HIGH_GEAR == curGear) ? K_high : K_low;
+    }
+
+    // specific gear ratio - informational only
+    public double getGearRatio(Gear g) {
+        return (Gear.HIGH_GEAR == g) ? K_high : K_low;
+    }
+
 }

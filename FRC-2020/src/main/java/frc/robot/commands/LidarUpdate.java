@@ -30,7 +30,6 @@ public class LidarUpdate extends CommandBase {
 
   // Called repeatedly when this Command is scheduled to ru
   public void execute() {
-    m_lidarsubsystem.updateLidar();
     
     if (m_lidarsubsystem.getAverageRange() < 500){
      m_lidardrive.x_speed = 0;

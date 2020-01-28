@@ -12,10 +12,9 @@ import static frc.robot.Constants.*;
 public class Drivetrain implements Subsystem {
 
 	// TODO: find actual values for new chassis
-	// values in inches
-	public final double ENCODER_RIGHT_DISTANCE_PER_PULSE = 0.002396219298; // TODO: look into the
+	public final double ENCODER_RIGHT_DISTANCE_PER_PULSE = 1; // TODO: look into the
 																			// getPositionConversionFactor method
-	public final double ENCODER_LEFT_DISTANCE_PER_PULSE = 0.002399087014;
+	public final double ENCODER_LEFT_DISTANCE_PER_PULSE = 1;
 	public final int ENCODER_COUNTS_PER_REVOLUTION = 8192;
 	public final double WHEEL_RADIUS = 3;
 

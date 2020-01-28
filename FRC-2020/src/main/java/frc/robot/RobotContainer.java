@@ -28,7 +28,7 @@ import frc.robot.subsystems.GearShifter.Gear;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain driveTrain = new Drivetrain();
+  public static final Drivetrain driveTrain = new Drivetrain();
   private final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
   private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);

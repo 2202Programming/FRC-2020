@@ -5,6 +5,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import static frc.robot.Constants.*;
 
 public class Drivetrain implements Subsystem {
@@ -70,6 +72,14 @@ public class Drivetrain implements Subsystem {
 
 	public void resetRightEncoder() {
 		rightEncoder.setPosition(0);
+	}
+
+	public void log() {
+		SmartDashboard.putNumber("Right Position", getRightPos());
+		SmartDashboard.putNumber("Left Position", getLeftPos());
+
+		SmartDashboard.putNumber("Right Velocity", getRightVel());
+		SmartDashboard.putNumber("Left Velocity", getLeftVel());
 	}
 
 }

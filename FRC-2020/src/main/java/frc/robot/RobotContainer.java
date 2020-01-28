@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.ArcadeDrive;
+import frc.robot.commands.drive.TankDrive;
 import frc.robot.commands.drive.shift.ShiftGear;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.GearShifter;
@@ -31,7 +32,8 @@ public class RobotContainer {
   public static final Drivetrain driveTrain = new Drivetrain();
   private final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
-  private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
+  public static final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
+  public static TankDrive tank = new TankDrive(driveTrain, driver);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

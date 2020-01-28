@@ -17,9 +17,20 @@ package frc.robot;
  */
 public final class Constants {
 
+    //region I2C
     public static final int FRONT_LEFT_LIDAR = 21;
     public static final int FRONT_RIGHT_LIDAR = 22;
+    //endregion
+
+    //region Timing
     public static final double LIDAR_SAMPLE_TIME = 100; //in ms
     public static final double COLOR_SAMPLE_TIME = 100; //in ms
     public static final int LOG_REFRESH_RATE = 100; //in ms
+    //endregion
+
+    //region CAN
+    public static final int E_SPARKMAX_CANID = 14; //Extension Motor
+    public static final int E_ROT_SPARKMAX_CANID = 15; //Extension Arm Rotation Motor
+    public static final int WN_SPARKMAX_CANID = 16; //Winch Motor
+    //endregion
 }

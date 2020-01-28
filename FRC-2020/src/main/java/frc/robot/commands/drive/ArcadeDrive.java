@@ -31,9 +31,9 @@ public class ArcadeDrive implements Command {
 
     public void execute() {
         // Robot.driveTrain.ArcadeDrive(0.90, 0, true);
-        double s = speedShaper.expo(xbox.getY(Hand.kLeft));
+        double s = 0.8* speedShaper.expo(xbox.getY(Hand.kLeft));
         // soften the input by limiting the max input
-        double rot = rotationShaper.expo(0.8 * xbox.getX(Hand.kRight));
+        double rot = 0.8 * rotationShaper.expo(xbox.getX(Hand.kRight));
         drive.arcadeDrive(s, rot, false);
     }
 

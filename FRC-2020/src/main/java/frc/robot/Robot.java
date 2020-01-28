@@ -58,8 +58,9 @@ public class Robot extends TimedRobot {
     if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
       // m_color.printLog();
       lastLogTime = System.currentTimeMillis();
-      RobotContainer.driveTrain.log();
     }
+    
+    RobotContainer.driveTrain.log();
 
     
   }
@@ -104,6 +105,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    RobotContainer.driveTrain.resetLeftEncoder();
+    RobotContainer.driveTrain.resetRightEncoder();
     
   }
 

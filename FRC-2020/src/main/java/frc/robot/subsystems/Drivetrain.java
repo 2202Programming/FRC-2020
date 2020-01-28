@@ -9,9 +9,8 @@ import static frc.robot.Constants.*;
 
 public class Drivetrain implements Subsystem {
 
-        //TODO: find actual values for new chassis
-        public final double ENCODER_RIGHT_DISTANCE_PER_PULSE = 0.002396219298; //TODO: look into the getPositionConversionFactor method
-        public final double ENCODER_LEFT_DISTANCE_PER_PULSE = 0.002399087014;
+        public final double ENCODER_RIGHT_DISTANCE_PER_PULSE = 0.002399;
+        public final double ENCODER_LEFT_DISTANCE_PER_PULSE  = 0.002399;
         public final int ENCODER_COUNTS_PER_REVOLUTION = 8192;
         public final double WHEEL_RADIUS = 3;
 
@@ -40,7 +39,6 @@ public class Drivetrain implements Subsystem {
                 //Encoders
                 leftEncoder = frontLeft.getEncoder();
                 rightEncoder = frontRight.getEncoder();
-
         }
 
         public void arcadeDrive(double xSpeed, double rotationSpeed) {

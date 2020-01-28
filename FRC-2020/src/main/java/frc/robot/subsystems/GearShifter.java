@@ -8,7 +8,7 @@ public class GearShifter implements Subsystem {
     
 
     public enum Gear {
-        HIGH_GEAR(DoubleSolenoid.Value.kForward), // ### need to check right order
+        HIGH_GEAR(DoubleSolenoid.Value.kForward),
         LOW_GEAR(DoubleSolenoid.Value.kReverse);
 
         private final DoubleSolenoid.Value gearCode;
@@ -27,11 +27,8 @@ public class GearShifter implements Subsystem {
 
     // State
     private Gear curGear = Gear.LOW_GEAR;
-    private boolean autoShiftEnabled;
-    private double shiftPoint;
-
+    
     public GearShifter() {
-
     }
     
     public Gear getCurGear() {

@@ -25,7 +25,6 @@ public class LidarUpdate extends CommandBase {
     // eg. requires(chassis);
     m_lidardrive = y;
     m_lidarsubsystem = x;
-
   }
 
   // Called repeatedly when this Command is scheduled to ru

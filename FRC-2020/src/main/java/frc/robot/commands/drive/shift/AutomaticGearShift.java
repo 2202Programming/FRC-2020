@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.GearShifter;
-import frc.robot.subsystems.GearShifter.Gear;
+//import frc.robot.subsystems.GearShifter.Gear;
 
 public class AutomaticGearShift implements Command {
     public static final double MAXSPEED_IN_COUNTS_PER_SECOND = 10000; // TODO: Find real values for these constants
@@ -22,8 +22,8 @@ public class AutomaticGearShift implements Command {
     public static final double DEADZONE = 0.02;
     public static final double TURNING_DEADZONE = 500;
 
-    private final double MAX_OUTPUT = 1.0;
-    private final double RIGHT_SIDE_INVERT_MULTIPLIER = -1.0;
+    //private final double MAX_OUTPUT = 1.0;
+    //private final double RIGHT_SIDE_INVERT_MULTIPLIER = -1.0;
 
     private GearShifter shifter;
     private Drivetrain drive;
@@ -34,7 +34,8 @@ public class AutomaticGearShift implements Command {
     }
 
     public void execute() {
-        Gear curGear = shifter.getCurGear();
+       // Gear curGear =   
+       shifter.getCurGear();
     }
 
     @Override

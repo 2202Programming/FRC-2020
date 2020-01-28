@@ -12,8 +12,8 @@ import static frc.robot.Constants.*;
 public class Drivetrain implements Subsystem {
 
 	// TODO: find actual values for new chassis
-	public final double ENCODER_RIGHT_DISTANCE_PER_PULSE = 1; // TODO: look into the
-																			// getPositionConversionFactor method
+	//It looks like the raw getPosition() actually gets the distance in inches somehow
+	public final double ENCODER_RIGHT_DISTANCE_PER_PULSE = 1;
 	public final double ENCODER_LEFT_DISTANCE_PER_PULSE = 1;
 	public final int ENCODER_COUNTS_PER_REVOLUTION = 8192;
 	public final double WHEEL_RADIUS = 3;
@@ -56,11 +56,11 @@ public class Drivetrain implements Subsystem {
 	}
 
 	public double getLeftPos() {
-		return leftEncoder.getPosition() * ENCODER_LEFT_DISTANCE_PER_PULSE;
+		return leftEncoder.getPosition(); //* ENCODER_LEFT_DISTANCE_PER_PULSE;
 	}
 
 	public double getLeftVel() {
-		return leftEncoder.getVelocity() * kSamplePeriod * ENCODER_LEFT_DISTANCE_PER_PULSE;
+		return leftEncoder.getVelocity(); //* kSamplePeriod * ENCODER_LEFT_DISTANCE_PER_PULSE;
 	}
 
 	public void resetLeftEncoder() {
@@ -68,11 +68,11 @@ public class Drivetrain implements Subsystem {
 	}
 
 	public double getRightPos() {
-		return rightEncoder.getPosition() * ENCODER_RIGHT_DISTANCE_PER_PULSE;
+		return rightEncoder.getPosition(); //* ENCODER_RIGHT_DISTANCE_PER_PULSE;
 	}
 
 	public double getRightVel() {
-		return rightEncoder.getVelocity() * kSamplePeriod * ENCODER_RIGHT_DISTANCE_PER_PULSE;
+		return rightEncoder.getVelocity(); //* kSamplePeriod * ENCODER_RIGHT_DISTANCE_PER_PULSE;
 	}
 
 	public void resetRightEncoder() {

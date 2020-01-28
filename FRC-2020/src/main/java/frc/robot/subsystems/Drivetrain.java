@@ -50,6 +50,11 @@ public class Drivetrain implements Subsystem {
 		drive.arcadeDrive(xSpeed, -rotationSpeed, squareInputs);
 	}
 
+	public void tankDrive(double speedLeft, double speedRight, boolean squareInputs)
+	{
+		drive.tankDrive(speedLeft, speedRight, squareInputs);
+	}
+
 	public double getLeftPos() {
 		return leftEncoder.getPosition(); //* ENCODER_LEFT_DISTANCE_PER_PULSE;
 	}

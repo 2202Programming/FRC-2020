@@ -91,6 +91,7 @@ public class DriveWithLidarToDistanceCmd extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return distancePIDController.atSetpoint();
+//    return distancePIDController.atSetpoint();
+return false;
   }
 }

@@ -31,8 +31,8 @@ public class Lidar_Subsystem extends SubsystemBase {
     front_left_lidar = new TimeOfFlight(Constants.FRONT_LEFT_LIDAR);
     front_right_lidar = new TimeOfFlight(Constants.FRONT_RIGHT_LIDAR);
 
-    front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Medium, Constants.LIDAR_SAMPLE_TIME);
-    front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Medium, Constants.LIDAR_SAMPLE_TIME);
+    front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, Constants.LIDAR_SAMPLE_TIME);
+    front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, Constants.LIDAR_SAMPLE_TIME);
 
     System.out.println(front_left_lidar.getRange());
   }

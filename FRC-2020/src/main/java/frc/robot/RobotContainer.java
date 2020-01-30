@@ -32,7 +32,7 @@ public class RobotContainer {
   public static final XboxController driver = new XboxController(0);
   public Mechanum_Joystick_Drive_Cmd m_mechanumdrive_cmd = new Mechanum_Joystick_Drive_Cmd(drivetrain, driver);
   public Lidar_Subsystem m_lidar_subsystem = new Lidar_Subsystem();
-  public DriveWithLidarToDistanceCmd m_lidardrive = new DriveWithLidarToDistanceCmd(drivetrain,m_lidar_subsystem,5,0.5);
+  public DriveWithLidarToDistanceCmd m_lidardrive = new DriveWithLidarToDistanceCmd(drivetrain,m_lidar_subsystem,10, 0.5);
   //public LidarUpdate m_lidarupdate = new LidarUpdate(m_lidar_subsystem, m_lidardrive);
 
   /**

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.drive.MechanumDrive;
+import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Mechanum_Drivetrain;
 
 
@@ -31,6 +32,8 @@ public class RobotContainer {
   public static final XboxController driver = new XboxController(0);
   //private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
   public MechanumDrive m_mechanumdrive = new MechanumDrive(drivetrain, driver);
+
+  public Limelight_Subsystem limelight = new Limelight_Subsystem();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

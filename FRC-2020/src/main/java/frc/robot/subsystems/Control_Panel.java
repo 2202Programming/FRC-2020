@@ -31,4 +31,13 @@ public class Control_Panel extends SubsystemBase
       // This method will be called once per scheduler run
     }
 
+    public void setSpeed(double x)
+    {
+        m_talon.set(shaper.expo(x));
+    }
+
+    public void print()
+    {
+        
+    }
 }

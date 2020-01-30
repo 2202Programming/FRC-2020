@@ -115,7 +115,7 @@ public class AutomaticGearShift implements Command {
 
         return Math.min(leftThrottle, rightThrottle);
     }
-
+    
     /**
      * Limit motor values to the -1.0 to +1.0 range.
      */

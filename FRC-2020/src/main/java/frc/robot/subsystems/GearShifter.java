@@ -50,4 +50,8 @@ public class GearShifter implements Subsystem {
     public void setAutoShift(boolean autoShifting) {
         autoShiftEnabled = autoShifting;
     }
+
+    public boolean isAutoShift() {
+        return autoShiftEnabled;
+    }
 }

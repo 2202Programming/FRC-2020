@@ -184,7 +184,6 @@ public class AutomaticGearShift implements Command {
     @Override
     public Set<Subsystem> getRequirements() {
         Set<Subsystem> subs = new HashSet<Subsystem>();
-        subs.add(drive);
         subs.add(shifter);
         return subs;
     }

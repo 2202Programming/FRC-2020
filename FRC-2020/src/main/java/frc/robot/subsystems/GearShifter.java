@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import static frc.robot.Constants.*;
 
@@ -30,7 +31,7 @@ public class GearShifter implements Subsystem {
     private double shiftPoint;
 
     public GearShifter() {
-
+        autoShiftEnabled = false;
     }
     
     public Gear getCurGear() {
@@ -53,5 +54,9 @@ public class GearShifter implements Subsystem {
 
     public boolean isAutoShift() {
         return autoShiftEnabled;
+    }
+
+    public void log() {
+        SmartDashboard.putBoolean("Auto-Shift Enabled", autoShiftEnabled);
     }
 }

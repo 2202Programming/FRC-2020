@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.drive.shift.AutomaticGearShift;
 import frc.robot.commands.drive.shift.ShiftGear;
+import frc.robot.commands.drive.shift.ThrottledUpShift;
 import frc.robot.commands.drive.shift.ToggleAutoShift;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.GearShifter;
@@ -31,7 +32,7 @@ import frc.robot.subsystems.GearShifter.Gear;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static final Drivetrain driveTrain = new Drivetrain();
-  private final GearShifter gearShifter = new GearShifter();
+  public static final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
   private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
 
@@ -42,7 +43,6 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
-    CommandScheduler.getInstance().setDefaultCommand(gearShifter, new AutomaticGearShift(driveTrain, gearShifter));
   }
 
   /**
@@ -52,7 +52,7 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(driver, 4).whenPressed(new ShiftGear(gearShifter, Gear.HIGH_GEAR));
+    new JoystickButton(driver, 4).whenPressed(new ThrottledUpShift(driveTrain, gearShifter));
     new JoystickButton(driver, 1).whenPressed(new ShiftGear(gearShifter, Gear.LOW_GEAR));
     new JoystickButton(driver, 2).whenPressed(new ToggleAutoShift(gearShifter, driveTrain));
   }

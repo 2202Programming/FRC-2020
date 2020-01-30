@@ -34,6 +34,7 @@ public class Lidar_Subsystem extends SubsystemBase {
     front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Medium, Constants.LIDAR_SAMPLE_TIME);
     front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Medium, Constants.LIDAR_SAMPLE_TIME);
 
+    System.out.println(front_left_lidar.getRange());
   }
 
   public double getAverageRange() {
@@ -72,5 +73,6 @@ public class Lidar_Subsystem extends SubsystemBase {
     right_lidar_range = front_right_lidar.getRange();
     findAngle();
     validRange = valid();
-  }
+    printLog();
+    }
 }

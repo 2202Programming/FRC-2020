@@ -8,9 +8,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.controller.PIDController;
 //import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Mechanum_Drivetrain;
 
@@ -22,8 +23,10 @@ public class DriveWithLidarToDistanceCmd extends CommandBase {
 
   private final double stopDist; // inches
   private double tolerancePct = .05;
+  private double kInchesToPerPower = -0.5;
+  private double maxSpeed = 0.1;
 
-  private final double Kp = 0.01, Ki = 0.0, Kd = 0.0;
+  private final double Kp = 0.1, Ki = 0.0, Kd = 0.0;
   private final PIDController distancePIDController;
 
   /**
@@ -41,7 +44,8 @@ public class DriveWithLidarToDistanceCmd extends CommandBase {
       final double stopDist, final double maxSpeed) {
     this.drive = drive;
     this.lidar = lidar;
-    this.stopDist = stopDist;
+    this.stopDist = stopDist; //inches
+    this.maxSpeed = maxSpeed;
 
     // create the PID with vel and accl limits
     distancePIDController = new PIDController(Kp, Ki, Kd);
@@ -62,7 +66,7 @@ public class DriveWithLidarToDistanceCmd extends CommandBase {
   public void initialize() {
     distancePIDController.reset();
     distancePIDController.setSetpoint(stopDist);
-    distancePIDController.setTolerance(stopDist * tolerancePct);
+    distancePIDController.setTolerance(stopDist * tolerancePct, 0.5);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -70,10 +74,13 @@ public class DriveWithLidarToDistanceCmd extends CommandBase {
   public void execute() {
     // read Lidar range
     double range = lidar.getAverageRange() * mm2in;
-    double speedCmd = distancePIDController.calculate(range);
-
+    double speedCmd = distancePIDController.calculate(range) * kInchesToPerPower;
+    speedCmd = MathUtil.clamp(speedCmd, -maxSpeed, maxSpeed);
+    SmartDashboard.putNumber("PID error (inches)", distancePIDController.getPositionError());
+    SmartDashboard.putNumber("Range (inches)", range);
+    SmartDashboard.putNumber("PID Output (%)", speedCmd);
     // move forward, no rotation
-    drive.driveCartesian(speedCmd, 0.0, 0.0);
+    drive.driveCartesian(0.0, 0.0, speedCmd);
   }
 
   // Called once the command ends or is interrupted.

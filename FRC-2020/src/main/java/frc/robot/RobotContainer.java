@@ -14,9 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DriveWithLidarToDistanceCmd;
-import frc.robot.commands.LidarUpdate;
-import frc.robot.commands.drive.LidarDrive;
-import frc.robot.commands.drive.MechanumDrive;
+import frc.robot.commands.Mechanum_Joystick_Drive_Cmd;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Mechanum_Drivetrain;
 
@@ -32,9 +30,9 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final Mechanum_Drivetrain drivetrain = new Mechanum_Drivetrain();
   public static final XboxController driver = new XboxController(0);
-  public MechanumDrive m_mechanumdrive = new MechanumDrive(drivetrain, driver);
+  public Mechanum_Joystick_Drive_Cmd m_mechanumdrive_cmd = new Mechanum_Joystick_Drive_Cmd(drivetrain, driver);
   public Lidar_Subsystem m_lidar_subsystem = new Lidar_Subsystem();
-  public DriveWithLidarToDistanceCmd m_lidardrive = new DriveWithLidarToDistanceCmd(drivetrain,m_lidar_subsystem,500,0.1);
+  public DriveWithLidarToDistanceCmd m_lidardrive = new DriveWithLidarToDistanceCmd(drivetrain,m_lidar_subsystem,5,0.5);
   //public LidarUpdate m_lidarupdate = new LidarUpdate(m_lidar_subsystem, m_lidardrive);
 
   /**
@@ -44,7 +42,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     //CommandScheduler.getInstance().setDefaultCommand(m_lidar_subsystem, m_lidarupdate);
-    CommandScheduler.getInstance().setDefaultCommand(drivetrain, m_mechanumdrive);
+    CommandScheduler.getInstance().setDefaultCommand(drivetrain, m_mechanumdrive_cmd);
   }
 
   /**
@@ -56,7 +54,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     JoystickButton b_button = new JoystickButton(driver, 2);
     b_button.whenHeld(m_lidardrive);
-    b_button.whenInactive(m_mechanumdrive);
+    b_button.whenInactive(m_mechanumdrive_cmd);
 
   }
 

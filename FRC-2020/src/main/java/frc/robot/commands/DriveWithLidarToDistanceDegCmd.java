@@ -35,7 +35,7 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
    * 
    * stopDistance = inches to stop from the wall maxSpeed = percent max speed (+-
    * 1.0 max)
-   * 
+   * angleTarget = degrees from front of robot to target
    * Recommend using this command with withTimeout()
    * 
    * D Laufenberg
@@ -94,7 +94,7 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
     SmartDashboard.putNumber("PID error (degrees)", anglePIDController.getPositionError());
     SmartDashboard.putNumber("Angle", lidar.findAngle());
     SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
-    // move forward, no rotation
+    // move forward, with rotation
     drive.driveCartesian(angleCmd, 0.0, speedCmd);
   }
 

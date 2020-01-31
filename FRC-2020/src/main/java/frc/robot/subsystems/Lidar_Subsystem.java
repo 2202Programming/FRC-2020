@@ -71,10 +71,13 @@ public class Lidar_Subsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    left_lidar_range = front_left_lidar.getRange();
-    right_lidar_range = front_right_lidar.getRange();
-    findAngle();
     validRange = valid();
+    if (validRange) { // only update lidar variables if both lidar are valid currently
+      left_lidar_range = front_left_lidar.getRange();
+      right_lidar_range = front_right_lidar.getRange();
+      findAngle();
+    }
+    
     printLog();
     }
 }

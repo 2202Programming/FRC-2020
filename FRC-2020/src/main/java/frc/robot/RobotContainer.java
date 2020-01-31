@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DriveWithLidarToDistanceCmd;
+import frc.robot.commands.DriveWithLidarToDistanceDegCmd;
 import frc.robot.commands.Mechanum_Joystick_Drive_Cmd;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Mechanum_Drivetrain;
@@ -32,8 +33,8 @@ public class RobotContainer {
   public static final XboxController driver = new XboxController(0);
   public Mechanum_Joystick_Drive_Cmd m_mechanumdrive_cmd = new Mechanum_Joystick_Drive_Cmd(drivetrain, driver);
   public Lidar_Subsystem m_lidar_subsystem = new Lidar_Subsystem();
-  public DriveWithLidarToDistanceCmd m_lidardrive = new DriveWithLidarToDistanceCmd(drivetrain,m_lidar_subsystem,10, 0.5);
-  //public LidarUpdate m_lidarupdate = new LidarUpdate(m_lidar_subsystem, m_lidardrive);
+  //public DriveWithLidarToDistanceCmd m_lidardrive = new DriveWithLidarToDistanceCmd(drivetrain,m_lidar_subsystem,10, 0.5);
+  public DriveWithLidarToDistanceDegCmd m_lidardrive_cmd = new DriveWithLidarToDistanceDegCmd(drivetrain,m_lidar_subsystem,10,0,0.5);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -53,7 +54,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     JoystickButton b_button = new JoystickButton(driver, 2);
-    b_button.whenHeld(m_lidardrive);
+    b_button.whenHeld(m_lidardrive_cmd);
     b_button.whenInactive(m_mechanumdrive_cmd);
 
   }

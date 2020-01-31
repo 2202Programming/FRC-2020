@@ -41,7 +41,7 @@ public class Lidar_Subsystem extends SubsystemBase {
     return ((left_lidar_range+right_lidar_range)/2);
   }
 
-  public void findAngle(){
+  public double findAngle(){
     //getRange() returns distance in milimeters 
     double dist2 = left_lidar_range;
     double dist1 = right_lidar_range;
@@ -49,6 +49,8 @@ public class Lidar_Subsystem extends SubsystemBase {
     double difference = dist1 - dist2;
   
     angle = Math.toDegrees(Math.atan(difference/LIDAR_DIST));
+
+    return angle;
 
   }
 

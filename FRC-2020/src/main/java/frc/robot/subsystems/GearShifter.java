@@ -11,12 +11,13 @@ public class GearShifter implements Subsystem {
     //shifter stage with 
     public final double K_high = 1.0 * K_shaft;
     public final double K_low = (1.0 / 2.65) * K_shaft; 
-
+    private boolean autoShiftEnabled = false;
+    
     public enum Gear {
         HIGH_GEAR(DoubleSolenoid.Value.kForward), 
         LOW_GEAR(DoubleSolenoid.Value.kReverse);
 
-        private final DoubleSolenoid.Value gearCode;
+        private final DoubleSolenoid.Value gearCode;    
 
         Gear(DoubleSolenoid.Value value) {
             gearCode = value;
@@ -34,7 +35,7 @@ public class GearShifter implements Subsystem {
     private Gear curGear = Gear.LOW_GEAR;
 
     public GearShifter() {
-        autoShiftEnabled = true;
+
     }
     
     public Gear getCurGear() {

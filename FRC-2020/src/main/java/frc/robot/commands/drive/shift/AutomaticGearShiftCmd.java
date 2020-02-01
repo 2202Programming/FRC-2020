@@ -4,14 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;
 
-public class AutomaticGearShift implements Command {
+public class AutomaticGearShiftCmd extends CommandBase {
     public static final double MAXSPEED_IN_COUNTS_PER_SECOND = 10000; // TODO: Find real values for these constants
     public static final double UPSHIFT_SPEED_LOW = 0.3;
     public static final double UPSHIFT_SPEED_HIGH = 0.3;
@@ -28,17 +28,19 @@ public class AutomaticGearShift implements Command {
     private final double RIGHT_SIDE_INVERT_MULTIPLIER = -1.0;
 
     private GearShifter shifter;
-    private DriveTrain drive;
+    private ArcadeDrive drive;
 
-    public AutomaticGearShift(DriveTrain drive, GearShifter shifter) {
+    public AutomaticGearShiftCmd(ArcadeDrive drive, GearShifter shifter) {
         this.drive = drive;
         this.shifter = shifter;
+
+        addRequirements(drive, shifter);
     }
 
     public void execute() {
         Gear curGear = shifter.getCurGear();
-        double leftSpeed = Math.abs(drive.getLeftVel());
-        double rightSpeed = Math.abs(drive.getRightVel());
+        double leftSpeed = Math.abs(drive.getLeftVel(true));
+        double rightSpeed = Math.abs(drive.getRightVel(true));
         double curSpeed = (leftSpeed + rightSpeed) / 2;
         double shiftSpeed = getShiftSpeed(shifter.getCurGear(), getThrottle(true));
 

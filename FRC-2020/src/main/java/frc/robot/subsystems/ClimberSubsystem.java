@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  */
 public class ClimberSubsystem extends SubsystemBase
 {
+<<<<<<< HEAD
     //region Motors
     private CANSparkMax eSparkMax = new CANSparkMax(Constants.E_SPARKMAX_CANID, MotorType.kBrushed);  //Extension motor
     private CANSparkMax eROTSparkMax = new CANSparkMax(Constants.E_ROT_SPARKMAX_CANID, MotorType.kBrushless); //Extension arm rotation motor
@@ -28,6 +29,19 @@ public class ClimberSubsystem extends SubsystemBase
         eSparkMax.setIdleMode(IdleMode.kBrake);
         eROTSparkMax.setIdleMode(IdleMode.kBrake);
         wnSparkMax.setIdleMode(IdleMode.kBrake);
+=======
+    /** Initial knowledge of how the subsystem is to be run
+     * 775 motor used for rotation(Talon controller)
+     * neo motor used to shoot arm up(sparkmax controller)
+     * mechanical stop for rotation
+     * Ask Kevin for more info from Kevin
+     */
+
+    //Default constructor
+    public ClimberSubsystem() 
+    { 
+
+>>>>>>> 67513c3309149186b76d6dcb8a15fd8469b3c41a
     }
 
     @Override

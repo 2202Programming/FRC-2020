@@ -48,6 +48,7 @@ public class RobotContainer {
     configureButtonBindings();
     //CommandScheduler.getInstance().setDefaultCommand(m_lidar_subsystem, m_lidarupdate);
     CommandScheduler.getInstance().setDefaultCommand(drivetrain, m_mechanumdrive_cmd);
+    m_limelight_subsystem.disableLED();
   }
 
   /**

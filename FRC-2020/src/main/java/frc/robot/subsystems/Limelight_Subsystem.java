@@ -68,6 +68,14 @@ public class Limelight_Subsystem extends SubsystemBase {
     return target;
   }
 
+  public void disableLED() {
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+}
+
+public void enableLED() {
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+}
+
   public void log(int interval){
     if((interval + logTimer) < System.currentTimeMillis()){ //interval in ms
       logTimer = System.currentTimeMillis();

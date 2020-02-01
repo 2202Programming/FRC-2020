@@ -71,6 +71,7 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    limelight.enableLED();
     distancePIDController.reset();
     distancePIDController.setSetpoint(stopDist);
     distancePIDController.setTolerance(stopDist * tolerancePct, 0.5);
@@ -80,9 +81,6 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
     anglePIDController.setSetpoint(angleTarget);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
 
-    SmartDashboard.putNumber("Angle Drive P", Kap);
-    SmartDashboard.putNumber("Angle Drive I", Kai);
-    SmartDashboard.putNumber("Angle Drive D", Kad);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -106,9 +104,7 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
     SmartDashboard.putNumber("Angle", target_angle);
     SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
 
-    Kap = SmartDashboard.getNumber("Angle Drive P", Kap);
-    Kai = SmartDashboard.getNumber("Angle Drive I", Kai);
-    Kad = SmartDashboard.getNumber("Angle Drive D", Kad);
+    SmartDashboard.putData(anglePIDController);
 
     anglePIDController.setPID(Kap, Kai, Kad);
   
@@ -120,6 +116,7 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(final boolean interrupted) {
+    limelight.disableLED();
   }
 
   // Returns true when the command should end.

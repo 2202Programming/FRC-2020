@@ -10,23 +10,18 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake_Subsystem;
 
+/**
+ * Creates a new IntakeOn.
+ */
 public class IntakeOn extends CommandBase {
-  /**
-   * Creates a new IntakeOn.
-   */
 
   private static Intake_Subsystem m_intake;
   private double motorPower = 0.5;
 
-
   public IntakeOn(Intake_Subsystem m_intake) {
     // Use addRequirements() here to declare subsystem dependencies.
-    
     addRequirements(m_intake);
-
-
-    this.m_intake = m_intake;
-
+    IntakeOn.m_intake = m_intake;
   }
 
   // Called when the command is initially scheduled.

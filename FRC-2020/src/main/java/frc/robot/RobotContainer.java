@@ -13,11 +13,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.ControlPanelCMD;
+import frc.robot.commands.FSMReaderCmd;
+import frc.robot.commands.PositionControlPanelCommand;
+import frc.robot.commands.RotateControlPanelCommand;
 import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.drive.shift.ShiftGear;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;
+import frc.robot.triggers.ControlPanelTrigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -51,6 +56,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(driver, 4).whenPressed(() -> new ShiftGear(gearShifter, Gear.HIGH_GEAR));
     new JoystickButton(driver, 1).whenPressed(() -> new ShiftGear(gearShifter, Gear.LOW_GEAR));
+    //new ControlPanelTrigger(2).whenActive(new ControlPanelCMD(new FSMReaderCmd(), new PositionControlPanelCommand(color_detector, final_color), new RotateControlPanelCommand(color_detector, num_rotations)));
   }
 
   /**

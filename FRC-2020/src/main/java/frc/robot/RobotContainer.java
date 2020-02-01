@@ -34,7 +34,7 @@ public class RobotContainer {
   public Mechanum_Joystick_Drive_Cmd m_mechanumdrive_cmd = new Mechanum_Joystick_Drive_Cmd(drivetrain, driver);
   public Lidar_Subsystem m_lidar_subsystem = new Lidar_Subsystem();
   //public DriveWithLidarToDistanceCmd m_lidardrive = new DriveWithLidarToDistanceCmd(drivetrain,m_lidar_subsystem,10, 0.5);
-  public DriveWithLidarToDistanceDegCmd m_lidardrive_cmd = new DriveWithLidarToDistanceDegCmd(drivetrain,m_lidar_subsystem,10,0,0.5);
+  public DriveWithLidarToDistanceDegCmd m_lidardrive_cmd = new DriveWithLidarToDistanceDegCmd(drivetrain,m_lidar_subsystem,10,0,0.2);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

@@ -9,6 +9,7 @@ package frc.robot.subsystems;
 
 import com.playingwithfusion.TimeOfFlight;
 
+import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -25,6 +26,8 @@ public class Lidar_Subsystem extends SubsystemBase {
   private final double LIDAR_DIST = 368.3;
   private double angle;
   private boolean validRange;
+  private LinearFilter left_iir;
+  private LinearFilter right_iir;
 
   public Lidar_Subsystem() {
 
@@ -33,6 +36,9 @@ public class Lidar_Subsystem extends SubsystemBase {
 
     front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, Constants.LIDAR_SAMPLE_TIME);
     front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, Constants.LIDAR_SAMPLE_TIME);
+
+    left_iir = LinearFilter.singlePoleIIR(0.8, 0.02);
+    right_iir = LinearFilter.singlePoleIIR(0.8, 0.02);
 
     System.out.println(front_left_lidar.getRange());
   }
@@ -73,8 +79,8 @@ public class Lidar_Subsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     validRange = valid();
     if (validRange) { // only update lidar variables if both lidar are valid currently
-      left_lidar_range = front_left_lidar.getRange();
-      right_lidar_range = front_right_lidar.getRange();
+      left_lidar_range = left_iir.calculate(front_left_lidar.getRange());
+      right_lidar_range = right_iir.calculate(front_right_lidar.getRange());
       findAngle();
     }
     

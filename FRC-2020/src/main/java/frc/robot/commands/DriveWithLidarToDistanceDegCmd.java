@@ -22,11 +22,13 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
 
   private final double stopDist; // inches
   private double tolerancePct = .05;
-  private double kInchesToPerPower = -0.5;
-  private double maxSpeed = 0.1;
+  private double angleToleranceDeg = 3;
+  private double kInchesToPerPower = -0.8;
+  private double kDegreesToPerPower = -1;
+  private double maxSpeed;
   private double angleTarget;
-  private final double Kp = 0.1, Ki = 0.0, Kd = 0.0;
-  private final double Kap = 0.1, Kai = 0.0, Kad = 0.0;
+  private final double Kp = 0.2, Ki = 0.04, Kd = 0.25;
+  private final double Kap = 0.05, Kai = 0.001, Kad = 0.0;
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
 
@@ -71,10 +73,11 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
     distancePIDController.reset();
     distancePIDController.setSetpoint(stopDist);
     distancePIDController.setTolerance(stopDist * tolerancePct, 0.5);
+    distancePIDController.setIntegratorRange(0, 3);
 
     anglePIDController.reset();
     anglePIDController.setSetpoint(angleTarget);
-    anglePIDController.setTolerance(angleTarget * tolerancePct, 0.5);
+    anglePIDController.setTolerance(angleToleranceDeg, 0.5);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -83,11 +86,12 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
     // read Lidar range
     double range = lidar.getAverageRange() * mm2in;
     double speedCmd = distancePIDController.calculate(range) * kInchesToPerPower;
-    double angleCmd = anglePIDController.calculate(lidar.findAngle());
+    double angleCmd = kDegreesToPerPower * anglePIDController.calculate(lidar.findAngle());
     speedCmd = MathUtil.clamp(speedCmd, -maxSpeed, maxSpeed);
     angleCmd = MathUtil.clamp(angleCmd, -maxSpeed, maxSpeed);
 
-    SmartDashboard.putNumber("PID error (inches)", distancePIDController.getPositionError());
+    SmartDashboard.putNumber("PID error (inches)", distancePIDController.getPositionError());    
+    SmartDashboard.putNumber("PID Verr", distancePIDController.getVelocityError());
     SmartDashboard.putNumber("Range (inches)", range);
     SmartDashboard.putNumber("PID Output (%)", speedCmd);
 
@@ -95,7 +99,8 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
     SmartDashboard.putNumber("Angle", lidar.findAngle());
     SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
     // move forward, with rotation
-    drive.driveCartesian(angleCmd, 0.0, speedCmd);
+    
+    drive.driveCartesian(0.0, angleCmd, speedCmd);
   }
 
   // Called once the command ends or is interrupted.

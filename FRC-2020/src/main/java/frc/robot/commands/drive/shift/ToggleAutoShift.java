@@ -1,7 +1,12 @@
 package frc.robot.commands.drive.shift;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.GearShifter;
 
@@ -16,12 +21,20 @@ public class ToggleAutoShift extends InstantCommand {
 
     @Override
     public void execute() {
-        if(shifter.getDefaultCommand() != null && shifter.getDefaultCommand().getName().equals("AutomaticGearShift")) {
-            CommandScheduler.getInstance().setDefaultCommand(shifter, new AutomaticGearShift(drive, shifter));
+        if(CommandScheduler.getInstance().getDefaultCommand(shifter) != null && CommandScheduler.getInstance().getDefaultCommand(shifter).getName().equals("AutomaticGearShift")) {
             shifter.setAutoShift(false);
+            CommandScheduler scheduler = CommandScheduler.getInstance();
+            scheduler.setDefaultCommand(shifter, null);
         } else {
             CommandScheduler.getInstance().setDefaultCommand(shifter, new AutomaticGearShift(drive, shifter));
             shifter.setAutoShift(true);
         }
+    }
+
+    @Override
+    public Set<Subsystem> getRequirements() {
+        Set<Subsystem> subs = new HashSet<Subsystem>();
+        subs.add(shifter);
+        return subs;
     }
 }

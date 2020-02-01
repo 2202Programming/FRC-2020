@@ -31,7 +31,7 @@ public class GearShifter implements Subsystem {
     private double shiftPoint;
 
     public GearShifter() {
-        autoShiftEnabled = false;
+        autoShiftEnabled = true;
     }
     
     public Gear getCurGear() {
@@ -58,5 +58,6 @@ public class GearShifter implements Subsystem {
 
     public void log() {
         SmartDashboard.putBoolean("Auto-Shift Enabled", autoShiftEnabled);
+        SmartDashboard.putString("Current Gear", getCurGear().toString());
     }
 }

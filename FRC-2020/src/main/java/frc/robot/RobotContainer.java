@@ -34,7 +34,9 @@ public class RobotContainer {
   public static final Drivetrain driveTrain = new Drivetrain();
   public static final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
+
   private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
+  private final AutomaticGearShift autoGearShift = new AutomaticGearShift(driveTrain, gearShifter);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -43,6 +45,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
+    CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
   }
 
   /**
@@ -54,7 +57,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(driver, 4).whenPressed(new ThrottledUpShift(driveTrain, gearShifter));
     new JoystickButton(driver, 1).whenPressed(new ShiftGear(gearShifter, Gear.LOW_GEAR));
-    new JoystickButton(driver, 2).whenPressed(new ToggleAutoShift(gearShifter, driveTrain));
+    //new JoystickButton(driver, 2).whenPressed(new ToggleAutoShift(gearShifter, driveTrain));
   }
 
   /**

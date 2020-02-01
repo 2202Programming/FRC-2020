@@ -23,7 +23,6 @@ public class Intake_Subsystem extends SubsystemBase {
   /**
    * Creates a new Intake_Subsystem.
    */
-
    
   //Intake
   public WPI_TalonSRX intake_talon = new WPI_TalonSRX(Constants.INTAKE_TALON_CAN);
@@ -52,7 +51,7 @@ public class Intake_Subsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
   }
-
+/*
   public void intakeUp() {
     elevatorSolenoid.set(DoubleSolenoid.Value.kForward);
   }
@@ -60,6 +59,7 @@ public class Intake_Subsystem extends SubsystemBase {
   public void intakeDown() {
     elevatorSolenoid.set(DoubleSolenoid.Value.kReverse);
   }
+
 
   public boolean isIntakeUp(){
     //DIO
@@ -71,8 +71,11 @@ public class Intake_Subsystem extends SubsystemBase {
     return intake_down_sensor.get();
   }
 
-  public void intakeOn(){
-    intake_talon.set(0.2);
+  */
+
+  //motor strength should be between -1 and 1 for all functions
+  public void intakeOn(double motorStrength){
+    intake_talon.set(motorStrength);
   }
 
   
@@ -80,12 +83,8 @@ public class Intake_Subsystem extends SubsystemBase {
     intake_talon.set(0.0);
   }
 
-
-
-  //method to adjust intake elevator
-
-  public void magazineOn(){
-    magazine_talon.set(0.2);
+  public void magazineOn(double motorStrength){
+    magazine_talon.set(motorStrength);
   }
 
   
@@ -93,26 +92,21 @@ public class Intake_Subsystem extends SubsystemBase {
     magazine_talon.set(0);
   }
 
-  public void upperShooterOn(){
-    upper_shooter_talon.set(0.2);
+  public void ShooterOn(double motorStrength){
+    upper_shooter_talon.set(motorStrength);
+    lower_shooter_talon.set(motorStrength);
+
   }
 
-  
-  public void upperShooterOff(){
+  public void ShooterOff(){
     upper_shooter_talon.set(0);
-  }
-
-  
-  public void lowerShooterOn(){
-    lower_shooter_talon.set(0.2);
-  }
-
-  public void lowerShooterOff(){
     lower_shooter_talon.set(0);
+
   }
 
+/*
   public void elevatorOn(){
     elevator_talon.set(0.2);
   }
-
+*/
 }

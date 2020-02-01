@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DriveWithLidarToDistanceCmd;
 import frc.robot.commands.DriveWithLidarToDistanceDegCmd;
 import frc.robot.commands.Mechanum_Joystick_Drive_Cmd;
+import frc.robot.commands.drive.DriveWithLimelightToDistanceDegCmd;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Mechanum_Drivetrain;
@@ -37,6 +38,7 @@ public class RobotContainer {
   public Lidar_Subsystem m_lidar_subsystem = new Lidar_Subsystem();
   //public DriveWithLidarToDistanceCmd m_lidardrive = new DriveWithLidarToDistanceCmd(drivetrain,m_lidar_subsystem,10, 0.5);
   public DriveWithLidarToDistanceDegCmd m_lidardrive_cmd = new DriveWithLidarToDistanceDegCmd(drivetrain,m_lidar_subsystem,10,0,0.2);
+  public DriveWithLimelightToDistanceDegCmd m_limelight_cmd = new DriveWithLimelightToDistanceDegCmd(drivetrain, m_limelight_subsystem, 10, 0, 0.5);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -56,7 +58,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     JoystickButton b_button = new JoystickButton(driver, 2);
-    b_button.whenHeld(m_lidardrive_cmd);
+    b_button.whenHeld(m_limelight_cmd);
     b_button.whenInactive(m_mechanumdrive_cmd);
 
   }
@@ -71,3 +73,4 @@ public class RobotContainer {
     return new CommandBase() {};//m_autoCommand;
   }
 }
+

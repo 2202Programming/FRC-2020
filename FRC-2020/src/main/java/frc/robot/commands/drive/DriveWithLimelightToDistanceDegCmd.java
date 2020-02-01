@@ -29,7 +29,7 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   private double maxSpeed;
   private double angleTarget;
   private final double Kp = 0.2, Ki = 0.04, Kd = 0.25;
-  private final double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
+  private double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
 
@@ -79,6 +79,10 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
     anglePIDController.reset();
     anglePIDController.setSetpoint(angleTarget);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
+
+    SmartDashboard.putNumber("Angle Drive P", Kap);
+    SmartDashboard.putNumber("Angle Drive I", Kai);
+    SmartDashboard.putNumber("Angle Drive D", Kad);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -101,6 +105,12 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
    // SmartDashboard.putNumber("PID error (degrees)", anglePIDController.getPositionError());
     SmartDashboard.putNumber("Angle", target_angle);
     SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
+
+    Kap = SmartDashboard.getNumber("Angle Drive P", Kap);
+    Kai = SmartDashboard.getNumber("Angle Drive I", Kai);
+    Kad = SmartDashboard.getNumber("Angle Drive D", Kad);
+
+    anglePIDController.setPID(Kap, Kai, Kad);
   
     // move forward, with rotation
     

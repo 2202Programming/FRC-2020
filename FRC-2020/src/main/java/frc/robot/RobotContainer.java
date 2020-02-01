@@ -9,41 +9,57 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.drive.ArcadeDrive;
+import frc.robot.commands.drive.shift.AutomaticGearShift;
+import frc.robot.commands.drive.shift.ShiftGear;
+import frc.robot.commands.drive.shift.ThrottledUpShift;
+import frc.robot.commands.drive.shift.ToggleAutoShift;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.GearShifter;
+import frc.robot.subsystems.GearShifter.Gear;
 
 /**
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a "declarative" paradigm, very little robot logic should
+ * actually be handled in the {@link Robot} periodic methods (other than the
+ * scheduler calls). Instead, the structure of the robot (including subsystems,
+ * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  public static final DriveTrain driveTrain = new DriveTrain();
+  public static final GearShifter gearShifter = new GearShifter();
+  public static final XboxController driver = new XboxController(0);
 
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
-
-
+  private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
+  private final AutomaticGearShift autoGearShift = new AutomaticGearShift(driveTrain, gearShifter);
 
   /**
-   * The container for the robot.  Contains subsystems, OI devices, and commands.
+   * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
+    CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
   }
 
   /**
-   * Use this method to define your button->command mappings.  Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
-   * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by instantiating a {@link GenericHID} or one of its subclasses
+   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
+   * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    new JoystickButton(driver, 4).whenPressed(new ThrottledUpShift(driveTrain, gearShifter));
+    new JoystickButton(driver, 1).whenPressed(new ShiftGear(gearShifter, Gear.LOW_GEAR));
+    //new JoystickButton(driver, 2).whenPressed(new ToggleAutoShift(gearShifter, driveTrain));
   }
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -52,6 +68,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    return new CommandBase() {};//m_autoCommand;
   }
 }

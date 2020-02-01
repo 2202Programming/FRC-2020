@@ -32,6 +32,7 @@ public class GearShifter implements Subsystem {
 
     // State
     private Gear curGear = Gear.LOW_GEAR;
+    private boolean autoShiftEnabled;
 
     public GearShifter() {
         autoShiftEnabled = true;

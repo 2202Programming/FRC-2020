@@ -28,6 +28,7 @@ public class Lidar_Subsystem extends SubsystemBase {
   private boolean validRange;
   private LinearFilter left_iir;
   private LinearFilter right_iir;
+  private double filterTC = 0.8;   //seconds, cutoff 1.25Hz
 
   public Lidar_Subsystem() {
 
@@ -37,10 +38,9 @@ public class Lidar_Subsystem extends SubsystemBase {
     front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, Constants.LIDAR_SAMPLE_TIME);
     front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, Constants.LIDAR_SAMPLE_TIME);
 
-    left_iir = LinearFilter.singlePoleIIR(0.8, 0.02);
-    right_iir = LinearFilter.singlePoleIIR(0.8, 0.02);
-
-    System.out.println(front_left_lidar.getRange());
+    // use a lowpass filter to clean up high freq noise. Helpful if you use a PID with any D.
+    left_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
+    right_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
   }
 
   public double getAverageRange() {
@@ -51,13 +51,9 @@ public class Lidar_Subsystem extends SubsystemBase {
     //getRange() returns distance in milimeters 
     double dist2 = left_lidar_range;
     double dist1 = right_lidar_range;
-  
     double difference = dist1 - dist2;
-  
     angle = Math.toDegrees(Math.atan(difference/LIDAR_DIST));
-
     return angle;
-
   }
 
   public void printLog() {

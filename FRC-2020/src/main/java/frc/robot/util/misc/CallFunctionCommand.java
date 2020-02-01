@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.misc;
 
 import java.util.function.IntSupplier;
 import edu.wpi.first.wpilibj2.command.InstantCommand;

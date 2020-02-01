@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.misc;
 
 // Converts angle relative to horizontal to angle relative to vertical
 public enum Angle {

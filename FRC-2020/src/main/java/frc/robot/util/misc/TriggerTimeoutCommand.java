@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.misc;
 
 import java.util.Set;
 import java.util.function.BooleanSupplier;

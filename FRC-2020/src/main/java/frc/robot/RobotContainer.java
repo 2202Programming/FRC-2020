@@ -18,7 +18,8 @@ import frc.robot.commands.drive.shift.AutomaticGearShift;
 import frc.robot.commands.drive.shift.ShiftGear;
 import frc.robot.commands.drive.shift.ThrottledUpShift;
 import frc.robot.commands.drive.shift.ToggleAutoShift;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;
 
@@ -31,7 +32,7 @@ import frc.robot.subsystems.GearShifter.Gear;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  public static final Drivetrain driveTrain = new Drivetrain();
+  public static final DriveTrain driveTrain = new DriveTrain();
   public static final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
 

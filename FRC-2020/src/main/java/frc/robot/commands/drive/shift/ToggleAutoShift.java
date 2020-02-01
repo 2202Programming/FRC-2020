@@ -5,16 +5,15 @@ import java.util.Set;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.GearShifter;
 
 public class ToggleAutoShift implements Command {
     private GearShifter shifter;
-    private Drivetrain drive;
+    private DriveTrain drive;
 
-    public ToggleAutoShift(GearShifter shifter, Drivetrain drive) {
+    public ToggleAutoShift(GearShifter shifter, DriveTrain drive) {
         this.shifter = shifter;
         this.drive = drive;
     }
@@ -33,7 +32,7 @@ public class ToggleAutoShift implements Command {
 
     @Override
     public boolean isFinished() {
-        return false;
+        return true;
     }
 
     @Override

@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static frc.robot.Constants.*;
 
-public class Drivetrain implements Subsystem {
+public class DriveTrain implements Subsystem {
 
 	// TODO: find actual values for new chassis
 	public final double ENCODER_RIGHT_DISTANCE_PER_PULSE = 0.005;
@@ -31,7 +31,7 @@ public class Drivetrain implements Subsystem {
 
 	private DifferentialDrive drive;
 
-	public Drivetrain() {
+	public DriveTrain() {
 		// Have motors follow to use Differential Drive
 		middleRight.follow(frontRight);
 		middleLeft.follow(frontLeft);

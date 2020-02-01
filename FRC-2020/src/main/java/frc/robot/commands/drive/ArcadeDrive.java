@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.ExpoShaper;
 
 public class ArcadeDrive implements Command {
     private ExpoShaper speedShaper;
     private ExpoShaper rotationShaper;
-    private Drivetrain drive;
+    private DriveTrain drive;
     private XboxController xbox;
 
     @Override
@@ -22,7 +22,7 @@ public class ArcadeDrive implements Command {
         return false;
     }
 
-    public ArcadeDrive(Drivetrain drive, XboxController controller) {
+    public ArcadeDrive(DriveTrain drive, XboxController controller) {
         this.drive = drive;
         xbox = controller;
         speedShaper = new ExpoShaper(0.6);

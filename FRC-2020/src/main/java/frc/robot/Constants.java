@@ -32,5 +32,6 @@ public final class Constants {
     public static final int E_SPARKMAX_CANID = 14; //Extension Motor
     public static final int E_ROT_SPARKMAX_CANID = 15; //Extension Arm Rotation Motor
     public static final int WN_SPARKMAX_CANID = 16; //Winch Motor
+    public static final int FLOOR_SENSOR = 17; //Time of Flight sensor, measures distance from floor
     //endregion
 }

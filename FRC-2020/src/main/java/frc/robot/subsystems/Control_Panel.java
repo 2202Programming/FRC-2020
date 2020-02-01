@@ -6,23 +6,31 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot.subsystems;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.ExpoShaper;
 
 public class Control_Panel extends SubsystemBase
 {
-    private static final double KEXPO = 0.5;
     private static final int TALON_CHANNEL = 1;
+    private static final int CHANNEL_A = 1;
+    private static final int CHANNEL_B = 2;
 
-    private ExpoShaper shaper;
     private Talon m_talon;
+    private Encoder m_encoder;
 
     /*Initialization*/
-    public Control_Panel()
+    public Control_Panel(double distance_per_pulse, double minRate, double maxPeriod, int sampleToAverage)
     {
-        shaper = new ExpoShaper(KEXPO);
         m_talon = new Talon(TALON_CHANNEL);
+        m_encoder = new Encoder(CHANNEL_A,CHANNEL_B);
+        m_encoder.setDistancePerPulse(distance_per_pulse);
+        m_encoder.setMinRate(minRate);
+        m_encoder.setMaxPeriod(maxPeriod);
+        m_encoder.setSamplesToAverage(sampleToAverage);
     }
 
     @Override
@@ -33,11 +41,24 @@ public class Control_Panel extends SubsystemBase
 
     public void setSpeed(double x)
     {
-        m_talon.set(shaper.expo(x));
+         m_talon.set(x);
+    }
+
+    public double getDistance()
+    {
+        return m_encoder.getDistance();
+    }
+
+
+    public void resetEncoder()
+    {
+        m_encoder.reset();
     }
 
     public void print()
     {
-        
+        SmartDashboard.putNumber("Distance", m_encoder.getDistance());
+        SmartDashboard.putNumber("Distance per Pulse", m_encoder.getDistancePerPulse());
+        SmartDashboard.putNumber("Speed", m_talon.get());
     }
 }

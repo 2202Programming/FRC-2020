@@ -3,6 +3,7 @@ package frc.robot.commands;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.Color_Subsystem;
 
@@ -10,7 +11,7 @@ import frc.robot.subsystems.Color_Subsystem;
 /**
  * Rotates the control panel an indicated number of times.
  */
-public class RotateControlPanelCommand implements Command {
+public class RotateControlPanelCommand extends CommandBase {
     private Color_Subsystem color_detector;
     private int numRotationsNeeded;
     private int degreesRotated = 0;
@@ -40,7 +41,6 @@ public class RotateControlPanelCommand implements Command {
     @Override
     public void execute() {
         // TODO Auto-generated method stub
-        Command.super.execute();
     }
 
     @Override

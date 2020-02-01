@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.GearShifter;
 
-public class ToggleAutoShift extends InstantCommand {
+public class ToggleAutoShift implements Command {
     private GearShifter shifter;
     private Drivetrain drive;
 
@@ -29,6 +29,11 @@ public class ToggleAutoShift extends InstantCommand {
             CommandScheduler.getInstance().setDefaultCommand(shifter, new AutomaticGearShift(drive, shifter));
             shifter.setAutoShift(true);
         }
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package frc.robot.input;
+package frc.robot.util;
 
 public class Converter {
     /**

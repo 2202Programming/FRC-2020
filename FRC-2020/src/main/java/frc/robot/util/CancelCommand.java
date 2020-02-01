@@ -1,7 +1,7 @@
-package frc.robot.commands.util;
+package frc.robot.util;
 
-import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class CancelCommand extends InstantCommand {
     private Command command;
@@ -11,7 +11,7 @@ public class CancelCommand extends InstantCommand {
     }
 
     @Override
-    protected void execute() {
+    public void execute() {
         command.cancel();
     }
 }

@@ -2,10 +2,10 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
 
-public class GearShifter implements Subsystem {
+public class GearShifter extends SubsystemBase {
     // define the gear ratios for high and low gear
     private final double K_shaft = (12.0 /30.0) * (24.0 / 60.0); //motor and output stage
     //shifter stage with 

@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.ifx.ArcadeDrive;
 
 /**
  * An example command. You can replace me with your own command.

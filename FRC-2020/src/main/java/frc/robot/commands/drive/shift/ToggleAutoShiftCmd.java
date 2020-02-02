@@ -2,7 +2,7 @@ package frc.robot.commands.drive.shift;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.ifx.ArcadeDrive;
 import frc.robot.subsystems.GearShifter;
 
 public class ToggleAutoShiftCmd extends CommandBase {

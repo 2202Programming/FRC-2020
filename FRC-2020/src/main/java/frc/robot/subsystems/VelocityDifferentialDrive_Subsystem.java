@@ -1,17 +1,17 @@
 package frc.robot.subsystems;
-
+import frc.robot.subsystems.ifx.*;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedController;
 import static frc.robot.Constants.*;
 
-public class VelocityDifferentialDrive_Subsystem implements Subsystem, TankDrive, ArcadeDrive {
+public class VelocityDifferentialDrive_Subsystem  extends SubsystemBase implements  TankDrive, ArcadeDrive {
 
         private final static double MAXRPM = 1000.0;
         private final static double MAXDPS = 5.0;

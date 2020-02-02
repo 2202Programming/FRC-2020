@@ -5,11 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.ifx;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 /**
- *  Any subsystem that can handle normalized tank commands
+ * Add your docs here.
  */
-public interface TankDrive extends Subsystem {
-    public void tankDrive(double xSpeed, double ySpeed);
+public interface ArcadeDrive extends Subsystem {
+    public void arcadeDrive(double xSpeed, double zRot);
+    public double getLeftVel(boolean normalized);
+    public double getRightVel(boolean normalized);
+
 }

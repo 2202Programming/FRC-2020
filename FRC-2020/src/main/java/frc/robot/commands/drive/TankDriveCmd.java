@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.util.ExpoShaper;
-import frc.robot.subsystems.TankDrive;
+import frc.robot.subsystems.ifx.TankDrive;
 
 /**
  * An example command. You can replace me with your own command.

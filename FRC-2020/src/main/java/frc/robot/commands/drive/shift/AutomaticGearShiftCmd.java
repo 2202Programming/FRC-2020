@@ -1,15 +1,10 @@
 package frc.robot.commands.drive.shift;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.ifx.ArcadeDrive;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;
+import frc.robot.subsystems.ifx.DriverControls;
 
 public class AutomaticGearShiftCmd extends CommandBase {
     public static final double MAXSPEED_IN_COUNTS_PER_SECOND = 10000; // TODO: Find real values for these constants
@@ -29,10 +24,12 @@ public class AutomaticGearShiftCmd extends CommandBase {
 
     private GearShifter shifter;
     private ArcadeDrive drive;
+    private DriverControls dc;
 
-    public AutomaticGearShiftCmd(ArcadeDrive drive, GearShifter shifter) {
+    public AutomaticGearShiftCmd(DriverControls dc, ArcadeDrive drive, GearShifter shifter) {
         this.drive = drive;
         this.shifter = shifter;
+        this.dc = dc;            //don't register dc, it runs on periodic
 
         addRequirements(drive, shifter);
     }
@@ -74,11 +71,8 @@ public class AutomaticGearShiftCmd extends CommandBase {
      * @return The minimum throttle
      */
     private double getThrottle(boolean squareInputs) {
-        double xSpeed = limit(RobotContainer.driver.getY(Hand.kLeft));
-        xSpeed = applyDeadband(xSpeed, DEADZONE);
-
-        double zRotation = limit(RobotContainer.driver.getX(Hand.kLeft));
-        zRotation = applyDeadband(zRotation, DEADZONE);
+        double xSpeed = dc.getVelocity();
+        double zRotation = dc.getRotation();
 
         // Square the inputs (while preserving the sign) to increase fine control
         // while permitting full power.
@@ -181,13 +175,6 @@ public class AutomaticGearShiftCmd extends CommandBase {
                 return MAXSPEED_IN_COUNTS_PER_SECOND * DOWNSHIFT_SPEED_HIGH;
             }
         }
-    }
-
-    @Override
-    public Set<Subsystem> getRequirements() {
-        Set<Subsystem> subs = new HashSet<Subsystem>();
-        subs.add(shifter);
-        return subs;
     }
 
 }

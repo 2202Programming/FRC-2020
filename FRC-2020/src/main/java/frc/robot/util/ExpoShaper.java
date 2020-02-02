@@ -1,7 +1,6 @@
 package frc.robot.util;
 
 import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpiutil.math.MathUtil;
 
 public class ExpoShaper {
@@ -13,37 +12,32 @@ public class ExpoShaper {
     // deadzone for normalzied
     double deadband = 0.0;
 
-    public ExpoShaper(double kExpo, DoubleSupplier inFunct) {
+    public ExpoShaper(final double kExpo, final DoubleSupplier inFunct) {
         setExpo(kExpo);
         this.inFunct = inFunct;
     }
 
-    public ExpoShaper(double kExpo) {
+    public ExpoShaper(final double kExpo) {
         this(kExpo, null);
     }
 
-    public void setExpo(double a) {
-        if (a > 1.0)
-            a = 1.0;
-        if (a < 0.0)
-            a = 0.0;
-        kExpo = a;
-        kCexpo = 1.0 - a;
+    public void setExpo(final double a) {
+        kExpo = MathUtil.clamp(a, 0.0, 1.0);
+        kCexpo = 1.0 - kExpo;
     }
 
-    public void setDeadzone(double dz) {
+    public void setDeadzone(final double dz) {
         deadband = MathUtil.clamp(dz, -1.0, 1.0);
     }
 
     // use Gord W's expo function
-    public double expo(double x) {
+    public double expo(final double x) {
         return x * x * x * kExpo + kCexpo * x;
     }
 
     // create a DoubleSupplier to use
     public double get() {
-        double x = applyDeadband(inFunct.getAsDouble());
-        return expo(x);
+        return  expo(applyDeadband(inFunct.getAsDouble()));
     }
 
     /**
@@ -53,7 +47,7 @@ public class ExpoShaper {
      * @param value    value to clip
      * @param deadband range around zero
      */
-    private double applyDeadband(double value) {
+    private double applyDeadband(final double value) {
         if (Math.abs(value) > deadband) {
             if (value > 0.0) {
                 return (value - deadband) / (1.0 - deadband);

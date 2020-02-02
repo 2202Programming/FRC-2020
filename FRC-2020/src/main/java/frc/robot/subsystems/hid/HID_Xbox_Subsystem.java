@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.ifx.DriverControls;
+//import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.util.ExpoShaper;
 
 /**
@@ -21,8 +22,8 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
   /**
    * Creates a new HID_Subsystem.
    */
-  private final XboxController driver = new XboxController(0);
-  //private final XboxController assistant = new XboxController(1);
+  private final XboxController driver;
+  //private final XboxController assistant;
   //private final XboxController switchBoard = new XboxController(2);
   // private final XboxController phantom = new XboxController(3);
 
@@ -32,16 +33,20 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
 
   double vel, z_rot;
 
-  public HID_Xbox_Subsystem() { 
+  public HID_Xbox_Subsystem(double velExpo, double rotExpo, double deadzone) { 
+    //register the devices
+    driver = (XboxController)registerController(Id.Driver, new XboxController(0));
+    //assistant = (XboxController)registerController(Id.Assistent, new XboxController(1));
+    
     // Driver inputs for acade style in normalized units, 
     // left Y-stick throttle
     // right X-stick turn rate
-    velShaper = new ExpoShaper(0.3, () -> driver.getY(Hand.kLeft)); 
-    rotShaper = new ExpoShaper(0.3, () -> driver.getX(Hand.kRight));
+    velShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft)); 
+    rotShaper = new ExpoShaper(rotExpo, () -> driver.getX(Hand.kRight));
     
-    //add some deadzone in normalized coordingates
-    rotShaper.setDeadzone(0.05);
-    velShaper.setDeadzone(0.05);
+    //add some deadzone in normalized coordinates
+    rotShaper.setDeadzone(deadzone);
+    velShaper.setDeadzone(deadzone);
   }
 
   @Override
@@ -79,8 +84,4 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     return true;
   }
 
-  @Override
-  public void bindButtons() {
-    
-  }
 }

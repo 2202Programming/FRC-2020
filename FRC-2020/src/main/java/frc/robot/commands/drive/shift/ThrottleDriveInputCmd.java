@@ -1,11 +1,9 @@
 package frc.robot.commands.drive.shift;
 
 import frc.robot.Constants;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.ifx.ArcadeDrive;
+import frc.robot.subsystems.ifx.DriverControls;
 
 /**
  * An example command. You can replace me with your own command.
@@ -17,17 +15,18 @@ public class ThrottleDriveInputCmd extends CommandBase {
     private double startValue;
 
     private ArcadeDrive drive;
-
+    private DriverControls dc;
     /**
      * 
      * @param rampTime Ramp up time in seconds
      */
-    public ThrottleDriveInputCmd(ArcadeDrive drive, double rampTime, double startValue, double endValue) {
+    public ThrottleDriveInputCmd(DriverControls dc, ArcadeDrive drive, double rampTime, double startValue, double endValue) {
         // Use requires() here to declare subsystem dependencies
         this.drive = drive;
         maxCycles = (int) Math.ceil(rampTime / Constants.DT);
         this.startValue = startValue;
         stepValue = (endValue - startValue) / maxCycles;
+        this.dc = dc;    //don't register driverControls, already running on periodic
 
         addRequirements(drive);
     }
@@ -44,8 +43,8 @@ public class ThrottleDriveInputCmd extends CommandBase {
     // right motors
     @Override
     public void execute() {
-        double throttle = RobotContainer.driver.getY(Hand.kLeft) * (startValue + stepValue * cycleCount);
-        double turnRate = RobotContainer.driver.getX(Hand.kRight) * (startValue + stepValue * cycleCount);
+        double throttle = dc.getVelocity() * (startValue + stepValue * cycleCount);
+        double turnRate = dc.getRotation() * (startValue + stepValue * cycleCount);
         cycleCount++;
         drive.arcadeDrive(throttle, turnRate);
     }

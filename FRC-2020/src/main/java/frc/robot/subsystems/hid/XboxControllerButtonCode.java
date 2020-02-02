@@ -25,7 +25,7 @@ public enum XboxControllerButtonCode {
 	LEFT_X(0),
 	LEFT_Y(1),
 	
-	//POV Hat //TODO: confirm numbers
+	//POV Hat 
 	POV_UP(11),
 	POV_DOWN(12),
 	POV_LEFT(13),

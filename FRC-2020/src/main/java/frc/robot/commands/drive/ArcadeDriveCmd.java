@@ -9,7 +9,7 @@ public class ArcadeDriveCmd extends CommandBase {
     private final DriverControls dc;
 
     public ArcadeDriveCmd(final DriverControls dc, final ArcadeDrive drive) {
-        this.drive = drive;
+         this.drive = drive;
         this.dc = dc;
 
         addRequirements(drive);

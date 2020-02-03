@@ -41,12 +41,31 @@ public interface DriverControls extends Subsystem {
   //physical or normalize values
   boolean isNormalized();
 
+  /**
+   * Register each of the controllers the DriverControls will use.
+   * Do this in the constructor of the implementing class.
+   * 
+   * @see HID_Xbox_Subsystem
+   * 
+   * @param id  Id.Driver, Id.Assistent, Id.Sideboard
+   * @param hid Input device, xbox or other stick
+   * @return
+   */
   public default GenericHID registerController(Id id, GenericHID hid) {
     deviceMap.put(id, hid);
     return hid;
   }
 
-
+/**
+ * Use this to bind a controller's button to a command.
+ * 
+ * example:
+ *  bindButton(Id.Driver, XboxController.A.getCode()).whenPressed(cmd)
+ * 
+ * @param id  Id.Driver, Id.Assistent, Id.Sideboard
+ * @param button  int that represents the button
+ * @return
+ */
   public default JoystickButton bindButton(Id id, int button) {
     return (deviceMap.get(id) != null) ?  
         new JoystickButton(deviceMap.get(id) , button) : null;

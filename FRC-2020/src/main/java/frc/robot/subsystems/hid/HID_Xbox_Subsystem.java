@@ -16,7 +16,18 @@ import frc.robot.util.ExpoShaper;
 /**
  * HID_Subsystem - Human Input Device
  * 
- * Use this class bind devices to their uses.
+ * Use this class bind devices to meaningful functions.
+ * 
+ * Add any needed member functions to the DriverControls interface 
+ * and then add to any implementations. This way they can work with
+ * different controller setup. It will also make it easy to switch 
+ * to a different Joystick.
+ * 
+ * Shouldn't need to make this subsystem a requirement for any
+ * command, just reference it. This class is intended to run in
+ * the periodic().  It should be run first by being first on the 
+ * list.
+ * 
  */
 public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls {
   /**

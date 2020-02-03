@@ -131,7 +131,9 @@ public class AutomaticGearShiftCmd extends CommandBase {
      *
      * @param value    value to clip
      * @param deadband range around zero
-     */
+     *
+     *  DPL - no longer needed - built into DriverControls
+     * 
     private double applyDeadband(double value, double deadband) {
         if (Math.abs(value) > deadband) {
             if (value > 0.0) {
@@ -143,7 +145,7 @@ public class AutomaticGearShiftCmd extends CommandBase {
             return 0.0;
         }
     }
-
+*/
     /**
      * Calculates the shift speed threshold based on the current gear and throttle
      * 

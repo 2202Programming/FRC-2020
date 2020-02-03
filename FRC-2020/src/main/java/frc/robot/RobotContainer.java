@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.commands.drive.shift.ShiftGearCmd;
+import frc.robot.commands.drive.ArcadeDriveCmd;
 
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
@@ -41,16 +42,18 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    //put driver controls first so its periodic is called first.
+    //put driver controls first so its periodic() is called first.
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 500.0, 5.0);
+
+    //Use basic arcade drive command
+    driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
 
     // Configure the button bindings
     configureButtonBindings();
     // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
     // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
-
   }
 
   /**

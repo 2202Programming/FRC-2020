@@ -57,8 +57,6 @@ public class Robot extends TimedRobot {
       m_robotContainer.driveTrain.log();
       m_robotContainer.gearShifter.log();
     }
-
-    
   }
 
   /**

@@ -17,8 +17,6 @@ import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.drive.shift.AutomaticGearShift;
 import frc.robot.commands.drive.shift.ShiftGear;
 import frc.robot.commands.drive.shift.ThrottledUpShift;
-import frc.robot.commands.drive.shift.ToggleAutoShift;
-import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;

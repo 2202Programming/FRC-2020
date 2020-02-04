@@ -4,11 +4,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.DriveTrain;
 
 public class SwitchDriveMode
 {
-    public static final Drivetrain driveTrain = new Drivetrain();
+    public static final DriveTrain driveTrain = new DriveTrain();
     public static final XboxController driver = new XboxController(0);
     private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
     private final TankDrive tank = new TankDrive(driveTrain, driver);

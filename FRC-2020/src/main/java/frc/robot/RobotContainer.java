@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.drive.ArcadeDrive;
+import frc.robot.commands.drive.SwitchDriveMode;
 import frc.robot.commands.drive.shift.AutomaticGearShift;
 import frc.robot.commands.drive.TankDrive;
 import frc.robot.commands.drive.shift.ShiftGear;
@@ -60,6 +61,7 @@ public class RobotContainer {
     new JoystickButton(driver, 4).whenPressed(new ThrottledUpShift(driveTrain, gearShifter));
     new JoystickButton(driver, 1).whenPressed(new ShiftGear(gearShifter, Gear.LOW_GEAR));
     //new JoystickButton(driver, 2).whenPressed(new ToggleAutoShift(gearShifter, driveTrain));
+    new JoystickButton(driver, 3).whenPressed(new SwitchDriveMode(driveTrain, arcade, tank, driver));
   }
 
   /**

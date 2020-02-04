@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.DriveTrain;
 
 /**
  * An example command. You can replace me with your own command.
@@ -19,13 +19,13 @@ public class ThrottleDriveInput implements Command {
     private double stepValue;
     private double startValue;
 
-    private Drivetrain drive;
+    private DriveTrain drive;
 
     /**
      * 
      * @param rampTime Ramp up time in seconds
      */
-    public ThrottleDriveInput(Drivetrain drive, double rampTime, double startValue, double endValue) {
+    public ThrottleDriveInput(DriveTrain drive, double rampTime, double startValue, double endValue) {
         // Use requires() here to declare subsystem dependencies
         this.drive = drive;
         maxCycles = (int) Math.ceil(rampTime / CYCLE_TIME_IN_SECONDS);

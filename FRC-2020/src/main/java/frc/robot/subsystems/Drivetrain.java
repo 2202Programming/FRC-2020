@@ -9,13 +9,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static frc.robot.Constants.*;
 
-public class Drivetrain implements Subsystem {
+public class DriveTrain implements Subsystem {
 
 	// TODO: find actual values for new chassis
-	//It looks like the raw getPosition() actually gets the distance in inches somehow
-	public final double ENCODER_RIGHT_DISTANCE_PER_PULSE = 1;
-	public final double ENCODER_LEFT_DISTANCE_PER_PULSE = 1;
-	public final int ENCODER_COUNTS_PER_REVOLUTION = 8192;
+	public final double ENCODER_RIGHT_DISTANCE_PER_PULSE = 0.005;
+	public final double ENCODER_LEFT_DISTANCE_PER_PULSE = 0.005;
+	public final int ENCODER_COUNTS_PER_REVOLUTION = 4096;
 	public final double WHEEL_RADIUS = 3;
 
 	public final double kSamplePeriod = 0.1; // TODO: Find what this is w/ SparkMAX
@@ -32,7 +31,7 @@ public class Drivetrain implements Subsystem {
 
 	private DifferentialDrive drive;
 
-	public Drivetrain() {
+	public DriveTrain() {
 		// Have motors follow to use Differential Drive
 		middleRight.follow(frontRight);
 		middleLeft.follow(frontLeft);
@@ -55,12 +54,13 @@ public class Drivetrain implements Subsystem {
 		drive.tankDrive(speedLeft, speedRight, squareInputs);
 	}
 
+	//getPosition() for some reason isn't returning raw counts but instead inches
 	public double getLeftPos() {
 		return leftEncoder.getPosition(); //* ENCODER_LEFT_DISTANCE_PER_PULSE;
 	}
 
 	public double getLeftVel() {
-		return leftEncoder.getVelocity(); //* kSamplePeriod * ENCODER_LEFT_DISTANCE_PER_PULSE;
+		return leftEncoder.getVelocity() * kSamplePeriod * ENCODER_LEFT_DISTANCE_PER_PULSE;
 	}
 
 	public void resetLeftEncoder() {
@@ -72,7 +72,7 @@ public class Drivetrain implements Subsystem {
 	}
 
 	public double getRightVel() {
-		return rightEncoder.getVelocity(); //* kSamplePeriod * ENCODER_RIGHT_DISTANCE_PER_PULSE;
+		return rightEncoder.getVelocity() * kSamplePeriod * ENCODER_RIGHT_DISTANCE_PER_PULSE;
 	}
 
 	public void resetRightEncoder() {
@@ -80,8 +80,10 @@ public class Drivetrain implements Subsystem {
 	}
 
 	public void log() {
-		SmartDashboard.putNumber("Right Position", rightEncoder.getPosition());
-		SmartDashboard.putNumber("Left Position", -leftEncoder.getPosition());
+		SmartDashboard.putNumber("Right Velocity", getRightVel());
+		SmartDashboard.putNumber("Left Velocity", getLeftVel());
+		SmartDashboard.putNumber("Right Position", getRightPos());
+		SmartDashboard.putNumber("Left Position", getLeftPos());
 	}
 
 }

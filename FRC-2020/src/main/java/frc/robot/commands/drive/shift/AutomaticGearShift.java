@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;
 
@@ -28,9 +28,9 @@ public class AutomaticGearShift implements Command {
     private final double RIGHT_SIDE_INVERT_MULTIPLIER = -1.0;
 
     private GearShifter shifter;
-    private Drivetrain drive;
+    private DriveTrain drive;
 
-    public AutomaticGearShift(Drivetrain drive, GearShifter shifter) {
+    public AutomaticGearShift(DriveTrain drive, GearShifter shifter) {
         this.drive = drive;
         this.shifter = shifter;
     }
@@ -115,7 +115,7 @@ public class AutomaticGearShift implements Command {
 
         return Math.min(leftThrottle, rightThrottle);
     }
-
+    
     /**
      * Limit motor values to the -1.0 to +1.0 range.
      */
@@ -184,7 +184,6 @@ public class AutomaticGearShift implements Command {
     @Override
     public Set<Subsystem> getRequirements() {
         Set<Subsystem> subs = new HashSet<Subsystem>();
-        subs.add(drive);
         subs.add(shifter);
         return subs;
     }

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedController;
 import static frc.robot.Constants.*;
 
-public class VelocityDifferentialDrive_Subsystem  extends SubsystemBase implements  TankDrive, ArcadeDrive {
+public class VelocityDifferentialDrive_Subsystem  extends SubsystemBase implements  ArcadeDrive {
 
         private final static double MAXRPM = 1000.0;
         private final static double MAXDPS = 5.0;
@@ -51,6 +51,10 @@ public class VelocityDifferentialDrive_Subsystem  extends SubsystemBase implemen
         private GearShifter gearbox = null;
 
         public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxRPM, final double maxDPS) {
+                //save scaling factors, they are required to use SparkMax in Vel mode
+                this.maxRPM = maxRPM;
+                this.maxDPS = maxDPS;
+                
                 // Have motors follow to use Differential Drive
                 middleRight.follow(frontRight);
                 middleLeft.follow(frontLeft);
@@ -63,6 +67,7 @@ public class VelocityDifferentialDrive_Subsystem  extends SubsystemBase implemen
                 rightPidController = initVelocityControl(frontRight);
 
                 dDrive = new DifferentialDrive(leftPidController, rightPidController);
+                dDrive.setSafetyEnabled(false);
         }
 
         public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {

@@ -45,11 +45,11 @@ public class RobotContainer {
     //put driver controls first so its periodic() is called first.
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
-    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 500.0, 5.0);
+    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
 
     //Use basic arcade drive command
     driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
-
+  
     // Configure the button bindings
     configureButtonBindings();
     // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);

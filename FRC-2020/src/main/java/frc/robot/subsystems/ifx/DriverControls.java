@@ -17,7 +17,7 @@ public interface DriverControls extends Subsystem {
 
   public enum Id {
     Driver(0),
-    Assistent(1),
+    Assistant(1),
     SideBoard(2),
     Phantom(3);
 
@@ -34,7 +34,7 @@ public interface DriverControls extends Subsystem {
   public double getVelocitX();
   public double getVelocityY();
 
-  //archive drive
+  //arcade drive
   public double getVelocity();
   public double getRotation();
   

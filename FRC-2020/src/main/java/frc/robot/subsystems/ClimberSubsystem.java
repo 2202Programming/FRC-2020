@@ -57,9 +57,9 @@ public class ClimberSubsystem extends SubsystemBase
      */
 
     /**
-     * Constructor
-     * @param rotDuration
-     * @param winchDuration
+     * 
+     * @param rotDuration How long we turn the rotation motor
+     * @param winchDuration How long we turn the winch motor
      */
     public ClimberSubsystem(double rotDuration, double winchDuration) 
     {

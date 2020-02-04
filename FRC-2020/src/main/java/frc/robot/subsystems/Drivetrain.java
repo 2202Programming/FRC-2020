@@ -5,6 +5,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static frc.robot.Constants.*;
@@ -17,7 +21,12 @@ public class DriveTrain implements Subsystem {
 	public final int ENCODER_COUNTS_PER_REVOLUTION = 4096;
 	public final double WHEEL_RADIUS = 3;
 
-	public final double kSamplePeriod = 0.1; // TODO: Find what this is w/ SparkMAX
+    public final double kSamplePeriod = 0.1; // TODO: Find what this is w/ SparkMAX
+    
+    //TODO: fina actual values for bot
+    public static final double trackWidthMeters = 0.69;
+    public static final double maxSpeed = 3; // m/s
+    public static final double maxAccel = 3; // m/s/s
 
 	private CANSparkMax frontRight = new CANSparkMax(FR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private CANSparkMax frontLeft = new CANSparkMax(FL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -29,6 +38,9 @@ public class DriveTrain implements Subsystem {
 	private CANEncoder leftEncoder;
 	private CANEncoder rightEncoder;
 
+    private DifferentialDriveOdometry odometry;
+    public static final DifferentialDriveKinematics driveKinematics = new DifferentialDriveKinematics(trackWidthMeters);
+
 	private DifferentialDrive drive;
 
 	public DriveTrain() {
@@ -38,6 +50,8 @@ public class DriveTrain implements Subsystem {
 		backRight.follow(frontRight);
 		backLeft.follow(frontLeft);
 		drive = new DifferentialDrive(frontLeft, frontRight);
+
+		odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 
 		// Encoders
 		leftEncoder = frontLeft.getEncoder();
@@ -77,7 +91,24 @@ public class DriveTrain implements Subsystem {
 
 	public void resetRightEncoder() {
 		rightEncoder.setPosition(0);
-	}
+    }
+
+    public void resetEncoders() {
+        resetRightEncoder();
+        resetLeftEncoder();
+    }
+    
+    public double getHeading() {
+        return 0.0; //TODO: Figure out how we're calculating heading
+    }
+
+    public void resetHeading() {
+         //TODO: Figure out how we're calculating heading
+    }
+
+    public Pose2d getPose() {
+        return odometry.getPoseMeters();
+    }
 
 	public void log() {
 		SmartDashboard.putNumber("Right Velocity", getRightVel());

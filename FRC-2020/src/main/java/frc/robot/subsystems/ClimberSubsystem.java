@@ -35,6 +35,10 @@ public class ClimberSubsystem extends SubsystemBase
     private long rotStartTime = 0;
     private long wnStartTime = 0;
 
+    //TODO: calibrate these times so that they spin the motors for the correct amount of time
+    public final double ROT_DUR_TIME;
+    public final double WN_DUR_TIME;
+
     /**
      * Rotation speed. Has to be between -1.0 and 1.0
      */
@@ -51,8 +55,17 @@ public class ClimberSubsystem extends SubsystemBase
      * mechanical stop for rotation
      * Ask Kevin for more info from Kevin
      */
-    public ClimberSubsystem() 
+
+    /**
+     * Constructor
+     * @param rotDuration
+     * @param winchDuration
+     */
+    public ClimberSubsystem(double rotDuration, double winchDuration) 
     {
+        ROT_DUR_TIME = rotDuration;
+        WN_DUR_TIME = winchDuration;
+
         //Set the motors to brake for testing purposes, feel free to change if needed
         eSparkMax.setIdleMode(IdleMode.kBrake);
         eROTSparkMax.setIdleMode(IdleMode.kBrake);
@@ -62,26 +75,26 @@ public class ClimberSubsystem extends SubsystemBase
     @Override
     public void periodic() 
     {
-        if (rotState == RotState.UNFOLDING && 2 <= (System.currentTimeMillis() - rotStartTime))
+        if (rotState == RotState.UNFOLDING && ROT_DUR_TIME <= (System.currentTimeMillis() - rotStartTime))
         {
             rotState = RotState.UNFOLDED;
             eSparkMax.set(0);
         }
 
-        else if (rotState == RotState.FODLING && 2 <= (System.currentTimeMillis() - rotStartTime))
+        else if (rotState == RotState.FODLING && ROT_DUR_TIME <= (System.currentTimeMillis() - rotStartTime))
         {
             rotState = RotState.FOLDED;
             eSparkMax.set(0);
         }
 
-        if (wnState == WinchState.EXTENDING && 2 <= (System.currentTimeMillis() - wnStartTime))
+        if (wnState == WinchState.EXTENDING && WN_DUR_TIME <= (System.currentTimeMillis() - wnStartTime))
         {
             wnState = WinchState.EXTENDED;
             wnSparkMax.set(0);
 
         }
 
-        else if (wnState == WinchState.RETRACTING && 2 <= (System.currentTimeMillis() - wnStartTime))
+        else if (wnState == WinchState.RETRACTING && WN_DUR_TIME <= (System.currentTimeMillis() - wnStartTime))
         {
             wnState = WinchState.RETRACTED;
             wnSparkMax.set(0);

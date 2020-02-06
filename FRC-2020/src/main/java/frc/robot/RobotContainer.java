@@ -19,6 +19,7 @@ import frc.robot.commands.PositionControlPanelCommand;
 import frc.robot.commands.RotateControlPanelCommand;
 import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.drive.shift.ShiftGear;
+import frc.robot.subsystems.Color_Subsystem;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;
@@ -34,6 +35,7 @@ import frc.robot.triggers.ControlPanelTrigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drivetrain driveTrain = new Drivetrain();
+  private static final Color_Subsystem detector = new Color_Subsystem();
   private final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
   private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
@@ -56,7 +58,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(driver, 4).whenPressed(() -> new ShiftGear(gearShifter, Gear.HIGH_GEAR));
     new JoystickButton(driver, 1).whenPressed(() -> new ShiftGear(gearShifter, Gear.LOW_GEAR));
-    //new ControlPanelTrigger(2).whenActive(new ControlPanelCMD(new FSMReaderCmd(), new PositionControlPanelCommand(color_detector, final_color), new RotateControlPanelCommand(color_detector, num_rotations)));
+    //new ControlPanelTrigger(2).whenActive(new ControlPanelCMD(new FSMReaderCmd(), new PositionControlPanelCommand(detector, final_color), new RotateControlPanelCommand(detector, 3)));
   }
 
   /**

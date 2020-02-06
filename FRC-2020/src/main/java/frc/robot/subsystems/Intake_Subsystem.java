@@ -13,10 +13,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.DigitalInput;
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
 
 /**
  * motorStrength should be between -1 and 1 for all methods
@@ -65,6 +67,14 @@ public class Intake_Subsystem extends SubsystemBase {
    * public boolean isIntakeDown(){ //DIO return intake_down_sensor.get(); }
    * 
    */
+
+  public void raiseIntake(){
+    elevatorSolenoid.set(kForward);
+  } 
+
+  public void lowerIntake(){
+    elevatorSolenoid.set(kReverse);
+  } 
 
   public void intakeOn(double motorStrength) {
     intake_talon.set(motorStrength);

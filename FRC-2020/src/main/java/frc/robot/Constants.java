@@ -31,7 +31,7 @@ public final class Constants {
     //Intake
     public static final int INTAKE_UP_DIO = 4;
     public static final int INTAKE_DOWN_DIO = 4;
-    public static final int INTAKE_TALON_CAN = 20;
+    public static final int INTAKE_SPARK_PWM = 0;
     public static final int MAGAZINE_TALON_CAN = 21;
     public static final int UPPER_SHOOTER_TALON_CAN = 22;
     public static final int LOWER_SHOOTER_TALON_CAN = 23;

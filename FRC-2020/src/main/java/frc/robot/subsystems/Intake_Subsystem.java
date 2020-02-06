@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.DigitalInput;
 import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
+import edu.wpi.first.wpilibj.Spark;
 
 /**
  * motorStrength should be between -1 and 1 for all methods
@@ -23,7 +24,7 @@ public class Intake_Subsystem extends SubsystemBase {
    */
 
   // Intake
-  public WPI_TalonSRX intake_talon = new WPI_TalonSRX(Constants.INTAKE_TALON_CAN);
+  public Spark intake_spark = new Spark(Constants.INTAKE_SPARK_PWM);
 
   public DoubleSolenoid elevatorSolenoid = new DoubleSolenoid(Constants.ELEVATOR_PCM_ID,
       Constants.ELEVATOR_UP_SOLENOID_PCM, Constants.ELEVATOR_DOWN_SOLENOID_PCM);
@@ -65,11 +66,11 @@ public class Intake_Subsystem extends SubsystemBase {
   } 
 
   public void intakeOn(double motorStrength) {
-    intake_talon.set(motorStrength);
+    intake_spark.set(motorStrength);
   }
 
   public void intakeOff() {
-    intake_talon.set(0);
+    intake_spark.set(0);
   }
 
   public void magazineOn(double motorStrength) {

@@ -35,7 +35,7 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   private double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
-  private static final NetworkTable networkTableSmartDashboard = (NetworkTableInstance.create()).getTable("SmartDashboard"); //TODO ensure this is okay, and put in right place if applicable (unsure if method returns the reference or a clone)
+  private static final NetworkTable networkTableSmartDashboard = (NetworkTableInstance.getDefault()).getTable("SmartDashboard"); //TODO ensure this is okay, and put in right place if applicable (unsure if method returns the reference or a clone)
 
   /**
    * Creates a new DriveWithLidarToDistanceCmd.

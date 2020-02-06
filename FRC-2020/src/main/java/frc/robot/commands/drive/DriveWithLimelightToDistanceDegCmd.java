@@ -12,8 +12,10 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.TableEntryListener;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.SmartDashboardListener;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Mechanum_Drivetrain;
@@ -32,10 +34,11 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   private double maxSpeed;
   private double angleTarget;
   private final double Kp = 0.2, Ki = 0.04, Kd = 0.25;
-  private double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
+  private static double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs - static so changes to values will be retained
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
-  private static final NetworkTable networkTableSmartDashboard = (NetworkTableInstance.getDefault()).getTable("SmartDashboard"); //TODO ensure this is okay, and put in right place if applicable (unsure if method returns the reference or a clone)
+  private static NetworkTable networkTableSmartDashboard;
+  private int listenerHandle; // may be necessary for listener for pid changes
 
   /**
    * Creates a new DriveWithLidarToDistanceCmd.
@@ -64,16 +67,38 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(limelight);
     addRequirements(drive);
+
+    setPID();
   }
 
   public DriveWithLimelightToDistanceDegCmd(Mechanum_Drivetrain drive, Limelight_Subsystem limelight, double stopDist, double maxSpeed, double angleTarget,
       double tolerancePct) {
     this(drive, limelight, stopDist, maxSpeed, angleTarget);
     this.tolerancePct = tolerancePct;
+        
+    setPID();
 
+  }
+
+  private void setPID() {
     SmartDashboard.putNumber("P", Kap); //TODO: ensure these work and values are editable
     SmartDashboard.putNumber("I", Kai);
     SmartDashboard.putNumber("D", Kad);
+    networkTableSmartDashboard = NetworkTableInstance.getDefault().getTable("SmartDashboard"); //TODO ensure this is okay, and put in right place if applicable (unsure if method returns the reference or a clone)
+    //TODO: addListener() may be needed
+    int listenerHandle = networkTableSmartDashboard.addEntryListener(new SmartDashboardListener(), flags);
+  }
+
+  public static void setKap(double kap) {
+    Kap = kap;
+  }
+
+  public static void setKai(double kai) {
+    Kai = kai;
+  }
+
+  public static void setKad(double kad) {
+    Kad = kad;
   }
 
   // Called when the command is initially scheduled.
@@ -114,14 +139,21 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
     SmartDashboard.putNumber("Angle", target_angle);
     SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
 
-    SmartDashboard.putData(anglePIDController);
+    
 
     Kap = networkTableSmartDashboard.getEntry("P").getDouble(Kap); //TODO: ensure values are editable
     Kai = networkTableSmartDashboard.getEntry("I").getDouble(Kai);
     Kad = networkTableSmartDashboard.getEntry("D").getDouble(Kad);
+
+    SmartDashboard.putNumber("P", Kap); //TODO: These should be unnecessary if the network table and smart dashboard refer to the same object
+    SmartDashboard.putNumber("I", Kap);
+    SmartDashboard.putNumber("D", Kap);
     
     anglePIDController.setPID(Kap, Kai, Kad);
   
+
+    SmartDashboard.putData(anglePIDController);
+
     // move forward, with rotation
     
     drive.driveCartesian(0.0, angleCmd, 0);

@@ -19,11 +19,25 @@ package frc.robot;
  */
 public final class Constants {
 
+    public static final double DT = 0.02;  //20ms framerate 50Hz
+
     public static final int FRONT_LEFT_LIDAR = 21;
     public static final int FRONT_RIGHT_LIDAR = 22;
-    public static final double LIDAR_SAMPLE_TIME = 100; // in ms
-    public static final double COLOR_SAMPLE_TIME = 100; // in ms
-    public static final int LOG_REFRESH_RATE = 100; // in ms
+    public static final double LIDAR_SAMPLE_TIME = 100; //in ms
+    public static final double COLOR_SAMPLE_TIME = 100; //in ms
+    public static final int LOG_REFRESH_RATE = 100; //in ms
+
+    //Intake
+    public static final int INTAKE_UP_DIO = 4;
+    public static final int INTAKE_DOWN_DIO = 4;
+    public static final int INTAKE_TALON_CAN = 20;
+    public static final int MAGAZINE_TALON_CAN = 21;
+    public static final int UPPER_SHOOTER_TALON_CAN = 22;
+    public static final int LOWER_SHOOTER_TALON_CAN = 23;
+    public static final int ELEVATOR_TALON_CAN = 24;
+    public static final int ELEVATOR_PCM_ID = 1;
+    public static final int ELEVATOR_UP_SOLENOID_PCM = 1;    
+    public static final int ELEVATOR_DOWN_SOLENOID_PCM = 2;
 
     public static final int FL_SPARKMAX_CANID = 11;
     public static final int ML_SPARKMAX_CANID = 12;

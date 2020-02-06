@@ -37,8 +37,8 @@ public class Limelight_Subsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx"); //-27 degrees to 27 degrees
-    NetworkTableEntry ty = table.getEntry("ty"); // -20.5 to 20.5 degrees
+    NetworkTableEntry tx = table.getEntry("tx"); //-29.8 degrees to 29.8 degrees (limelight 2)
+    NetworkTableEntry ty = table.getEntry("ty"); // -24.85 to 24.85 degrees (limelight 2)
     NetworkTableEntry ta = table.getEntry("ta");
     NetworkTableEntry tv = table.getEntry("tv"); //target validity (1 or 0)
 

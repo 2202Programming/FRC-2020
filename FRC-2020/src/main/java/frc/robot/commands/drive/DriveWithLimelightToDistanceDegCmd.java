@@ -10,6 +10,9 @@ package frc.robot.commands.drive;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
@@ -32,6 +35,7 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   private double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
+  private static final NetworkTable networkTableSmartDashboard = (NetworkTableInstance.create()).getTable("SmartDashboard"); //TODO ensure this is okay, and put in right place if applicable (unsure if method returns the reference or a clone)
 
   /**
    * Creates a new DriveWithLidarToDistanceCmd.
@@ -66,6 +70,10 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
       double tolerancePct) {
     this(drive, limelight, stopDist, maxSpeed, angleTarget);
     this.tolerancePct = tolerancePct;
+
+    SmartDashboard.putNumber("P", Kap); //TODO: ensure these work and values are editable
+    SmartDashboard.putNumber("I", Kai);
+    SmartDashboard.putNumber("D", Kad);
   }
 
   // Called when the command is initially scheduled.
@@ -80,6 +88,8 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
     anglePIDController.reset();
     anglePIDController.setSetpoint(angleTarget);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
+
+
 
   }
 
@@ -106,6 +116,10 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
 
     SmartDashboard.putData(anglePIDController);
 
+    Kap = networkTableSmartDashboard.getEntry("P").getDouble(Kap); //TODO: ensure values are editable
+    Kai = networkTableSmartDashboard.getEntry("I").getDouble(Kai);
+    Kad = networkTableSmartDashboard.getEntry("D").getDouble(Kad);
+    
     anglePIDController.setPID(Kap, Kai, Kad);
   
     // move forward, with rotation

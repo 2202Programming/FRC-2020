@@ -69,7 +69,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
   } 
 
   @Override
-  public double getVelocitX() {
+  public double getVelocityX() {
    // not set for XY control 
     return 0;
   }

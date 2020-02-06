@@ -10,13 +10,10 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake_Subsystem;
 
-  public class ShooterOn extends CommandBase{
- private static Intake_Subsystem m_intake;
-  private final double MOTOR_STRENGTH = 0.5;
+public class RaiseIntake extends CommandBase {
 
-  public ShooterOn(Intake_Subsystem m_intake) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    
+  private Intake_Subsystem m_intake;
+  public RaiseIntake(Intake_Subsystem m_intake) {
     addRequirements(m_intake);
     this.m_intake = m_intake;
   }
@@ -29,13 +26,18 @@ import frc.robot.subsystems.Intake_Subsystem;
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.shooterOn(MOTOR_STRENGTH);
+    m_intake.raiseIntake();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.shooterOff();
+    m_intake.lowerIntake();
   }
 
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
 }

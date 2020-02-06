@@ -4,16 +4,17 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;
 
-public class ShiftGear extends InstantCommand {
+public class ShiftGearCmd extends InstantCommand {
     private Gear g;
     private GearShifter shifter;
 
-    public ShiftGear(GearShifter shifter, Gear g) {
+    public ShiftGearCmd(GearShifter shifter, Gear g) {
         this.shifter = shifter;
         this.g = g;
+        addRequirements(shifter);
     }
-
-    public void execute() {
+    @Override
+    public void initialize() {
         if (g == Gear.HIGH_GEAR) {
             shifter.shiftUp();
         } else {

@@ -1,17 +1,12 @@
 package frc.robot.commands.drive.shift;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.ifx.ArcadeDrive;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.GearShifter.Gear;
+import frc.robot.subsystems.ifx.DriverControls;
 
-public class AutomaticGearShift implements Command {
+public class AutomaticGearShiftCmd extends CommandBase {
     public static final double MAXSPEED_IN_COUNTS_PER_SECOND = 10000; // TODO: Find real values for these constants
     public static final double UPSHIFT_SPEED_LOW = 0.3;
     public static final double UPSHIFT_SPEED_HIGH = 0.3;
@@ -28,17 +23,21 @@ public class AutomaticGearShift implements Command {
     private final double RIGHT_SIDE_INVERT_MULTIPLIER = -1.0;
 
     private GearShifter shifter;
-    private DriveTrain drive;
+    private ArcadeDrive drive;
+    private DriverControls dc;
 
-    public AutomaticGearShift(DriveTrain drive, GearShifter shifter) {
+    public AutomaticGearShiftCmd(DriverControls dc, ArcadeDrive drive, GearShifter shifter) {
         this.drive = drive;
         this.shifter = shifter;
+        this.dc = dc;            //don't register dc, it runs on periodic
+
+        addRequirements(drive, shifter);
     }
 
     public void execute() {
         Gear curGear = shifter.getCurGear();
-        double leftSpeed = Math.abs(drive.getLeftVel());
-        double rightSpeed = Math.abs(drive.getRightVel());
+        double leftSpeed = Math.abs(drive.getLeftVel(true));
+        double rightSpeed = Math.abs(drive.getRightVel(true));
         double curSpeed = (leftSpeed + rightSpeed) / 2;
         double shiftSpeed = getShiftSpeed(shifter.getCurGear(), getThrottle(true));
 
@@ -72,11 +71,8 @@ public class AutomaticGearShift implements Command {
      * @return The minimum throttle
      */
     private double getThrottle(boolean squareInputs) {
-        double xSpeed = limit(RobotContainer.driver.getY(Hand.kLeft));
-        xSpeed = applyDeadband(xSpeed, DEADZONE);
-
-        double zRotation = limit(RobotContainer.driver.getX(Hand.kLeft));
-        zRotation = applyDeadband(zRotation, DEADZONE);
+        double xSpeed = dc.getVelocity();
+        double zRotation = dc.getRotation();
 
         // Square the inputs (while preserving the sign) to increase fine control
         // while permitting full power.
@@ -135,7 +131,9 @@ public class AutomaticGearShift implements Command {
      *
      * @param value    value to clip
      * @param deadband range around zero
-     */
+     *
+     *  DPL - no longer needed - built into DriverControls
+     * 
     private double applyDeadband(double value, double deadband) {
         if (Math.abs(value) > deadband) {
             if (value > 0.0) {
@@ -147,7 +145,7 @@ public class AutomaticGearShift implements Command {
             return 0.0;
         }
     }
-
+*/
     /**
      * Calculates the shift speed threshold based on the current gear and throttle
      * 
@@ -179,13 +177,6 @@ public class AutomaticGearShift implements Command {
                 return MAXSPEED_IN_COUNTS_PER_SECOND * DOWNSHIFT_SPEED_HIGH;
             }
         }
-    }
-
-    @Override
-    public Set<Subsystem> getRequirements() {
-        Set<Subsystem> subs = new HashSet<Subsystem>();
-        subs.add(shifter);
-        return subs;
     }
 
 }

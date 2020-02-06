@@ -8,13 +8,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.shuffleboard.EventImportance;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -55,12 +49,6 @@ public class Intake_Subsystem extends SubsystemBase {
     // This method will be called once per scheduler run
   }
   /*
-   * public void intakeUp() { elevatorSolenoid.set(DoubleSolenoid.Value.kForward);
-   * }
-   * 
-   * public void intakeDown() {
-   * elevatorSolenoid.set(DoubleSolenoid.Value.kReverse); }
-   * 
    * 
    * public boolean isIntakeUp(){ //DIO return intake_up_sensor.get(); }
    * 
@@ -102,7 +90,5 @@ public class Intake_Subsystem extends SubsystemBase {
     lower_shooter_talon.set(0);
   }
 
-  /*
-   * public void elevatorOn(){ elevator_talon.set(0.2); }
-   */
+
 }

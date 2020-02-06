@@ -45,8 +45,8 @@ public class SwitchDriveMode implements Command
     @Override
 	public Set<Subsystem> getRequirements() {
 		Set<Subsystem> subs = new HashSet<Subsystem>();
-    subs.add(driveTrain);
-    return subs;
+        subs.add(driveTrain);
+        return subs;
 	}
 
 }

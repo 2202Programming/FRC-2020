@@ -1,4 +1,4 @@
-package frc.robot.util.misc;
+package frc.robot.util;
 
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpiutil.math.MathUtil;

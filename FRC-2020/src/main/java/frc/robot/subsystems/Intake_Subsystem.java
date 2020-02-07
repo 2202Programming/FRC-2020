@@ -37,7 +37,7 @@ public class Intake_Subsystem extends SubsystemBase {
   public WPI_TalonSRX magazine_talon = new WPI_TalonSRX(Constants.MAGAZINE_TALON_CAN);
   // shooters
   public WPI_TalonSRX upper_shooter_talon = new WPI_TalonSRX(Constants.UPPER_SHOOTER_TALON_CAN);
-  public WPI_TalonSRX lower_shooter_talon = new WPI_TalonSRX(Constants.LOWER_SHOOTER_TALON_CAN);
+  //public WPI_TalonSRX lower_shooter_talon = new WPI_TalonSRX(Constants.LOWER_SHOOTER_TALON_CAN);
   // elevator
   public WPI_TalonSRX elevator_talon = new WPI_TalonSRX(Constants.ELEVATOR_TALON_CAN);
 
@@ -83,12 +83,12 @@ public class Intake_Subsystem extends SubsystemBase {
 
   public void shooterOn(double motorStrength) {
     upper_shooter_talon.set(motorStrength);
-    lower_shooter_talon.set(motorStrength);
+    //lower_shooter_talon.set(motorStrength);
   }
 
   public void shooterOff() {
     upper_shooter_talon.set(0);
-    lower_shooter_talon.set(0);
+    //lower_shooter_talon.set(0);
   }
 
 

@@ -30,8 +30,8 @@ public class Intake_Subsystem extends SubsystemBase {
       Constants.ELEVATOR_UP_SOLENOID_PCM, Constants.ELEVATOR_DOWN_SOLENOID_PCM);
 
   // Intake Pneumatic Sensors
-  public DigitalInput intake_up_sensor = new DigitalInput(Constants.INTAKE_UP_DIO);
-  public DigitalInput intake_down_sensor = new DigitalInput(Constants.INTAKE_DOWN_DIO);
+  //public DigitalInput intake_up_sensor = new DigitalInput(Constants.INTAKE_UP_DIO);
+  //public DigitalInput intake_down_sensor = new DigitalInput(Constants.INTAKE_DOWN_DIO);
 
   // magazine
   public WPI_TalonSRX magazine_talon = new WPI_TalonSRX(Constants.MAGAZINE_TALON_CAN);

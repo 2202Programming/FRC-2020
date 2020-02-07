@@ -23,7 +23,7 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   private final double stopDist; // inches
   private double tolerancePct = .05;
   private double angleToleranceDeg = 3;
-  private double kDegreesToPerPower = 1;
+  private double kDegreesToDPS = 1; //convert PID rotation output to degrees per second for VelocityDifferentalDrive
   private double maxSpeed;
   private double angleTarget;
   private final double Kp = 0.2, Ki = 0.04, Kd = 0.25;
@@ -85,21 +85,18 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   @Override
   public void execute() {
     double target_angle = limelight.getX();
-    double angleCmd = kDegreesToPerPower * anglePIDController.calculate(target_angle);
+    double angleCmd = kDegreesToDPS * anglePIDController.calculate(target_angle);
     angleCmd = MathUtil.clamp(angleCmd, -maxSpeed, maxSpeed);
 
 
    // SmartDashboard.putNumber("PID error (degrees)", anglePIDController.getPositionError());
     SmartDashboard.putNumber("Angle", target_angle);
-    SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
+    SmartDashboard.putNumber("PID Output DPS", angleCmd);
 
     SmartDashboard.putData(anglePIDController);
-
-    anglePIDController.setPID(Kap, Kai, Kad);
   
-    // move forward, with rotation
-    
-    //drive.driveCartesian(0.0, angleCmd, 0);
+    // move rotation only
+    drive.velocityArcadeDrive(0, angleCmd);
   }
 
   // Called once the command ends or is interrupted.

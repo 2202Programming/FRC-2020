@@ -1,4 +1,5 @@
 package frc.robot.subsystems;
+
 import frc.robot.subsystems.ifx.*;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
@@ -7,15 +8,18 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedController;
 import static frc.robot.Constants.*;
 
-public class VelocityDifferentialDrive_Subsystem  extends SubsystemBase implements  ArcadeDrive {
+public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements ArcadeDrive {
 
         private final static double MAXRPM = 1000.0;
         private final static double MAXDPS = 5.0;
-        
+
         public final double WHEEL_RADIUS = 3; // inches
         private final double K_rev_per_ft = 1.0 / (2.0 * Math.PI * (WHEEL_RADIUS / 12.0)); // rev/feet
 
@@ -51,10 +55,10 @@ public class VelocityDifferentialDrive_Subsystem  extends SubsystemBase implemen
         private GearShifter gearbox = null;
 
         public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxRPM, final double maxDPS) {
-                //save scaling factors, they are required to use SparkMax in Vel mode
+                // save scaling factors, they are required to use SparkMax in Vel mode
                 this.maxRPM = maxRPM;
                 this.maxDPS = maxDPS;
-                
+
                 // Have motors follow to use Differential Drive
                 middleRight.follow(frontRight);
                 middleLeft.follow(frontLeft);
@@ -99,10 +103,11 @@ public class VelocityDifferentialDrive_Subsystem  extends SubsystemBase implemen
 
         // TODO: velocityTankDrive()
 
-        public void arcadeDrive(double xSpeed, double zRotation){
+        public void arcadeDrive(double xSpeed, double zRotation) {
                 dDrive.arcadeDrive(xSpeed, zRotation);
         }
-        public void tankDrive(double leftSpeed,  double rightSpeed){
+
+        public void tankDrive(double leftSpeed, double rightSpeed) {
                 dDrive.tankDrive(leftSpeed, rightSpeed, false);
         }
 
@@ -136,6 +141,98 @@ public class VelocityDifferentialDrive_Subsystem  extends SubsystemBase implemen
                 SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
                 SmartDashboard.putNumber("Right Position", getRightPos());
                 SmartDashboard.putNumber("Left Position", getLeftPos());
+        }
+
+        /**
+         * Returns the currently-estimated pose of the robot.
+         *
+         * @return The pose.
+         */
+        public Pose2d getPose() {
+                return m_odometry.getPoseMeters();
+        }
+
+        /**
+         * Resets the odometry to the specified pose.
+         *
+         * @param pose The pose to which to set the odometry.
+         */
+        public void resetOdometry(Pose2d pose) {
+                resetEncoders();
+                m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
+        }
+
+        /**
+         * Returns the current wheel speeds of the robot.
+         *
+         * @return The current wheel speeds.
+         */
+        public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+                return new DifferentialDriveWheelSpeeds(leftPidController.get(), rightPidController.get());
+        }
+
+        /**
+         * Controls the left and right sides of the drive directly with voltages.
+         *
+         * @param leftVolts  the commanded left output
+         * @param rightVolts the commanded right output
+         */
+        public void tankDriveVolts(double leftVolts, double rightVolts) {
+                frontLeft.setVoltage(leftVolts);
+                frontRight.setVoltage(-rightVolts);
+                dDrive.feed();
+        }
+
+        /**
+         * Resets the drive encoders to currently read a position of 0.
+         */
+        public void resetEncoders() {
+                leftPidController.setPosition(0);
+                rightPidController.setPosition(0);
+        }
+
+        /**
+         * Gets the average distance of the two encoders.
+         *
+         * @return the average of the two encoder readings
+         */
+        public double getAverageEncoderDistance() {
+                return (leftPidController.getPosition() + rightPidController.getPosition()) / 2.0;
+        }
+
+        /**
+         * Sets the max output of the drive. Useful for scaling the drive to drive more
+         * slowly.
+         *
+         * @param maxOutput the maximum output to which the drive will be constrained
+         */
+        public void setMaxOutput(double maxOutput) {
+                dDrive.setMaxOutput(maxOutput);
+        }
+
+        /**
+         * Zeroes the heading of the robot.
+         */
+        public void zeroHeading() {
+                m_gyro.reset();
+        }
+
+        /**
+         * Returns the heading of the robot.
+         *
+         * @return the robot's heading in degrees, from -180 to 180
+         */
+        public double getHeading() {
+                return Math.IEEEremainder(m_gyro.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+        }
+
+        /**
+         * Returns the turn rate of the robot.
+         *
+         * @return The turn rate of the robot, in degrees per second
+         */
+        public double getTurnRate() {
+                return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
         }
 
         // Use velocity control for SparkMax - RPM based

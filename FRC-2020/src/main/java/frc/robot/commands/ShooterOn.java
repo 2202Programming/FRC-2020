@@ -12,7 +12,7 @@ import frc.robot.subsystems.Intake_Subsystem;
 
   public class ShooterOn extends CommandBase{
  private static Intake_Subsystem m_intake;
-  private final double MOTOR_STRENGTH = 0.5;
+  private final double RPM_TARGET = 1000;
 
   public ShooterOn(Intake_Subsystem m_intake) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -29,7 +29,7 @@ import frc.robot.subsystems.Intake_Subsystem;
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.shooterOn(MOTOR_STRENGTH);
+    m_intake.shooterOn(RPM_TARGET);
   }
 
   // Called once the command ends or is interrupted.

@@ -53,4 +53,9 @@ public final class Constants {
     public static final int GEARSHIFT_PCM_ID = 2;
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
+
+    //Auto Delays - values to be adjusted later with testing
+    public static final double DELAY_A = 0.0;
+    public static final double DELAY_B = 1.0;
+    public static final double DELAY_C = 2.0;
 }

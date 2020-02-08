@@ -44,6 +44,11 @@ public class Control_Panel extends SubsystemBase
          m_talon.set(x);
     }
 
+    public double getSpeed()
+    {
+        return m_talon.get();
+    }
+
     public double getDistance()
     {
         return m_encoder.getDistance();

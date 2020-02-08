@@ -60,7 +60,7 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(driver, 4).whenPressed(() -> new ShiftGear(gearShifter, Gear.HIGH_GEAR));
     new JoystickButton(driver, 1).whenPressed(() -> new ShiftGear(gearShifter, Gear.LOW_GEAR));
-    new ControlPanelTrigger(2).whenActive(new ControlPanelCMD(new FSMReaderCmd(), new RotateControlPanelCommand(3, panel), new PositionControlPanelCommand(detector)));
+    new ControlPanelTrigger(2).whenActive(new ControlPanelCMD(new FSMReaderCmd(), new RotateControlPanelCommand(3, panel), new PositionControlPanelCommand(detector,panel)));
   }
 
   /**

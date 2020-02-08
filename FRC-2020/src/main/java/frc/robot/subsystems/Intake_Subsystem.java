@@ -144,7 +144,6 @@ public class Intake_Subsystem extends SubsystemBase {
        * CHECK UNITS/REV WITH GEARBOX!
 			 */
 			double targetVelocity_UnitsPer100ms = RPM_target * 4096 * 600;
-			/* 500 RPM in either direction */
 			upper_shooter_talon.set(ControlMode.Velocity, targetVelocity_UnitsPer100ms);
 
   }

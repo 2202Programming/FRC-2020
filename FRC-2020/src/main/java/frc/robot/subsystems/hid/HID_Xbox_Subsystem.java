@@ -41,8 +41,12 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
   //Arcade 
   ExpoShaper velShaper;
   ExpoShaper rotShaper;
-
+  //Tank 
+  ExpoShaper velLeftShaper;
+  ExpoShaper velRightShaper;
+  
   double vel, z_rot;
+  double vLeft, vRight;
 
   public HID_Xbox_Subsystem(double velExpo, double rotExpo, double deadzone) { 
     //register the devices
@@ -53,8 +57,12 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     // left Y-stick throttle
     // right X-stick turn rate
     velShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft)); 
-    rotShaper = new ExpoShaper(rotExpo, () -> driver.getX(Hand.kRight));
+    rotShaper = new ExpoShaper(rotExpo, () -> (driver.getX(Hand.kRight)*-1.0));  //TODO:larry -1
     
+    //Tank drive
+    velLeftShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft)); 
+    velRightShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
+
     //add some deadzone in normalized coordinates
     rotShaper.setDeadzone(deadzone);
     velShaper.setDeadzone(deadzone);
@@ -66,18 +74,20 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     // needed inputs.
     z_rot = rotShaper.get();
     vel = velShaper.get();
+    
+    //tank
+    vLeft = velLeftShaper.get();
+    vRight = velRightShaper.get();
   } 
 
   @Override
   public double getVelocityX() {
-   // not set for XY control 
-    return 0;
+    return 0;   //todo:fix for mechanum 
   }
 
   @Override
   public double getVelocityY() {
-    // not set for XY control 
-    return 0;
+    return vLeft;
   }
 
   @Override
@@ -87,12 +97,24 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
 
   @Override
   public double getRotation() {
-    return z_rot;
+    return z_rot;   
   }
 
   @Override
   public boolean isNormalized() {
     return true;
+  }
+
+  //Tank Drive controls
+  @Override
+  public double getVelocityLeft() {
+    return vLeft;
+  }  
+  
+
+  @Override
+  public double getVelocityRight() {
+    return vRight;
   }
 
 }

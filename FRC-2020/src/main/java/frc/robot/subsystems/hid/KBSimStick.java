@@ -39,7 +39,7 @@ public class KBSimStick extends GenericHID {
     
   @Override
   public double getX(Hand hand) {
-    if (hand.value != Hand.kRight) {
+    if (hand != Hand.kRight) {
 
     }
     return 0;

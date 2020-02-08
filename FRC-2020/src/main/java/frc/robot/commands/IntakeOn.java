@@ -17,6 +17,7 @@ public class IntakeOn extends CommandBase {
 
   private static Intake_Subsystem m_intake;
   private double motorPower = 0.5;
+  private final double RPM_TARGET = 1000;
 
   public IntakeOn(Intake_Subsystem m_intake) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -32,7 +33,7 @@ public class IntakeOn extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.intakeOn(motorPower);
+    m_intake.intakeOn(RPM_TARGET);
     m_intake.magazineOn(motorPower);
   }
 

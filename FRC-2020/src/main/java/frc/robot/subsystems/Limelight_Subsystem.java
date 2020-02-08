@@ -72,6 +72,10 @@ public void enableLED() {
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 }
 
+public boolean valid(){
+  return (target == 1) ? true : false;
+}
+
   public void log(int interval){
     if((interval + logTimer) < System.currentTimeMillis()){ //interval in ms
       logTimer = System.currentTimeMillis();

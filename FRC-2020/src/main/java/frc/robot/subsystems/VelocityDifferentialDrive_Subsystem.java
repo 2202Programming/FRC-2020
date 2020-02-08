@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.SpeedController;
 import static frc.robot.Constants.*;
 
-public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements ArcadeDrive {
+public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements ArcadeDrive, TankDrive {
 
 	private final static double MAXRPM = 1000.0;
 	private final static double MAXDPS = 5.0;

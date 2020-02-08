@@ -30,9 +30,13 @@ public interface DriverControls extends Subsystem {
   
   public HashMap<Id, GenericHID> deviceMap = new HashMap<Id, GenericHID>();
 
-  //mech, tank
+  //mech
   public double getVelocityX();
   public double getVelocityY();
+
+  //tank
+  public double getVelocityLeft();
+  public double getVelocityRight();
 
   //arcade drive
   public double getVelocity();

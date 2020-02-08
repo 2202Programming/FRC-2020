@@ -16,7 +16,7 @@ import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.IntakeOn;
 import frc.robot.commands.ShooterOn;
 import frc.robot.commands.drive.ArcadeDriveCmd;
-
+import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
@@ -54,7 +54,9 @@ public class RobotContainer {
     intake = new Intake_Subsystem();
 
     //Use basic arcade drive command
-    driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
+    //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
+    //Use tank drive to make Dustin happy - dpl 2/8/2020
+    driveTrain.setDefaultCommand(new TankDriveCmd(driverControls, driveTrain));
   
     // Configure the button bindings
     configureButtonBindings();

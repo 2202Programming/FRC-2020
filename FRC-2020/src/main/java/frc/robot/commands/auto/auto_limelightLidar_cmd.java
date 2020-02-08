@@ -15,12 +15,13 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.subsystems.ifx.ArcadeDrive;
 
 public class auto_limelightLidar_cmd extends CommandBase {
   
    final double mm2in = 1.0 / 25.4;
 
-  private final VelocityDifferentialDrive_Subsystem drive;
+  private final ArcadeDrive drive;
   private final Limelight_Subsystem limelight;
 
   private final double stopDist; // inches
@@ -46,7 +47,7 @@ public class auto_limelightLidar_cmd extends CommandBase {
    * D Laufenberg
    * 
    */
-  public auto_limelightLidar_cmd(final VelocityDifferentialDrive_Subsystem drive, final Limelight_Subsystem limelight,
+  public auto_limelightLidar_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight,
       final double stopDist, final double angleTarget, final double maxSpeed, double targetVelocity) {
     this.drive = drive;
     this.limelight = limelight;
@@ -65,7 +66,7 @@ public class auto_limelightLidar_cmd extends CommandBase {
     addRequirements(drive);
   }
 
-  public auto_limelightLidar_cmd(VelocityDifferentialDrive_Subsystem drive, Limelight_Subsystem limelight, double stopDist, double maxSpeed, double angleTarget,
+  public auto_limelightLidar_cmd(ArcadeDrive drive, Limelight_Subsystem limelight, double stopDist, double maxSpeed, double angleTarget,
       double tolerancePct, double targetVelocity) {
     this(drive, limelight, stopDist, maxSpeed, angleTarget, targetVelocity);
     this.tolerancePct = tolerancePct;

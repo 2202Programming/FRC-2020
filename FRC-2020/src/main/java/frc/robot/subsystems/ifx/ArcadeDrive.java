@@ -14,5 +14,6 @@ public interface ArcadeDrive extends Subsystem {
     public void arcadeDrive(double xSpeed, double zRot);
     public double getLeftVel(boolean normalized);
     public double getRightVel(boolean normalized);
+    public void velocityArcadeDrive(double feetPerSecond, double degreePerSecond);
 
 }

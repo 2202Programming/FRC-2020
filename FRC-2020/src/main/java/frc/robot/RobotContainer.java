@@ -48,6 +48,8 @@ public class RobotContainer {
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
 
     //Use basic arcade drive command
+    //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
+    //Use tank drive to make Dustin happy - dpl 2/8/2020
     driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
   
     // Configure the button bindings

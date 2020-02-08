@@ -14,7 +14,7 @@ import static frc.robot.Constants.*;
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements ArcadeDrive, TankDrive {
 
-	private final static double MAXRPM = 1000.0;
+	private final static double MAXRPM = 15000.0;
 	private final static double MAXDPS = 5.0;
 
 	public final double WHEEL_RADIUS = 3; // inches

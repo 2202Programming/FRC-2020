@@ -39,7 +39,7 @@ public class Intake_Subsystem extends SubsystemBase {
   //public DigitalInput intake_down_sensor = new DigitalInput(Constants.INTAKE_DOWN_DIO);
 
   // magazine
-  public WPI_TalonSRX magazine_talon = new WPI_TalonSRX(Constants.MAGAZINE_TALON_CAN);
+  public Spark magazine = new Spark(Constants.MAGAZINE_PWM);
   // shooters
   public TalonSRX upper_shooter_talon = new TalonSRX(Constants.UPPER_SHOOTER_TALON_CAN);
   //public WPI_TalonSRX lower_shooter_talon = new WPI_TalonSRX(Constants.LOWER_SHOOTER_TALON_CAN);
@@ -126,15 +126,11 @@ public class Intake_Subsystem extends SubsystemBase {
   }
 
   public void magazineOn(double motorStrength) {
-    //magazine_talon.set(motorStrength);
-
-    //PID
-
-    magazine_talon.pidWrite(motorStrength);
+    magazine.set(motorStrength);
   }
 
   public void magazineOff() {
-    magazine_talon.set(0);
+    magazine.set(0);
   }
 
   public void shooterOn(double RPM_target) {

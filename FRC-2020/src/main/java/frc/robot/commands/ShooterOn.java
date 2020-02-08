@@ -18,7 +18,7 @@ public class ShooterOn extends CommandBase {
     this.m_intake = m_intake;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_intake);
+   // addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.

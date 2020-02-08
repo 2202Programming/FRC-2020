@@ -16,11 +16,11 @@ import frc.robot.subsystems.Intake_Subsystem;
 public class IntakeOn extends CommandBase {
 
   private static Intake_Subsystem m_intake;
-  private double motorPower = 0.5;
+  private double motorPower = 0.7;
 
   public IntakeOn(Intake_Subsystem m_intake) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_intake);
+  //  addRequirements(m_intake);
     IntakeOn.m_intake = m_intake;
   }
 

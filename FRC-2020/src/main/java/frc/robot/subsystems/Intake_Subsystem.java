@@ -71,8 +71,9 @@ public class Intake_Subsystem extends SubsystemBase {
      * kF: 1023 represents output value to Talon at 100%, 7200 represents Velocity units at 100% output
      * 
 	 * 	                                    			  kP   kI   kD   kF          Iz    PeakOut */
-    public final static Gains kGains_Velocit = new Gains( 0.25, 0.001, 20, 1023.0/7200.0,  300,  1.00);
+    public final static Gains kGains_Velocit = new Gains( 0.25, 0.001, 0, 0.0 /* 1023.0/7200.0 */,  300,  1.00);
 
+    final double GEAR = 0.1;  //10:1 gear, encoder after the gearsS 
 
   public Intake_Subsystem() {
      /* Factory Default all hardware to prevent unexpected behaviour */
@@ -83,8 +84,8 @@ public class Intake_Subsystem extends SubsystemBase {
     kPIDLoopIdx, kTimeoutMs);
 
     /* Config the peak and nominal outputs */
-		upper_shooter_talon.configNominalOutputForward(1.0, kTimeoutMs);
-		upper_shooter_talon.configNominalOutputReverse(-1.0, kTimeoutMs);
+		upper_shooter_talon.configNominalOutputForward(0, kTimeoutMs);
+		upper_shooter_talon.configNominalOutputReverse(0, kTimeoutMs);
 		upper_shooter_talon.configPeakOutputForward(1, kTimeoutMs);
 		upper_shooter_talon.configPeakOutputReverse(-1, kTimeoutMs);
 
@@ -143,8 +144,9 @@ public class Intake_Subsystem extends SubsystemBase {
 			 * velocity setpoint is in units/100ms
        * CHECK UNITS/REV WITH GEARBOX!
 			 */
-			double targetVelocity_UnitsPer100ms = RPM_target * 4096 * 600;
-			upper_shooter_talon.set(ControlMode.Velocity, targetVelocity_UnitsPer100ms);
+			double targetVelocity_UnitsPer100ms = GEAR * RPM_target * 4096 / 600;
+//			upper_shooter_talon.set(ControlMode.Velocity, targetVelocity_UnitsPer100ms);
+     upper_shooter_talon.set(ControlMode.PercentOutput, 0.5); // Gautam: just trying a force percentOutput mode
 
   }
 

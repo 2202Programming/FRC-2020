@@ -41,6 +41,7 @@ public class IntakeOn extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.intakeOff();
     m_intake.magazineOff();
+    System.out.println("IntakeOn-Ended");
   }
 
   // Returns true when the command should end.

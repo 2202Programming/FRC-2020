@@ -8,20 +8,21 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
+import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.subsystems.ifx.ArcadeDrive;
 
 public class auto_limelightDrive_cmd extends CommandBase {
   
    final double mm2in = 1.0 / 25.4;
 
-  private final VelocityDifferentialDrive_Subsystem drive;
+  private final ArcadeDrive drive;
   private final Limelight_Subsystem limelight;
+  private final Lidar_Subsystem lidar;
 
   private final double stopDist; // inches
   private double tolerancePct = .05;
@@ -46,10 +47,11 @@ public class auto_limelightDrive_cmd extends CommandBase {
    * D Laufenberg
    * 
    */
-  public auto_limelightDrive_cmd(final VelocityDifferentialDrive_Subsystem drive, final Limelight_Subsystem limelight,
+  public auto_limelightDrive_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final Lidar_Subsystem lidar,
       final double stopDist, final double angleTarget, final double maxSpeed, double targetVelocity) {
     this.drive = drive;
     this.limelight = limelight;
+    this.lidar = lidar;
     this.stopDist = stopDist; //inches
     this.maxSpeed = maxSpeed;
     this.angleTarget = angleTarget;
@@ -65,9 +67,10 @@ public class auto_limelightDrive_cmd extends CommandBase {
     addRequirements(drive);
   }
 
-  public auto_limelightDrive_cmd(VelocityDifferentialDrive_Subsystem drive, Limelight_Subsystem limelight, double stopDist, double maxSpeed, double angleTarget,
+  public auto_limelightDrive_cmd(ArcadeDrive drive, Limelight_Subsystem limelight, final Lidar_Subsystem lidar,
+  double stopDist, double maxSpeed, double angleTarget,
       double tolerancePct, double targetVelocity) {
-    this(drive, limelight, stopDist, maxSpeed, angleTarget, targetVelocity);
+    this(drive, limelight, lidar, stopDist, maxSpeed, angleTarget, targetVelocity);
     this.tolerancePct = tolerancePct;
   }
 
@@ -114,6 +117,6 @@ public class auto_limelightDrive_cmd extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return RobotContainer.lidar.valid();
+    return lidar.valid();
   }
 }

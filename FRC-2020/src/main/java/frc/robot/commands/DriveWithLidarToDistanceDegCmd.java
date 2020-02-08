@@ -12,12 +12,12 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Lidar_Subsystem;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.subsystems.ifx.ArcadeDrive;
 
 public class DriveWithLidarToDistanceDegCmd extends CommandBase {
   final double mm2in = 1.0 / 25.4;
 
-  private final VelocityDifferentialDrive_Subsystem drive;
+  private final ArcadeDrive drive;
   private final Lidar_Subsystem lidar;
 
   private final double stopDist; // inches
@@ -36,18 +36,17 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
    * Creates a new DriveWithLidarToDistanceCmd.
    * 
    * stopDistance = inches to stop from the wall maxSpeed = percent max speed (+-
-   * 1.0 max)
-   * angleTarget = degrees from front of robot to target
-   * Recommend using this command with withTimeout()
+   * 1.0 max) angleTarget = degrees from front of robot to target Recommend using
+   * this command with withTimeout()
    * 
    * D Laufenberg
    * 
    */
-  public DriveWithLidarToDistanceDegCmd(final VelocityDifferentialDrive_Subsystem drive, final Lidar_Subsystem lidar,
-      final double stopDist, final double angleTarget, final double maxSpeed) {
+  public DriveWithLidarToDistanceDegCmd(final ArcadeDrive drive, final Lidar_Subsystem lidar, final double stopDist,
+      final double angleTarget, final double maxSpeed) {
     this.drive = drive;
     this.lidar = lidar;
-    this.stopDist = stopDist; //inches
+    this.stopDist = stopDist; // inches
     this.maxSpeed = maxSpeed;
     this.angleTarget = angleTarget;
 
@@ -55,14 +54,13 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
     distancePIDController = new PIDController(Kp, Ki, Kd);
     anglePIDController = new PIDController(Kap, Kai, Kad);
 
-
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(lidar);
-    addRequirements(drive);
+    addRequirements(this.lidar);
+    addRequirements(this.drive);
   }
 
-  public DriveWithLidarToDistanceDegCmd(VelocityDifferentialDrive_Subsystem drive, Lidar_Subsystem lidar, double stopDist, double maxSpeed, double angleTarget,
-      double tolerancePct) {
+  public DriveWithLidarToDistanceDegCmd(ArcadeDrive drive, Lidar_Subsystem lidar, double stopDist, double maxSpeed,
+      double angleTarget, double tolerancePct) {
     this(drive, lidar, stopDist, maxSpeed, angleTarget);
     this.tolerancePct = tolerancePct;
   }
@@ -90,7 +88,7 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
     speedCmd = MathUtil.clamp(speedCmd, -maxSpeed, maxSpeed);
     angleCmd = MathUtil.clamp(angleCmd, -maxSpeed, maxSpeed);
 
-    SmartDashboard.putNumber("PID error (inches)", distancePIDController.getPositionError());    
+    SmartDashboard.putNumber("PID error (inches)", distancePIDController.getPositionError());
     SmartDashboard.putNumber("PID Verr", distancePIDController.getVelocityError());
     SmartDashboard.putNumber("Range (inches)", range);
     SmartDashboard.putNumber("PID Output (%)", speedCmd);
@@ -99,8 +97,8 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
     SmartDashboard.putNumber("Angle", lidar.findAngle());
     SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
     // move forward, with rotation
-    
-    //drive.driveCartesian(0.0, angleCmd, speedCmd);
+    // Derek says "Use the velArcadeDrive() speed/angle control"
+    //drive.velocityArcadeDrive(feetPerSecond, degreePerSecond);
   }
 
   // Called once the command ends or is interrupted.
@@ -111,7 +109,7 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-//    return distancePIDController.atSetpoint();
-return false;
+    // return distancePIDController.atSetpoint();
+    return false;
   }
 }

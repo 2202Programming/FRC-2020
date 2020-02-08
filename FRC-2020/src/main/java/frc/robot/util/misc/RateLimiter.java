@@ -123,7 +123,7 @@ public class RateLimiter {
     if (model == InputModel.Position) {
       // for postion limits, need to look at command vs current an limit rate aka dX
       double rate = (kc - Xprev) / dT;
-      double phyRate = (devPos - devPosPrev) / dT; // this could amplify noise
+      //double phyRate = (devPos - devPosPrev) / dT; // this could amplify noise
       dX = limit(rate, dx_fall, dx_raise);
     }
     return dX;

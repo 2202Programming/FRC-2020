@@ -126,7 +126,11 @@ public class Intake_Subsystem extends SubsystemBase {
   }
 
   public void magazineOn(double motorStrength) {
-    magazine_talon.set(motorStrength);
+    //magazine_talon.set(motorStrength);
+
+    //PID
+
+    magazine_talon.pidWrite(motorStrength);
   }
 
   public void magazineOff() {

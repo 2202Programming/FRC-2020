@@ -34,7 +34,7 @@ public final class Constants {
     public static final int INTAKE_DOWN_DIO = 5;
     public static final int INTAKE_SPARK_PWM = 0;
     public static final int MAGAZINE_TALON_CAN = 19;
-    public static final int UPPER_SHOOTER_TALON_CAN = 22;
+    public static final int UPPER_SHOOTER_TALON_CAN = 18;
     public static final int LOWER_SHOOTER_TALON_CAN = 23;
     public static final int ELEVATOR_TALON_CAN = 24;
     public static final int ELEVATOR_PCM_ID = 1;

@@ -18,6 +18,7 @@ import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
+import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
@@ -38,6 +39,7 @@ public class RobotContainer {
   public final VelocityDifferentialDrive_Subsystem driveTrain;
   public final Intake_Subsystem intake;
   public static final Lidar_Subsystem lidar = new Lidar_Subsystem();
+  public static final Limelight_Subsystem limelight = new Limelight_Subsystem();
   // private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
   // private final AutomaticGearShift autoGearShift = new
   // AutomaticGearShift(driveTrain, gearShifter);

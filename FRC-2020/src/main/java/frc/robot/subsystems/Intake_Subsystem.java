@@ -42,7 +42,7 @@ public class Intake_Subsystem extends SubsystemBase {
   public WPI_TalonSRX elevator_talon = new WPI_TalonSRX(Constants.ELEVATOR_TALON_CAN);
 
   public Intake_Subsystem() {
-
+  
   }
 
   @Override

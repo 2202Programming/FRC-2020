@@ -50,7 +50,7 @@ public final class Constants {
     public static final int BR_SPARKMAX_CANID = 35;
 
     //Gearshifter
-    public static final int GEARSHIFT_PCM_ID = 10;
+    public static final int GEARSHIFT_PCM_ID = 2;
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
 }

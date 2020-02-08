@@ -10,9 +10,11 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Constants;
 import frc.robot.Gains;
@@ -35,71 +37,95 @@ public class Intake_Subsystem extends SubsystemBase {
       Constants.ELEVATOR_UP_SOLENOID_PCM, Constants.ELEVATOR_DOWN_SOLENOID_PCM);
 
   // Intake Pneumatic Sensors
-  //public DigitalInput intake_up_sensor = new DigitalInput(Constants.INTAKE_UP_DIO);
-  //public DigitalInput intake_down_sensor = new DigitalInput(Constants.INTAKE_DOWN_DIO);
+  // public DigitalInput intake_up_sensor = new
+  // DigitalInput(Constants.INTAKE_UP_DIO);
+  // public DigitalInput intake_down_sensor = new
+  // DigitalInput(Constants.INTAKE_DOWN_DIO);
 
   // magazine
   public Spark magazine = new Spark(Constants.MAGAZINE_PWM);
   // shooters
   public TalonSRX upper_shooter_talon = new TalonSRX(Constants.UPPER_SHOOTER_TALON_CAN);
-  //public WPI_TalonSRX lower_shooter_talon = new WPI_TalonSRX(Constants.LOWER_SHOOTER_TALON_CAN);
+  // public WPI_TalonSRX lower_shooter_talon = new
+  // WPI_TalonSRX(Constants.LOWER_SHOOTER_TALON_CAN);
   // elevator
-//  public WPI_TalonSRX elevator_talon = new WPI_TalonSRX(Constants.ELEVATOR_TALON_CAN);
+  // public WPI_TalonSRX elevator_talon = new
+  // WPI_TalonSRX(Constants.ELEVATOR_TALON_CAN);
 
+  /**
+   * Which PID slot to pull gains from. Starting 2018, you can choose from 0,1,2
+   * or 3. Only the first two (0,1) are visible in web-based configuration.
+   */
+  public static final int kSlotIdx = 0;
 
-	/**
-	 * Which PID slot to pull gains from. Starting 2018, you can choose from
-	 * 0,1,2 or 3. Only the first two (0,1) are visible in web-based
-	 * configuration.
-	 */
-	public static final int kSlotIdx = 0;
+  /**
+   * Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops. For now
+   * we just want the primary one.
+   */
+  final int kPIDLoopIdx = 0;
 
-	/**
-	 * Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops. For
-	 * now we just want the primary one.
-	 */
-	public static final int kPIDLoopIdx = 0;
+  /**
+   * Set to zero to skip waiting for confirmation, set to nonzero to wait and
+   * report to DS if action fails.
+   */
+  final int kTimeoutMs = 30;
 
-	/**
-	 * Set to zero to skip waiting for confirmation, set to nonzero to wait and
-	 * report to DS if action fails.
-	 */
-    public static final int kTimeoutMs = 30;
-
-	/**
-	 * PID Gains may have to be adjusted based on the responsiveness of control loop.
-     * kF: 1023 represents output value to Talon at 100%, 7200 represents Velocity units at 100% output
-     * 
-	 * 	                                    			  kP   kI   kD   kF          Iz    PeakOut */
-    public final static Gains kGains_Velocit = new Gains( 0.25, 0.001, 20, 1023.0/7200.0,  300,  1.00);
-
+  /**
+   * PID Gains may have to be adjusted based on the responsiveness of control
+   * loop. kF: 1023 represents output value to Talon at 100%, 7200 represents
+   * Velocity units at 100% output
+   * 
+   * kP kI kD kF Iz PeakOut
+   */
+   final static Gains kGains_Velocit = new Gains(0.25, 0.001, 20, 1023.0 / 7200.0, 300, 1.00);
+   ErrorCode lastError;
+   TalonSRXConfiguration shooterCfg = new TalonSRXConfiguration();
 
   public Intake_Subsystem() {
      /* Factory Default all hardware to prevent unexpected behaviour */
     upper_shooter_talon.configFactoryDefault();
+    shooterCfg.slot0.kP = 1.0;
+    shooterCfg.slot0.kI = 0.0001;
+    shooterCfg.slot0.kD = 0.0;
+    shooterCfg.slot0.kF = 0.0;
+/*
+    shooterCfg.slot1 = shooterCfg.slot0;
+    shooterCfg.auxPIDPolarity = false;
+    shooterCfg.feedbackNotContinuous = true;
+    shooterCfg.forwardSoftLimitEnable = false;
+*/
+    
 
     /* Config sensor used for Primary PID [Velocity] */
     upper_shooter_talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative,
     kPIDLoopIdx, kTimeoutMs);
+  
+    upper_shooter_talon.configAllSettings(shooterCfg);
 
-    /* Config the peak and nominal outputs */
-		upper_shooter_talon.configNominalOutputForward(1.0, kTimeoutMs);
-		upper_shooter_talon.configNominalOutputReverse(-1.0, kTimeoutMs);
+    /* Config the peak and nominal outputs */ /*
+		upper_shooter_talon.configNominalOutputForward(0, kTimeoutMs);
+		upper_shooter_talon.configNominalOutputReverse(0, kTimeoutMs);
 		upper_shooter_talon.configPeakOutputForward(1, kTimeoutMs);
-		upper_shooter_talon.configPeakOutputReverse(-1, kTimeoutMs);
+    upper_shooter_talon.configPeakOutputReverse(-1, kTimeoutMs);
+    */
+    lastError = upper_shooter_talon.getLastError();
+
 
 		/* Config the Velocity closed loop gains in slot0 */
-		upper_shooter_talon.config_kF(kPIDLoopIdx, kGains_Velocit.kF, kTimeoutMs);
-		upper_shooter_talon.config_kP(kPIDLoopIdx, kGains_Velocit.kP, kTimeoutMs);
-		upper_shooter_talon.config_kI(kPIDLoopIdx, kGains_Velocit.kI, kTimeoutMs);
-		upper_shooter_talon.config_kD(kPIDLoopIdx, kGains_Velocit.kD, kTimeoutMs);
+		//upper_shooter_talon.config_kF(kPIDLoopIdx, 0.0 /*kGains_Velocit.kF */, kTimeoutMs);
+		//upper_shooter_talon.config_kP(kPIDLoopIdx, kGains_Velocit.kP, kTimeoutMs);
+		//upper_shooter_talon.config_kI(kPIDLoopIdx, kGains_Velocit.kI, kTimeoutMs);
+		//upper_shooter_talon.config_kD(kPIDLoopIdx, kGains_Velocit.kD, kTimeoutMs);
 
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    
+    lastError = upper_shooter_talon.getLastError();
+    TalonSRXConfiguration allConfigs = new TalonSRXConfiguration();
+    upper_shooter_talon.getAllConfigs(allConfigs);
+
   }
   /*
    * 
@@ -143,13 +169,13 @@ public class Intake_Subsystem extends SubsystemBase {
 			 * velocity setpoint is in units/100ms
        * CHECK UNITS/REV WITH GEARBOX!
 			 */
-			double targetVelocity_UnitsPer100ms = RPM_target * 4096 * 600;
+			double targetVelocity_UnitsPer100ms = RPM_target * 4096 / 600;
 			upper_shooter_talon.set(ControlMode.Velocity, targetVelocity_UnitsPer100ms);
 
   }
 
   public void shooterOff() {
-    upper_shooter_talon.set(ControlMode.PercentOutput,0);
+    upper_shooter_talon.set(ControlMode.Velocity, 0);
  
   }
 

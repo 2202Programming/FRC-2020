@@ -44,7 +44,7 @@ public class Intake_Subsystem extends SubsystemBase {
   public TalonSRX upper_shooter_talon = new TalonSRX(Constants.UPPER_SHOOTER_TALON_CAN);
   //public WPI_TalonSRX lower_shooter_talon = new WPI_TalonSRX(Constants.LOWER_SHOOTER_TALON_CAN);
   // elevator
-  public WPI_TalonSRX elevator_talon = new WPI_TalonSRX(Constants.ELEVATOR_TALON_CAN);
+//  public WPI_TalonSRX elevator_talon = new WPI_TalonSRX(Constants.ELEVATOR_TALON_CAN);
 
 
 	/**
@@ -83,8 +83,8 @@ public class Intake_Subsystem extends SubsystemBase {
     kPIDLoopIdx, kTimeoutMs);
 
     /* Config the peak and nominal outputs */
-		upper_shooter_talon.configNominalOutputForward(0, kTimeoutMs);
-		upper_shooter_talon.configNominalOutputReverse(0, kTimeoutMs);
+		upper_shooter_talon.configNominalOutputForward(1.0, kTimeoutMs);
+		upper_shooter_talon.configNominalOutputReverse(-1.0, kTimeoutMs);
 		upper_shooter_talon.configPeakOutputForward(1, kTimeoutMs);
 		upper_shooter_talon.configPeakOutputReverse(-1, kTimeoutMs);
 

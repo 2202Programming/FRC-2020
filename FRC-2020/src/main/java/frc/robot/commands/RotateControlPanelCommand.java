@@ -21,41 +21,54 @@ public class RotateControlPanelCommand extends CommandBase {
     private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
 
     private Control_Panel panel;
+
     private int numRotationsNeeded;
+    private int numSlices;
     private double degreesRotated;
+    private String init_color;
+    private String curr_color;
+    private Color_Subsystem detector;
     //private String init_color;
     //private String final_color;
     //private String[] colorOrder = null; //TODO: get color order of control panel
 
-    public RotateControlPanelCommand(int num_rotations,Control_Panel panel) {
+    public RotateControlPanelCommand(int num_rotations,Control_Panel panel,Color_Subsystem detector) {
         numRotationsNeeded = num_rotations;
         degreesRotated = 0;
+        this.detector = detector;
         this.panel = panel;
+        numSlices = 25;
         //requirements
         addRequirements(panel);
+        addRequirements(detector);
     }
 
     @Override
     public void initialize() {
         // TODO: Change
         //Command.super.initialize();
+        init_color = detector.getColor();
+        curr_color = init_color;
         //add arm
         panel.resetEncoder();
         panel.setSpeed(SPEED);
         
     }
 
-
-
     @Override
     public void execute() {
         // TODO Auto-generated method stub
         degreesRotated = findDegrees();
+        if(!curr_color.equals(detector.getColor()))
+            {
+                numSlices--;
+                curr_color = detector.getColor();
+            }
     }
 
     @Override
     public boolean isFinished() {
-        return degreesRotated >= numRotationsNeeded * FULL_ROTATION; // 360 is number of degrees in one rotation
+        return degreesRotated >= numRotationsNeeded * FULL_ROTATION && numSlices == 0 && curr_color.equals(init_color); // 360 is number of degrees in one rotation
     }
 
     public double findDegrees()

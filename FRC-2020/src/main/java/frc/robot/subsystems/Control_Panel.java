@@ -18,7 +18,6 @@ public class Control_Panel extends SubsystemBase
     private static final int TALON_CHANNEL = 1;
     private static final int CHANNEL_A = 1;
     private static final int CHANNEL_B = 2;
-
     private Talon m_talon;
     private Encoder m_encoder;
 

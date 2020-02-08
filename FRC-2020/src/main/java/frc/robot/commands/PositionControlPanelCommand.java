@@ -15,7 +15,16 @@ import frc.robot.subsystems.FSMState_Subsystem;
  * Positions the control panel to an indicated color.
  */
 public class PositionControlPanelCommand extends CommandBase {
+    private static final int SLICE_DEGREE = 45;
+    private static final int FULL_ROTATION = 360;
+    private static final double STOP = 0;
+    private static final double WHEEL_CIRCUMFERENCE = 42;//wrong
+    private static final int PANEL_DIAMETER = 20;//20 inches
+    private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
+
+    
     private Color_Subsystem color_detector;
+    private double degreesRotated;
     private String init_color;
     private String curr_color;
     private String final_color;
@@ -29,6 +38,7 @@ public class PositionControlPanelCommand extends CommandBase {
         this.color_detector = color_detector;
         this.panel = panel;
         colors = new String[]{"Blue","Green","Red","Yellow"};
+        degreesRotated = 0;
         //requirements
         addRequirements(color_detector);
         addRequirements(panel);
@@ -48,6 +58,7 @@ public class PositionControlPanelCommand extends CommandBase {
             if(final_color.equals(colors[i]))
                 index_final = i;
         }
+        panel.resetEncoder();
         panel.setSpeed(findShortest() * 0.5);
         //move arm
     }
@@ -61,11 +72,12 @@ public class PositionControlPanelCommand extends CommandBase {
             count--;
             curr_color = color_detector.getColor();
         }
+        degreesRotated = findDegrees();
     }
 
     @Override
     public boolean isFinished() {
-        return color_detector.getColor().equals(final_color);
+        return degreesRotated >= (findShortest()*SLICE_DEGREE) && color_detector.getColor().equals(final_color) && count == 0;
     }
 
     public int findShortest()
@@ -92,10 +104,15 @@ public class PositionControlPanelCommand extends CommandBase {
             count = 2;
     }
 
+    public double findDegrees()
+    {
+        return (((panel.getDistance()/FULL_ROTATION) * WHEEL_CIRCUMFERENCE)/PANEL_CIRCUMFERENCE)*FULL_ROTATION;
+    }
+
     @Override
     public void end(boolean interrupted)
     {
         //retract arm
-        panel.setSpeed(0);
+        panel.setSpeed(STOP);
     }
 }

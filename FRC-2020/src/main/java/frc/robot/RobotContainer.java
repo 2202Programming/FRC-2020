@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.drive.ArcadeDriveCmd;
-
+import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.GearShifter.Gear;
@@ -50,7 +50,7 @@ public class RobotContainer {
     //Use basic arcade drive command
     //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
     //Use tank drive to make Dustin happy - dpl 2/8/2020
-    driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
+    driveTrain.setDefaultCommand(new TankDriveCmd(driverControls, driveTrain));
   
     // Configure the button bindings
     configureButtonBindings();

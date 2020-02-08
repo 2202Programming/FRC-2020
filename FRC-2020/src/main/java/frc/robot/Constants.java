@@ -42,12 +42,21 @@ public final class Constants {
     public static final int ELEVATOR_DOWN_SOLENOID_PCM = 5;
 
     //Drivetrain
+    /*  THESE ARE MVP
     public static final int FL_SPARKMAX_CANID = 30;
     public static final int ML_SPARKMAX_CANID = 31;
     public static final int BL_SPARKMAX_CANID = 32;
     public static final int FR_SPARKMAX_CANID = 33;
     public static final int MR_SPARKMAX_CANID = 34;
     public static final int BR_SPARKMAX_CANID = 35;
+*/
+    //THESE ARE FOR LARRY - DO NOT Merge
+    public static final int FL_SPARKMAX_CANID = 11;
+    public static final int ML_SPARKMAX_CANID = 12;
+    public static final int BL_SPARKMAX_CANID = 13;
+    public static final int FR_SPARKMAX_CANID = 24;
+    public static final int MR_SPARKMAX_CANID = 22;
+    public static final int BR_SPARKMAX_CANID = 23;
 
     //Gearshifter
     public static final int GEARSHIFT_PCM_ID = 2;

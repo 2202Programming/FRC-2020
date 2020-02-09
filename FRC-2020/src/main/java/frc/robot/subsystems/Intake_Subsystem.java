@@ -77,7 +77,7 @@ public class Intake_Subsystem extends SubsystemBase {
    * 
    * kP kI kD kF Iz PeakOut
    */
-   final static Gains kGains_Velocit = new Gains(0.25, 0.001, 20, 1023.0 / 7200.0, 300, 1.00);
+   //final static Gains kGains_Velocit = new Gains(0.25, 0.001, 20, 1023.0 / 7200.0, 300, 1.00);
    ErrorCode lastError;
    TalonSRXConfiguration shooterCfg = new TalonSRXConfiguration();
 
@@ -116,7 +116,7 @@ public class Intake_Subsystem extends SubsystemBase {
 		upper_shooter_talon.configNominalOutputReverse(-1.0, kTimeoutMs);
 		upper_shooter_talon.configPeakOutputForward(1, kTimeoutMs);
     upper_shooter_talon.configPeakOutputReverse(-1, kTimeoutMs);
-    */
+ 
     lastError = upper_shooter_talon.getLastError();
 
 

@@ -17,6 +17,7 @@ public class IntakeOn extends CommandBase {
 
   private static Intake_Subsystem m_intake;
   private double motorPower = 0.7;
+  private double RPM_TARGET = 1000;
 
   public IntakeOn(Intake_Subsystem m_intake) {
     // Use addRequirements() here to declare subsystem dependencies.

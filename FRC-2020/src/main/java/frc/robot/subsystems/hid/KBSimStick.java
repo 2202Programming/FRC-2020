@@ -1,9 +1,10 @@
 package frc.robot.subsystems.hid;
 
+import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.hal.HAL;
+
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -19,19 +20,18 @@ public class KBSimStick extends GenericHID {
   @SuppressWarnings({ "MemberName", "PMD.SingularField" })
   public enum Button {
     // Buttons
+    FlapUp(1), FlapDown(2),  
     A1(3), A2(4), A3(5), B1(6), B2(7), B3(8), 
     C1(9), C2(10), C3(11), 
-    FlapUp(1), FlapDown(2),  
     Start(12),
     Eject(13),
-    Mode(30),     //this will also switch trigger modes
     // RED MODE
     TriggerRed(14), PinkyTriggerRed(15), TopTriggerRed(18), PinkyTopTriggerRed(19),
     // GREEN MODE
-    TriggerGn(16), PinkyTriggerGn(17), TopTriggerGn(20), PinkyTopTriggerGn(21),;
+    TriggerGn(16), PinkyTriggerGn(17), TopTriggerGn(20), PinkyTopTriggerGn(21),
+    Mode(30);     //this will also switch trigger modes
 
     public int value;
-
     private Button(final int val) {
       value = val;
     }
@@ -68,8 +68,10 @@ public class KBSimStick extends GenericHID {
 
   public KBSimStick(final int port) {
     super(port);
+    super.setOutputs(0);
+
     // use xboxcontroller as reporting, best fit.
-    HAL.report(tResourceType.kResourceType_XboxController, port + 1, 0, "kbsimstick");
+    //HAL.report(tResourceType.kResourceType_XboxController, port + 1, 0, "kbsimstick");
   }
 
   public double getAxis(final Axis axis) {
@@ -85,6 +87,7 @@ public class KBSimStick extends GenericHID {
   public double getY(final Hand hand) {
     return getAxis(Axis.kY);
   }
+
 
   /**
    * There are a ton of buttons on the stick, so just use a general reader.

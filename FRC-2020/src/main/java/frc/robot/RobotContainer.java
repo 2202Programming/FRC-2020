@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.commands.drive.shift.ShiftGearCmd;
+import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.IntakeOn;
 import frc.robot.commands.ShooterOn;
 import frc.robot.commands.drive.ArcadeDriveCmd;
@@ -43,11 +44,15 @@ public class RobotContainer {
   // private final AutomaticGearShift autoGearShift = new
   // AutomaticGearShift(driveTrain, gearShifter);
 
+  //Tests to run during test mode
+  TestKBSimMode t1;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     //put driver controls first so its periodic() is called first.
+    
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
@@ -62,6 +67,7 @@ public class RobotContainer {
     configureButtonBindings();
     // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
     // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
+
   }
 
   /**
@@ -87,6 +93,8 @@ public class RobotContainer {
         
   }
 
+  
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -96,5 +104,30 @@ public class RobotContainer {
     // An ExampleCommand will run in autonomous
     return new CommandBase() {
     };
+  }
+
+  /**
+   *   InitTest() called from Robot when test mode is used.
+   *   Put code here to fire up in test mode.
+   */
+  public void initTest() {
+    t1 =  new TestKBSimMode();
+
+  }
+
+  public void runTestPeriod() {
+    t1.periodic();
+  }
+
+  /**
+   * Use this to pass the test command to the main {@link Robot} class.
+   *
+   * @return the command to run in test mode
+   */
+  public Command getTestCommand() {
+    // An ExampleCommand will run in autonomous
+    return new CommandBase() {
+    };
+
   }
 }

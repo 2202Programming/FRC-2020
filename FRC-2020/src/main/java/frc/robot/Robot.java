@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private Command m_testCommand;
 
   private RobotContainer m_robotContainer;
   private long lastLogTime;
@@ -114,6 +115,14 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    m_testCommand = m_robotContainer.getTestCommand();
+    
+    //Setup any test objects needed in test mode 
+    m_robotContainer.initTest();
+
+    if (m_testCommand != null) {
+      CommandScheduler.getInstance().schedule(m_testCommand);
+    }
   }
 
   /**
@@ -121,5 +130,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    m_robotContainer.runTestPeriod();
+    CommandScheduler.getInstance().run();
+
+
   }
 }

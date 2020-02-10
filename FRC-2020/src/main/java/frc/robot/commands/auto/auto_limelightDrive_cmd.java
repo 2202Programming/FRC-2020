@@ -5,69 +5,79 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Lidar_Subsystem;
+import frc.robot.subsystems.Limelight_Subsystem;
+
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.ifx.ArcadeDrive;
 
-public class DriveWithLidarToDistanceDegCmd extends CommandBase {
-  final double mm2in = 1.0 / 25.4;
+public class auto_limelightDrive_cmd extends CommandBase {
+  
+   final double mm2in = 1.0 / 25.4;
 
   private final ArcadeDrive drive;
+  private final Limelight_Subsystem limelight;
   private final Lidar_Subsystem lidar;
 
   private final double stopDist; // inches
   private double tolerancePct = .05;
   private double angleToleranceDeg = 3;
-  private double kInchesToPerPower = -0.8;
-  private double kDegreesToPerPower = -1;
+  private double kDegreesToDPS = 1; //convert PID rotation output to degrees per second for VelocityDifferentalDrive
   private double maxSpeed;
   private double angleTarget;
   private final double Kp = 0.2, Ki = 0.04, Kd = 0.25;
-  private final double Kap = 0.05, Kai = 0.001, Kad = 0.0;
+  private double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
+  private double targetVelocity;
 
   /**
    * Creates a new DriveWithLidarToDistanceCmd.
    * 
    * stopDistance = inches to stop from the wall maxSpeed = percent max speed (+-
-   * 1.0 max) angleTarget = degrees from front of robot to target Recommend using
-   * this command with withTimeout()
+   * 1.0 max)
+   * angleTarget = degrees from front of robot to target
+   * Recommend using this command with withTimeout()
    * 
    * D Laufenberg
    * 
    */
-  public DriveWithLidarToDistanceDegCmd(final ArcadeDrive drive, final Lidar_Subsystem lidar, final double stopDist,
-      final double angleTarget, final double maxSpeed) {
+  public auto_limelightDrive_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final Lidar_Subsystem lidar,
+      final double stopDist, final double angleTarget, final double maxSpeed, double targetVelocity) {
     this.drive = drive;
+    this.limelight = limelight;
     this.lidar = lidar;
-    this.stopDist = stopDist; // inches
+    this.stopDist = stopDist; //inches
     this.maxSpeed = maxSpeed;
     this.angleTarget = angleTarget;
+    this.targetVelocity = targetVelocity;
 
     // create the PID with vel and accl limits
     distancePIDController = new PIDController(Kp, Ki, Kd);
     anglePIDController = new PIDController(Kap, Kai, Kad);
 
+
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(this.lidar);
-    addRequirements(this.drive);
+    addRequirements(limelight);
+    addRequirements(drive);
   }
 
-  public DriveWithLidarToDistanceDegCmd(ArcadeDrive drive, Lidar_Subsystem lidar, double stopDist, double maxSpeed,
-      double angleTarget, double tolerancePct) {
-    this(drive, lidar, stopDist, maxSpeed, angleTarget);
+  public auto_limelightDrive_cmd(ArcadeDrive drive, Limelight_Subsystem limelight, final Lidar_Subsystem lidar,
+  double stopDist, double maxSpeed, double angleTarget,
+      double tolerancePct, double targetVelocity) {
+    this(drive, limelight, lidar, stopDist, maxSpeed, angleTarget, targetVelocity);
     this.tolerancePct = tolerancePct;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    limelight.enableLED();
     distancePIDController.reset();
     distancePIDController.setSetpoint(stopDist);
     distancePIDController.setTolerance(stopDist * tolerancePct, 0.5);
@@ -76,40 +86,37 @@ public class DriveWithLidarToDistanceDegCmd extends CommandBase {
     anglePIDController.reset();
     anglePIDController.setSetpoint(angleTarget);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // read Lidar range
-    double range = lidar.getAverageRange() * mm2in;
-    double speedCmd = distancePIDController.calculate(range) * kInchesToPerPower;
-    double angleCmd = kDegreesToPerPower * anglePIDController.calculate(lidar.findAngle());
-    speedCmd = MathUtil.clamp(speedCmd, -maxSpeed, maxSpeed);
+    double target_angle = limelight.getX();
+    double angleCmd = kDegreesToDPS * anglePIDController.calculate(target_angle);
     angleCmd = MathUtil.clamp(angleCmd, -maxSpeed, maxSpeed);
 
-    SmartDashboard.putNumber("PID error (inches)", distancePIDController.getPositionError());
-    SmartDashboard.putNumber("PID Verr", distancePIDController.getVelocityError());
-    SmartDashboard.putNumber("Range (inches)", range);
-    SmartDashboard.putNumber("PID Output (%)", speedCmd);
 
-    SmartDashboard.putNumber("PID error (degrees)", anglePIDController.getPositionError());
-    SmartDashboard.putNumber("Angle", lidar.findAngle());
-    SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
-    // move forward, with rotation
-    // Derek says "Use the velArcadeDrive() speed/angle control"
-    //drive.velocityArcadeDrive(feetPerSecond, degreePerSecond);
+   // SmartDashboard.putNumber("PID error (degrees)", anglePIDController.getPositionError());
+    SmartDashboard.putNumber("Angle", target_angle);
+    SmartDashboard.putNumber("PID Output DPS", angleCmd);
+
+    SmartDashboard.putData(anglePIDController);
+  
+    // move rotation only
+    drive.velocityArcadeDrive(targetVelocity, angleCmd);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(final boolean interrupted) {
+    limelight.disableLED();
+
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // return distancePIDController.atSetpoint();
-    return false;
+    return lidar.valid();
   }
 }

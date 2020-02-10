@@ -16,11 +16,12 @@ import frc.robot.subsystems.Intake_Subsystem;
 public class IntakeOn extends CommandBase {
 
   private static Intake_Subsystem m_intake;
-  private double motorPower = 0.5;
+  private double motorPower = 0.7;
+  private double RPM_TARGET = 1000;
 
   public IntakeOn(Intake_Subsystem m_intake) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_intake);
+  //  addRequirements(m_intake);
     IntakeOn.m_intake = m_intake;
   }
 
@@ -32,7 +33,7 @@ public class IntakeOn extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.intakeOn(motorPower);
+    m_intake.intakeOn(RPM_TARGET);
     m_intake.magazineOn(motorPower);
   }
 
@@ -41,6 +42,7 @@ public class IntakeOn extends CommandBase {
   public void end(boolean interrupted) {
     m_intake.intakeOff();
     m_intake.magazineOff();
+    System.out.println("IntakeOn-Ended");
   }
 
   // Returns true when the command should end.

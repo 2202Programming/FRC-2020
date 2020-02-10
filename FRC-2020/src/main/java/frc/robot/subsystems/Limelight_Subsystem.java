@@ -22,7 +22,7 @@ public class Limelight_Subsystem extends SubsystemBase {
    private double x;
    private double y;
    private double area; //area is between 0 and 100. Calculated as a percentage of image
-   private double target;
+   private boolean target;
    private long logTimer;
    
   public Limelight_Subsystem() {
@@ -43,7 +43,7 @@ public class Limelight_Subsystem extends SubsystemBase {
     x = tx.getDouble(0.0);
     y = ty.getDouble(0.0);
     area = ta.getDouble(0.0);
-    target = tv.getDouble(0.0);
+    target = tv.getBoolean(false);
     
     log(10);
   }
@@ -60,7 +60,7 @@ public class Limelight_Subsystem extends SubsystemBase {
     return area;
   }
 
-  public double getTarget(){
+  public boolean getTarget(){
     return target;
   }
 
@@ -72,6 +72,10 @@ public void enableLED() {
     NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
 }
 
+public boolean valid(){
+  return target;
+}
+
   public void log(int interval){
     if((interval + logTimer) < System.currentTimeMillis()){ //interval in ms
       logTimer = System.currentTimeMillis();
@@ -79,7 +83,7 @@ public void enableLED() {
       SmartDashboard.putNumber("X value", x);
       SmartDashboard.putNumber("Y value", y);
       SmartDashboard.putNumber("Area", area);
-      SmartDashboard.putNumber("target", target);
+      SmartDashboard.putBoolean("Limelight Valid", target);
 
     }
   }

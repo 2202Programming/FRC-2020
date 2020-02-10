@@ -13,9 +13,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import frc.robot.commands.drive.shift.ShiftGearCmd;
+import frc.robot.commands.test.TestKBSimMode;
+import frc.robot.commands.IntakeOn;
+import frc.robot.commands.ShooterOn;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.subsystems.GearShifter;
+import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
@@ -34,18 +38,25 @@ public class RobotContainer {
   public final HID_Xbox_Subsystem driverControls;
   public final GearShifter gearShifter;
   public final VelocityDifferentialDrive_Subsystem driveTrain;
+  public final Intake_Subsystem intake;
+
   // private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
   // private final AutomaticGearShift autoGearShift = new
   // AutomaticGearShift(driveTrain, gearShifter);
+
+  //Tests to run during test mode
+  TestKBSimMode t1;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     //put driver controls first so its periodic() is called first.
+    
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
+    intake = new Intake_Subsystem();
 
     //Use basic arcade drive command
     //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
@@ -56,6 +67,7 @@ public class RobotContainer {
     configureButtonBindings();
     // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
     // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
+
   }
 
   /**
@@ -68,11 +80,20 @@ public class RobotContainer {
     // new JoystickButton(driver, 4).whenPressed(new ThrottledUpShift(driveTrain,
     // gearShifter));
 
+    //These are for test, not the real controls yet. 2-8-20
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.LOW_GEAR));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.HIGH_GEAR));
+
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
+      .whileHeld(new ShooterOn(intake));
+      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.Y.getCode())
+      .whileHeld(new IntakeOn(intake));
+        
   }
+
+  
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -83,5 +104,30 @@ public class RobotContainer {
     // An ExampleCommand will run in autonomous
     return new CommandBase() {
     };
+  }
+
+  /**
+   *   InitTest() called from Robot when test mode is used.
+   *   Put code here to fire up in test mode.
+   */
+  public void initTest() {
+    t1 =  new TestKBSimMode();
+
+  }
+
+  public void runTestPeriod() {
+    t1.periodic();
+  }
+
+  /**
+   * Use this to pass the test command to the main {@link Robot} class.
+   *
+   * @return the command to run in test mode
+   */
+  public Command getTestCommand() {
+    // An ExampleCommand will run in autonomous
+    return new CommandBase() {
+    };
+
   }
 }

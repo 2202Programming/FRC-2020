@@ -33,7 +33,7 @@ public final class Constants {
     public static final int INTAKE_UP_DIO = 4;
     public static final int INTAKE_DOWN_DIO = 5;
     public static final int INTAKE_SPARK_PWM = 0;
-    public static final int MAGAZINE_TALON_CAN = 19;
+    public static final int MAGAZINE_PWM = 9;
     public static final int UPPER_SHOOTER_TALON_CAN = 18;
     public static final int LOWER_SHOOTER_TALON_CAN = 23;
     public static final int ELEVATOR_TALON_CAN = 24;
@@ -62,4 +62,9 @@ public final class Constants {
     public static final int GEARSHIFT_PCM_ID = 2;
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
+
+    //Auto Delays - values to be adjusted later with testing
+    public static final double DELAY_A = 0.0;
+    public static final double DELAY_B = 1.0;
+    public static final double DELAY_C = 2.0;
 }

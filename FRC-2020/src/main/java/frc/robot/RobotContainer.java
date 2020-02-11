@@ -98,11 +98,11 @@ public class RobotContainer {
 
   private void DustinsButtons() {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-    .whenPressed(new IntakeToggleCmd(intake));
+      .whenPressed(new IntakeToggleCmd(intake));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new GearToggleCmd(gearShifter));
-     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
-      .whileHeld(new ShooterOn(intake, 1200, 0.10));  // rpm, seconds mag backup 
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
+      .whenHeld(new ShooterOn(intake, 1200, 0.10));  // rpm, seconds mag backup 
   }
   
 

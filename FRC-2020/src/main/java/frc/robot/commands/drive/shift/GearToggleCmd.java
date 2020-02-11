@@ -22,8 +22,8 @@ public class GearToggleCmd extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_inLowGear = !m_inLowGear;
-    if (m_inLowGear = true) {
+   
+    if (m_inLowGear) {
       m_shifter.shiftUp();
     } else {
       m_shifter.shiftDown();

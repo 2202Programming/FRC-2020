@@ -34,7 +34,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
    * Creates a new HID_Subsystem.
    */
   private final XboxController driver;
-  //private final XboxController assistant;
+  private final XboxController assistant;
   //private final XboxController switchBoard = new XboxController(2);
   // private final XboxController phantom = new XboxController(3);
 
@@ -51,7 +51,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
   public HID_Xbox_Subsystem(double velExpo, double rotExpo, double deadzone) { 
     //register the devices
     driver = (XboxController)registerController(Id.Driver, new XboxController(0));
-    //assistant = (XboxController)registerController(Id.Assistent, new XboxController(1));
+    assistant = (XboxController)registerController(Id.Assistant, new XboxController(1));
     
     // Driver inputs for acade style in normalized units, 
     // left Y-stick throttle

@@ -16,6 +16,7 @@ import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.IntakeOn;
 import frc.robot.commands.LowerIntake;
+import frc.robot.commands.MagazineAdjust;
 import frc.robot.commands.RaiseIntake;
 import frc.robot.commands.ShooterOn;
 import frc.robot.commands.drive.ArcadeDriveCmd;
@@ -26,6 +27,8 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls.Id;
+import frc.robot.util.input.GeneralTrigger;
+import frc.robot.util.input.JoystickTrigger;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
 
 /**
@@ -97,6 +100,12 @@ public class RobotContainer {
       .whenPressed(new LowerIntake(intake));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
       .whenPressed(new RaiseIntake(intake));
+
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
+      .whileHeld(new MagazineAdjust(intake, true));
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
+      .whileHeld(new MagazineAdjust(intake, false));
+
       
   }
 

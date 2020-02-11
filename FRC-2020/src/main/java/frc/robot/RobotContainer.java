@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.IntakeOn;
+import frc.robot.commands.LowerIntake;
+import frc.robot.commands.RaiseIntake;
 import frc.robot.commands.ShooterOn;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.TankDriveCmd;
@@ -88,9 +90,14 @@ public class RobotContainer {
 
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
       .whileHeld(new ShooterOn(intake));
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.Y.getCode())
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.Y.getCode())
       .whileHeld(new IntakeOn(intake));
-        
+
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
+      .whenPressed(new LowerIntake(intake));
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
+      .whenPressed(new RaiseIntake(intake));
+      
   }
 
   

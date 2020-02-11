@@ -39,7 +39,7 @@ public class Intake_Subsystem extends SubsystemBase {
   // Intake
   Spark intake_spark = new Spark(Constants.INTAKE_SPARK_PWM);
 
-  public DoubleSolenoid elevatorSolenoid = new DoubleSolenoid(Constants.ELEVATOR_PCM_ID,
+  public DoubleSolenoid elevatorSolenoid = new DoubleSolenoid(Constants.ELEVATOR_PCM_CAN_ID,
       Constants.ELEVATOR_UP_SOLENOID_PCM, Constants.ELEVATOR_DOWN_SOLENOID_PCM);
 
   // Intake Pneumatic Sensors
@@ -182,11 +182,11 @@ public class Intake_Subsystem extends SubsystemBase {
   public void shooterOn(double RPM_target) {
       /* Velocity Closed Loop */
       double targetVelocity_UnitsPer100ms = RPM_target * kRPM2Counts;
-			upper_shooter.set(ControlMode.Velocity, targetVelocity_UnitsPer100ms);
+			upper_shooter.set(ControlMode.PercentOutput, RPM_target);
   }
 
   public void shooterOff() {
-    upper_shooter.set(ControlMode.Velocity, 0);
+    upper_shooter.set(ControlMode.PercentOutput, 0);
   }
 
 

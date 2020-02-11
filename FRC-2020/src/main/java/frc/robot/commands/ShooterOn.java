@@ -12,7 +12,7 @@ import frc.robot.subsystems.Intake_Subsystem;
 
 public class ShooterOn extends CommandBase {
   private Intake_Subsystem m_intake;
-  private final double RPM_TARGET = 1000;
+  private final double shootPower = 1;
 
   public ShooterOn(Intake_Subsystem m_intake) {
     this.m_intake = m_intake;
@@ -33,7 +33,7 @@ public class ShooterOn extends CommandBase {
     // We will want to backup the mag a little bit before shooter gets engaged
     // this will prevent balls getting stuck.
 
-    m_intake.shooterOn(RPM_TARGET);
+    m_intake.shooterOn(shootPower);
   }
 
   // Called once the command ends or is interrupted.

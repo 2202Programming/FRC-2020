@@ -7,6 +7,10 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Talon;
@@ -15,16 +19,22 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Control_Panel extends SubsystemBase
 {
-    private static final int TALON_CHANNEL = 1;
+    private static final int DEVICE_ID = 1;
     private static final int CHANNEL_A = 1;
     private static final int CHANNEL_B = 2;
-    private Talon m_talon;
+    private TalonSRX m_talon;
     private Encoder m_encoder;
 
     /*Initialization*/
     public Control_Panel(double distance_per_pulse, double minRate, double maxPeriod, int sampleToAverage)
     {
-        m_talon = new Talon(TALON_CHANNEL);
+        m_talon = new TalonSRX(DEVICE_ID);
+        /* Factory Default all hardware to prevent unexpected behaviour */
+        m_talon.configFactoryDefault();
+        m_talon.setInverted(false);
+        m_talon.setNeutralMode(NeutralMode.Brake);
+        m_talon.configOpenloopRamp(0.2);
+        m_talon.configClosedloopRamp(0);
         m_encoder = new Encoder(CHANNEL_A,CHANNEL_B);
         m_encoder.setDistancePerPulse(distance_per_pulse);
         m_encoder.setMinRate(minRate);
@@ -40,13 +50,9 @@ public class Control_Panel extends SubsystemBase
 
     public void setSpeed(double x)
     {
-         m_talon.set(x);
+         m_talon.set(ControlMode.Velocity,x);
     }
 
-    public double getSpeed()
-    {
-        return m_talon.get();
-    }
 
     public double getDistance()
     {
@@ -63,6 +69,5 @@ public class Control_Panel extends SubsystemBase
     {
         SmartDashboard.putNumber("Distance", m_encoder.getDistance());
         SmartDashboard.putNumber("Distance per Pulse", m_encoder.getDistancePerPulse());
-        SmartDashboard.putNumber("Speed", m_talon.get());
     }
 }

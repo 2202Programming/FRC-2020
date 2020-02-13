@@ -11,10 +11,11 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
+import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.IntakeOn;
+import frc.robot.commands.IntakeToggleCmd;
 import frc.robot.commands.LowerIntake;
 import frc.robot.commands.MagazineAdjust;
 import frc.robot.commands.RaiseIntake;
@@ -69,7 +70,8 @@ public class RobotContainer {
     driveTrain.setDefaultCommand(new TankDriveCmd(driverControls, driveTrain));
   
     // Configure the button bindings
-    configureButtonBindings();
+    ///configureButtonBindings();
+    DustinsButtons();
     // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
     // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
 
@@ -82,10 +84,12 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
     // new JoystickButton(driver, 4).whenPressed(new ThrottledUpShift(driveTrain,
     // gearShifter));
 
     //These are for test, not the real controls yet. 2-8-20
+    
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.LOW_GEAR));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
@@ -109,6 +113,14 @@ public class RobotContainer {
       
   }
 
+  private void DustinsButtons() {
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
+      .whenPressed(new IntakeToggleCmd(intake));
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
+      .whenPressed(new GearToggleCmd(gearShifter));
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
+      .whenHeld(new ShooterOn(intake, 1200, 0.10));  // rpm, seconds mag backup 
+  }
   
 
   /**

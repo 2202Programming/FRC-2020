@@ -17,7 +17,7 @@ public class IntakeOn extends InstantCommand {
 
   private static Intake_Subsystem m_intake;
   private double magMotorPower = 0.7;
-  private double intakeMotorPower = 0.5;
+  private double intakeMotorPower = 0.75;
 
   public IntakeOn(Intake_Subsystem m_intake) {
     // Use addRequirements() here to declare subsystem dependencies.

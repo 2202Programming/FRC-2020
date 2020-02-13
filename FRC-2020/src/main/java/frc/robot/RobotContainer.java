@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.test.TestKBSimMode;
-import frc.robot.commands.IntakeOn;
 import frc.robot.commands.IntakeToggleCmd;
 import frc.robot.commands.LowerIntake;
 import frc.robot.commands.MagazineAdjust;
@@ -26,6 +25,7 @@ import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
@@ -48,6 +48,7 @@ public class RobotContainer {
   public final GearShifter gearShifter;
   public final VelocityDifferentialDrive_Subsystem driveTrain;
   public final Intake_Subsystem intake;
+  public final Limelight_Subsystem limelight;
 
   // private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
   // private final AutomaticGearShift autoGearShift = new
@@ -67,12 +68,12 @@ public class RobotContainer {
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     intake = new Intake_Subsystem();
+    limelight = new Limelight_Subsystem();
 
     //Use basic arcade drive command
     //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
     //Use tank drive to make Dustin happy - dpl 2/8/2020
     driveTrain.setDefaultCommand(new TankDriveCmd(driverControls, driveTrain));
-  
     // Configure the button bindings
     ///configureButtonBindings();
     DustinsButtons();
@@ -105,14 +106,6 @@ public class RobotContainer {
         Derek - we can use the DriverControls to do the invert, not the drive train
               -  We are changing the controls, not the drive train.  
         */
-    
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
-      .whenPressed(new IntakeOn(intake));
-
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
-      .whenPressed(new LowerIntake(intake));
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
-      .whenPressed(new RaiseIntake(intake));
 /*
   * Derek =We don't have the adj yet. 2-12-20
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
@@ -125,7 +118,7 @@ public class RobotContainer {
 
   private void DustinsButtons() {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-      .whenPressed(new IntakeToggleCmd(intake));
+      .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); //mag, intake
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new GearToggleCmd(gearShifter));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())

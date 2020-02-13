@@ -6,13 +6,16 @@ import frc.robot.subsystems.Intake_Subsystem;
 public class IntakeToggleCmd extends InstantCommand {
   private boolean intakeUp = true;
   private final Intake_Subsystem m_intake;
-  private double m_magMotor = 0.8;
+  private double m_magMotor;
+  private double m_intakeMotor;
 
-  public IntakeToggleCmd(final Intake_Subsystem intake) {
+  public IntakeToggleCmd(final Intake_Subsystem intake, double magPower, double intakePower) {
     // Use addRequirements() here to declare subsystem dependencies.
     //No reqs.,  Only needs the piston controls
     m_intake = intake;
     m_intake.raiseIntake();  //force solnoid to match, even if nothing happens
+    m_magMotor = magPower;
+    m_intakeMotor = intakePower;
   }
 
   // Called when the command is initially scheduled.
@@ -21,10 +24,13 @@ public class IntakeToggleCmd extends InstantCommand {
     if (intakeUp)  {
       m_intake.raiseIntake();
       m_intake.magazineOff();
+      m_intake.intakeOff();
     }
     else {
       m_intake.lowerIntake();
       m_intake.magazineOn(m_magMotor);
+      m_intake.intakeOn(m_intakeMotor);
+
     }
     //toggle the state
     intakeUp = !intakeUp;

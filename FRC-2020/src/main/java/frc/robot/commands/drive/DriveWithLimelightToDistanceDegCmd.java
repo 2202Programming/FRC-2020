@@ -81,13 +81,15 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   }
 
   private void setPID() {
-    SmartDashboard.putNumber("P", Kap); //TODO: ensure these work and values are editable
+    SmartDashboard.putNumber("P", Kap); //TODO: ensure these work and values are editable - could use Shuffleboard.getTab(String).add(String, Object).withWidget(a widget).getEntry();
     SmartDashboard.putNumber("I", Kai);
     SmartDashboard.putNumber("D", Kad);
     networkTableSmartDashboard = NetworkTableInstance.getDefault().getTable("SmartDashboard"); //TODO ensure this is okay, and put in right place if applicable (unsure if method returns the reference or a clone)
     //TODO: addListener() may be needed
-    int listenerHandle = networkTableSmartDashboard.addEntryListener(new SmartDashboardListener(), flags);
+    int listenerHandle = networkTableSmartDashboard.addEntryListener(new SmartDashboardListener(), 0x20);
   }
+
+  
 
   public static void setKap(double kap) {
     Kap = kap;

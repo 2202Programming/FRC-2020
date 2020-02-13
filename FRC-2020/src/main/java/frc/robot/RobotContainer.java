@@ -91,14 +91,14 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.HIGH_GEAR));
 
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
       .whileHeld(new ShooterOn(intake));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.Y.getCode())
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
       .whileHeld(new IntakeOn(intake));
 
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new LowerIntake(intake));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
       .whenPressed(new RaiseIntake(intake));
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())

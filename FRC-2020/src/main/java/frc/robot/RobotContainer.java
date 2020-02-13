@@ -22,6 +22,7 @@ import frc.robot.commands.ShooterOn;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.TankDriveCmd;
+import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
@@ -41,6 +42,7 @@ import frc.robot.subsystems.hid.XboxControllerButtonCode;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  public final CameraSubsystem cameraSubsystem;
   public final HID_Xbox_Subsystem driverControls;
   public final GearShifter gearShifter;
   public final VelocityDifferentialDrive_Subsystem driveTrain;
@@ -59,6 +61,7 @@ public class RobotContainer {
   public RobotContainer() {
     //put driver controls first so its periodic() is called first.
     
+    cameraSubsystem = new CameraSubsystem();
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);

@@ -58,4 +58,9 @@ public final class Constants {
     public static final double DELAY_A = 0.0;
     public static final double DELAY_B = 1.0;
     public static final double DELAY_C = 2.0;
+
+    //camera paths
+    public static final String FRONT_DRIVE_CAMERA_PATH = "/dev/video1";
+    public static final String REAR_DRIVE_CAMERA_PATH = "/dev/video0";
+    public static final String ARM_CAMERA_PATH = "/dev/video2";
 }

@@ -20,6 +20,7 @@ import frc.robot.commands.MagazineAdjust;
 import frc.robot.commands.RaiseIntake;
 import frc.robot.commands.ShooterOn;
 import frc.robot.commands.drive.ArcadeDriveCmd;
+import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
@@ -90,6 +91,8 @@ public class RobotContainer {
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.LOW_GEAR));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.HIGH_GEAR));
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
+        .whenPressed(new InvertDriveControls(driveTrain));
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
       .whenPressed(new ShooterOn(intake));

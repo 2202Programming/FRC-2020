@@ -50,6 +50,7 @@ public class ShooterOn extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_intake.shooterOff();
+    m_intake.magazineOff();
     System.out.println("ShooterOn-Ended");
   }
 

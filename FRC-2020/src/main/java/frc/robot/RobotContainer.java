@@ -98,11 +98,14 @@ public class RobotContainer {
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.LOW_GEAR));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.HIGH_GEAR));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
+  /* 
+      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
         .whenPressed(new InvertDriveControls(driveTrain));
 
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-      .whenPressed(new ShooterOn(intake));
+        Derek - we can use the DriverControls to do the invert, not the drive train
+              -  We are changing the controls, not the drive train.  
+        */
+    
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
       .whenPressed(new IntakeOn(intake));
 
@@ -110,12 +113,13 @@ public class RobotContainer {
       .whenPressed(new LowerIntake(intake));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
       .whenPressed(new RaiseIntake(intake));
-
+/*
+  * Derek =We don't have the adj yet. 2-12-20
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
       .whileHeld(new MagazineAdjust(intake, true));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
       .whileHeld(new MagazineAdjust(intake, false));
-
+*/
       
   }
 

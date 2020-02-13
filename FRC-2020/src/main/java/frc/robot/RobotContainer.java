@@ -21,7 +21,9 @@ import frc.robot.commands.MagazineAdjust;
 import frc.robot.commands.RaiseIntake;
 import frc.robot.commands.ShooterOn;
 import frc.robot.commands.drive.ArcadeDriveCmd;
+import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.TankDriveCmd;
+import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
@@ -41,6 +43,7 @@ import frc.robot.subsystems.hid.XboxControllerButtonCode;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  public final CameraSubsystem cameraSubsystem;
   public final HID_Xbox_Subsystem driverControls;
   public final GearShifter gearShifter;
   public final VelocityDifferentialDrive_Subsystem driveTrain;
@@ -59,6 +62,7 @@ public class RobotContainer {
   public RobotContainer() {
     //put driver controls first so its periodic() is called first.
     
+    cameraSubsystem = new CameraSubsystem();
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
@@ -92,13 +96,15 @@ public class RobotContainer {
     
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.LOW_GEAR));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.HIGH_GEAR));
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
+        .whenPressed(new InvertDriveControls(driveTrain));
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-      .whileHeld(new ShooterOn(intake));
+      .whenPressed(new ShooterOn(intake));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
-      .whileHeld(new IntakeOn(intake));
+      .whenPressed(new IntakeOn(intake));
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new LowerIntake(intake));

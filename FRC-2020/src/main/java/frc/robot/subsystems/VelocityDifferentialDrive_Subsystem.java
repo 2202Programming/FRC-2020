@@ -46,6 +46,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final DifferentialDrive dDrive;
 	private GearShifter gearbox = null;
 
+	private double inversionConstant;
+
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxRPM, final double maxDPS) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
 		this.maxRPM = maxRPM;
@@ -64,6 +66,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 		dDrive = new DifferentialDrive(leftPidController, rightPidController);
 		dDrive.setSafetyEnabled(false);
+
+		inversionConstant = 1;
 	}
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {
@@ -100,7 +104,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void tankDrive(double leftSpeed, double rightSpeed) {
-		dDrive.tankDrive(leftSpeed, rightSpeed, false);
+		dDrive.tankDrive(inversionConstant* leftSpeed, inversionConstant*rightSpeed, false);
 	}
 
 	public double getLeftPos() {
@@ -127,6 +131,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public void resetPositon() {
 		rightPidController.setPosition(0);
 		leftPidController.setPosition(0);
+	}
+
+	public void invertControls() {
+		inversionConstant*=-1;
 	}
 
 	public void log() {

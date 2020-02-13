@@ -86,15 +86,15 @@ public class RobotContainer {
     // gearShifter));
 
     //These are for test, not the real controls yet. 2-8-20
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.LOW_GEAR));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ShiftGearCmd(gearShifter, Gear.HIGH_GEAR));
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-      .whileHeld(new ShooterOn(intake));
+      .whenPressed(new ShooterOn(intake));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
-      .whileHeld(new IntakeOn(intake));
+      .whenPressed(new IntakeOn(intake));
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new LowerIntake(intake));

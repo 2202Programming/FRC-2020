@@ -7,12 +7,12 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Intake_Subsystem;
 
-public class ShooterOn extends CommandBase {
+public class ShooterOn extends InstantCommand {
   private Intake_Subsystem m_intake;
-  private final double shootPower = 1;
+  private final double shootPower = 0.7;
 
   public ShooterOn(Intake_Subsystem m_intake) {
     this.m_intake = m_intake;
@@ -24,23 +24,10 @@ public class ShooterOn extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("ShooterOn-Inited");
+    if (m_intake.shooterIsOn()) {
+      m_intake.shooterOff();
+    } else {
+      m_intake.shooterOn(shootPower);
+    }
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    // We will want to backup the mag a little bit before shooter gets engaged
-    // this will prevent balls getting stuck.
-
-    m_intake.shooterOn(shootPower);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    m_intake.shooterOff();
-    System.out.println("ShooterOn-Ended");
-  }
-
 }

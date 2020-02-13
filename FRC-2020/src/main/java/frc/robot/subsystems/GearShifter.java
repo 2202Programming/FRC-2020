@@ -28,7 +28,7 @@ public class GearShifter extends SubsystemBase {
         }
     }
 
-    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(GEARSHIFT_PCM_ID, GEARSHIFTUP_SOLENOID_PCM,
+    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(GEARSHIFT_PCM_CAN_ID, GEARSHIFTUP_SOLENOID_PCM,
             GEARSHIFTDOWN_SOLENOID_PCM);
 
     // State

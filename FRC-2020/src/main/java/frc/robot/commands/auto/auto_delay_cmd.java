@@ -16,11 +16,10 @@ public class auto_delay_cmd extends CommandBase {
    */
 
    private double timeStarted;
-   private double delay;
+   private double delay; //in milliseconds
 
   public auto_delay_cmd(boolean switch1, boolean switch2) {
     // Use addRequirements() here to declare subsystem dependencies.
-    timeStarted = System.currentTimeMillis();
     //assuming using two switches on driver's station, switch1 on means A, both off means B, and switch2 on means C
     if (switch1)
         delay = Constants.DELAY_A;
@@ -33,6 +32,7 @@ public class auto_delay_cmd extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    timeStarted = System.currentTimeMillis();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

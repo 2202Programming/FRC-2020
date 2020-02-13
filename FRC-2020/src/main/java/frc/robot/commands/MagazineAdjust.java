@@ -10,19 +10,17 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake_Subsystem;
 
-/**
- * Creates a new IntakeOn.
- */
-public class IntakeOn extends CommandBase {
-
-  private static Intake_Subsystem m_intake;
-  private double magMotorPower = 0.7;
-  private double intakeMotorPower = 0.5;
-
-  public IntakeOn(Intake_Subsystem m_intake) {
+public class MagazineAdjust extends CommandBase {
+  private static Intake_Subsystem intake;
+  private boolean forward;
+  private static final double strength = 0.7;
+  /**
+   * Creates a new MagazineAdjust.
+   */
+  public MagazineAdjust(Intake_Subsystem intake, boolean forward) {
     // Use addRequirements() here to declare subsystem dependencies.
-  //  addRequirements(m_intake);
-    IntakeOn.m_intake = m_intake;
+    this.intake = intake;
+    this.forward = forward;
   }
 
   // Called when the command is initially scheduled.
@@ -33,16 +31,14 @@ public class IntakeOn extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.intakeOn(intakeMotorPower);
-    m_intake.magazineOn(magMotorPower);
+    if (forward) intake.magazineOn(strength);
+    else intake.magazineOn(-strength);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.intakeOff();
-    m_intake.magazineOff();
-    System.out.println("IntakeOn-Ended");
+    intake.magazineOff();
   }
 
   // Returns true when the command should end.

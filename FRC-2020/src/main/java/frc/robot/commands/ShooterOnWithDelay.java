@@ -5,50 +5,51 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.auto;
+package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.subsystems.Intake_Subsystem;
 
-public class auto_delay_cmd extends CommandBase {
-  /**
-   * Creates a new auto_delay_cmd.
-   */
+public class ShooterOnWithDelay extends CommandBase {
+  private Intake_Subsystem m_intake;
+  private final double shootPower = 1;
+  private double delay; //in milliseconds
+  private double startTime;
 
-   private double timeStarted;
-   private double delay; //in milliseconds
+  public ShooterOnWithDelay(Intake_Subsystem m_intake, double delay) {
+    this.m_intake = m_intake;
+    this.delay = delay;
 
-  public auto_delay_cmd(boolean switch1, boolean switch2) {
     // Use addRequirements() here to declare subsystem dependencies.
-    //assuming using two switches on driver's station, switch1 on means A, both off means B, and switch2 on means C
-    if (switch1)
-        delay = Constants.DELAY_A;
-    else if (switch2)
-        delay = Constants.DELAY_C;
-    else
-        delay = Constants.DELAY_B;
+   // addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    timeStarted = System.currentTimeMillis();
+    System.out.println("ShooterOn-Inited");
+    startTime = System.currentTimeMillis();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // We will want to backup the mag a little bit before shooter gets engaged
+    // this will prevent balls getting stuck.
+
+    m_intake.shooterOn(shootPower);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    
+    m_intake.shooterOff();
+    System.out.println("ShooterOn-Ended");
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-      return (System.currentTimeMillis() - timeStarted) >= delay;
+      return (System.currentTimeMillis() - startTime) >= delay;
   }
 }

@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.ifx.DriverControls;
-//import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.util.ExpoShaper;
 
 /**
@@ -38,6 +37,12 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
   private final XboxController switchBoard;
   // private final XboxController phantom = new XboxController(3);
 
+  //Buttons onStartup - in case you want to do something based on controls 
+  // being held at power up or on switchboard.
+  int initDriverButtons;
+  int initAssistentButtons;
+  int initSwitchBoardButtons;
+
   //Arcade 
   ExpoShaper velShaper;
   ExpoShaper rotShaper;
@@ -48,41 +53,55 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
   double vel, z_rot;
   double vLeft, vRight;
 
-  public HID_Xbox_Subsystem(double velExpo, double rotExpo, double deadzone) { 
-    //register the devices
-    driver = (XboxController)registerController(Id.Driver, new XboxController(0));
-    assistant = (XboxController)registerController(Id.Assistant, new XboxController(1));
-    switchBoard = (XboxController)registerController(Id.SideBoard, new XboxController(2));
-    // Driver inputs for acade style in normalized units, 
+  //invertGain is used to change the controls for driving backwards easily.  
+  // A negative value indicates you're driving backwards with forwards controls.
+  double invertGain = 1.0;
+
+  public HID_Xbox_Subsystem(final double velExpo, final double rotExpo, final double deadzone) {
+    // register the devices
+    driver = (XboxController) registerController(Id.Driver, new XboxController(Id.Driver.value));
+    assistant = (XboxController) registerController(Id.Assistant, new XboxController(Id.Assistant.value));
+    switchBoard = (XboxController) registerController(Id.SwitchBoard, new XboxController(Id.SwitchBoard.value));
+    // Driver inputs for acade style in normalized units,
     // left Y-stick throttle
     // right X-stick turn rate
-    velShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft)); 
-    rotShaper = new ExpoShaper(rotExpo, () -> (driver.getX(Hand.kRight)*-1.0));  //TODO:larry -1
-    
-    //Tank drive
-    velLeftShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft)); 
+    velShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft));
+    rotShaper = new ExpoShaper(rotExpo, () -> (driver.getX(Hand.kRight) * -1.0));
+
+    // Tank drive
+    velLeftShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft));
     velRightShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
 
-    //add some deadzone in normalized coordinates
+    // add some deadzone in normalized coordinates
     rotShaper.setDeadzone(deadzone);
     velShaper.setDeadzone(deadzone);
+
+    // read some values to remove unused warning
+    assistant.getX();
+    switchBoard.getX();
+
+    // read initial buttons for each device - maybe used for configurions
+    initDriverButtons = getButtonsRaw(Id.Driver);
+    initAssistentButtons = getButtonsRaw(Id.Assistant);
+    initSwitchBoardButtons = getButtonsRaw(Id.SwitchBoard);
+
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run, use this to read all 
+    // This method will be called once per scheduler run, use this to read all
     // needed inputs.
-    z_rot = rotShaper.get();
-    vel = velShaper.get();
-    
-    //tank
-    vLeft = velLeftShaper.get();
-    vRight = velRightShaper.get();
-  } 
+    z_rot = rotShaper.get() * invertGain;
+    vel = velShaper.get() * invertGain;
+
+    // tank
+    vLeft = velLeftShaper.get() * invertGain;
+    vRight = velRightShaper.get() * invertGain;
+  }
 
   @Override
   public double getVelocityX() {
-    return 0;   //todo:fix for mechanum 
+    return 0; // todo:fix for mechanum
   }
 
   @Override
@@ -97,7 +116,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
 
   @Override
   public double getRotation() {
-    return z_rot;   
+    return z_rot;
   }
 
   @Override
@@ -105,16 +124,45 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     return true;
   }
 
-  //Tank Drive controls
+  // Tank Drive controls
   @Override
   public double getVelocityLeft() {
     return vLeft;
-  }  
-  
+  }
 
   @Override
   public double getVelocityRight() {
     return vRight;
   }
+
+  @Override
+  public void setInvertControls(final boolean invert) {
+    invertGain = (invert) ? -1.0 : 1.0;
+  }
+
+  @Override
+  public boolean isControlInverted() {
+    if (invertGain < 0)
+      return true;
+    return false;
+  }
+
+  @Override
+  public int getInitialButtons(final Id id) {
+    switch (id) 
+    {
+      case Driver:
+        return initSwitchBoardButtons;
+      case Assistant:
+        return initAssistentButtons;
+      case SwitchBoard:
+        return initSwitchBoardButtons;
+      default:
+        return 0;
+    }
+  }
+
+  
+
 
 }

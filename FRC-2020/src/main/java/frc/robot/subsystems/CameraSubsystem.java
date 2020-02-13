@@ -11,7 +11,7 @@ public class CameraSubsystem extends SubsystemBase {
 
   private UsbCamera frontCamera;
   private UsbCamera rearCamera;
-  private UsbCamera armCamera;
+  //private UsbCamera armCamera;
   private VideoSink switchedCamera;
   private Integer currentCamera = 1;
 

@@ -192,8 +192,10 @@ public class Intake_Subsystem extends SubsystemBase {
 
   public void shooterOn(double RPM_target) {
     shooterIsOn = true;
-      /* Velocity Closed Loop */
-      double targetVelocity_UnitsPer100ms = RPM_target * kRPM2Counts;
+      /* Velocity Closed Loop
+          double targetVelocity_UnitsPer100ms = RPM_target * kRPM2Counts;
+       */
+      //WIP - using simple motorpercent for now - 2/13/20
 			upper_shooter.set(ControlMode.PercentOutput, RPM_target);
   }
 

@@ -11,6 +11,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  *   KBSim Gladiator Flight Stick
  * 
  *   Warning this stick has modal control on trigger buttons.
+ *   Pinky button switches the numbers, so too does the RED/GREEN mode.
+ * 
+ *   TriggerMode (R/G) is tracked by a command tied to the Mode(30) button
+ *   
  *   
  */
 
@@ -71,13 +75,17 @@ public class KBSimStick extends GenericHID {
     super.setOutputs(0);
 
     // use xboxcontroller as reporting, best fit.
-    //HAL.report(tResourceType.kResourceType_XboxController, port + 1, 0, "kbsimstick");
+    HAL.report(tResourceType.kResourceType_XboxController, port + 1, 0, "kbsimstick");
   }
 
   public double getAxis(final Axis axis) {
     return getRawAxis(axis.value);
   }
 
+  /**
+   * Hand doesn't make sense for this stick, but the GenericHid requires it.
+   * Returning the best value we can.
+   */
   @Override
   public double getX(final Hand hand) {
     return getAxis(Axis.kX);
@@ -91,11 +99,14 @@ public class KBSimStick extends GenericHID {
 
   /**
    * There are a ton of buttons on the stick, so just use a general reader.
-   * 
+   * If specific funcs are desired, add them here.
    */
 
   /**
    * Reads the button's current state.
+   * 
+   * If the TriggerMode ever gets out of sync, we can use special buttons
+   * to "fix" it if this ever becomes an issue.
    * 
    * @param button
    * @return state of button

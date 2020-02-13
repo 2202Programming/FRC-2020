@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class MagazineAdjust extends CommandBase {
-  private static Intake_Subsystem intake;
+  private Intake_Subsystem intake;
   private boolean forward;
   private static final double strength = 0.7;
   /**

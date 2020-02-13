@@ -1,0 +1,7 @@
+{
+  "lengthUnit": "Inch",
+  "maxVelocity": 10.0,
+  "maxAcceleration": 60.0,
+  "wheelBase": 2.0,
+  "gameName": "Destination: Deep Space"
+}

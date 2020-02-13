@@ -35,7 +35,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
    */
   private final XboxController driver;
   private final XboxController assistant;
-  //private final XboxController switchBoard = new XboxController(2);
+  private final XboxController switchBoard;
   // private final XboxController phantom = new XboxController(3);
 
   //Arcade 
@@ -52,7 +52,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     //register the devices
     driver = (XboxController)registerController(Id.Driver, new XboxController(0));
     assistant = (XboxController)registerController(Id.Assistant, new XboxController(1));
-    
+    switchBoard = (XboxController)registerController(Id.SideBoard, new XboxController(2));
     // Driver inputs for acade style in normalized units, 
     // left Y-stick throttle
     // right X-stick turn rate

@@ -74,7 +74,7 @@ public class RobotContainer {
     //Use basic arcade drive command
     //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
     //Use tank drive to make Dustin happy - dpl 2/8/2020
-    driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
+    driveTrain.setDefaultCommand(new TankDriveCmd(driverControls, driveTrain));
     // Configure the button bindings
     ///configureButtonBindings();
     DustinsButtons();

@@ -91,7 +91,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
   public void periodic() {
     // This method will be called once per scheduler run, use this to read all
     // needed inputs.
-    z_rot = rotShaper.get() * invertGain;
+    z_rot = rotShaper.get();
     vel = velShaper.get() * invertGain;
 
     // tank

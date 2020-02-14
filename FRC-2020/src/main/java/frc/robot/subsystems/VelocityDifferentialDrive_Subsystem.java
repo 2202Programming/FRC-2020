@@ -18,7 +18,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final static double MAXDPS = 5.0;
 
 	public final double WHEEL_RADIUS = 3; // inches
-	private final double K_rev_per_ft = 1.0 / (2.0 * Math.PI * (WHEEL_RADIUS / 12.0)); // rev/feet
+	private final double K_ft_per_rev = (2.0 * Math.PI * (WHEEL_RADIUS / 12.0)); // rev/feet
+	private final double K_rev_per_ft = 1.0 / K_ft_per_rev;
 
 	// CANSpark Max will be used 3 per side, 2 folowing the leader
 	private final CANSparkMax frontRight = new CANSparkMax(FR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -46,8 +47,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final DifferentialDrive dDrive;
 	private GearShifter gearbox = null;
 
-	private double inversionConstant;
-
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxRPM, final double maxDPS) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
 		this.maxRPM = maxRPM;
@@ -66,8 +65,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 		dDrive = new DifferentialDrive(leftPidController, rightPidController);
 		dDrive.setSafetyEnabled(false);
-
-		inversionConstant = 1;
 	}
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {
@@ -104,11 +101,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void tankDrive(double leftSpeed, double rightSpeed) {
-		dDrive.tankDrive(inversionConstant* leftSpeed, inversionConstant*rightSpeed, false);
+		dDrive.tankDrive(leftSpeed, rightSpeed, false);
 	}
 
 	public double getLeftPos() {
-		return leftPidController.getPosition();
+		return K_ft_per_rev*leftPidController.getPosition();
 	}
 
 	public double getLeftVel(boolean normalized) {
@@ -118,7 +115,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getRightPos() {
-		return rightPidController.getPosition();
+		return K_ft_per_rev*rightPidController.getPosition();
 
 	}
 
@@ -128,13 +125,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		return vel;
 	}
 
-	public void resetPositon() {
+	public void resetPosition() {
 		rightPidController.setPosition(0);
 		leftPidController.setPosition(0);
-	}
-
-	public void invertControls() {
-		inversionConstant*=-1;
 	}
 
 	public void log() {
@@ -222,4 +215,5 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			set(0.0);
 		}
 	}
+
 }

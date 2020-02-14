@@ -13,13 +13,14 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.subsystems.ifx.ArcadeDrive;
 
 public class auto_creep_cmd extends CommandBase {
   /**
    * Creates a new auto_creep_cmd.
    */
 
-  private final VelocityDifferentialDrive_Subsystem drive;
+  private final ArcadeDrive drive;
   private final Limelight_Subsystem limelight;
   private double angleTarget;
   private double targetDistance;
@@ -34,7 +35,7 @@ public class auto_creep_cmd extends CommandBase {
   private double starting_position;
   private double kInchesToPerPower = -0.8;
 
-  public auto_creep_cmd(final VelocityDifferentialDrive_Subsystem drive, final Limelight_Subsystem limelight, final double angleTarget, final double maxSpeed, final double targetDistance) {
+  public auto_creep_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final double angleTarget, final double maxSpeed, final double targetDistance) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drive = drive;
     this.limelight = limelight;

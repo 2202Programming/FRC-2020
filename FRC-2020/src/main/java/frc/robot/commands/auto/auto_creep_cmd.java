@@ -97,7 +97,7 @@ public class auto_creep_cmd extends CommandBase {
     SmartDashboard.putData(distancePIDController);
   
     // move rotation only
-    drive.arcadeDrive(speedCmd, angleCmd);
+    drive.velocityArcadeDrive(speedCmd*1000, angleCmd);
   }
 
   // Called once the command ends or is interrupted.
@@ -116,6 +116,6 @@ public class auto_creep_cmd extends CommandBase {
       return true;
     else return false;
     */
-    return false;
+    return !limelight.valid();
   }
 }

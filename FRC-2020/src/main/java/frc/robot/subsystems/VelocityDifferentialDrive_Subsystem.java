@@ -17,8 +17,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final static double MAXRPM = 1000.0;
 	private final static double MAXDPS = 5.0;
 
-	public final double WHEEL_RADIUS = 3; // inches
-	private final double K_ft_per_rev = (2.0 * Math.PI * (WHEEL_RADIUS / 12.0)); // rev/feet
+	public final double WHEEL_RADIUS = 4; // inches
+	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // rev/feet
 	private final double K_rev_per_ft = 1.0 / K_ft_per_rev;
 
 	// CANSpark Max will be used 3 per side, 2 folowing the leader

@@ -108,7 +108,7 @@ public class RobotContainer {
               -  We are changing the controls, not the drive train.  
         */
 /*
-  * Derek =We don't have the adj yet. 2-12-20
+  *
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
       .whileHeld(new MagazineAdjust(intake, true));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
@@ -118,16 +118,22 @@ public class RobotContainer {
   }
 
   private void DustinsButtons() {
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-      .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); //mag, intake
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
-      .whenPressed(new GearToggleCmd(gearShifter));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
-      .whenHeld(new ShooterOn(intake, 1200, 0.3));  // rpm, seconds mag backup 
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
-      .whenPressed(new InvertDriveControls(driverControls));
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-      .whenHeld(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
+    
+      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
+        .whenPressed(new GearToggleCmd(gearShifter));
+      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
+        .whenPressed(new InvertDriveControls(driverControls));
+
+      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
+        .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); //mag, intake
+      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
+        .whenHeld(new ShooterOn(intake, 1200, 0.3));  // rpm, seconds mag backup 
+      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
+        .whileHeld(new MagazineAdjust(intake, true));
+      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
+        .whileHeld(new MagazineAdjust(intake, false));
+    //driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
+    //  .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
   }
   
 

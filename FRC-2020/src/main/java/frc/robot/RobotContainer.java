@@ -20,6 +20,7 @@ import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.commands.auto.auto_creep_cmd;
+import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.subsystems.CameraSubsystem;
@@ -73,7 +74,7 @@ public class RobotContainer {
     //Use basic arcade drive command
     //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
     //Use tank drive to make Dustin happy - dpl 2/8/2020
-    driveTrain.setDefaultCommand(new TankDriveCmd(driverControls, driveTrain));
+    driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
     // Configure the button bindings
     ///configureButtonBindings();
     DustinsButtons();

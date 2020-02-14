@@ -22,20 +22,20 @@ public class CameraSubsystem extends SubsystemBase {
     //      https://www.chiefdelphi.com/t/stream-from-jetson-to-rio/343525/2
     //CameraServer cs = CameraServer.getInstance();
 
-    frontCamera = CameraServer.getInstance().startAutomaticCapture("Front Drive", Constants.FRONT_DRIVE_CAMERA_PATH);
-    frontCamera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 20);
+    //frontCamera = CameraServer.getInstance().startAutomaticCapture("Front Drive", Constants.FRONT_DRIVE_CAMERA_PATH);
+    //frontCamera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 20);
     
-    rearCamera = CameraServer.getInstance().startAutomaticCapture("Rear Drive", Constants.REAR_DRIVE_CAMERA_PATH);
-    rearCamera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 20);
+    //rearCamera = CameraServer.getInstance().startAutomaticCapture("Rear Drive", Constants.REAR_DRIVE_CAMERA_PATH);
+    //rearCamera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 20);
 
     //armCamera = CameraServer.getInstance().startAutomaticCapture("Arm", RobotMap.ARM_CAMERA_PATH);
     //armCamera.setVideoMode(VideoMode.PixelFormat.kYUYV, 240, 240, 15);
 
-    switchedCamera = CameraServer.getInstance().addSwitchedCamera("Switched Camera");
+    //switchedCamera = CameraServer.getInstance().addSwitchedCamera("Switched Camera");
     
     //frontCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
     //rearCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-    switchedCamera.setSource(frontCamera);
+    //switchedCamera.setSource(frontCamera);
   }
 
   public void toggleDriveCamera() { //switch drive camera to other USB webcam

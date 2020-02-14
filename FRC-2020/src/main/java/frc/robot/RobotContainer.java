@@ -127,7 +127,7 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
       .whenPressed(new InvertDriveControls(driverControls));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-      .whenHeld(new auto_creep_cmd(driveTrain, limelight, 0, 0.5, 1000));
+      .whenHeld(new auto_creep_cmd(driveTrain, limelight, 0, 10, 1000));
   }
   
 

@@ -24,13 +24,13 @@ public class auto_creep_cmd extends CommandBase {
   private final Limelight_Subsystem limelight;
   private double angleTarget;
   private double targetDistance;
-  private double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
+  private double Kap = 0.2, Kai = 0.001, Kad = 0.0; //angle drive PIDs
   private double Kp = 0.2, Ki = 0.04, Kd = 0.25; //distance drive PIDs
   private final PIDController anglePIDController;
   private final PIDController distancePIDController;
   private double tolerancePct = .05;
   private double angleToleranceDeg = 3;
-  private double maxSpeed = 0.5;
+  private double maxSpeed;
   private double kDegreesToDPS = 1; //convert PID rotation output to degrees per second for VelocityDifferentalDrive
   private double starting_position;
   private double kInchesToPerPower = -0.8;
@@ -89,7 +89,7 @@ public class auto_creep_cmd extends CommandBase {
     SmartDashboard.putData(anglePIDController);
 
     SmartDashboard.putNumber("Distance", current_position);
-    SmartDashboard.putNumber("PID Output DPS", speedCmd);
+    SmartDashboard.putNumber("PID Output Distance", speedCmd);
     SmartDashboard.putData(distancePIDController);
   
     // move rotation only

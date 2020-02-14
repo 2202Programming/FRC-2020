@@ -8,21 +8,25 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.subsystems.ifx.DriverControls;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class InvertDriveControls extends InstantCommand {
-  private VelocityDifferentialDrive_Subsystem driveTrain;
-  public InvertDriveControls(VelocityDifferentialDrive_Subsystem driveTrain) {
+  public DriverControls dc;
+  public InvertDriveControls(DriverControls dc) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.driveTrain = driveTrain;
+    this.dc = dc;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    driveTrain.invertControls();
+    if (dc.isControlInverted()) {
+      dc.setInvertControls(false);
+    } else {
+      dc.setInvertControls(true);
+    }
   }
 }

@@ -19,6 +19,7 @@ import frc.robot.commands.LowerIntake;
 import frc.robot.commands.MagazineAdjust;
 import frc.robot.commands.RaiseIntake;
 import frc.robot.commands.ShooterOn;
+import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.TankDriveCmd;
@@ -122,7 +123,11 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new GearToggleCmd(gearShifter));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
-      .whenHeld(new ShooterOn(intake, 1200, 0.10));  // rpm, seconds mag backup 
+      .whenHeld(new ShooterOn(intake, 1200, 0.3));  // rpm, seconds mag backup 
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
+      .whenPressed(new InvertDriveControls(driverControls));
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
+      .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 0.5, 1));
   }
   
 

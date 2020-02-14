@@ -12,8 +12,8 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class ShooterOn extends CommandBase {
-  private double SLOW_MAG_REVERSE = -0.2; // motor power
-  private double FAST_MAG_FORWARD =  0.8; // motor power
+  private double SLOW_MAG_REVERSE = -0.6; // motor power
+  private double FAST_MAG_FORWARD =  1; // motor power
   private Intake_Subsystem m_intake;
   private final double m_rpmTarget;
   private final int m_backupCount;
@@ -23,6 +23,7 @@ public class ShooterOn extends CommandBase {
     m_intake = intake;
     m_rpmTarget = rpmTarget;
     m_backupCount = (int) Math.floor(backupSec / Constants.DT);
+
   }
 
   // Called when the command is initially scheduled.
@@ -37,8 +38,7 @@ public class ShooterOn extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_count++; // frame counter 20ms per tick
-    if (m_count < m_backupCount) {
+    if (m_count++ < m_backupCount) {
       // We will want to backup the mag a little bit before shooter gets engaged
       // this will prevent balls getting stuck.
       m_intake.magazineOn(SLOW_MAG_REVERSE);

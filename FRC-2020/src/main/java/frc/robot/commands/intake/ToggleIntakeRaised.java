@@ -5,15 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Intake_Subsystem;
 
-public class RaiseIntake extends CommandBase {
+public class ToggleIntakeRaised extends InstantCommand {
+  private boolean intakeUp = true;
 
   private Intake_Subsystem m_intake;
-  public RaiseIntake(Intake_Subsystem m_intake) {
+  public ToggleIntakeRaised(Intake_Subsystem m_intake) {
     addRequirements(m_intake);
     this.m_intake = m_intake;
   }
@@ -21,22 +22,14 @@ public class RaiseIntake extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-  }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    m_intake.raiseIntake();
-  }
+    if (intakeUp) {
+      m_intake.lowerIntake();
+    } else {
+      m_intake.raiseIntake();
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return true;
+    //flip state
+    intakeUp = !intakeUp;
   }
 }

@@ -14,13 +14,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.test.TestKBSimMode;
-import frc.robot.commands.IntakeToggleCmd;
-import frc.robot.commands.LowerIntake;
-import frc.robot.commands.MagazineAdjust;
-import frc.robot.commands.RaiseIntake;
-import frc.robot.commands.ShooterOn;
+import frc.robot.commands.intake.IntakeToggleCmd;
+import frc.robot.commands.intake.MagazineAdjust;
+import frc.robot.commands.intake.ReverseIntake;
+import frc.robot.commands.intake.ShooterOn;
+import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.commands.auto.auto_creep_cmd;
-import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.subsystems.CameraSubsystem;
@@ -126,8 +125,12 @@ public class RobotContainer {
 
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); //mag, intake
+      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
+        .whenHeld(new ReverseIntake(intake, -0.5));
+      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
+        .whenPressed(new ToggleIntakeRaised(intake));
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
-        .whenHeld(new ShooterOn(intake, 1200, 0.3));  // rpm, seconds mag backup 
+        .whenHeld(new ShooterOn(intake, 1200, 0.4));  // rpm, seconds mag backup 
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
         .whileHeld(new MagazineAdjust(intake, true));
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())

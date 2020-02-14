@@ -1,10 +1,10 @@
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class IntakeToggleCmd extends InstantCommand {
-  private boolean intakeUp = true;
+  private boolean intakeOn = false;
   private final Intake_Subsystem m_intake;
   private double m_magMotor;
   private double m_intakeMotor;
@@ -21,18 +21,17 @@ public class IntakeToggleCmd extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (intakeUp)  {
-      m_intake.raiseIntake();
+    if (intakeOn) {
       m_intake.magazineOff();
       m_intake.intakeOff();
     }
     else {
-      m_intake.lowerIntake();
       m_intake.magazineOn(m_magMotor);
       m_intake.intakeOn(m_intakeMotor);
 
     }
     //toggle the state
-    intakeUp = !intakeUp;
+    
+    intakeOn = !intakeOn;
   }
 }

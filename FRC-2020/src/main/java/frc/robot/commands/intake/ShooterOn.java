@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class ShooterOn extends CommandBase {
-  private double SLOW_MAG_REVERSE = -0.6; // motor power
+  private double SLOW_MAG_REVERSE = -0.8; // motor power
   private double FAST_MAG_FORWARD =  1; // motor power
   private Intake_Subsystem m_intake;
   private final double m_rpmTarget;

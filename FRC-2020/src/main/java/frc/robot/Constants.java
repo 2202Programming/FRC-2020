@@ -37,7 +37,7 @@ public final class Constants {
     public static final int UPPER_SHOOTER_TALON_CAN = 18;
     public static final int LOWER_SHOOTER_TALON_CAN = 23;
     public static final int ELEVATOR_TALON_CAN = 24;
-    public static final int ELEVATOR_PCM_ID = 1;
+    public static final int ELEVATOR_PCM_CAN_ID = 2;
     public static final int ELEVATOR_UP_SOLENOID_PCM = 4;    
     public static final int ELEVATOR_DOWN_SOLENOID_PCM = 5;
 
@@ -59,7 +59,7 @@ public final class Constants {
     public static final int BR_SPARKMAX_CANID = 23;
 
     //Gearshifter
-    public static final int GEARSHIFT_PCM_ID = 2;
+    public static final int GEARSHIFT_PCM_CAN_ID = 2;
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
 
@@ -67,4 +67,9 @@ public final class Constants {
     public static final double DELAY_A = 0.0;
     public static final double DELAY_B = 1.0;
     public static final double DELAY_C = 2.0;
+
+    //camera paths
+    public static final String FRONT_DRIVE_CAMERA_PATH = "/dev/video1";
+    public static final String REAR_DRIVE_CAMERA_PATH = "/dev/video0";
+    public static final String ARM_CAMERA_PATH = "/dev/video2";
 }

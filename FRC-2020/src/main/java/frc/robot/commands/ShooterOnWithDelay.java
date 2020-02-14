@@ -10,44 +10,46 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake_Subsystem;
 
-/**
- * Creates a new IntakeOn.
- */
-public class IntakeOn extends CommandBase {
+public class ShooterOnWithDelay extends CommandBase {
+  private Intake_Subsystem m_intake;
+  private final double shootPower = 1;
+  private double delay; //in milliseconds
+  private double startTime;
 
-  private static Intake_Subsystem m_intake;
-  private double motorPower = 0.7;
-  private double RPM_TARGET = 1000;
+  public ShooterOnWithDelay(Intake_Subsystem m_intake, double delay) {
+    this.m_intake = m_intake;
+    this.delay = delay;
 
-  public IntakeOn(Intake_Subsystem m_intake) {
     // Use addRequirements() here to declare subsystem dependencies.
-  //  addRequirements(m_intake);
-    IntakeOn.m_intake = m_intake;
+   // addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    System.out.println("ShooterOn-Inited");
+    startTime = System.currentTimeMillis();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.intakeOn(RPM_TARGET);
-    m_intake.magazineOn(motorPower);
+    // We will want to backup the mag a little bit before shooter gets engaged
+    // this will prevent balls getting stuck.
+
+    m_intake.shooterOn(shootPower);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.intakeOff();
-    m_intake.magazineOff();
-    System.out.println("IntakeOn-Ended");
+    m_intake.shooterOff();
+    System.out.println("ShooterOn-Ended");
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+      return (System.currentTimeMillis() - startTime) >= delay;
   }
 }

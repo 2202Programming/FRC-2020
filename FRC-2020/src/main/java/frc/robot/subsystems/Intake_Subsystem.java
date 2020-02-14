@@ -39,7 +39,7 @@ public class Intake_Subsystem extends SubsystemBase {
   // Intake
   Spark intake_spark = new Spark(Constants.INTAKE_SPARK_PWM);
 
-  public DoubleSolenoid elevatorSolenoid = new DoubleSolenoid(Constants.ELEVATOR_PCM_ID,
+  public DoubleSolenoid elevatorSolenoid = new DoubleSolenoid(Constants.ELEVATOR_PCM_CAN_ID,
       Constants.ELEVATOR_UP_SOLENOID_PCM, Constants.ELEVATOR_DOWN_SOLENOID_PCM);
 
   // Intake Pneumatic Sensors
@@ -108,6 +108,8 @@ public class Intake_Subsystem extends SubsystemBase {
     final double RPM2CountsPer100ms = 600.0;  // Vel uses 100mS as counter sample period
     final double kRPM2Counts = (GEAR * ShooterEncoder) / RPM2CountsPer100ms;
  
+    private boolean intakeIsOn;
+    private boolean shooterIsOn;
   public Intake_Subsystem() {
      /* Factory Default all hardware to prevent unexpected behaviour */
     upper_shooter.configFactoryDefault();
@@ -138,7 +140,10 @@ public class Intake_Subsystem extends SubsystemBase {
 		//upper_shooter_talon.config_kF(kPIDLoopIdx, 0.0 /*kGains_Velocit.kF */, kTimeoutMs);
 		//upper_shooter_talon.config_kP(kPIDLoopIdx, kGains_Velocit.kP, kTimeoutMs);
 		//upper_shooter_talon.config_kI(kPIDLoopIdx, kGains_Velocit.kI, kTimeoutMs);
-		//upper_shooter_talon.config_kD(kPIDLoopIdx, kGains_Velocit.kD, kTimeoutMs);
+    //upper_shooter_talon.config_kD(kPIDLoopIdx, kGains_Velocit.kD, kTimeoutMs);
+    
+    intakeIsOn = false;
+    shooterIsOn = false;
 
   }
 
@@ -164,10 +169,16 @@ public class Intake_Subsystem extends SubsystemBase {
   } 
 
   public void intakeOn(double motorStrength) {
+    intakeIsOn = true;
     intake_spark.set(motorStrength);
   }
 
+  public boolean intakeIsOn() {
+    return intakeIsOn;
+  }
+
   public void intakeOff() {
+    intakeIsOn = false;
     intake_spark.set(0);
   }
 
@@ -180,13 +191,21 @@ public class Intake_Subsystem extends SubsystemBase {
   }
 
   public void shooterOn(double RPM_target) {
-      /* Velocity Closed Loop */
-      double targetVelocity_UnitsPer100ms = RPM_target * kRPM2Counts;
-			upper_shooter.set(ControlMode.Velocity, targetVelocity_UnitsPer100ms);
+    shooterIsOn = true;
+      /* Velocity Closed Loop
+          double targetVelocity_UnitsPer100ms = RPM_target * kRPM2Counts;
+       */
+      //WIP - using simple motorpercent for now - 2/13/20
+			upper_shooter.set(ControlMode.PercentOutput, RPM_target);
+  }
+
+  public boolean shooterIsOn() {
+    return shooterIsOn;
   }
 
   public void shooterOff() {
-    upper_shooter.set(ControlMode.Velocity, 0);
+    shooterIsOn = false;
+    upper_shooter.set(ControlMode.PercentOutput, 0);
   }
 
 

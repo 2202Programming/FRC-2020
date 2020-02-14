@@ -5,42 +5,46 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake_Subsystem;
 
-public class ShooterOn extends CommandBase {
-  private Intake_Subsystem m_intake;
-  private final double RPM_TARGET = 1000;
+public class ReverseIntake extends CommandBase {
 
-  public ShooterOn(Intake_Subsystem m_intake) {
-    this.m_intake = m_intake;
+  private Intake_Subsystem intake;
+  private double power;
+  /**
+   * Creates a new ReverseIntake.
+   */
+  public ReverseIntake(Intake_Subsystem intake, double power) {
+    this.intake = intake;
+    this.power = power;
 
+    addRequirements(intake);
     // Use addRequirements() here to declare subsystem dependencies.
-   // addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("ShooterOn-Inited");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // We will want to backup the mag a little bit before shooter gets engaged
-    // this will prevent balls getting stuck.
-
-    m_intake.shooterOn(RPM_TARGET);
+    intake.intakeOn(power);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.shooterOff();
-    System.out.println("ShooterOn-Ended");
+    intake.intakeOff();
   }
 
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
 }

@@ -52,12 +52,12 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     // m_color.updateColorSensor();
     
-    if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
+    /*if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
       // m_color.printLog();
       lastLogTime = System.currentTimeMillis();
      // m_robotContainer.driveTrain.log();
       m_robotContainer.gearShifter.log();
-    }
+    }*/
   }
 
   /**

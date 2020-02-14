@@ -92,7 +92,7 @@ public class auto_creep_cmd extends CommandBase {
     SmartDashboard.putData(distancePIDController);
   
     // move rotation only
-    drive.velocityArcadeDrive(speedCmd, angleCmd);
+    drive.velocityArcadeDrive(0, angleCmd);
   }
 
   // Called once the command ends or is interrupted.
@@ -104,10 +104,13 @@ public class auto_creep_cmd extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    /*
     double current_position = (drive.getLeftPos()+drive.getRightPos())/2;
     double current_travel_distance = current_position - starting_position;
     if (targetDistance == current_travel_distance)
       return true;
     else return false;
+    */
+    return false;
   }
 }

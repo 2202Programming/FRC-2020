@@ -19,7 +19,8 @@ public class auto_cmd_group extends SequentialCommandGroup{
     public auto_cmd_group(DriverControls dc, VelocityDifferentialDrive_Subsystem drive, Intake_Subsystem intake,
                             Limelight_Subsystem limelight, Lidar_Subsystem lidar) {
         double angleTarget = 0;
-        double maxSpeed = 0;
+        double maxSpeed = 10;
+        double maxAngleSpeed = 10;
         double targetDistance = 0;
         double stopDist = 0;
         double targetVelocity = 0;
@@ -35,7 +36,7 @@ public class auto_cmd_group extends SequentialCommandGroup{
 
         addCommands(
             new WaitCommand(startDelay[delayCode]),
-            new auto_creep_cmd(drive, limelight, angleTarget, maxSpeed, targetDistance),
+            new auto_creep_cmd(drive, limelight, angleTarget, maxSpeed, maxAngleSpeed, targetDistance),
             new auto_delay_cmd(switch1, switch2),
             new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetVelocity),
             new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetVelocity),

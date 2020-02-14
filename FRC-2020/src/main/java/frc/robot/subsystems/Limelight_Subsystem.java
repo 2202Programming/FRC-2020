@@ -45,7 +45,7 @@ public class Limelight_Subsystem extends SubsystemBase {
     area = ta.getDouble(0.0);
     target = tv.getBoolean(false);
     
-    log(10);
+    //log(10);
   }
 
   public double getX(){

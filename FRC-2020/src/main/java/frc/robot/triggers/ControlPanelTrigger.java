@@ -15,6 +15,7 @@ public class ControlPanelTrigger extends Trigger
 
     @Override
     public boolean get() {
+        // Gets the value of the digital input.  Returns true if the circuit is open.
         return panel_switch.get();
     }
 }

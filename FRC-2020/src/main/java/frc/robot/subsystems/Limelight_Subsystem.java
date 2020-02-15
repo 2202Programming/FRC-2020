@@ -43,7 +43,7 @@ public class Limelight_Subsystem extends SubsystemBase {
     x = tx.getDouble(0.0);
     y = ty.getDouble(0.0);
     area = ta.getDouble(0.0);
-    target = tv.getBoolean(false);
+    target = (tv.getDouble(0)==0) ? (false) : (true);
     
 
   }

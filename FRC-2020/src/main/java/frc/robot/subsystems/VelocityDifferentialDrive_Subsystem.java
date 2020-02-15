@@ -53,7 +53,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// save scaling factors, they are required to use SparkMax in Vel mode
 		this.maxRPM = maxRPM;
 		this.maxDPS = maxDPS;
-
+		
+		setCoastMode();
+		
 		// Have motors follow to use Differential Drive
 		middleRight.follow(frontRight);
 		middleLeft.follow(frontLeft);
@@ -64,7 +66,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// velocity setup - using RPM speed controller
 		leftPidController = initVelocityControl(frontLeft);
 		rightPidController = initVelocityControl(frontRight);
-
+		
 		setVelocityMode(false);
 
 		dDrive = new DifferentialDrive(leftPidController, rightPidController);

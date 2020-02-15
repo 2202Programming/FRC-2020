@@ -28,6 +28,7 @@ import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
+import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
@@ -51,6 +52,7 @@ public class RobotContainer {
   public final VelocityDifferentialDrive_Subsystem driveTrain;
   public final Intake_Subsystem intake;
   public final Limelight_Subsystem limelight;
+  public final Log_Subsystem logSubsystem;
 
   Command tankDriveCmd;
   Command arcadeDriveCmd;
@@ -74,6 +76,7 @@ public class RobotContainer {
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
+    logSubsystem = new Log_Subsystem(limelight, driveTrain);
     
     //Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);

@@ -76,8 +76,7 @@ public boolean valid(){
   return target;
 }
 
-  public void log(int interval){
-
+  public void log(){
 
       SmartDashboard.putNumber("X value", x);
       SmartDashboard.putNumber("Y value", y);

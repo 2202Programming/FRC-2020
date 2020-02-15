@@ -19,7 +19,7 @@ public class PositionControlPanelCommand extends CommandBase {
     private static final double GEAR_RATIO= 3;
     private static final int FULL_ROTATION = 360;
     private static final double STOP = 0;
-    private static final double WHEEL_CIRCUMFERENCE = 42;//wrong
+    private static final double WHEEL_CIRCUMFERENCE = 2*Math.PI;//wrong
     private static final int PANEL_DIAMETER = 20;//20 inches
     private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
 
@@ -61,7 +61,7 @@ public class PositionControlPanelCommand extends CommandBase {
         }
         panel.resetEncoder();
         panel.setSpeed(findShortest() * 0.2);
-        //move arm
+        panel.moveArm();
     }
 
     @Override

@@ -18,7 +18,7 @@ public class RotateControlPanelCommand extends CommandBase {
     private static final int FULL_ROTATION = 360;
     private static final double STOP = 0;
     private static final double RATE = 0.2;
-    private static final double WHEEL_CIRCUMFERENCE = 7;//wrong
+    private static final double WHEEL_CIRCUMFERENCE = 2*Math.PI;
     private static final int PANEL_DIAMETER = 20;//20 inches
     private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
     private static final double START = 0.1;
@@ -53,7 +53,7 @@ public class RotateControlPanelCommand extends CommandBase {
         //Command.super.initialize();
         init_color = detector.getColor();
         curr_color = detector.getColor();
-        //add arm
+        panel.moveArm();
         panel.resetEncoder();
         panel.setSpeed(START);
         curr_speed = START;
@@ -86,7 +86,7 @@ public class RotateControlPanelCommand extends CommandBase {
     public void end(boolean interrupted)
     {
         panel.setSpeed(STOP);
-        //add arm
+        panel.retractArm();
     }
 
     public void ramp()

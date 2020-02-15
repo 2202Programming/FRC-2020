@@ -1,25 +1,13 @@
 package frc.robot.commands.drive.pid;
 
-import java.util.Set;
-
-import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.commands.drive.DriveWithLimelightToDistanceDegCmd;
 
-public class changeLimelightAngleDrivePID extends InstantCommand implements Sendable {
+public class changeLimelightAngleDrivePID extends InstantCommand {
 
     public changeLimelightAngleDrivePID(final char valueToChange, final double incrementValue) {
         this.valueToChange = valueToChange;
         this.incrementValue = incrementValue;
-    }
-
-    @Override
-    public Set<Subsystem> getRequirements() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -35,12 +23,6 @@ public class changeLimelightAngleDrivePID extends InstantCommand implements Send
             DriveWithLimelightToDistanceDegCmd.setKad(incrementValue);
             break;
         }
-    }
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        // TODO Auto-generated method stub
-
     }
 
     private final char valueToChange;

@@ -12,12 +12,9 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.TableEntryListener;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.SmartDashboardListener;
 import frc.robot.commands.drive.pid.changeLimelightAngleDrivePID;
-import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Mechanum_Drivetrain;
 
@@ -39,7 +36,7 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
   private static NetworkTable networkTableSmartDashboard;
-  private int listenerHandle; // may be necessary for listener for pid changes
+  private int listenerHandle; // may or may not be necessary for listener for pid changes
 
   /**
    * Creates a new DriveWithLidarToDistanceCmd.

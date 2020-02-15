@@ -12,6 +12,7 @@ import java.util.HashMap;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.util.input.JoystickTrigger;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public interface DriverControls extends Subsystem {
@@ -100,4 +101,8 @@ public interface DriverControls extends Subsystem {
         new JoystickButton(deviceMap.get(id) , button) : null;
   }
 
+  public default JoystickTrigger bindJoystick(Id id, int axis) {
+    return (deviceMap.get(id) != null) ?  
+        new JoystickTrigger(deviceMap.get(id), axis, 0.5) : null;
+  }
 }

@@ -122,12 +122,13 @@ public class RobotContainer {
         .whenHeld(new ReverseIntake(intake, -0.5));
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ToggleIntakeRaised(intake));
-      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
-        .whenHeld(new ShooterOn(intake, 1200, 0.4));  // rpm, seconds mag backup 
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
         .whileHeld(new MagazineAdjust(intake, true));
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
         .whileHeld(new MagazineAdjust(intake, false));
+      driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
+        .whenHeld(new ShooterOn(intake, 1200, 0.4));  // rpm, seconds mag backup 
+
     //driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     //  .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
   }

@@ -32,8 +32,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax middleLeft = new CANSparkMax(ML_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 
-	private final VelController leftPidController;
-	private final VelController rightPidController;
+	private final VelController leftController;
+	private final VelController rightController;
 
 	// PID coefficients TODO: move these constants
 	private double kP = 5e-5;
@@ -53,9 +53,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// save scaling factors, they are required to use SparkMax in Vel mode
 		this.maxRPM = maxRPM;
 		this.maxDPS = maxDPS;
-		
+
 		setCoastMode();
-		
+
 		// Have motors follow to use Differential Drive
 		middleRight.follow(frontRight);
 		middleLeft.follow(frontLeft);
@@ -64,12 +64,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		gearbox = gear;
 
 		// velocity setup - using RPM speed controller
-		leftPidController = initVelocityControl(frontLeft);
-		rightPidController = initVelocityControl(frontRight);
-		
+		leftController = new VelController(frontLeft);
+		rightController = new VelController(frontRight);
+
 		setVelocityMode(false);
 
-		dDrive = new DifferentialDrive(leftPidController, rightPidController);
+		dDrive = new DifferentialDrive(leftController, rightController);
 		dDrive.setSafetyEnabled(false);
 	}
 
@@ -88,8 +88,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void setVelocityMode(boolean useVelocity) {
-		leftPidController.setVelocityMode(useVelocity);
-		rightPidController.setVelocityMode(useVelocity);
+		leftController.setVelocityMode(useVelocity);
+		rightController.setVelocityMode(useVelocity);
 	}
 
 	// vel is ft/s positive forward
@@ -126,29 +126,29 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getLeftPos() {
-		return K_ft_per_rev*leftPidController.getPosition();
+		return K_ft_per_rev * leftController.getPosition();
 	}
 
 	public double getLeftVel(boolean normalized) {
-		double vel = leftPidController.get();
+		double vel = leftController.get();
 		vel = (normalized) ? (vel / maxRPM) : vel;
 		return vel;
 	}
 
 	public double getRightPos() {
-		return K_ft_per_rev*rightPidController.getPosition();
+		return K_ft_per_rev * rightController.getPosition();
 
 	}
 
 	public double getRightVel(boolean normalized) {
-		double vel = rightPidController.get();
+		double vel = rightController.get();
 		vel = (normalized) ? (vel / maxRPM) : vel;
 		return vel;
 	}
 
 	public void resetPosition() {
-		rightPidController.setPosition(0);
-		leftPidController.setPosition(0);
+		rightController.setPosition(0);
+		leftController.setPosition(0);
 	}
 
 	public void log() {
@@ -158,41 +158,33 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// SmartDashboard.putNumber("Left Position", getLeftPos());
 	}
 
-	// Use velocity control for SparkMax - RPM based
-	VelController initVelocityControl(final CANSparkMax motor) {
-		/**
-		 * In order to use PID functionality for a controller, a CANPIDController object
-		 * is constructed by calling the getPIDController() method on an existing
-		 * CANSparkMax object
-		 */
-		final CANPIDController pid = motor.getPIDController();
-		final VelController velController = new VelController(motor); // use our SpeedController
-		// set PID coefficients
-		pid.setP(kP);
-		pid.setI(kI);
-		pid.setD(kD);
-		pid.setIZone(kIz);
-		pid.setFF(kFF);
-		pid.setOutputRange(kMinOutput, kMaxOutput);
-		return velController;
-	}
-
 	public class VelController implements SpeedController {
 		final CANSparkMax controller;
 		final CANPIDController pid;
 		final CANEncoder encoder;
 		boolean velocityMode = true;
 
-		public VelController(final CANSparkMax controller) {
-			this.controller = controller;
-			this.encoder = controller.getEncoder();
-			this.pid = controller.getPIDController();
+		public VelController(final CANSparkMax ctrl) {
+			controller = ctrl;
+			encoder = controller.getEncoder();
+			pid = controller.getPIDController();
+
+			// set PID coefficients
+			pid.setP(kP);
+			pid.setI(kI);
+			pid.setD(kD);
+			pid.setIZone(kIz);
+			pid.setFF(kFF);
+			pid.setOutputRange(kMinOutput, kMaxOutput);
 		}
 
 		public void setVelocityMode(boolean useVelocity) {
 			velocityMode = useVelocity;
 		}
-		public boolean getVelocityMode() {return velocityMode;}
+
+		public boolean getVelocityMode() {
+			return velocityMode;
+		}
 
 		@Override
 		public void pidWrite(final double output) {
@@ -208,10 +200,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			if (velocityMode) {
 				final double rpm = speed * maxRPM;
 				pid.setReference(rpm, ControlType.kVelocity);
-			}
-			else {
+			} else {
 				controller.set(speed);
-				//pid.setReference(speed, ControlType.kDutyCycle);
+				// pid.setReference(speed, ControlType.kDutyCycle);
 			}
 		}
 

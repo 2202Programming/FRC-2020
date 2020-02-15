@@ -78,6 +78,10 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     rotShaper.setDeadzone(deadzone);
     velShaper.setDeadzone(deadzone);
 
+    //add deadzone for tank - ###hack x 2
+    velLeftShaper.setDeadzone(deadzone*2);
+    velRightShaper.setDeadzone(deadzone*2);
+
     // read some values to remove unused warning
     assistant.getX();
     switchBoard.getX();

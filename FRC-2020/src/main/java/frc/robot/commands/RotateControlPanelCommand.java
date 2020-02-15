@@ -91,15 +91,15 @@ public class RotateControlPanelCommand extends CommandBase {
 
     public void ramp()
     {
-        if(degreesRotated <= ((numRotationsNeeded * FULL_ROTATION)/3) )
+        if(degreesRotated <= ((numRotationsNeeded * FULL_ROTATION)/3) || numSlices < 8)
         {
-            panel.setSpeed(curr_speed + RATE);
-            curr_speed +=RATE;
+            curr_speed = ((curr_speed + RATE) <= 1)? curr_speed + RATE:1;
+            panel.setSpeed(curr_speed);
         }
         else if(degreesRotated >= ((2*numRotationsNeeded * FULL_ROTATION)/3))
         {
-            panel.setSpeed(curr_speed-RATE);
-            curr_speed-=RATE;
+            curr_speed = ((curr_speed - RATE) >= 0.2)? curr_speed - RATE:0.2;
+            panel.setSpeed(curr_speed);
         }
     }
     

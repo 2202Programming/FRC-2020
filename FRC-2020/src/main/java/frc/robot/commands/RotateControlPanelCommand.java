@@ -13,16 +13,20 @@ import frc.robot.subsystems.Control_Panel;
  * Rotates the control panel an indicated number of times.
  */
 public class RotateControlPanelCommand extends CommandBase {
-    private static final double SPEED = 1;
+    private static final double FULL_SPEED = 1;
+    private static final int GEAR_RATIO = 2; // wrong
     private static final int FULL_ROTATION = 360;
     private static final double STOP = 0;
-    private static final double WHEEL_CIRCUMFERENCE = 42;//wrong
+    private static final double RATE = 0.2;
+    private static final double WHEEL_CIRCUMFERENCE = 7;//wrong
     private static final int PANEL_DIAMETER = 20;//20 inches
     private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
+    private static final double START = 0.1;
 
     private Control_Panel panel;
 
     private int numRotationsNeeded;
+    private double curr_speed;
     private int numSlices;
     private double degreesRotated;
     private String init_color;
@@ -48,10 +52,11 @@ public class RotateControlPanelCommand extends CommandBase {
         // TODO: Change
         //Command.super.initialize();
         init_color = detector.getColor();
-        curr_color = init_color;
+        curr_color = detector.getColor();
         //add arm
         panel.resetEncoder();
-        panel.setSpeed(SPEED);
+        panel.setSpeed(START);
+        curr_speed = START;
         
     }
 
@@ -59,6 +64,7 @@ public class RotateControlPanelCommand extends CommandBase {
     public void execute() {
         // TODO Auto-generated method stub
         degreesRotated = findDegrees();
+        ramp();
         if(!curr_color.equals(detector.getColor()))
             {
                 numSlices--;
@@ -68,12 +74,12 @@ public class RotateControlPanelCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return degreesRotated >= numRotationsNeeded * FULL_ROTATION && numSlices == 0 && curr_color.equals(init_color); // 360 is number of degrees in one rotation
+        return degreesRotated >= (numRotationsNeeded * FULL_ROTATION) || (numSlices == 0 && curr_color.equals(init_color)); // 360 is number of degrees in one rotation
     }
 
     public double findDegrees()
     {
-        return (((panel.getDistance()/FULL_ROTATION) * WHEEL_CIRCUMFERENCE)/PANEL_CIRCUMFERENCE)*FULL_ROTATION;
+        return ((((panel.getDistance()*GEAR_RATIO)/FULL_ROTATION) * WHEEL_CIRCUMFERENCE)/PANEL_CIRCUMFERENCE)*FULL_ROTATION;
     }
 
     @Override
@@ -81,6 +87,20 @@ public class RotateControlPanelCommand extends CommandBase {
     {
         panel.setSpeed(STOP);
         //add arm
+    }
+
+    public void ramp()
+    {
+        if(degreesRotated <= ((numRotationsNeeded * FULL_ROTATION)/3) )
+        {
+            panel.setSpeed(curr_speed + RATE);
+            curr_speed +=RATE;
+        }
+        else if(degreesRotated >= ((2*numRotationsNeeded * FULL_ROTATION)/3))
+        {
+            panel.setSpeed(curr_speed-RATE);
+            curr_speed-=RATE;
+        }
     }
     
 }

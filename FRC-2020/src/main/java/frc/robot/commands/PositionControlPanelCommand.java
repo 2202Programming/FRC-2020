@@ -16,6 +16,7 @@ import frc.robot.subsystems.FSMState_Subsystem;
  */
 public class PositionControlPanelCommand extends CommandBase {
     private static final int SLICE_DEGREE = 45;
+    private static final double GEAR_RATIO= 3;
     private static final int FULL_ROTATION = 360;
     private static final double STOP = 0;
     private static final double WHEEL_CIRCUMFERENCE = 42;//wrong
@@ -59,7 +60,7 @@ public class PositionControlPanelCommand extends CommandBase {
                 index_final = i;
         }
         panel.resetEncoder();
-        panel.setSpeed(findShortest() * 0.5);
+        panel.setSpeed(findShortest() * 0.2);
         //move arm
     }
 
@@ -77,7 +78,7 @@ public class PositionControlPanelCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return degreesRotated >= (findShortest()*SLICE_DEGREE) && color_detector.getColor().equals(final_color) && count == 0;
+        return degreesRotated >= (findShortest()*SLICE_DEGREE) || (color_detector.getColor().equals(final_color) && count == 0);
     }
 
     public int findShortest()
@@ -88,7 +89,9 @@ public class PositionControlPanelCommand extends CommandBase {
             return 1;
         else if(index_init == index_final)
             return 0;
-        else
+        else if(index_init > index_final)
+            return -1;
+        else 
             return 1;
     }
 
@@ -101,12 +104,12 @@ public class PositionControlPanelCommand extends CommandBase {
         else if(index_init == index_final)
             count = 0;
         else
-            count = 2;
+            count = Math.abs(index_init-index_final);
     }
 
     public double findDegrees()
     {
-        return (((panel.getDistance()/FULL_ROTATION) * WHEEL_CIRCUMFERENCE)/PANEL_CIRCUMFERENCE)*FULL_ROTATION;
+        return ((((panel.getDistance()*GEAR_RATIO)/FULL_ROTATION) * WHEEL_CIRCUMFERENCE)/PANEL_CIRCUMFERENCE)*FULL_ROTATION;
     }
 
     @Override

@@ -40,7 +40,7 @@ public class RobotContainer {
   private final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
   private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
-  private final Control_Panel panel = new Control_Panel(30, 30, 30, 30);
+  private final Control_Panel panel = new Control_Panel(1040, 10, 50, 20);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

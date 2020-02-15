@@ -33,8 +33,8 @@ public class Control_Panel extends SubsystemBase
         m_talon.configFactoryDefault();
         m_talon.setInverted(false);
         m_talon.setNeutralMode(NeutralMode.Brake);
-        m_talon.configOpenloopRamp(0.2);
-        m_talon.configClosedloopRamp(0);
+        //m_talon.configOpenloopRamp(0.2);
+        //m_talon.configClosedloopRamp(0);
         m_encoder = new Encoder(CHANNEL_A,CHANNEL_B);
         m_encoder.setDistancePerPulse(distance_per_pulse);
         m_encoder.setMinRate(minRate);

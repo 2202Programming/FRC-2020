@@ -32,7 +32,7 @@ public class Log_Subsystem extends SubsystemBase {
 
     if(System.nanoTime() % 10 == 0){
       SmartDashboard.putString("Command: ", Robot.command);
-      }
+      }  
 
     //lidar.printLog();
   }

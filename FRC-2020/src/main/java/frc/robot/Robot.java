@@ -10,6 +10,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -23,6 +28,8 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
   private long lastLogTime;
+
+  private XboxController xbox = new XboxController(0);
 
   //what command robot is running
   public static String command = "none";
@@ -63,12 +70,11 @@ public class Robot extends TimedRobot {
       m_robotContainer.gearShifter.log();
     }*/
 
-<<<<<<< HEAD
-=======
   
     SmartDashboard.putString("Command: ", command);
 
->>>>>>> Larry
+    SmartDashboard.putNumber("Right trigger: ", xbox.getTriggerAxis(Hand.kRight));
+    
   }
 
   /**

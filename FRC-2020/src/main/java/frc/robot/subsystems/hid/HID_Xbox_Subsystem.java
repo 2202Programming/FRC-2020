@@ -77,9 +77,9 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     // add some deadzone in normalized coordinates
     rotShaper.setDeadzone(deadzone);
     velShaper.setDeadzone(deadzone);
-    //add deadzone for tank - ###hack x 2
-    velLeftShaper.setDeadzone(deadzone*2);
-    velRightShaper.setDeadzone(deadzone*2);
+    //add deadzone for tank 
+    velLeftShaper.setDeadzone(deadzone);
+    velRightShaper.setDeadzone(deadzone);
 
     // read some values to remove unused warning
     assistant.getX();
@@ -106,11 +106,16 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     } else {
       vLeft = velLeftShaper.get() * invertGain;
       vRight = velRightShaper.get() * invertGain;
-    }
-    // Apply a rotation limit on tank with speed
+    }    
+  }
+
+  private void limitTankRotation() {
+  // Apply a rotation limit on tank with speed
     double Kv = 100.0;
     double avg = (vRight + vLeft)/2.0;
-    double maxDelta = 1.0/(Kv*avg*avg*avg + 1.0);
+    double absV = Math.abs(avg);
+
+    double maxDelta = 1.0/(Kv*absV*absV*absV + 1.0);
     double absDelta = Math.abs(vLeft - vRight);
     
     if (absDelta > maxDelta) {
@@ -118,8 +123,8 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
       vLeft = avg;
       vRight = avg;
     }
-
   }
+
 
   @Override
   public double getVelocityX() {

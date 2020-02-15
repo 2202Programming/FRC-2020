@@ -108,9 +108,9 @@ public class RobotContainer {
     
       driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new GearToggleCmd(gearShifter));
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
-        .whenPressed(new InvertDriveControls(driverControls));
       driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
+        .whenPressed(new InvertDriveControls(driverControls));
+      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
 
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())

@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedController;
 import static frc.robot.Constants.*;
@@ -152,10 +153,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void log() {
-		// SmartDashboard.putNumber("Right Velocity", getRightVel(false));
-		// SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
-		// SmartDashboard.putNumber("Right Position", getRightPos());
-		// SmartDashboard.putNumber("Left Position", getLeftPos());
+		SmartDashboard.putNumber("Right Velocity", getRightVel(false));
+		SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
+		SmartDashboard.putNumber("Right Position", getRightPos());
+		SmartDashboard.putNumber("Left Position", getLeftPos());
 	}
 
 	public class VelController implements SpeedController {

@@ -1,30 +1,27 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
-import frc.robot.subsystems.ifx.DriverControls;
-import frc.robot.subsystems.ifx.TankDrive;
+import frc.robot.subsystems.ifx.DualDrive;
 
 public class SwitchDriveMode extends InstantCommand {
-  public final VelocityDifferentialDrive_Subsystem driveTrain;
-  private final DriverControls dc;
+  public final DualDrive driveTrain;
   private boolean isArcade = false;
+  private final Command tankAuto;
+  private final Command arcadeAuto;
 
-  public SwitchDriveMode(VelocityDifferentialDrive_Subsystem driveTrain, DriverControls dc) {
+  public SwitchDriveMode(final DualDrive driveTrain, final Command arcadeAuto, final Command tankAuto) {
     this.driveTrain = driveTrain;
-    this.dc = dc;
-
+    this.arcadeAuto = arcadeAuto;
+    this.tankAuto = tankAuto;
   }
 
   public void initialize() {
     if (isArcade) {
-      CommandScheduler.getInstance().setDefaultCommand(driveTrain, new TankDriveCmd(dc, driveTrain));
+        driveTrain.setDefaultCommand(tankAuto);
     } else {
-      CommandScheduler.getInstance().setDefaultCommand(driveTrain, new ArcadeDriveCmd(dc, driveTrain));
+        driveTrain.setDefaultCommand(arcadeAuto);
     }
-
     isArcade = !isArcade;
   }
 }

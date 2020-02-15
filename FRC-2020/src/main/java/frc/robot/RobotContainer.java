@@ -52,6 +52,9 @@ public class RobotContainer {
   public final Intake_Subsystem intake;
   public final Limelight_Subsystem limelight;
 
+  Command tankDriveCmd;
+  Command arcadeDriveCmd;
+
   // private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
   // private final AutomaticGearShift autoGearShift = new
   // AutomaticGearShift(driveTrain, gearShifter);
@@ -71,11 +74,12 @@ public class RobotContainer {
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
+    
+    //Create default commads for driver preference
+    tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
+    arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
+    driveTrain.setDefaultCommand(tankDriveCmd);
 
-    //Use basic arcade drive command
-    //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
-    //Use tank drive to make Dustin happy - dpl 2/8/2020
-    driveTrain.setDefaultCommand(new TankDriveCmd(driverControls, driveTrain));
     // Configure the button bindings
     ///configureButtonBindings();
     DustinsButtons();
@@ -91,25 +95,7 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-
-    // new JoystickButton(driver, 4).whenPressed(new ThrottledUpShift(driveTrain,
-    // gearShifter));
-
-    //These are for test, not the real controls yet. 2-8-20
-    
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-        .whenPressed(new ShiftGearCmd(gearShifter, Gear.LOW_GEAR));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
-        .whenPressed(new ShiftGearCmd(gearShifter, Gear.HIGH_GEAR));
-  /* 
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-        .whenPressed(new InvertDriveControls(driveTrain));
-
-        Derek - we can use the DriverControls to do the invert, not the drive train
-              -  We are changing the controls, not the drive train.  
-        */
 /*
-  *
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
       .whileHeld(new MagazineAdjust(intake, true));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
@@ -125,7 +111,7 @@ public class RobotContainer {
       driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new InvertDriveControls(driverControls));
       driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-        .whenPressed(new SwitchDriveMode(driveTrain, driverControls));
+        .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
 
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); //mag, intake

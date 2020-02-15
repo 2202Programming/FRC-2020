@@ -64,9 +64,9 @@ public class Robot extends TimedRobot {
       m_robotContainer.gearShifter.log();
     }*/
 
-    if(System.nanoTime() % 10 == 0){
+  
     SmartDashboard.putString("Command: ", command);
-    }
+
   }
 
   /**

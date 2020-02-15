@@ -28,8 +28,6 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
-  private XboxController xbox = new XboxController(0);
-
   //what command robot is running
   public static String command = "none";
 
@@ -60,9 +58,7 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     // m_color.updateColorSensor();
-    
-    SmartDashboard.putNumber("Right trigger: ", xbox.getTriggerAxis(Hand.kRight));
-    
+        
   }
 
   /**

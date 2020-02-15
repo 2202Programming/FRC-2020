@@ -18,6 +18,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
+import frc.robot.commands.test.TestCmd;
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.drive.ArcadeDriveCmd;
@@ -140,6 +141,8 @@ public class RobotContainer {
         .whileHeld(new MagazineAdjust(intake, false)); */
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
      .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
+
+    driverControls.bindJoystick(Id.Driver, XboxControllerButtonCode.TRIGGER_RIGHT.getCode()).whenHeld(new TestCmd());
   }
   
 

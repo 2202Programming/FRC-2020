@@ -60,8 +60,8 @@ public class PositionControlPanelCommand extends CommandBase {
                 index_final = i;
         }
         panel.resetEncoder();
-        panel.setSpeed(findShortest() * 0.2);
         panel.moveArm();
+        panel.setSpeed(findShortest() * 0.2);
     }
 
     @Override

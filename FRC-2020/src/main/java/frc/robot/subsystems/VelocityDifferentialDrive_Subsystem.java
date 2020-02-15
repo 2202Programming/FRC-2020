@@ -6,6 +6,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -63,12 +65,29 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		leftPidController = initVelocityControl(frontLeft);
 		rightPidController = initVelocityControl(frontRight);
 
+		setVelocityMode(false);
+
 		dDrive = new DifferentialDrive(leftPidController, rightPidController);
 		dDrive.setSafetyEnabled(false);
 	}
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {
 		this(gear, MAXRPM, MAXDPS);
+	}
+
+	void setCoastMode() {
+		frontRight.setIdleMode(IdleMode.kCoast);
+		middleRight.setIdleMode(IdleMode.kCoast);
+		backRight.setIdleMode(IdleMode.kCoast);
+
+		frontLeft.setIdleMode(IdleMode.kCoast);
+		middleLeft.setIdleMode(IdleMode.kCoast);
+		backLeft.setIdleMode(IdleMode.kCoast);
+	}
+
+	public void setVelocityMode(boolean useVelocity) {
+		leftPidController.setVelocityMode(useVelocity);
+		rightPidController.setVelocityMode(useVelocity);
 	}
 
 	// vel is ft/s positive forward
@@ -160,12 +179,18 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		final CANSparkMax controller;
 		final CANPIDController pid;
 		final CANEncoder encoder;
+		boolean velocityMode = true;
 
 		public VelController(final CANSparkMax controller) {
 			this.controller = controller;
 			this.encoder = controller.getEncoder();
 			this.pid = controller.getPIDController();
 		}
+
+		public void setVelocityMode(boolean useVelocity) {
+			velocityMode = useVelocity;
+		}
+		public boolean getVelocityMode() {return velocityMode;}
 
 		@Override
 		public void pidWrite(final double output) {
@@ -178,8 +203,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		 */
 		@Override
 		public void set(final double speed) {
-			final double rpm = speed * maxRPM;
-			pid.setReference(rpm, ControlType.kVelocity);
+			if (velocityMode) {
+				final double rpm = speed * maxRPM;
+				pid.setReference(rpm, ControlType.kVelocity);
+			}
+			else {
+				pid.setReference(speed, ControlType.kDutyCycle);
+			}
 		}
 
 		@Override

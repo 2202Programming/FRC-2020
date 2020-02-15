@@ -86,6 +86,8 @@ public class RobotContainer {
     // Configure the button bindings
     ///configureButtonBindings();
     DustinsButtons();
+    DPLTestButtons();
+
     // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
     // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
 
@@ -132,7 +134,26 @@ public class RobotContainer {
     //driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     //  .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
   }
+
+  //Derek's testing...
+  private void DPLTestButtons() {
+
+    // testing buttion to enable/disable rotation limits
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.START.getCode())
+    .toggleWhenPressed(new CommandBase() {
+        @Override
+        public void initialize() {
+          driverControls.setLimitRotation(true);
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+          driverControls.setLimitRotation(false);
+        }
+    }); 
+  }
   
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

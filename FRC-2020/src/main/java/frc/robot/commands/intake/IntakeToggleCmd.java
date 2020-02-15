@@ -22,11 +22,11 @@ public class IntakeToggleCmd extends InstantCommand {
   @Override
   public void initialize() {
     if (intakeOn) {
-      m_intake.magazineOff();
+     // m_intake.magazineOff();
       m_intake.intakeOff();
     }
     else {
-      m_intake.magazineOn(m_magMotor);
+    //  m_intake.magazineOn(m_magMotor);
       m_intake.intakeOn(m_intakeMotor);
 
     }

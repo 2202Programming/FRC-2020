@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.TableEntryListener;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.SmartDashboardListener;
+import frc.robot.commands.drive.pid.changeLimelightAngleDrivePID;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Mechanum_Drivetrain;
@@ -69,6 +70,14 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
     addRequirements(drive);
 
     setPID();
+    
+    SmartDashboard.putData("Increase Limelight Angle Drive P", new changeLimelightAngleDrivePID('P', 0.01));
+    SmartDashboard.putData("Decrease Limelight Angle Drive P", new changeLimelightAngleDrivePID('P', -0.01));
+    SmartDashboard.putData("Increase Limelight Angle Drive I", new changeLimelightAngleDrivePID('I', 0.001));
+    SmartDashboard.putData("Decrease Limelight Angle Drive I", new changeLimelightAngleDrivePID('I', -0.001));
+    SmartDashboard.putData("Increase Limelight Angle Drive D", new changeLimelightAngleDrivePID('D', 0.001));
+    SmartDashboard.putData("Decrease Limelight Angle Drive D", new changeLimelightAngleDrivePID('D', -0.001));
+    
   }
 
   public DriveWithLimelightToDistanceDegCmd(Mechanum_Drivetrain drive, Limelight_Subsystem limelight, double stopDist, double maxSpeed, double angleTarget,

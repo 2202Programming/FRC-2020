@@ -115,7 +115,7 @@ public class PositionControlPanelCommand extends CommandBase {
     @Override
     public void end(boolean interrupted)
     {
-        //retract arm
         panel.setSpeed(STOP);
+        panel.retractArm();
     }
 }

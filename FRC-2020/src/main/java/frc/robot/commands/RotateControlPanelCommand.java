@@ -18,7 +18,7 @@ public class RotateControlPanelCommand extends CommandBase {
     private static final int FULL_ROTATION = 360;
     private static final double STOP = 0;
     private static final double RATE = 0.2;
-    private static final double WHEEL_CIRCUMFERENCE = 2*Math.PI;
+    private static final double WHEEL_CIRCUMFERENCE = 4*Math.PI;
     private static final int PANEL_DIAMETER = 20;//20 inches
     private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
     private static final double START = 0.1;
@@ -96,7 +96,7 @@ public class RotateControlPanelCommand extends CommandBase {
             curr_speed = ((curr_speed + RATE) <= 1)? curr_speed + RATE:1;
             panel.setSpeed(curr_speed);
         }
-        else if(degreesRotated >= ((2*numRotationsNeeded * FULL_ROTATION)/3))
+        else if(degreesRotated >= ((2*numRotationsNeeded * FULL_ROTATION)/3) || numSlices > 16)
         {
             curr_speed = ((curr_speed - RATE) >= 0.2)? curr_speed - RATE:0.2;
             panel.setSpeed(curr_speed);

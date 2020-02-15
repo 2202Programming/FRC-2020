@@ -17,14 +17,16 @@ import frc.robot.subsystems.FSMState_Subsystem;
 public class PositionControlPanelCommand extends CommandBase {
     private static final int SLICE_DEGREE = 45;
     private static final double GEAR_RATIO= 3;
+    private static final double RATE = 0.2;
     private static final int FULL_ROTATION = 360;
     private static final double STOP = 0;
-    private static final double WHEEL_CIRCUMFERENCE = 2*Math.PI;//wrong
+    private static final double WHEEL_CIRCUMFERENCE = 4*Math.PI;//wrong
     private static final int PANEL_DIAMETER = 20;//20 inches
     private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
 
     
     private Color_Subsystem color_detector;
+    private double curr_speed;
     private double degreesRotated;
     private String init_color;
     private String curr_color;
@@ -38,6 +40,7 @@ public class PositionControlPanelCommand extends CommandBase {
     public PositionControlPanelCommand(Color_Subsystem color_detector, Control_Panel panel) {
         this.color_detector = color_detector;
         this.panel = panel;
+        curr_speed = 0.2;
         colors = new String[]{"Blue","Green","Red","Yellow"};
         degreesRotated = 0;
         //requirements
@@ -61,7 +64,7 @@ public class PositionControlPanelCommand extends CommandBase {
         }
         panel.resetEncoder();
         panel.moveArm();
-        panel.setSpeed(findShortest() * 0.2);
+        panel.setSpeed(findShortest() * curr_speed);
     }
 
     @Override
@@ -74,6 +77,7 @@ public class PositionControlPanelCommand extends CommandBase {
             curr_color = color_detector.getColor();
         }
         degreesRotated = findDegrees();
+        ramp();
     }
 
     @Override
@@ -118,4 +122,19 @@ public class PositionControlPanelCommand extends CommandBase {
         panel.setSpeed(STOP);
         panel.retractArm();
     }
+
+    public void ramp()
+    {
+        if(degreesRotated <= ((findShortest() * SLICE_DEGREE * FULL_ROTATION)/3))
+        {
+            curr_speed = ((curr_speed + findShortest() * RATE) <= 1)? curr_speed + findShortest() * RATE:findShortest() * 1;
+            panel.setSpeed(curr_speed);
+        }
+        else if(degreesRotated >= ((2*findShortest() * SLICE_DEGREE * FULL_ROTATION)/3))
+        {
+            curr_speed = ((curr_speed - findShortest() * RATE) >= 0.2)? curr_speed - findShortest() * RATE:findShortest() * 0.2;
+            panel.setSpeed(curr_speed);
+        }
+    }
+    
 }

@@ -210,7 +210,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 				pid.setReference(rpm, ControlType.kVelocity);
 			}
 			else {
-				pid.setReference(speed, ControlType.kDutyCycle);
+				controller.set(speed);
+				//pid.setReference(speed, ControlType.kDutyCycle);
 			}
 		}
 

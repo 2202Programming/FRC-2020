@@ -119,7 +119,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	// TODO: velocityTankDrive()
 
 	public void arcadeDrive(double xSpeed, double zRotation) {
-		dDrive.arcadeDrive(xSpeed, zRotation);
+		dDrive.arcadeDrive(xSpeed, zRotation, false);
 	}
 
 	public void tankDrive(double leftSpeed, double rightSpeed) {

@@ -27,7 +27,6 @@ public class Robot extends TimedRobot {
   private Command m_testCommand;
 
   private RobotContainer m_robotContainer;
-  private long lastLogTime;
 
   private XboxController xbox = new XboxController(0);
 
@@ -43,7 +42,6 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    lastLogTime = System.currentTimeMillis();
     m_robotContainer.limelight.disableLED();
   }
 
@@ -63,16 +61,6 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
     // m_color.updateColorSensor();
     
-    /*if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
-      // m_color.printLog();
-      lastLogTime = System.currentTimeMillis();
-     // m_robotContainer.driveTrain.log();
-      m_robotContainer.gearShifter.log();
-    }*/
-
-  
-    SmartDashboard.putString("Command: ", command);
-
     SmartDashboard.putNumber("Right trigger: ", xbox.getTriggerAxis(Hand.kRight));
     
   }

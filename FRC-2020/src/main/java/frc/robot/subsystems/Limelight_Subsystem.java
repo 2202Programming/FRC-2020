@@ -76,15 +76,11 @@ public boolean valid(){
   return target;
 }
 
-  public void log(int interval){
-    if((interval + logTimer) < System.currentTimeMillis()){ //interval in ms
-      logTimer = System.currentTimeMillis();
+  public void log(){
 
       SmartDashboard.putNumber("X value", x);
       SmartDashboard.putNumber("Y value", y);
       SmartDashboard.putNumber("Area", area);
-      SmartDashboard.putBoolean("Limelight Valid", target);
 
-    }
   }
 }

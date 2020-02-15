@@ -71,7 +71,7 @@ public class RobotContainer {
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     limelight = new Limelight_Subsystem();
-    log = new Log_Subsystem(limelight);
+    log = new Log_Subsystem(limelight, driveTrain);
 
     //Use basic arcade drive command
     //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));

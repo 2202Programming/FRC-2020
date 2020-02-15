@@ -9,8 +9,10 @@ package frc.robot.subsystems.hid;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.util.ExpoShaper;
+
 
 /**
  * HID_Subsystem - Human Input Device
@@ -76,6 +78,10 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     rotShaper.setDeadzone(deadzone);
     velShaper.setDeadzone(deadzone);
 
+    //add deadzone for tank - ###hack x 2
+    velLeftShaper.setDeadzone(deadzone*2);
+    velRightShaper.setDeadzone(deadzone*2);
+
     // read some values to remove unused warning
     assistant.getX();
     switchBoard.getX();
@@ -102,6 +108,18 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
       vLeft = velLeftShaper.get() * invertGain;
       vRight = velRightShaper.get() * invertGain;
     }
+    // Apply a rotation limit on tank with speed
+    double Kv = 1.0;
+    double avg = (vRight + vLeft)/2.0;
+    double maxDelta = 2.0/(Kv*avg*avg + 1.0);
+    double absDelta = Math.abs(vLeft - vRight);
+    
+    if (absDelta > maxDelta) {
+      //equalize the sticks so no rotation
+      vLeft = avg;
+      vRight = avg;
+    }
+
   }
 
   @Override
@@ -167,7 +185,24 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     }
   }
 
-  
+  /**
+     * Returns 0.0 if the given value is within the specified range around zero. The
+     * remaining range between the deadband and 1.0 is scaled from 0.0 to 1.0.
+     *
+     * @param value    value to clip
+     * @param deadband range around zero
+     */
+    private double applyDeadband(final double value, double deadband) {
+      if (Math.abs(value) > deadband) {
+          if (value > 0.0) {
+              return (value - deadband) / (1.0 - deadband);
+          } else {
+              return (value + deadband) / (1.0 - deadband);
+          }
+      } else {
+          return 0.0;
+      }
+  }
 
 
 }

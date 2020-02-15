@@ -63,6 +63,12 @@ public class Robot extends TimedRobot {
       m_robotContainer.gearShifter.log();
     }*/
 
+<<<<<<< HEAD
+=======
+  
+    SmartDashboard.putString("Command: ", command);
+
+>>>>>>> Larry
   }
 
   /**

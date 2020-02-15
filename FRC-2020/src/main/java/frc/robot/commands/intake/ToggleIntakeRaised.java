@@ -25,8 +25,10 @@ public class ToggleIntakeRaised extends InstantCommand {
 
     if (intakeUp) {
       m_intake.lowerIntake();
+      //off is intentional on lowering according to Kyle.
     } else {
       m_intake.raiseIntake();
+      m_intake.intakeOff();
     }
 
     //flip state

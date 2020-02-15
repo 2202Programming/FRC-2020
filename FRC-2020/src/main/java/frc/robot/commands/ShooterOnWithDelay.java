@@ -8,6 +8,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class ShooterOnWithDelay extends CommandBase {
@@ -29,6 +30,7 @@ public class ShooterOnWithDelay extends CommandBase {
   public void initialize() {
     System.out.println("ShooterOn-Inited");
     startTime = System.currentTimeMillis();
+    Robot.command = "Shooter on with delay";
   }
 
   // Called every time the scheduler runs while the command is scheduled.

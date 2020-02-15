@@ -9,6 +9,7 @@ package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class ShooterOn extends CommandBase {
@@ -33,6 +34,8 @@ public class ShooterOn extends CommandBase {
     m_intake.magazineOff();
     m_intake.intakeOff();
     m_count = 0;
+
+    Robot.command = "Shooter on";
   }
 
   // Called every time the scheduler runs while the command is scheduled.

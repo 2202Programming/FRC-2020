@@ -1,6 +1,7 @@
 package frc.robot.commands.drive.shift;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.GearShifter;
 
 public class GearToggleCmd extends CommandBase {
@@ -29,6 +30,8 @@ public class GearToggleCmd extends CommandBase {
       m_shifter.shiftDown();
     }
     m_inLowGear = !m_inLowGear;
+
+    Robot.command = "Gear toggle";
   }
 
   // Called every time the scheduler runs while the command is scheduled.

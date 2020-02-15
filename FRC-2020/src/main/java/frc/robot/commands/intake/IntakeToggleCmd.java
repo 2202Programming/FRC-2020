@@ -1,6 +1,7 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Robot;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class IntakeToggleCmd extends InstantCommand {
@@ -33,5 +34,7 @@ public class IntakeToggleCmd extends InstantCommand {
     //toggle the state
     
     intakeOn = !intakeOn;
+
+    Robot.command = "Intake toggle";
   }
 }

@@ -24,6 +24,9 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private long lastLogTime;
 
+  //what command robot is running
+  public static String command = "none";
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.

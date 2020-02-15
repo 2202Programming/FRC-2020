@@ -8,6 +8,7 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class MagazineAdjust extends CommandBase {
@@ -26,6 +27,7 @@ public class MagazineAdjust extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    Robot.command = "Magazine Adjust";
   }
 
   // Called every time the scheduler runs while the command is scheduled.

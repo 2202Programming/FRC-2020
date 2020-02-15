@@ -8,6 +8,7 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.Limelight_Subsystem;
 
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -83,6 +84,7 @@ public class auto_limelightLidar_cmd extends CommandBase {
     anglePIDController.setSetpoint(angleTarget);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
 
+    Robot.command = "Auto limelight lidar";
   }
 
   // Called every time the scheduler runs while the command is scheduled.

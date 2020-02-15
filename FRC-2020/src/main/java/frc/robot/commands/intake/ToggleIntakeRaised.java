@@ -8,6 +8,7 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.Robot;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class ToggleIntakeRaised extends InstantCommand {
@@ -31,5 +32,7 @@ public class ToggleIntakeRaised extends InstantCommand {
 
     //flip state
     intakeUp = !intakeUp;
+
+    Robot.command = "Toggle intake raised";
   }
 }

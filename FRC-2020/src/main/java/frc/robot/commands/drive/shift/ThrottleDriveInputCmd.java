@@ -1,6 +1,7 @@
 package frc.robot.commands.drive.shift;
 
 import frc.robot.Constants;
+import frc.robot.Robot;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ifx.ArcadeDrive;
 import frc.robot.subsystems.ifx.DriverControls;
@@ -29,6 +30,8 @@ public class ThrottleDriveInputCmd extends CommandBase {
         this.dc = dc;    //don't register driverControls, already running on periodic
 
         addRequirements(drive);
+
+        Robot.command = "Throttle Drive Input";
     }
 
     // Called just before this Command runs the first time

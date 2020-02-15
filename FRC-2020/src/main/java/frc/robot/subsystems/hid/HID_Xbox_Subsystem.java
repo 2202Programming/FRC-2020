@@ -105,7 +105,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
       vRight = velRightShaper.get() * invertGain;
     }
     // Apply a rotation limit on tank with speed
-    double Kv = 100.0;
+    double Kv = 1.0;
     double avg = (vRight + vLeft)/2.0;
     double maxDelta = 2.0/(Kv*avg*avg + 1.0);
     double absDelta = Math.abs(vLeft - vRight);

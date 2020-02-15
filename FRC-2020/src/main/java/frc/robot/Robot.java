@@ -34,6 +34,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     lastLogTime = System.currentTimeMillis();
+    m_robotContainer.limelight.disableLED();
   }
 
   /**
@@ -100,6 +101,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.limelight.disableLED();
   }
 
   /**

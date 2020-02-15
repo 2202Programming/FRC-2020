@@ -28,6 +28,7 @@ import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
+import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
@@ -50,6 +51,7 @@ public class RobotContainer {
   public final GearShifter gearShifter;
   public final VelocityDifferentialDrive_Subsystem driveTrain;
   public final Limelight_Subsystem limelight;
+  public final Log_Subsystem log;
 
   // private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
   // private final AutomaticGearShift autoGearShift = new
@@ -69,6 +71,7 @@ public class RobotContainer {
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     limelight = new Limelight_Subsystem();
+    log = new Log_Subsystem(limelight);
 
     //Use basic arcade drive command
     //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));

@@ -80,6 +80,6 @@ public class Lidar_Subsystem extends SubsystemBase {
       findAngle();
     }
     
-    printLog();
+    //printLog();
     }
 }

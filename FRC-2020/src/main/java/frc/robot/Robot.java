@@ -22,7 +22,9 @@ public class Robot extends TimedRobot {
   private Command m_testCommand;
 
   private RobotContainer m_robotContainer;
-  private long lastLogTime;
+
+  //what command robot is running
+  public static String command = "none";
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -33,8 +35,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-    lastLogTime = System.currentTimeMillis();
-
+    m_robotContainer.limelight.disableLED();
   }
 
   /**
@@ -52,13 +53,7 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
     // m_color.updateColorSensor();
-    
-    if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
-      // m_color.printLog();
-      lastLogTime = System.currentTimeMillis();
-     // m_robotContainer.driveTrain.log();
-      m_robotContainer.gearShifter.log();
-    }
+
   }
 
   /**
@@ -101,6 +96,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    m_robotContainer.limelight.disableLED();
   }
 
   /**

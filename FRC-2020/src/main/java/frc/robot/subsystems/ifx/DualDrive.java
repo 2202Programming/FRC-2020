@@ -6,20 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot.subsystems.ifx;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+
 /**
- * Add your docs here.
+ * DualDrive supports Both Tank and Arcade systems.
  */
-public interface ArcadeDrive extends Subsystem {
-    public void arcadeDrive(double xSpeed, double zRot);
-    public double getLeftVel(boolean normalized);
-    public double getRightVel(boolean normalized);
-    
-    // Position should be in physical units
-    public double getLeftPos();
-    public double getRightPos();
-    public void resetPosition();
-
-    public void velocityArcadeDrive(double feetPerSecond, double degreePerSecond);
-
+public interface DualDrive extends TankDrive, ArcadeDrive  {
 }

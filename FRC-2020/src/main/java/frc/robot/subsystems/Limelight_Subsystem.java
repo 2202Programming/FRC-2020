@@ -43,9 +43,9 @@ public class Limelight_Subsystem extends SubsystemBase {
     x = tx.getDouble(0.0);
     y = ty.getDouble(0.0);
     area = ta.getDouble(0.0);
-    target = tv.getBoolean(false);
+    target = (tv.getDouble(0)==0) ? (false) : (true);
     
-    log(10);
+
   }
 
   public double getX(){
@@ -76,15 +76,12 @@ public boolean valid(){
   return target;
 }
 
-  public void log(int interval){
-    if((interval + logTimer) < System.currentTimeMillis()){ //interval in ms
-      logTimer = System.currentTimeMillis();
+  public void log(){
 
       SmartDashboard.putNumber("X value", x);
       SmartDashboard.putNumber("Y value", y);
       SmartDashboard.putNumber("Area", area);
       SmartDashboard.putBoolean("Limelight Valid", target);
 
-    }
   }
 }

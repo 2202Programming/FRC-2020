@@ -34,9 +34,8 @@ public class TestKBSimMode {
 
         int pov =  stick.getPOV();
 
-        System.out.println("   throttle:"+ th +"  X:"+ x );
-        System.out.println("   bcount:"+ bcount +"b:"+ b + " POV: " + pov );
-        
+        System.out.println("   throttle:"+ th +"  X: "+ x + ", Y: " + y + ", rot: "+rot);
+        System.out.println("   bcount:"+ bcount +"b:"+ b + " POV: " + pov );  
     }
     public Command getCommand() {return null;}
 

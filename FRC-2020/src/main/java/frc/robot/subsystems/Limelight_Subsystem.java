@@ -23,10 +23,9 @@ public class Limelight_Subsystem extends SubsystemBase {
    private double y;
    private double area; //area is between 0 and 100. Calculated as a percentage of image
    private boolean target;
-   private long logTimer;
    
   public Limelight_Subsystem() {
-    logTimer = System.currentTimeMillis();
+  
   }
 
   @Override

@@ -18,7 +18,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
-import frc.robot.commands.test.TestCmd;
+// import frc.robot.commands.test.TestCmd;  
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.drive.ArcadeDriveCmd;
@@ -86,10 +86,6 @@ public class RobotContainer {
     ///configureButtonBindings();
     DustinsButtons();
     DPLTestButtons();
-
-    // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
-    // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
-
   }
 
   /**
@@ -100,23 +96,8 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 /*
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
-      .whileHeld(new MagazineAdjust(intake, true));
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
-      .whileHeld(new MagazineAdjust(intake, false));
-*/
-      
-  }
 
-  private void DustinsButtons() {
-    
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
-        .whenPressed(new GearToggleCmd(gearShifter));
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-        .whenPressed(new InvertDriveControls(driverControls));
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
-        .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
-
+    // Intake Buttons -unused in Larry - dpl 2/15/2020
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); //mag, intake
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
@@ -129,6 +110,21 @@ public class RobotContainer {
         .whileHeld(new MagazineAdjust(intake, false));
       driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
         .whenHeld(new ShooterOn(intake, 1200, 0.4));  // rpm, seconds mag backup 
+
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
+      .whileHeld(new MagazineAdjust(intake, true));
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
+      .whileHeld(new MagazineAdjust(intake, false));
+*/    
+  }
+
+  private void DustinsButtons() {    
+      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
+        .whenPressed(new GearToggleCmd(gearShifter));
+      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
+        .whenPressed(new InvertDriveControls(driverControls));
+      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
+        .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
 
     //driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     //  .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));

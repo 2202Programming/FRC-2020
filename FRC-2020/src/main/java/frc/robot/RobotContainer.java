@@ -52,7 +52,10 @@ public class RobotContainer {
   public final GearShifter gearShifter;
   public final VelocityDifferentialDrive_Subsystem driveTrain;
   public final Limelight_Subsystem limelight;
-  public final Log_Subsystem log;
+  public final Log_Subsystem logSubsystem;
+
+  Command tankDriveCmd;
+  Command arcadeDriveCmd;
 
   // private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
   // private final AutomaticGearShift autoGearShift = new
@@ -72,15 +75,18 @@ public class RobotContainer {
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     limelight = new Limelight_Subsystem();
-    log = new Log_Subsystem(limelight, driveTrain,gearShifter);
+    logSubsystem = new Log_Subsystem(limelight, driveTrain);
+    
+    //Create default commads for driver preference
+    tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
+    arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
+    driveTrain.setDefaultCommand(tankDriveCmd);
 
-    //Use basic arcade drive command
-    //driveTrain.setDefaultCommand(new ArcadeDriveCmd(driverControls, driveTrain));
-    //Use tank drive to make Dustin happy - dpl 2/8/2020
-    driveTrain.setDefaultCommand(new TankDriveCmd(driverControls, driveTrain));
     // Configure the button bindings
     ///configureButtonBindings();
     DustinsButtons();
+    DPLTestButtons();
+
     // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
     // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
 
@@ -93,23 +99,7 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-
-    // new JoystickButton(driver, 4).whenPressed(new ThrottledUpShift(driveTrain,
-    // gearShifter));
-
-    //These are for test, not the real controls yet. 2-8-20
-    
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-        .whenPressed(new ShiftGearCmd(gearShifter, Gear.LOW_GEAR));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
-        .whenPressed(new ShiftGearCmd(gearShifter, Gear.HIGH_GEAR));
-  /* 
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-        .whenPressed(new InvertDriveControls(driveTrain));
-
-        */
 /*
-  *
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
       .whileHeld(new MagazineAdjust(intake, true));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
@@ -122,29 +112,47 @@ public class RobotContainer {
     
       driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new GearToggleCmd(gearShifter));
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
-        .whenPressed(new InvertDriveControls(driverControls));
       driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-        .whenPressed(new SwitchDriveMode(driveTrain, driverControls));
-/*
+        .whenPressed(new InvertDriveControls(driverControls));
+      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
+        .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
+
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); //mag, intake
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
         .whenHeld(new ReverseIntake(intake, -0.5));
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ToggleIntakeRaised(intake));
-      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
-        .whenHeld(new ShooterOn(intake, 1200, 0.4));  // rpm, seconds mag backup 
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
         .whileHeld(new MagazineAdjust(intake, true));
       driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
-        .whileHeld(new MagazineAdjust(intake, false)); */
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-     .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
+        .whileHeld(new MagazineAdjust(intake, false));
+      driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
+        .whenHeld(new ShooterOn(intake, 1200, 0.4));  // rpm, seconds mag backup 
 
-    driverControls.bindJoystick(Id.Driver, XboxControllerButtonCode.TRIGGER_RIGHT.getCode()).whenHeld(new TestCmd());
+    //driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
+    //  .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
+  }
+
+  //Derek's testing...
+  private void DPLTestButtons() {
+
+    // testing buttion to enable/disable rotation limits
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.START.getCode())
+    .toggleWhenPressed(new CommandBase() {
+        @Override
+        public void initialize() {
+          driverControls.setLimitRotation(true);
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+          driverControls.setLimitRotation(false);
+        }
+    }); 
   }
   
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

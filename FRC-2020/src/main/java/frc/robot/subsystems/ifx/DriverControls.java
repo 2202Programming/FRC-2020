@@ -105,6 +105,4 @@ public interface DriverControls extends Subsystem {
     return (deviceMap.get(id) != null) ?  
         new JoystickTrigger(deviceMap.get(id), axis, 0.5) : null;
   }
-
-
 }

@@ -6,28 +6,25 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot.subsystems.hid;
+
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.util.ExpoShaper;
-
 
 /**
  * HID_Subsystem - Human Input Device
  * 
  * Use this class bind devices to meaningful functions.
  * 
- * Add any needed member functions to the DriverControls interface 
- * and then add to any implementations. This way they can work with
- * different controller setup. It will also make it easy to switch 
- * to a different Joystick.
+ * Add any needed member functions to the DriverControls interface and then add
+ * to any implementations. This way they can work with different controller
+ * setup. It will also make it easy to switch to a different Joystick.
  * 
- * Shouldn't need to make this subsystem a requirement for any
- * command, just reference it. This class is intended to run in
- * the periodic().  It should be run first by being first on the 
- * list.
+ * Shouldn't need to make this subsystem a requirement for any command, just
+ * reference it. This class is intended to run in the periodic(). It should be
+ * run first by being first on the list.
  * 
  */
 public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls {
@@ -39,23 +36,25 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
   private final XboxController switchBoard;
   // private final XboxController phantom = new XboxController(3);
 
-  //Buttons onStartup - in case you want to do something based on controls 
+  // Buttons onStartup - in case you want to do something based on controls
   // being held at power up or on switchboard.
   int initDriverButtons;
   int initAssistentButtons;
   int initSwitchBoardButtons;
 
-  //Arcade 
+  boolean limitRotation = true;
+
+  // Arcade
   ExpoShaper velShaper;
   ExpoShaper rotShaper;
-  //Tank 
+  // Tank
   ExpoShaper velLeftShaper;
   ExpoShaper velRightShaper;
-  
+
   double vel, z_rot;
   double vLeft, vRight;
 
-  //invertGain is used to change the controls for driving backwards easily.  
+  // invertGain is used to change the controls for driving backwards easily.
   // A negative value indicates you're driving backwards with forwards controls.
   double invertGain = 1.0;
 
@@ -77,10 +76,9 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     // add some deadzone in normalized coordinates
     rotShaper.setDeadzone(deadzone);
     velShaper.setDeadzone(deadzone);
-
-    //add deadzone for tank - ###hack x 2
-    velLeftShaper.setDeadzone(deadzone*2);
-    velRightShaper.setDeadzone(deadzone*2);
+    // add deadzone for tank
+    velLeftShaper.setDeadzone(deadzone);
+    velRightShaper.setDeadzone(deadzone);
 
     // read some values to remove unused warning
     assistant.getX();
@@ -103,23 +101,43 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     // tank
     if (isControlInverted()) {
       vLeft = velRightShaper.get() * invertGain;
-      vRight =  velLeftShaper.get() * invertGain;
+      vRight = velLeftShaper.get() * invertGain;
     } else {
       vLeft = velLeftShaper.get() * invertGain;
       vRight = velRightShaper.get() * invertGain;
     }
-    // Apply a rotation limit on tank with speed
-    double Kv = 1.0;
-    double avg = (vRight + vLeft)/2.0;
-    double maxDelta = 2.0/(Kv*avg*avg + 1.0);
-    double absDelta = Math.abs(vLeft - vRight);
-    
-    if (absDelta > maxDelta) {
-      //equalize the sticks so no rotation
-      vLeft = avg;
-      vRight = avg;
-    }
 
+    limitTankRotation();
+  }
+  
+  public void setLimitRotation(boolean enableLimit) {
+    this.limitRotation = enableLimit;
+  }
+
+  private void limitTankRotation() {
+    if (limitRotation == false) return;
+
+    // Apply a rotation limit on tank based on command
+    double Kv = 33.0;
+    double avg = (vRight + vLeft) / 2.0;
+    double absV = Math.abs(avg);
+
+    double maxDelta = 1.0 / (Kv * absV * absV * absV + 1.0);
+    double absDelta = Math.abs(vLeft - vRight);
+
+    // Handle the different quadrents of the stick for tank drive
+    if ((vLeft > 0) && (vRight > 0) || (vLeft < 0) && (vRight < 0)) {
+      // Commanding forward or reverse, sticks in same direction
+
+      if (absDelta > maxDelta) {
+        // equalize the sticks so no rotation
+        vLeft = avg;
+        vRight = avg;
+      }
+    }
+    else {
+      //Sticks in opposite direction
+    }
   }
 
   @Override
@@ -172,37 +190,16 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
 
   @Override
   public int getInitialButtons(final Id id) {
-    switch (id) 
-    {
-      case Driver:
-        return initSwitchBoardButtons;
-      case Assistant:
-        return initAssistentButtons;
-      case SwitchBoard:
-        return initSwitchBoardButtons;
-      default:
-        return 0;
+    switch (id) {
+    case Driver:
+      return initSwitchBoardButtons;
+    case Assistant:
+      return initAssistentButtons;
+    case SwitchBoard:
+      return initSwitchBoardButtons;
+    default:
+      return 0;
     }
   }
-
-  /**
-     * Returns 0.0 if the given value is within the specified range around zero. The
-     * remaining range between the deadband and 1.0 is scaled from 0.0 to 1.0.
-     *
-     * @param value    value to clip
-     * @param deadband range around zero
-     */
-    private double applyDeadband(final double value, double deadband) {
-      if (Math.abs(value) > deadband) {
-          if (value > 0.0) {
-              return (value - deadband) / (1.0 - deadband);
-          } else {
-              return (value + deadband) / (1.0 - deadband);
-          }
-      } else {
-          return 0.0;
-      }
-  }
-
 
 }

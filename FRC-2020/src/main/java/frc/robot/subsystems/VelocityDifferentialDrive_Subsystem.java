@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedController;
 import static frc.robot.Constants.*;
 
-public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements ArcadeDrive, TankDrive {
+public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements DualDrive, ArcadeDrive, TankDrive {
 
 	private final static double MAXRPM = 15000.0;
 	private final static double MAXDPS = 5.0;
@@ -119,7 +119,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	// TODO: velocityTankDrive()
 
 	public void arcadeDrive(double xSpeed, double zRotation) {
-		dDrive.arcadeDrive(xSpeed, zRotation);
+		dDrive.arcadeDrive(xSpeed, zRotation, false);
 	}
 
 	public void tankDrive(double leftSpeed, double rightSpeed) {

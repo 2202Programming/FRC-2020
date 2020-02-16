@@ -19,11 +19,10 @@ public class Log_Subsystem extends SubsystemBase {
 
   private Limelight_Subsystem limelight;
   private VelocityDifferentialDrive_Subsystem drive;
-  private GearShifter gear;
   private int counter;
  // private Lidar_Subsystem lidar;
 
-  public Log_Subsystem(Limelight_Subsystem limelight, VelocityDifferentialDrive_Subsystem drive, GearShifter gear) {
+  public Log_Subsystem(Limelight_Subsystem limelight, VelocityDifferentialDrive_Subsystem drive) {
     this.limelight = limelight;
     this.drive = drive;
     //this.lidar = lidar;
@@ -32,8 +31,6 @@ public class Log_Subsystem extends SubsystemBase {
 
   private void log(){
     SmartDashboard.putString("Command: ", Robot.command);
-
-
   }
 
   @Override
@@ -42,7 +39,6 @@ public class Log_Subsystem extends SubsystemBase {
     if (counter == 10) limelight.log();
     if (counter == 30) drive.log();
     if (counter == 50) log();
-    if (counter == 70) gear.log();
     
     counter++;
     if (counter==100) counter = 0;

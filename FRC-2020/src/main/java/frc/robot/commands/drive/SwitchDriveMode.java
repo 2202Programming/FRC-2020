@@ -7,20 +7,20 @@ import frc.robot.subsystems.ifx.DualDrive;
 public class SwitchDriveMode extends InstantCommand {
   public final DualDrive driveTrain;
   private boolean isArcade = false;
-  private final Command tankAuto;
-  private final Command arcadeAuto;
+  private final Command tankCmd;
+  private final Command arcadeCmd;
 
-  public SwitchDriveMode(final DualDrive driveTrain, final Command arcadeAuto, final Command tankAuto) {
+  public SwitchDriveMode(final DualDrive driveTrain, final Command arcadeCmd, final Command tankCmd) {
     this.driveTrain = driveTrain;
-    this.arcadeAuto = arcadeAuto;
-    this.tankAuto = tankAuto;
+    this.arcadeCmd = arcadeCmd;
+    this.tankCmd = tankCmd;
   }
 
   public void initialize() {
     if (isArcade) {
-        driveTrain.setDefaultCommand(tankAuto);
+      driveTrain.setDefaultCommand(tankCmd);
     } else {
-        driveTrain.setDefaultCommand(arcadeAuto);
+      driveTrain.setDefaultCommand(arcadeCmd);
     }
     isArcade = !isArcade;
   }

@@ -25,14 +25,16 @@ public class MagazineAdjust extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
+  public void initialize() { 
+    //do the work when the button is pressed, end() called on release
+    if (forward) intake.magazineOn(strength);
+    else intake.magazineOn(-strength);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (forward) intake.magazineOn(strength);
-    else intake.magazineOn(-strength);
+    //nothing to do, motor is in proper state.
   }
 
   // Called once the command ends or is interrupted.
@@ -42,6 +44,7 @@ public class MagazineAdjust extends CommandBase {
   }
 
   // Returns true when the command should end.
+  // This command ends with button release.
   @Override
   public boolean isFinished() {
     return false;

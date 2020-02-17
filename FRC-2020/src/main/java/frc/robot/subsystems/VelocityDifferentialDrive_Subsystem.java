@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.subsystems.ifx.*;
+import frc.robot.util.misc.MathUtil;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANPIDController;
@@ -13,13 +14,20 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedController;
+
 import static frc.robot.Constants.*;
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements DualDrive, ArcadeDrive, TankDrive {
+	// Current Limits
+	private final int SMARTCURRENT_MAX = 80;
+	private int smartCurrentLimit = 20; // amps
+	private final double KSecondaryCurrent = 1.20; // set secondary current based on smart current
 
-	private final static double MAXRPM = 15000.0;
-	private final static double MAXDPS = 5.0;
+	//Acceleration limits
+	private final double RATE_MAX_SECONDS = 10;
+	private double rateLimit = 0.5; // seconds to max speed/power
 
+	//Chasis details
 	public final double WHEEL_RADIUS = 4; // inches
 	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // rev/feet
 	private final double K_rev_per_ft = 1.0 / K_ft_per_rev;
@@ -29,9 +37,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final CANSparkMax frontLeft = new CANSparkMax(FL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax backRight = new CANSparkMax(BR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax backLeft = new CANSparkMax(BL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
-	private final CANSparkMax middleRight = new CANSparkMax(MR_SPARKMAX_CANID,
-			CANSparkMaxLowLevel.MotorType.kBrushless);
+	private final CANSparkMax middleRight = new CANSparkMax(MR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax middleLeft = new CANSparkMax(ML_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
+
+	private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft,
+			middleRight, middleLeft };
 
 	private final VelController leftController;
 	private final VelController rightController;
@@ -70,22 +80,57 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 		setVelocityMode(false);
 
+		//zero adjust will set the default limits
+		adjustAccelerationLimit(0.0);
+		adjustCurrentLimit(0);
+
 		dDrive = new DifferentialDrive(leftController, rightController);
 		dDrive.setSafetyEnabled(false);
 	}
 
-	public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {
-		this(gear, MAXRPM, MAXDPS);
+	/**
+	 *  adjust the acceleration time - limit on how fast the output gets to max
+	 * @param deltaRate (seconds) ammount to add to current rate
+	 * @return
+	 */
+	public double adjustAccelerationLimit(double deltaRate) {
+		rateLimit = MathUtil.limit((rateLimit + deltaRate), 0.0, RATE_MAX_SECONDS);
+	
+		for (CANSparkMax c : controllers) {
+			c.setOpenLoopRampRate(rateLimit);
+			c.setClosedLoopRampRate(rateLimit);
+		}
+		SmartDashboard.putNumber("motorRate", smartCurrentLimit );
+		return smartCurrentLimit;
 	}
 
-	void setCoastMode() {
-		frontRight.setIdleMode(IdleMode.kCoast);
-		middleRight.setIdleMode(IdleMode.kCoast);
-		backRight.setIdleMode(IdleMode.kCoast);
+	/**
+	 * Change the default smart current limits for drive motors
+	 * Also adjusts secondary to smart limit +20% 
+	 * 
+	 * @param deltaCurrent (amps) 0 - 80 amps for max power
+	 * @return
+	 */
+	public int adjustCurrentLimit(int deltaCurrent) {
+		smartCurrentLimit += deltaCurrent;
+		smartCurrentLimit = MathUtil.limit(smartCurrentLimit, 0, SMARTCURRENT_MAX);
+		double secondaryCurrent = smartCurrentLimit * KSecondaryCurrent;
 
-		frontLeft.setIdleMode(IdleMode.kCoast);
-		middleLeft.setIdleMode(IdleMode.kCoast);
-		backLeft.setIdleMode(IdleMode.kCoast);
+		for (CANSparkMax c : controllers) {
+			//smart current limit
+			c.setSmartCurrentLimit(smartCurrentLimit);
+
+			// Set the secondary current based on the smartCurrent
+			c.setSecondaryCurrentLimit(secondaryCurrent);
+		}
+		SmartDashboard.putNumber("motorI", smartCurrentLimit );
+		return smartCurrentLimit;
+	}
+
+	private void setCoastMode() {
+		for (CANSparkMax c : controllers) {
+			c.setIdleMode(IdleMode.kCoast);
+		}
 	}
 
 	public void setVelocityMode(boolean useVelocity) {

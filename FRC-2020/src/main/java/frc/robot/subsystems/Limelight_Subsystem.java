@@ -25,7 +25,6 @@ public class Limelight_Subsystem extends SubsystemBase {
    private boolean target;
    
   public Limelight_Subsystem() {
-  
   }
 
   @Override

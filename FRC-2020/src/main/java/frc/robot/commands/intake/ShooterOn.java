@@ -30,7 +30,6 @@ public class ShooterOn extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    System.out.println("ShooterOn-Inited");
     m_intake.magazineOff();
     m_intake.intakeOff();
     m_count = 0;
@@ -56,7 +55,6 @@ public class ShooterOn extends CommandBase {
     m_intake.shooterOff();
     m_intake.magazineOff();
     m_intake.intakeOff();
-    System.out.println("ShooterOn-Ended");
   }
 
 }

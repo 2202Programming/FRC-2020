@@ -20,6 +20,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final static double MAXRPM = 1000.0;
 	private final static double MAXDPS = 5.0;
 
+	// Current Limits
+	private int smartCurrentLimit = 20; // amps
+	private final double KSecondaryCurrent = 1.20; // set secondary current based on smart current
+
 	public final double WHEEL_RADIUS = 4; // inches
 	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // rev/feet
 	private final double K_rev_per_ft = 1.0 / K_ft_per_rev;
@@ -29,9 +33,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final CANSparkMax frontLeft = new CANSparkMax(FL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax backRight = new CANSparkMax(BR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax backLeft = new CANSparkMax(BL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
-	private final CANSparkMax middleRight = new CANSparkMax(MR_SPARKMAX_CANID,
-			CANSparkMaxLowLevel.MotorType.kBrushless);
+	private final CANSparkMax middleRight = new CANSparkMax(MR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax middleLeft = new CANSparkMax(ML_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
+
+	private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft,
+			middleRight, middleLeft };
 
 	private final VelController leftController;
 	private final VelController rightController;
@@ -78,14 +84,24 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		this(gear, MAXRPM, MAXDPS);
 	}
 
-	void setCoastMode() {
-		frontRight.setIdleMode(IdleMode.kCoast);
-		middleRight.setIdleMode(IdleMode.kCoast);
-		backRight.setIdleMode(IdleMode.kCoast);
+	public int adjustCurrent(int deltaCurrent) {
+		smartCurrentLimit += deltaCurrent;
+		double secondaryCurrent = smartCurrentLimit * KSecondaryCurrent;
 
-		frontLeft.setIdleMode(IdleMode.kCoast);
-		middleLeft.setIdleMode(IdleMode.kCoast);
-		backLeft.setIdleMode(IdleMode.kCoast);
+		for (CANSparkMax c : controllers) {
+			c.setSmartCurrentLimit(smartCurrentLimit);
+
+			// Set the secondary current based on the smartCurrent
+			c.setSecondaryCurrentLimit(secondaryCurrent);
+		}
+		SmartDashboard.putNumber("motorCurrent", smartCurrentLimit );
+		return smartCurrentLimit;
+	}
+
+	private void setCoastMode() {
+		for (CANSparkMax c : controllers) {
+			c.setIdleMode(IdleMode.kCoast);
+		}
 	}
 
 	public void setVelocityMode(boolean useVelocity) {

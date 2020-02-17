@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.DriveWithLidarToDistanceDegCmd;
 import frc.robot.commands.ShooterOnWithDelay;
+import frc.robot.commands.intake.ShooterOn;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
@@ -41,9 +42,12 @@ public class auto_cmd_group extends SequentialCommandGroup{
             new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetVelocity),
             new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetVelocity),
             new DriveWithLidarToDistanceDegCmd(drive, lidar, stopDist, angleTarget, maxSpeed),
-            new ShooterOnWithDelay(intake, delay),
+            new ShooterOn(intake, 1200, 0.4).withTimeout(4.0),  //turn shooter on for 4 seconds 1200 rpm
+            //new ShooterOnWithDelay(intake, delay),
             new DriveWithLidarToDistanceDegCmd(drive, lidar, stopDist, angleTarget, maxSpeed),
             new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetVelocity)
         );
+        //TODO: ?? Will the change from auto to tele do this or
+        //this.withTimeout(15.0);  //do we want to make sure this group ends after Auto is done
     }
 }

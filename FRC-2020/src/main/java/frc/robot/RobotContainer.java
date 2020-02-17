@@ -9,18 +9,16 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.Relay.Direction;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
-import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
-import frc.robot.commands.auto.auto_creep_cmd;
+import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.SwitchDriveMode;
@@ -28,18 +26,15 @@ import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
-import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
-import frc.robot.util.input.GeneralTrigger;
-import frc.robot.util.input.JoystickTrigger;
 import frc.robot.util.misc.DPadButton;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
-import frc.robot.util.misc.DPadButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -56,6 +51,7 @@ public class RobotContainer {
   public final VelocityDifferentialDrive_Subsystem driveTrain;
   public final Intake_Subsystem intake;
   public final Limelight_Subsystem limelight;
+  public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
 
   Command tankDriveCmd;
@@ -80,6 +76,7 @@ public class RobotContainer {
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
+    lidar = new Lidar_Subsystem();
     logSubsystem = new Log_Subsystem(limelight, driveTrain);
 
     // Create default commads for driver preference
@@ -182,9 +179,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return new CommandBase() {
-    };
+    return new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar ).withTimeout(15.0);
   }
 
   /**

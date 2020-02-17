@@ -157,7 +157,7 @@ public class RobotContainer {
     dUp.toggleWhenPressed(new CommandBase() {
       @Override
       public void initialize() {
-        driveTrain.adjustCurrent(1);
+        driveTrain.adjustCurrentLimit(1);
       }
     });
 
@@ -166,10 +166,28 @@ public class RobotContainer {
     dDown.whenPressed(new CommandBase() {
       @Override
       public void initialize() {
-        driveTrain.adjustCurrent(-1);
+        driveTrain.adjustCurrentLimit(-1);
       }
     });
 
+    // Use the DPad to change the motor ramp rate - increasing time will slow down response
+    DPadButton dLeft = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
+    DPadButton.Direction.LEFT);
+    dLeft.toggleWhenPressed(new CommandBase() {
+      @Override
+      public void initialize() {
+        driveTrain.adjustAccelerationLimit(0.1);
+      }
+    });
+
+    DPadButton dRight = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
+                  DPadButton.Direction.RIGHT);
+    dRight.whenPressed(new CommandBase() {
+      @Override
+      public void initialize() {
+        driveTrain.adjustAccelerationLimit(-0.1);
+      }
+    });
 
   }
 

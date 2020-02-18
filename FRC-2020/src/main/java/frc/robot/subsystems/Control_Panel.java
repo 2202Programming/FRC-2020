@@ -7,7 +7,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -40,8 +39,8 @@ public class Control_Panel extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
-    public void setSpeed(double x) {
-        rotationMotor.set(ControlMode.Velocity, x);
+    public void setSpeed(double speed) {
+        rotationMotor.set(speed);
     }
 
     public double getDistance() {

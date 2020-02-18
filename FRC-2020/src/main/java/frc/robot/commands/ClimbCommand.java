@@ -23,14 +23,23 @@ public class ClimbCommand extends CommandBase
     @Override
     public void initialize() 
     {
-        climber.setRotSpeed(0);
+        climber.stopRot();
+        //climber.setRotPos(0);
         climber.setWinchSpeed(0);
     }
 
     @Override
     public void execute()
     {
-        
+        if (input.getAButton())
+        {
+            climber.setRotPos(1);
+        }
+
+        else if (input.getBButton())
+        {
+            climber.setRotPos(0);
+        }
     }
 
     /**
@@ -48,7 +57,7 @@ public class ClimbCommand extends CommandBase
     @Override
     public void end(boolean interrupted)
     {
-        climber.setRotSpeed(0);
+        //climber.setRotSpeed(0);
         climber.setWinchSpeed(0);
     }
 }

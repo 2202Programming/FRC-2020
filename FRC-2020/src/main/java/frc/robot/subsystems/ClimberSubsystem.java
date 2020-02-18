@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -14,7 +15,7 @@ public class ClimberSubsystem extends SubsystemBase
 {
     //region Motors
     //private CANSparkMax eSparkMax = new CANSparkMax(Constants.E_SPARKMAX_CANID, MotorType.kBrushed);  //Changed (invalid?)
-    private ServoMotor eRotSparkMax = new CANSparkMax(Constants.E_ROT_SPARKMAX_PWM, MotorType.kBrushless); //Arm rotation motor (TODO: class)
+    private Spark eRotSparkMax = new Spark(Constants.E_ROT_SPARKMAX_PWM); //Arm rotation motor
     private CANSparkMax wnSparkMax = new CANSparkMax(Constants.WN_SPARKMAX_CANID, MotorType.kBrushless); //Winch motor - extend / retract arm
     //endregion
 
@@ -31,7 +32,8 @@ public class ClimberSubsystem extends SubsystemBase
     public ClimberSubsystem() 
     {
         //eSparkMax.setIdleMode(IdleMode.kBrake);
-        eRotSparkMax.setIdleMode(IdleMode.kBrake);
+        eRotSparkMax.set(0);
+        wnSparkMax.set(0);
         wnSparkMax.setIdleMode(IdleMode.kBrake);
     }
 
@@ -62,10 +64,18 @@ public class ClimberSubsystem extends SubsystemBase
      * Set the speed of the arm rotations motor
      * @param speed The speed at which to unfold the arm (-1 to 1)
      */
-    public void setRotSpeed(double speed)
+    public void setRotPos(double pos)
     {
-        speed = validateDouble(speed);
-        eRotSparkMax.set(speed); //Set motor speed
+        pos = validateDouble(pos);
+        eRotSparkMax.setPosition(pos); //Set motor speed
+    }
+
+    /**
+     * Stop the rotation
+     */
+    public void stopRot()
+    {
+        eRotSparkMax.set(0);
     }
 
     /**

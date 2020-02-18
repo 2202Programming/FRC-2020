@@ -100,8 +100,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			c.setOpenLoopRampRate(rateLimit);
 			c.setClosedLoopRampRate(rateLimit);
 		}
-		SmartDashboard.putNumber("motorRate", smartCurrentLimit );
-		return smartCurrentLimit;
+		SmartDashboard.putNumber("motorRate", rateLimit );
+		return rateLimit;
 	}
 
 	/**

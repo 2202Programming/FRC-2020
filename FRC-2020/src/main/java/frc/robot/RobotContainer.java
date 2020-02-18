@@ -117,6 +117,7 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
 
+        /*
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
@@ -129,7 +130,7 @@ public class RobotContainer {
         .whileHeld(new MagazineAdjust(intake, false));
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
         .whenHeld(new ShooterOn(intake, 1200, 0.4)); // rpm, seconds mag backup
-
+*/
     // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
   }
@@ -195,7 +196,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar ).withTimeout(15.0);
+    return null;// new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar ).withTimeout(15.0);
   }
 
   /**

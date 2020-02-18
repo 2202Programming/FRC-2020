@@ -95,7 +95,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 		//zero adjust will set the default limits
 		//adjustAccelerationLimit(0.0);
-		//adjustCurrentLimit(0);
+		adjustCurrentLimit(0);
 
 		dDrive = new DifferentialDrive(leftController, rightController);
 		dDrive.setSafetyEnabled(false);
@@ -111,7 +111,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	
 		for (CANSparkMax c : controllers) {
 			c.setOpenLoopRampRate(rateLimit);
-			c.setClosedLoopRampRate(rateLimit);
+//			c.setClosedLoopRampRate(rateLimit);
 		}
 		SmartDashboard.putNumber("motorRate", rateLimit );
 		return rateLimit;

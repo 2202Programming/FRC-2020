@@ -23,7 +23,9 @@ public class TankDriveCmd extends CommandBase {
     }
 
     public void execute() {
-        drive.tankDrive(dc.getVelocityLeft(), dc.getVelocityRight());
+        double l = dc.getVelocityLeft();
+        double r = dc.getVelocityRight();
+        drive.tankDrive(l , r );
     }
 
 }

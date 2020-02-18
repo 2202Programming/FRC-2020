@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import frc.robot.subsystems.ifx.*;
 import frc.robot.util.misc.MathUtil;
 import com.revrobotics.CANEncoder;
+import com.revrobotics.CANError;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMaxLowLevel;
@@ -43,6 +44,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft,
 			middleRight, middleLeft };
 
+
+	
+
 	private final VelController leftController;
 	private final VelController rightController;
 
@@ -59,6 +63,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	private final DifferentialDrive dDrive;
 	private GearShifter gearbox = null;
+	CANError err;
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxRPM, final double maxDPS) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
@@ -68,21 +73,29 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		setCoastMode();
 
 		// Have motors follow to use Differential Drive
-		middleRight.follow(frontRight);
-		middleLeft.follow(frontLeft);
-		backRight.follow(frontRight);
-		backLeft.follow(frontLeft);
+		CANSparkMax rMaster = backRight;
+		err=middleRight.follow(rMaster);
+		err=frontRight.follow(rMaster);
+		//err=backRight.follow(rMaster);
+		err=middleRight.follow(rMaster);
+
+		CANSparkMax lMaster = backLeft;
+		err= middleLeft.follow(lMaster);
+		err= frontLeft.follow(lMaster);
+		//backLeft.follow(lMaster);
+		err = middleLeft.follow(lMaster);
+		
 		gearbox = gear;
 
 		// velocity setup - using RPM speed controller
-		leftController = new VelController(frontLeft);
-		rightController = new VelController(frontRight);
+		leftController = new VelController(lMaster);
+		rightController = new VelController(rMaster);
 
 		setVelocityMode(false);
 
 		//zero adjust will set the default limits
-		adjustAccelerationLimit(0.0);
-		adjustCurrentLimit(0);
+		//adjustAccelerationLimit(0.0);
+		//adjustCurrentLimit(0);
 
 		dDrive = new DifferentialDrive(leftController, rightController);
 		dDrive.setSafetyEnabled(false);
@@ -121,7 +134,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			c.setSmartCurrentLimit(smartCurrentLimit);
 
 			// Set the secondary current based on the smartCurrent
-			c.setSecondaryCurrentLimit(secondaryCurrent);
+			//c.setSecondaryCurrentLimit(secondaryCurrent);
 		}
 		SmartDashboard.putNumber("motorI", smartCurrentLimit );
 		return smartCurrentLimit;
@@ -129,6 +142,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	private void setCoastMode() {
 		for (CANSparkMax c : controllers) {
+			c.restoreFactoryDefaults(true);
 			c.setIdleMode(IdleMode.kCoast);
 		}
 	}

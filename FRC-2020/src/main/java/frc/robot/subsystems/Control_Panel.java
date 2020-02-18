@@ -22,7 +22,7 @@ public class Control_Panel extends SubsystemBase {
     // DistPerPulse: 1040, minRate: 10, maxPeriod: 50, sampleAverage: 20
     private DoubleSolenoid extensionSol = new DoubleSolenoid(Constants.CLIMB_PISTON_FORWARD_PCM,
             Constants.CLIMB_PISTON_REVERSE_PCM);
-
+            
     /* Initialization */
     public Control_Panel() {
         /* Factory Default all hardware to prevent unexpected behaviour */

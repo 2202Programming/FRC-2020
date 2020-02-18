@@ -8,14 +8,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Color_Subsystem;
 import frc.robot.subsystems.Control_Panel;
 
 public class SimpRotateControl extends CommandBase {
 
   private static final double COUNTS_PER_WHEEL_ROTATION = 1024; //TODO: Find correct value
 
-  private static final double TARGET_PANEL_ROTATIONS = 3;
+  //Intentionally overrotate to avoid undershoot, just need to be between 3 and 5 full rotations
+  private static final double TARGET_PANEL_ROTATIONS = 3.5; 
   private static final double ROTATOR_WHEEL_CIRCUMFERENCE = 4 * Math.PI;
   private static final int PANEL_DIAMETER = 20;// 20 inches
   private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,25 +14,18 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
  */
 public class ClimberSubsystem extends SubsystemBase
 {
+    //region
+    private DoubleSolenoid armSolenoid = new DoubleSolenoid(6, 7); //Arm valves
+    //endregion
+
     //region Motors
-    //private CANSparkMax eSparkMax = new CANSparkMax(Constants.E_SPARKMAX_CANID, MotorType.kBrushed);  //Changed (invalid?)
     private Spark eRotSparkMax = new Spark(Constants.E_ROT_SPARKMAX_PWM); //Arm rotation motor
     private CANSparkMax wnSparkMax = new CANSparkMax(Constants.WN_SPARKMAX_CANID, MotorType.kBrushless); //Winch motor - extend / retract arm
     //endregion
 
-    /* Initial knowledge of how the subsystem is to be run
-     * 775 motor used for rotation(Talon controller)
-     * neo motor used to shoot arm up(sparkmax controller)
-     * mechanical stop for rotation
-     * Ask Kevin for more info from Kevin
-     */
-
-    /**
-     * 
-     */
     public ClimberSubsystem() 
     {
-        //eSparkMax.setIdleMode(IdleMode.kBrake);
+        armSolenoid.set(DoubleSolenoid.Value.kOff);
         eRotSparkMax.set(0);
         wnSparkMax.set(0);
         wnSparkMax.setIdleMode(IdleMode.kBrake);
@@ -79,13 +73,39 @@ public class ClimberSubsystem extends SubsystemBase
     }
 
     /**
-     * Set the speed of the winch motor
+     * Set the speed of the winch motor.
+     * 1 reels the winch in.
+     * -1 loosens the winch.
      * @param speed The speed at which to extend the arm (-1 to 1)
      */
     public void setWinchSpeed(double speed)
     {
         speed = validateDouble(speed);
         wnSparkMax.set(speed); //Set motor speed
+    }
+
+    /**
+     * Extend arm
+     */
+    public void extendArm()
+    {
+        armSolenoid.set(DoubleSolenoid.Value.kForward);
+    }
+
+    /**
+     * Retract arm
+     */
+    public void retractArm()
+    {
+        armSolenoid.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    /**
+     * Stop arm in place
+     */
+    public void stopArm()
+    {
+        armSolenoid.set(DoubleSolenoid.Value.kOff);
     }
 
     public void log()

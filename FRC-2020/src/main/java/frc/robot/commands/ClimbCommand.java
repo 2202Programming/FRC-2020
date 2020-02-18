@@ -1,15 +1,11 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.ClimberSubsystem;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ClimbCommand extends CommandBase
 {
     private ClimberSubsystem climber;
-
-    //TODO: setup controller ID
-    XboxController input;    
 
     public ClimbCommand(ClimberSubsystem _climber)
     {
@@ -24,22 +20,13 @@ public class ClimbCommand extends CommandBase
     public void initialize() 
     {
         climber.stopRot();
-        //climber.setRotPos(0);
         climber.setWinchSpeed(0);
     }
 
     @Override
     public void execute()
     {
-        if (input.getAButton())
-        {
-            climber.setRotPos(1);
-        }
-
-        else if (input.getBButton())
-        {
-            climber.setRotPos(0);
-        }
+        //Functionality
     }
 
     /**

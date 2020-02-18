@@ -35,4 +35,8 @@ public final class Constants {
     public static final int GEARSHIFT_PCM_ID = 1;
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
+
+    public static final int CLIMB_ROTATION_CANID = 1;//placeholder
+    public static final int CLIMB_PISTON_FORWARD_PCM = 3;
+    public static final int CLIMB_PISTON_REVERSE_PCM = 4;
 }

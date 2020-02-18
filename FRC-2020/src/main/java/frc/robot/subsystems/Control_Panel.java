@@ -8,84 +8,93 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
-public class Control_Panel extends SubsystemBase
-{
-    private static final int DEVICE_ID = 1;
-    private static final int CHANNEL_A = 1;
-    private static final int CHANNEL_B = 2;
-    private static final int FORWARD_CHANNEL=3;
-    private static final int REVERSE_CHANNEL=4;
+public class Control_Panel extends SubsystemBase {
+    private WPI_TalonSRX rotationMotor = new WPI_TalonSRX(Constants.CLIMB_ROTATION_CANID);
+    // DistPerPulse: 1040, minRate: 10, maxPeriod: 50, sampleAverage: 20
+    private DoubleSolenoid extensionSol = new DoubleSolenoid(Constants.CLIMB_PISTON_FORWARD_PCM,
+            Constants.CLIMB_PISTON_REVERSE_PCM);
 
-    private TalonSRX m_talon;
-    private DoubleSolenoid m_solenoid;
-    private Encoder m_encoder;
-
-    /*Initialization*/
-    public Control_Panel(double distance_per_pulse, double minRate, double maxPeriod, int sampleToAverage)
-    {
-        m_talon = new TalonSRX(DEVICE_ID);
-        m_solenoid = new DoubleSolenoid(FORWARD_CHANNEL,REVERSE_CHANNEL);
+    /* Initialization */
+    public Control_Panel() {
         /* Factory Default all hardware to prevent unexpected behaviour */
-        m_talon.configFactoryDefault();
-        m_talon.setInverted(false);
-        m_talon.setNeutralMode(NeutralMode.Brake);
-        //m_talon.configOpenloopRamp(0.2);
-        //m_talon.configClosedloopRamp(0);
-        m_encoder = new Encoder(CHANNEL_A,CHANNEL_B);
-        m_encoder.setDistancePerPulse(distance_per_pulse);
-        m_encoder.setMinRate(minRate);
-        m_encoder.setMaxPeriod(maxPeriod);
-        m_encoder.setSamplesToAverage(sampleToAverage);
+        rotationMotor.configFactoryDefault();
+        rotationMotor.setInverted(false);
+        rotationMotor.setNeutralMode(NeutralMode.Brake);
+        rotationMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder);
+        // m_talon.configOpenloopRamp(0.2);
+        // m_talon.configClosedloopRamp(0);
     }
 
     @Override
-    public void periodic() 
-    {
-      // This method will be called once per scheduler run
+    public void periodic() {
+        // This method will be called once per scheduler run
     }
 
-    public void setSpeed(double x)
-    {
-         m_talon.set(ControlMode.Velocity,x);
+    public void setSpeed(double x) {
+        rotationMotor.set(ControlMode.Velocity, x);
     }
 
-
-    public double getDistance()
-    {
-        return m_encoder.getDistance();
+    public double getDistance() {
+        return rotationMotor.getSelectedSensorPosition();
     }
 
-
-    public void resetEncoder()
-    {
-        m_encoder.reset();
+    public void resetEncoder() {
+        rotationMotor.setSelectedSensorPosition(0);
     }
 
-    public void moveArm()
-    {
-        m_solenoid.set(DoubleSolenoid.Value.kForward);
+    public void extendArm() {
+        extensionSol.set(DoubleSolenoid.Value.kForward);
     }
 
-    public void retractArm()
-    {
-        m_solenoid.set(DoubleSolenoid.Value.kReverse);
+    public void retractArm() {
+        extensionSol.set(DoubleSolenoid.Value.kReverse);
     }
 
-    
+    public String getTargetColor() {
+        String fullGameData = DriverStation.getInstance().getGameSpecificMessage();
+        String gameData = "";
+        if (fullGameData.length() > 0) {
+            switch (fullGameData.charAt(0)) {
+            case 'B':
+                // Blue case code
+                gameData = "Blue";
+                break;
+            case 'G':
+                // Green case code
+                gameData = "Green";
+                break;
+            case 'R':
+                // Red case code
+                gameData = "Red";
+                break;
+            case 'Y':
+                // Yellow case code
+                gameData = "Yellow";
+                break;
+            default:
+                // This is corrupt data
+                gameData = "";
+                break;
+            }
+        } else {
+            // Code for no data received yet
+            gameData = "";
+        }
 
-    public void print()
-    {
-        SmartDashboard.putNumber("Distance", m_encoder.getDistance());
-        SmartDashboard.putNumber("Distance per Pulse", m_encoder.getDistancePerPulse());
+        return gameData;
+    }
+
+    public void log() {
+        SmartDashboard.putNumber("Distance", getDistance());
     }
 }

@@ -53,7 +53,7 @@ public class RotateControlPanelCommand extends CommandBase {
         //Command.super.initialize();
         init_color = detector.getColor();
         curr_color = detector.getColor();
-        panel.moveArm();
+        panel.extendArm();
         panel.resetEncoder();
         panel.setSpeed(START);
         curr_speed = START;

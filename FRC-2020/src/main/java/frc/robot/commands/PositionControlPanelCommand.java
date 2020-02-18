@@ -1,14 +1,8 @@
 package frc.robot.commands;
 
-import java.util.Set;
-
-import javax.lang.model.util.ElementScanner6;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.subsystems.Color_Subsystem;
 import frc.robot.subsystems.Control_Panel;
-import frc.robot.subsystems.FSMState_Subsystem;
 
 //TODO: NOT DONE
 /**
@@ -54,7 +48,7 @@ public class PositionControlPanelCommand extends CommandBase {
         //Command.super.initialize();
         init_color = color_detector.getColor();
         curr_color = init_color;
-        final_color = FSMState_Subsystem.getColor();
+        final_color = panel.getTargetColor();
         for(int i = 0; i < colors.length; i++)
         {
             if(init_color.equals(colors[i]))
@@ -63,7 +57,7 @@ public class PositionControlPanelCommand extends CommandBase {
                 index_final = i;
         }
         panel.resetEncoder();
-        panel.moveArm();
+        panel.extendArm();
         panel.setSpeed(findShortest() * curr_speed);
     }
 

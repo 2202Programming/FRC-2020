@@ -19,6 +19,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
+import frc.robot.commands.auto.DriveOffLine;
 import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
@@ -71,22 +72,22 @@ public class RobotContainer {
     //put driver controls first so its periodic() is called first.
     
     cameraSubsystem = new CameraSubsystem();
-    driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
+    driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.07); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
-    logSubsystem = new Log_Subsystem(limelight, driveTrain);
+    logSubsystem = new Log_Subsystem(limelight, driveTrain, gearShifter);
     
     //Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
-    driveTrain.setDefaultCommand(tankDriveCmd);
+    driveTrain.setDefaultCommand(arcadeDriveCmd);
 
     // Configure the button bindings
     ///configureButtonBindings();
     DustinsButtons();
-    DPLTestButtons();
+    //DPLTestButtons();
 
     // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
     // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
@@ -162,8 +163,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new CommandBase() {
-    };
+    //return new CommandBase() {};
+    return new DriveOffLine(driveTrain);
   }
 
   /**

@@ -153,10 +153,15 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void log() {
+		/*
+		//These are all very bad
 		SmartDashboard.putNumber("Right Velocity", getRightVel(false));
 		SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
 		SmartDashboard.putNumber("Right Position", getRightPos());
 		SmartDashboard.putNumber("Left Position", getLeftPos());
+		*/
+
+		SmartDashboard.putString("Drive Train Default Command", getDefaultCommand().toString());
 	}
 
 	public class VelController implements SpeedController {

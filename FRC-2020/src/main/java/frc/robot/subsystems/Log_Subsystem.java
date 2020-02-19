@@ -19,12 +19,14 @@ public class Log_Subsystem extends SubsystemBase {
 
   private Limelight_Subsystem limelight;
   private VelocityDifferentialDrive_Subsystem drive;
+  private GearShifter gearShifter;
   private int counter;
  // private Lidar_Subsystem lidar;
 
-  public Log_Subsystem(Limelight_Subsystem limelight, VelocityDifferentialDrive_Subsystem drive) {
+  public Log_Subsystem(Limelight_Subsystem limelight, VelocityDifferentialDrive_Subsystem drive, GearShifter gearShifter) {
     this.limelight = limelight;
     this.drive = drive;
+    this.gearShifter = gearShifter;
     //this.lidar = lidar;
     counter = 0;
   }
@@ -36,9 +38,10 @@ public class Log_Subsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    if (counter == 10) limelight.log();
+    if (counter == 10) //limelight.log();
     if (counter == 30) drive.log();
     if (counter == 50) log();
+    if (counter == 70) gearShifter.log();
     
     counter++;
     if (counter==100) counter = 0;

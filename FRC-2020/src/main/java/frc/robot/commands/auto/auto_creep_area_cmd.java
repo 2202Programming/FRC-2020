@@ -15,7 +15,7 @@ import frc.robot.Robot;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.ifx.ArcadeDrive;
 
-public class auto_creep_cmd extends CommandBase {
+public class auto_creep_area_cmd extends CommandBase {
   /**
    * Creates a new auto_creep_cmd.
    */
@@ -23,9 +23,9 @@ public class auto_creep_cmd extends CommandBase {
   private final ArcadeDrive drive;
   private final Limelight_Subsystem limelight;
   private double angleTarget;
-  private double targetDistance;
+  private double targetArea;
   private double Kap = 0.03, Kai = 0.00, Kad = 0.02; //angle drive PIDs
-  private double Kp = 0.1, Ki = 0.001, Kd = 0.02; //distance drive PIDs
+  private double Kp = 0.2, Ki = 0.01, Kd = 0.02; //distance drive PIDs
   private final PIDController anglePIDController;
   private final PIDController distancePIDController;
   private double tolerancePct = .05;
@@ -33,13 +33,13 @@ public class auto_creep_cmd extends CommandBase {
   private double maxAngleRate;
   private double maxSpeed;
   private double kDegreesToDPS = 1; //convert PID rotation output to degrees per second for VelocityDifferentalDrive
-  private double kDistanceToPid = 5;
+  private double kAreaToPid = -2; // 
 
-  public auto_creep_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final double angleTarget, final double maxSpeed, final double maxAngleRate, final double targetDistance) {
+  public auto_creep_area_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final double angleTarget, final double maxSpeed, final double maxAngleRate, final double targetArea) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drive = drive;
     this.limelight = limelight;
-    this.targetDistance = targetDistance; //feet
+    this.targetArea = targetArea; //feet
     this.maxSpeed = maxSpeed;
     this.angleTarget = angleTarget;
     this.maxAngleRate = maxAngleRate;
@@ -60,8 +60,8 @@ public class auto_creep_cmd extends CommandBase {
     drive.resetPosition();
 
     distancePIDController.reset();
-    distancePIDController.setSetpoint(targetDistance);
-    distancePIDController.setTolerance((targetDistance) * tolerancePct, 0.5);
+    distancePIDController.setSetpoint(targetArea);
+    distancePIDController.setTolerance((targetArea) * tolerancePct, 0.5);
     //distancePIDController.setIntegratorRange(0, 3);
 
     anglePIDController.reset();
@@ -81,8 +81,8 @@ public class auto_creep_cmd extends CommandBase {
     angleCmd = MathUtil.clamp(angleCmd, -maxAngleRate, maxAngleRate);
 
     //distanace pid
-    double current_position = (drive.getLeftPos()+drive.getRightPos())/2;
-    double speedCmd = kDistanceToPid * distancePIDController.calculate(current_position);
+    double current_position = limelight.getArea();
+    double speedCmd = kAreaToPid * distancePIDController.calculate(current_position);
     speedCmd = MathUtil.clamp(speedCmd, -maxSpeed, maxSpeed);
 
    // SmartDashboard.putNumber("PID error (degrees)", anglePIDController.getPositionError());
@@ -92,8 +92,8 @@ public class auto_creep_cmd extends CommandBase {
     //SmartDashboard.putData(anglePIDController);
 
     SmartDashboard.putNumber("Max Speed", maxSpeed);
-    SmartDashboard.putNumber("Target Distance", targetDistance);
-    SmartDashboard.putNumber("Current Distance", current_position);
+    SmartDashboard.putNumber("Target Area", targetArea);
+    SmartDashboard.putNumber("Current Area", current_position);
     SmartDashboard.putNumber("PID Output Distance", speedCmd);
     //SmartDashboard.putData(distancePIDController);
   

@@ -21,6 +21,7 @@ import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
+import frc.robot.commands.auto.auto_creep_area_cmd;
 // import frc.robot.commands.test.TestCmd;  
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.auto.auto_creep_cmd;
@@ -118,8 +119,11 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
 
+    //driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+    //    .whileHeld(new auto_creep_cmd(driveTrain, limelight, 0, 0.4, 0.2, -1));
+
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
-        .whileHeld(new auto_creep_cmd(driveTrain, limelight, 0, 10, 0.2, 10));
+        .whileHeld(new auto_creep_area_cmd(driveTrain, limelight, 0, 0.4, 0.2, 1.8));
     
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
         .whenPressed(new toggleLED(limelight));

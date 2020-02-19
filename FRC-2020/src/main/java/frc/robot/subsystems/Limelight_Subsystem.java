@@ -24,7 +24,8 @@ public class Limelight_Subsystem extends SubsystemBase {
    private double area; //area is between 0 and 100. Calculated as a percentage of image
    private boolean target;
    
-  public Limelight_Subsystem() {
+  public Limelight_Subsystem() { 
+    disableLED();
   }
 
   @Override
@@ -41,10 +42,7 @@ public class Limelight_Subsystem extends SubsystemBase {
     x = tx.getDouble(0.0);
     y = ty.getDouble(0.0);
     area = ta.getDouble(0.0);
-    target = (tv.getDouble(0)==0) ? (false) : (true);
-    
-    disableLED();
-
+    target = (tv.getDouble(0)==0) ? (false) : (true); 
   }
 
   public double getX(){

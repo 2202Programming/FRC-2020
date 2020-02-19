@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.ifx.*;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,6 +37,7 @@ import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.util.input.GeneralTrigger;
 import frc.robot.util.input.JoystickTrigger;
+import frc.robot.util.misc.DPadButton;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
 
 /**
@@ -62,36 +64,32 @@ public class RobotContainer {
   // private final AutomaticGearShift autoGearShift = new
   // AutomaticGearShift(driveTrain, gearShifter);
 
-  //Tests to run during test mode
+  // Tests to run during test mode
   TestKBSimMode t1;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    //put driver controls first so its periodic() is called first.
-    
+    // put driver controls first so its periodic() is called first.
+
     cameraSubsystem = new CameraSubsystem();
-    driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.07); // velExpo,rotExpo, deadzone
+    driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
     logSubsystem = new Log_Subsystem(limelight, driveTrain, gearShifter);
-    
-    //Create default commads for driver preference
+
+    // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
     driveTrain.setDefaultCommand(arcadeDriveCmd);
 
     // Configure the button bindings
-    ///configureButtonBindings();
+    /// configureButtonBindings();
     DustinsButtons();
-    //DPLTestButtons();
-
-    // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
-    // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
-
+    DPLTestButtons();
   }
 
   /**
@@ -101,60 +99,91 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-/*
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
-      .whileHeld(new MagazineAdjust(intake, true));
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
-      .whileHeld(new MagazineAdjust(intake, false));
-*/
-      
+    /*
+     * driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
+     * .whileHeld(new MagazineAdjust(intake, true));
+     * driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
+     * .whileHeld(new MagazineAdjust(intake, false));
+     */
+
   }
 
   private void DustinsButtons() {
-    
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
+
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new GearToggleCmd(gearShifter));
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
         .whenPressed(new InvertDriveControls(driverControls));
-      driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
 
-      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-        .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); //mag, intake
-      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
+        .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
         .whenHeld(new ReverseIntake(intake, -0.5));
-      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ToggleIntakeRaised(intake));
-      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
         .whileHeld(new MagazineAdjust(intake, true));
-      driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
         .whileHeld(new MagazineAdjust(intake, false));
-      driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-        .whenHeld(new ShooterOn(intake, 1200, 0.4));  // rpm, seconds mag backup 
+    driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
+        .whenHeld(new ShooterOn(intake, 1200, 0.4)); // rpm, seconds mag backup
 
-    //driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-    //  .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
+    // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
+    // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
   }
 
-  //Derek's testing...
+  // Derek's testing...
   private void DPLTestButtons() {
 
     // testing buttion to enable/disable rotation limits
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.START.getCode())
-    .toggleWhenPressed(new CommandBase() {
-        @Override
-        public void initialize() {
-          driverControls.setLimitRotation(true);
-        }
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.START.getCode()).toggleWhenPressed(new CommandBase() {
+      @Override
+      public void initialize() {
+        driverControls.setLimitRotation(true);
+      }
 
-        @Override
-        public void end(boolean interrupted) {
-          driverControls.setLimitRotation(false);
-        }
-    }); 
+      @Override
+      public void end(boolean interrupted) {
+        driverControls.setLimitRotation(false);
+      }
+    });
+
+    // current limit testing UP/DOWN on driver Pad
+    DPadButton dUp = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), DPadButton.Direction.UP);
+    dUp.toggleWhenPressed(new CommandBase() {
+      @Override
+      public void initialize() {
+        driveTrain.adjustCurrentLimit(1);
+      }
+    });
+
+    DPadButton dDown = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver),DPadButton.Direction.DOWN);
+    dDown.toggleWhenPressed(new CommandBase() {
+      @Override
+      public void initialize() {
+        driveTrain.adjustCurrentLimit(-1);
+      }
+    });
+    /**
+     * // Use the DPad to change the motor ramp rate - increasing time will slow
+     * down response DPadButton dLeft = new DPadButton((XboxController)
+     * DriverControls.deviceMap.get(Id.Driver), DPadButton.Direction.LEFT);
+     * dLeft.toggleWhenPressed(new CommandBase() {
+     * 
+     * @Override public void initialize() { driveTrain.adjustAccelerationLimit(0.1);
+     *           } });
+     * 
+     *           DPadButton dRight = new DPadButton((XboxController)
+     *           DriverControls.deviceMap.get(Id.Driver),
+     *           DPadButton.Direction.RIGHT); dRight.toggleWhenPressed(new
+     *           CommandBase() {
+     * @Override public void initialize() {
+     *           driveTrain.adjustAccelerationLimit(-0.1); } });
+     */
+
   }
-  
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -163,16 +192,16 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    //return new CommandBase() {};
+    // return new CommandBase() {};
     return new DriveOffLine(driveTrain);
   }
 
   /**
-   *   InitTest() called from Robot when test mode is used.
-   *   Put code here to fire up in test mode.
+   * InitTest() called from Robot when test mode is used. Put code here to fire up
+   * in test mode.
    */
   public void initTest() {
-    t1 =  new TestKBSimMode();
+    t1 = new TestKBSimMode();
 
   }
 

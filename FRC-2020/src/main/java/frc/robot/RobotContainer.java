@@ -123,7 +123,7 @@ public class RobotContainer {
     //    .whileHeld(new auto_creep_cmd(driveTrain, limelight, 0, 0.4, 0.2, -1));
 
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
-        .whileHeld(new auto_creep_area_cmd(driveTrain, limelight, 0, 0.4, 0.2, 1.8));
+        .whileHeld(new auto_creep_area_cmd(driveTrain, limelight, lidar, 0, 0.4, 0.2, 1.8));
     
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
         .whenPressed(new toggleLED(limelight));

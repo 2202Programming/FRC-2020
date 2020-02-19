@@ -22,9 +22,9 @@ public class auto_cmd_group extends SequentialCommandGroup{
         double angleTarget = 0;
         double maxSpeed = 10;
         double maxAngleSpeed = 10;
-        double targetDistance = 0;
+        double targetDistance = 0.1;
         double stopDist = 0;
-        double targetVelocity = 0;
+        double targetForwardPower = 0.1;
         double delay = 0;
 
         // Compute delay based on switches 
@@ -37,15 +37,15 @@ public class auto_cmd_group extends SequentialCommandGroup{
 
         addCommands(
             new WaitCommand(delay),
-            new auto_creep_cmd(drive, limelight, angleTarget, maxSpeed, maxAngleSpeed, targetDistance),
+            new auto_creep_cmd(drive, limelight, lidar, angleTarget, maxSpeed, maxAngleSpeed, targetDistance),
             //     new auto_delay_cmd(switch1, switch2),
-            new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetVelocity),
-            new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetVelocity),
+            new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetForwardPower),
+            new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower),
             new DriveWithLidarToDistanceDegCmd(drive, lidar, stopDist, angleTarget, maxSpeed),
             new ShooterOn(intake, 1200, 0.4).withTimeout(4.0),  //turn shooter on for 4 seconds 1200 rpm
             //new ShooterOnWithDelay(intake, delay),
             new DriveWithLidarToDistanceDegCmd(drive, lidar, stopDist, angleTarget, maxSpeed),
-            new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetVelocity)
+            new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower)
         );
     }
 }

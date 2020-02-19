@@ -35,7 +35,7 @@ public class auto_limelightDrive_cmd extends CommandBase {
   private double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
-  private double targetVelocity;
+  private double targetForwardPower;
 
   /**
    * Creates a new DriveWithLidarToDistanceCmd.
@@ -49,14 +49,14 @@ public class auto_limelightDrive_cmd extends CommandBase {
    * 
    */
   public auto_limelightDrive_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final Lidar_Subsystem lidar,
-      final double stopDist, final double angleTarget, final double maxSpeed, double targetVelocity) {
+      final double stopDist, final double angleTarget, final double maxSpeed, double targetForwardPower) {
     this.drive = drive;
     this.limelight = limelight;
     this.lidar = lidar;
     this.stopDist = stopDist; //inches
     this.maxSpeed = maxSpeed;
     this.angleTarget = angleTarget;
-    this.targetVelocity = targetVelocity;
+    this.targetForwardPower = targetForwardPower;
 
     // create the PID with vel and accl limits
     distancePIDController = new PIDController(Kp, Ki, Kd);
@@ -70,8 +70,8 @@ public class auto_limelightDrive_cmd extends CommandBase {
 
   public auto_limelightDrive_cmd(ArcadeDrive drive, Limelight_Subsystem limelight, final Lidar_Subsystem lidar,
   double stopDist, double maxSpeed, double angleTarget,
-      double tolerancePct, double targetVelocity) {
-    this(drive, limelight, lidar, stopDist, maxSpeed, angleTarget, targetVelocity);
+      double tolerancePct, double targetForwardPower) {
+    this(drive, limelight, lidar, stopDist, maxSpeed, angleTarget, targetForwardPower);
     this.tolerancePct = tolerancePct;
   }
 
@@ -106,7 +106,7 @@ public class auto_limelightDrive_cmd extends CommandBase {
     SmartDashboard.putData(anglePIDController);
   
     // move rotation only
-    drive.velocityArcadeDrive(targetVelocity, angleCmd);
+    drive.arcadeDrive(targetForwardPower, angleCmd);
   }
 
   // Called once the command ends or is interrupted.

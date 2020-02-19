@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Robot;
+import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.ifx.ArcadeDrive;
 
@@ -22,6 +23,7 @@ public class auto_creep_cmd extends CommandBase {
 
   private final ArcadeDrive drive;
   private final Limelight_Subsystem limelight;
+  private final Lidar_Subsystem lidar;
   private double angleTarget;
   private double targetDistance;
   private double Kap = 0.03, Kai = 0.00, Kad = 0.02; //angle drive PIDs
@@ -35,7 +37,7 @@ public class auto_creep_cmd extends CommandBase {
   private double kDegreesToDPS = 1; //convert PID rotation output to degrees per second for VelocityDifferentalDrive
   private double kDistanceToPid = 5;
 
-  public auto_creep_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final double angleTarget, final double maxSpeed, final double maxAngleRate, final double targetDistance) {
+  public auto_creep_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final Lidar_Subsystem lidar, final double angleTarget, final double maxSpeed, final double maxAngleRate, final double targetDistance) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drive = drive;
     this.limelight = limelight;
@@ -43,6 +45,7 @@ public class auto_creep_cmd extends CommandBase {
     this.maxSpeed = maxSpeed;
     this.angleTarget = angleTarget;
     this.maxAngleRate = maxAngleRate;
+    this.lidar = lidar;
 
     anglePIDController = new PIDController(Kap, Kai, Kad);
     distancePIDController = new PIDController(Kp, Ki, Kd);

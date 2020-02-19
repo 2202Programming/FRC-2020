@@ -20,7 +20,7 @@ package frc.robot;
 public final class Constants {
 
     public static final double DT = 0.02;  //20ms framerate 50Hz
-    public static final double Tperiod = 0.02;   //framerate period 20ms, 50Hz
+    public static final double Tperiod = 0.01;   //framerate period 20ms, 50Hz
     
     //Lidar
     public static final int FRONT_LEFT_LIDAR = 21;

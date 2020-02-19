@@ -24,7 +24,7 @@ public class auto_creep_cmd extends CommandBase {
   private final Limelight_Subsystem limelight;
   private double angleTarget;
   private double targetDistance;
-  private double Kap = 0.2, Kai = 0.01, Kad = 0.0; //angle drive PIDs
+  private double Kap = 0.03, Kai = 0.00, Kad = 0.02; //angle drive PIDs
   private double Kp = 0.5, Ki = 0.001, Kd = 0.0; //distance drive PIDs
   private final PIDController anglePIDController;
   private final PIDController distancePIDController;
@@ -76,7 +76,7 @@ public class auto_creep_cmd extends CommandBase {
   public void execute() {
 
     //angle pid to limelight angle
-    double current_angle = limelight.getX();
+    double current_angle = limelight.getFilteredX();
     double angleCmd = kDegreesToDPS * anglePIDController.calculate(current_angle);
     angleCmd = MathUtil.clamp(angleCmd, -maxAngleRate, maxAngleRate);
 
@@ -87,7 +87,7 @@ public class auto_creep_cmd extends CommandBase {
 
    // SmartDashboard.putNumber("PID error (degrees)", anglePIDController.getPositionError());
     SmartDashboard.putNumber("Max Angle Rate", maxAngleRate);
-    SmartDashboard.putNumber("Angle", current_angle);
+    SmartDashboard.putNumber("Filtered Angle", current_angle);
     SmartDashboard.putNumber("PID Output DPS", angleCmd);
     //SmartDashboard.putData(anglePIDController);
 

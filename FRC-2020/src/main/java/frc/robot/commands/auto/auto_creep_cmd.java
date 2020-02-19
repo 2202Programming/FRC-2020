@@ -24,7 +24,7 @@ public class auto_creep_cmd extends CommandBase {
   private final Limelight_Subsystem limelight;
   private double angleTarget;
   private double targetDistance;
-  private double Kap = 0.2, Kai = 0.001, Kad = 0.0; //angle drive PIDs
+  private double Kap = 0.2, Kai = 0.01, Kad = 0.0; //angle drive PIDs
   private double Kp = 0.5, Ki = 0.001, Kd = 0.0; //distance drive PIDs
   private final PIDController anglePIDController;
   private final PIDController distancePIDController;
@@ -89,22 +89,24 @@ public class auto_creep_cmd extends CommandBase {
     SmartDashboard.putNumber("Max Angle Rate", maxAngleRate);
     SmartDashboard.putNumber("Angle", current_angle);
     SmartDashboard.putNumber("PID Output DPS", angleCmd);
-    SmartDashboard.putData(anglePIDController);
+    //SmartDashboard.putData(anglePIDController);
 
     SmartDashboard.putNumber("Max Speed", maxSpeed);
     SmartDashboard.putNumber("Target Distance", targetDistance);
     SmartDashboard.putNumber("Distance", current_position);
     SmartDashboard.putNumber("PID Output Distance", speedCmd);
-    SmartDashboard.putData(distancePIDController);
+    //SmartDashboard.putData(distancePIDController);
   
     // move rotation only
-    drive.velocityArcadeDrive(speedCmd*1000, angleCmd);
+    drive.arcadeDrive(0, angleCmd);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.velocityArcadeDrive(0, 0);
+    drive.arcadeDrive(0, 0);
+    limelight.disableLED();
+    Robot.command = "None";
   }
 
   // Returns true when the command should end.

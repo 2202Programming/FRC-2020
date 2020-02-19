@@ -26,6 +26,7 @@ public class TankDriveCmd extends CommandBase {
         double l = dc.getVelocityLeft();
         double r = dc.getVelocityRight();
         drive.tankDrive(l , r );
+        Robot.command = "Tank Drive";
     }
 
 }

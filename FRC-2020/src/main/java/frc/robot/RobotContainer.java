@@ -117,6 +117,9 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
 
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+        .whileHeld(new auto_creep_cmd(driveTrain, limelight, 0, 10, 0.2, 10));
+
         /*
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
@@ -131,8 +134,7 @@ public class RobotContainer {
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
         .whenHeld(new ShooterOn(intake, 1200, 0.4)); // rpm, seconds mag backup
 */
-    // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-    // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
+
   }
 
   // Derek's testing...

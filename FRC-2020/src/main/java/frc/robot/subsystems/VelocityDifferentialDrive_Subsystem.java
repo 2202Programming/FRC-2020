@@ -18,17 +18,19 @@ import edu.wpi.first.wpilibj.SpeedController;
 
 import static frc.robot.Constants.*;
 
+import java.util.concurrent.TimeUnit;
+
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements DualDrive, ArcadeDrive, TankDrive {
 	// Current Limits
-	private final int SMARTCURRENT_MAX = 80;
-	private int smartCurrentLimit = 20; // amps
-	private final double KSecondaryCurrent = 1.20; // set secondary current based on smart current
+	private final int SMARTCURRENT_MAX = 60;
+	private int smartCurrentLimit = 30; // amps
+	private final double KSecondaryCurrent = 1.40; // set secondary current based on smart current
 
-	//Acceleration limits
+	// Acceleration limits
 	private final double RATE_MAX_SECONDS = 10;
 	private double rateLimit = 0.5; // seconds to max speed/power
 
-	//Chasis details
+	// Chasis details
 	public final double WHEEL_RADIUS = 4; // inches
 	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // rev/feet
 	private final double K_rev_per_ft = 1.0 / K_ft_per_rev;
@@ -38,17 +40,16 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final CANSparkMax frontLeft = new CANSparkMax(FL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax backRight = new CANSparkMax(BR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax backLeft = new CANSparkMax(BL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
-	private final CANSparkMax middleRight = new CANSparkMax(MR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
+	private final CANSparkMax middleRight = new CANSparkMax(MR_SPARKMAX_CANID,
+			CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax middleLeft = new CANSparkMax(ML_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 
 	private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft,
 			middleRight, middleLeft };
 
-
-	
-
-	private final VelController leftController;
-	private final VelController rightController;
+	//VelController can use either Velocity mode or dutycycle modes and is wrapper around CANSparkMax
+	private VelController leftController;
+	private VelController rightController;
 
 	// PID coefficients TODO: move these constants
 	private double kP = 5e-5;
@@ -69,32 +70,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// save scaling factors, they are required to use SparkMax in Vel mode
 		this.maxRPM = maxRPM;
 		this.maxDPS = maxDPS;
-
-		setCoastMode();
-
-		// Have motors follow to use Differential Drive
-		CANSparkMax rMaster = backRight;
-		err=middleRight.follow(rMaster);
-		err=frontRight.follow(rMaster);
-		//err=backRight.follow(rMaster);
-		err=middleRight.follow(rMaster);
-
-		CANSparkMax lMaster = backLeft;
-		err= middleLeft.follow(lMaster);
-		err= frontLeft.follow(lMaster);
-		//backLeft.follow(lMaster);
-		err = middleLeft.follow(lMaster);
+		this.gearbox = gear;
 		
-		gearbox = gear;
-
-		// velocity setup - using RPM speed controller
-		leftController = new VelController(lMaster);
-		rightController = new VelController(rMaster);
-
+		//setup SparkMax controllers, sets left and right masters
+		configureControllers();
 		setVelocityMode(false);
 
-		//zero adjust will set the default limits
-		//adjustAccelerationLimit(0.0);
+		// zero adjust will set the default limits
+		// adjustAccelerationLimit(0.0);
 		adjustCurrentLimit(0);
 
 		dDrive = new DifferentialDrive(leftController, rightController);
@@ -102,24 +85,50 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	/**
-	 *  adjust the acceleration time - limit on how fast the output gets to max
+	 *   hides some of the ugly setups like delays between programming.
+	 */
+	void configureControllers() {
+		// factory reset
+		resetControllers();
+
+		// Have motors follow to use Differential Drive
+		CANSparkMax rMaster = backRight;
+		err = middleRight.follow(rMaster);
+		sleep(2);
+		err = frontRight.follow(rMaster);
+		// err=backRight.follow(rMaster);
+	
+		CANSparkMax lMaster = backLeft;
+		err = middleLeft.follow(lMaster);
+		sleep(2);
+		err = frontLeft.follow(lMaster);
+		// backLeft.follow(lMaster);
+		
+		// velocity setup - using RPM speed controller
+		leftController = new VelController(lMaster);
+		rightController = new VelController(rMaster);
+	}
+
+	/**
+	 * adjust the acceleration time - limit on how fast the output gets to max
+	 * 
 	 * @param deltaRate (seconds) ammount to add to current rate
 	 * @return
 	 */
 	public double adjustAccelerationLimit(double deltaRate) {
 		rateLimit = MathUtil.limit((rateLimit + deltaRate), 0.0, RATE_MAX_SECONDS);
-	
+
 		for (CANSparkMax c : controllers) {
 			c.setOpenLoopRampRate(rateLimit);
-//			c.setClosedLoopRampRate(rateLimit);
+			// c.setClosedLoopRampRate(rateLimit);
 		}
-		SmartDashboard.putNumber("motorRate", rateLimit );
+		SmartDashboard.putNumber("motorRate", rateLimit);
 		return rateLimit;
 	}
 
 	/**
-	 * Change the default smart current limits for drive motors
-	 * Also adjusts secondary to smart limit +20% 
+	 * Change the default smart current limits for drive motors Also adjusts
+	 * secondary to smart limit +20%
 	 * 
 	 * @param deltaCurrent (amps) 0 - 80 amps for max power
 	 * @return
@@ -130,20 +139,22 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		double secondaryCurrent = smartCurrentLimit * KSecondaryCurrent;
 
 		for (CANSparkMax c : controllers) {
-			//smart current limit
+			// smart current limit
 			c.setSmartCurrentLimit(smartCurrentLimit);
 
 			// Set the secondary current based on the smartCurrent
-			//c.setSecondaryCurrentLimit(secondaryCurrent);
+			// c.setSecondaryCurrentLimit(secondaryCurrent);
 		}
-		SmartDashboard.putNumber("motorI", smartCurrentLimit );
+		SmartDashboard.putNumber("motorI", smartCurrentLimit);
+		System.out.println("***** SmartCurrent*****" + smartCurrentLimit);
 		return smartCurrentLimit;
 	}
 
-	private void setCoastMode() {
+	private void resetControllers() {
 		for (CANSparkMax c : controllers) {
-			c.restoreFactoryDefaults(true);
-			c.setIdleMode(IdleMode.kCoast);
+			c.restoreFactoryDefaults(false);
+			sleep(5);
+			//c.setIdleMode(IdleMode.kCoast);  //idle is default
 		}
 	}
 
@@ -297,6 +308,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		@Override
 		public void stopMotor() {
 			set(0.0);
+		}
+	}
+
+	void sleep(long ms) {
+		try {
+			TimeUnit.MILLISECONDS.sleep(ms);
+		} catch (InterruptedException e) {
+			// don't care
 		}
 	}
 

@@ -162,7 +162,7 @@ public class RobotContainer {
 
     DPadButton dDown = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
                   DPadButton.Direction.DOWN);
-    dDown.whenPressed(new CommandBase() {
+    dDown.toggleWhenPressed(new CommandBase() {
       @Override
       public void initialize() {
         driveTrain.adjustCurrentLimit(-1);
@@ -181,7 +181,7 @@ public class RobotContainer {
 
     DPadButton dRight = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
                   DPadButton.Direction.RIGHT);
-    dRight.whenPressed(new CommandBase() {
+    dRight.toggleWhenPressed(new CommandBase() {
       @Override
       public void initialize() {
         driveTrain.adjustAccelerationLimit(-0.1);

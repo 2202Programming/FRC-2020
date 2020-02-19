@@ -43,6 +43,7 @@ public class Limelight_Subsystem extends SubsystemBase {
     area = ta.getDouble(0.0);
     target = (tv.getDouble(0)==0) ? (false) : (true);
     
+    disableLED();
 
   }
 

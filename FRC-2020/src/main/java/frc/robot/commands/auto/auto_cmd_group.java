@@ -39,9 +39,9 @@ public class auto_cmd_group extends SequentialCommandGroup{
             new WaitCommand(delay),
             new auto_creep_cmd(drive, limelight, lidar, angleTarget, maxSpeed, maxAngleSpeed, targetDistance),
             //     new auto_delay_cmd(switch1, switch2),
-            new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetForwardPower),
-            new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower),
-            new DriveWithLidarToDistanceDegCmd(drive, lidar, stopDist, angleTarget, maxSpeed),
+            new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetForwardPower), // drive towards target with limelight until lidar valid
+            new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower), // drive towards target with limelight until not valid
+            new auto_drive_lidar_straight(drive, lidar, 50, lidar.findAngle(), 0.1), // drive straight with lidar alone at current angle until XX mm from wall
             new ShooterOn(intake, 1200, 0.4).withTimeout(4.0),  //turn shooter on for 4 seconds 1200 rpm
             //new ShooterOnWithDelay(intake, delay),
             new DriveWithLidarToDistanceDegCmd(drive, lidar, stopDist, angleTarget, maxSpeed),

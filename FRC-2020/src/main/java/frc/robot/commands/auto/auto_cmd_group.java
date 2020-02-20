@@ -26,6 +26,7 @@ public class auto_cmd_group extends SequentialCommandGroup{
         double stopDist = 0;
         double targetForwardPower = 0.1;
         double delay = 0;
+        double departure_angle = 20;
 
         // Compute delay based on switches 
         int delayCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x03);        // sw 1 & 2
@@ -41,10 +42,11 @@ public class auto_cmd_group extends SequentialCommandGroup{
             //     new auto_delay_cmd(switch1, switch2),
             new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetForwardPower), // drive towards target with limelight until lidar valid
             new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower), // drive towards target with limelight until not valid
-            new auto_drive_lidar_straight(drive, lidar, 50, lidar.findAngle(), 0.1), // drive straight with lidar alone at current angle until XX mm from wall
+            new auto_drive_lidar(drive, lidar, 12, lidar.findAngle(), 0.1), // drive straight with lidar alone at current angle until XX inches from wall
+            new auto_drive_lidar(drive, lidar, 5, 0, 0.1), //drive to angle 0, stop at XX inches
             new ShooterOn(intake, 1200, 0.4).withTimeout(4.0),  //turn shooter on for 4 seconds 1200 rpm
             //new ShooterOnWithDelay(intake, delay),
-            new DriveWithLidarToDistanceDegCmd(drive, lidar, stopDist, angleTarget, maxSpeed),
+            new auto_drive_lidar_until_limelight(drive, lidar, limelight, departure_angle, 0.1), //drive at angle departure_angle, go until limelight valid
             new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower)
         );
     }

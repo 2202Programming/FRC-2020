@@ -66,10 +66,6 @@ public class RobotContainer {
   Command tankDriveCmd;
   Command arcadeDriveCmd;
 
-  // private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
-  // private final AutomaticGearShift autoGearShift = new
-  // AutomaticGearShift(driveTrain, gearShifter);
-
   // Tests to run during test mode
   TestKBSimMode t1;
 
@@ -84,8 +80,10 @@ public class RobotContainer {
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     limelight = new Limelight_Subsystem();
-    lidar = new Lidar_Subsystem();
-    logSubsystem = new Log_Subsystem(limelight, driveTrain);
+    logSubsystem = new Log_Subsystem(5);   // log every 5 frames - 100mS
+    
+    //Add anything that has logging requirements
+    logSubsystem.add(driveTrain, limelight);
 
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);

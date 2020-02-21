@@ -8,14 +8,14 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.subsystems.ifx.Logger;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Limelight_Subsystem extends SubsystemBase {
+public class Limelight_Subsystem extends SubsystemBase implements Logger {
   /**
    * Creates a new Limelight_Subsystem.
    */

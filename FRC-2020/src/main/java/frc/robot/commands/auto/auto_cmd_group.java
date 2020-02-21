@@ -42,7 +42,6 @@ public class auto_cmd_group extends SequentialCommandGroup{
             new auto_creep_cmd(drive, limelight, lidar, angleTarget, maxSpeed, maxAngleSpeed, targetDistance),
             //     new auto_delay_cmd(switch1, switch2),
             new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetForwardPower), // drive towards target with limelight until lidar valid
-            new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower), // drive towards target with limelight until not valid
             new set_departure_angle(lidar.findAngle()), //sets global variable in Robot
             new auto_drive_lidar(drive, lidar, 12, Robot.departureAngle, 0.1), // drive straight with lidar alone at current angle until XX inches from wall
             new auto_drive_lidar(drive, lidar, 5, 0, 0.1), //drive to angle 0, stop at XX inches

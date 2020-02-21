@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.ifx.*;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +20,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
+import frc.robot.commands.auto.DriveOffLine;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.auto_creep_area_cmd;
@@ -39,6 +41,8 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
+import frc.robot.util.input.GeneralTrigger;
+import frc.robot.util.input.JoystickTrigger;
 import frc.robot.util.misc.DPadButton;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
 
@@ -86,7 +90,7 @@ public class RobotContainer {
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
-    driveTrain.setDefaultCommand(tankDriveCmd);
+    driveTrain.setDefaultCommand(arcadeDriveCmd);
 
     // Configure the button bindings
     /// configureButtonBindings();
@@ -161,7 +165,7 @@ public class RobotContainer {
       }
     });
 
-    // current limit testing  UP/DOWN on driver Pad
+    // current limit testing UP/DOWN on driver Pad
     DPadButton dUp = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), DPadButton.Direction.UP);
     dUp.toggleWhenPressed(new CommandBase() {
       @Override
@@ -170,33 +174,29 @@ public class RobotContainer {
       }
     });
 
-    DPadButton dDown = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
-                  DPadButton.Direction.DOWN);
+    DPadButton dDown = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver),DPadButton.Direction.DOWN);
     dDown.toggleWhenPressed(new CommandBase() {
       @Override
       public void initialize() {
         driveTrain.adjustCurrentLimit(-1);
       }
     });
-
-    // Use the DPad to change the motor ramp rate - increasing time will slow down response
-    DPadButton dLeft = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
-    DPadButton.Direction.LEFT);
-    dLeft.toggleWhenPressed(new CommandBase() {
-      @Override
-      public void initialize() {
-        driveTrain.adjustAccelerationLimit(0.1);
-      }
-    });
-
-    DPadButton dRight = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
-                  DPadButton.Direction.RIGHT);
-    dRight.toggleWhenPressed(new CommandBase() {
-      @Override
-      public void initialize() {
-        driveTrain.adjustAccelerationLimit(-0.1);
-      }
-    });
+    /**
+     * // Use the DPad to change the motor ramp rate - increasing time will slow
+     * down response DPadButton dLeft = new DPadButton((XboxController)
+     * DriverControls.deviceMap.get(Id.Driver), DPadButton.Direction.LEFT);
+     * dLeft.toggleWhenPressed(new CommandBase() {
+     * 
+     * @Override public void initialize() { driveTrain.adjustAccelerationLimit(0.1);
+     *           } });
+     * 
+     *           DPadButton dRight = new DPadButton((XboxController)
+     *           DriverControls.deviceMap.get(Id.Driver),
+     *           DPadButton.Direction.RIGHT); dRight.toggleWhenPressed(new
+     *           CommandBase() {
+     * @Override public void initialize() {
+     *           driveTrain.adjustAccelerationLimit(-0.1); } });
+     */
 
   }
 
@@ -206,7 +206,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;// new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar ).withTimeout(15.0);
+    // An ExampleCommand will run in autonomous
+    // return new CommandBase() {};
+    return new DriveOffLine(driveTrain);
   }
 
   /**

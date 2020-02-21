@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
-import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -23,12 +22,12 @@ import java.util.concurrent.TimeUnit;
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements DualDrive, ArcadeDrive, TankDrive {
 	// Current Limits
 	private final int SMARTCURRENT_MAX = 60;
-	private int smartCurrentLimit = 30; // amps
+	private int smartCurrentLimit = 50; // amps
 	private final double KSecondaryCurrent = 1.40; // set secondary current based on smart current
 
 	// Acceleration limits
-	private final double RATE_MAX_SECONDS = 10;
-	private double rateLimit = 0.5; // seconds to max speed/power
+	private final double RATE_MAX_SECONDS = 2;
+	private double rateLimit = 0.2; // seconds to max speed/power
 
 	// Chasis details
 	public final double WHEEL_RADIUS = 4; // inches
@@ -47,7 +46,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft,
 			middleRight, middleLeft };
 
-	//VelController can use either Velocity mode or dutycycle modes and is wrapper around CANSparkMax
+	// VelController can use either Velocity mode or dutycycle modes and is wrapper
+	// around CANSparkMax
 	private VelController leftController;
 	private VelController rightController;
 
@@ -71,57 +71,59 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		this.maxRPM = maxRPM;
 		this.maxDPS = maxDPS;
 		this.gearbox = gear;
-		
-		//setup SparkMax controllers, sets left and right masters
+
+		// setup SparkMax controllers, sets left and right masters
 		configureControllers();
 		setVelocityMode(false);
-
-		// zero adjust will set the default limits
-		// adjustAccelerationLimit(0.0);
-		adjustCurrentLimit(0);
 
 		dDrive = new DifferentialDrive(leftController, rightController);
 		dDrive.setSafetyEnabled(false);
 	}
 
 	/**
-	 *   hides some of the ugly setups like delays between programming.
+	 * hides some of the ugly setups like delays between programming.
 	 */
 	void configureControllers() {
+		CANSparkMax rMaster = backRight;
+		CANSparkMax lMaster = backLeft;
+
+		// velocity setup - using RPM speed controller
+		this.leftController = new VelController(lMaster);
+		this.rightController = new VelController(rMaster);
+		
 		// factory reset
 		resetControllers();
 
 		// Have motors follow to use Differential Drive
-		CANSparkMax rMaster = backRight;
 		err = middleRight.follow(rMaster);
-		sleep(2);
+		sleep(2); // hack to ensure timing
 		err = frontRight.follow(rMaster);
-		// err=backRight.follow(rMaster);
-	
-		CANSparkMax lMaster = backLeft;
-		err = middleLeft.follow(lMaster);
 		sleep(2);
+		err = middleLeft.follow(lMaster);
+		sleep(2); // hack to ensure timing
 		err = frontLeft.follow(lMaster);
-		// backLeft.follow(lMaster);
-		
-		// velocity setup - using RPM speed controller
-		leftController = new VelController(lMaster);
-		rightController = new VelController(rMaster);
+
+		// zero adjust will set the default limits for accel and currents
+		adjustAccelerationLimit(0.0);
+		adjustCurrentLimit(0);
+
+		// burn the default value incase of brown-out
+		saveControllers();		
 	}
 
 	/**
-	 * adjust the acceleration time - limit on how fast the output gets to max
+	 * adjust the acceleration time - limit on how fast the output gets to max spped
+	 * Should be kRampRate as shown in SparkMax Client.
 	 * 
-	 * @param deltaRate (seconds) ammount to add to current rate
+	 * @param deltaRate (seconds) amount to add to current rate
 	 * @return
 	 */
 	public double adjustAccelerationLimit(double deltaRate) {
 		rateLimit = MathUtil.limit((rateLimit + deltaRate), 0.0, RATE_MAX_SECONDS);
-
-		for (CANSparkMax c : controllers) {
-			c.setOpenLoopRampRate(rateLimit);
-			// c.setClosedLoopRampRate(rateLimit);
-		}
+		// Just set the ramp limit on the masters
+		leftController.controller.setOpenLoopRampRate(rateLimit);
+		sleep(1);
+		rightController.controller.setOpenLoopRampRate(rateLimit);
 		SmartDashboard.putNumber("motorRate", rateLimit);
 		return rateLimit;
 	}
@@ -153,11 +155,22 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private void resetControllers() {
 		for (CANSparkMax c : controllers) {
 			c.restoreFactoryDefaults(false);
-			sleep(5);
-			//c.setIdleMode(IdleMode.kCoast);  //idle is default
+			sleep(2);
 		}
 	}
 
+	private void saveControllers() {
+		for (CANSparkMax c : controllers) {
+			c.burnFlash();
+			sleep(2);
+		}
+	}
+
+	/**
+	 * Enables using physical units for driving.
+	 * 
+	 * @param useVelocity
+	 */
 	public void setVelocityMode(boolean useVelocity) {
 		leftController.setVelocityMode(useVelocity);
 		rightController.setVelocityMode(useVelocity);
@@ -223,10 +236,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void log() {
-		SmartDashboard.putNumber("Right Velocity", getRightVel(false));
-		SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
-		SmartDashboard.putNumber("Right Position", getRightPos());
-		SmartDashboard.putNumber("Left Position", getLeftPos());
+		/**
+		 * SmartDashboard.putNumber("Right Velocity", getRightVel(false));
+		 * SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
+		 * SmartDashboard.putNumber("Right Position", getRightPos());
+		 * SmartDashboard.putNumber("Left Position", getLeftPos());
+		 */
+		SmartDashboard.putString("Drive Train Default Command", getDefaultCommand().toString());
 	}
 
 	public class VelController implements SpeedController {

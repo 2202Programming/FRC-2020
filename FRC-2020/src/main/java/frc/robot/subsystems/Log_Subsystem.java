@@ -23,7 +23,8 @@ public class Log_Subsystem extends SubsystemBase {
   private int counter;
  // private Lidar_Subsystem lidar;
 
-  public Log_Subsystem(Limelight_Subsystem limelight, VelocityDifferentialDrive_Subsystem drive, GearShifter gearShifter) {
+  public Log_Subsystem(Limelight_Subsystem limelight, VelocityDifferentialDrive_Subsystem drive)//, GearShifter gearShifter) 
+  {
     this.limelight = limelight;
     this.drive = drive;
     this.gearShifter = gearShifter;

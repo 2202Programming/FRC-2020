@@ -8,13 +8,14 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.ifx.Logger;
 
 //import com.kauailabs.navx.AHRSProtocol.AHRSUpdate;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation;
 
-public class Sensors_Subsystem extends SubsystemBase {
+public class Sensors_Subsystem extends SubsystemBase implements Logger {
   /**
    * Creates a new Sensors_Subsystem.
    * 
@@ -78,6 +79,12 @@ public static class Signals {
 
 
 }
+
+  @Override
+  public void log() {
+    //WIP but it will log stuff
+
+  }
 
 
 

@@ -19,7 +19,7 @@ import static frc.robot.Constants.*;
 
 import java.util.concurrent.TimeUnit;
 
-public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements DualDrive, ArcadeDrive, TankDrive {
+public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive {
 	// Current Limits
 	private final int SMARTCURRENT_MAX = 60;
 	private int smartCurrentLimit = 50; // amps

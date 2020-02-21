@@ -4,47 +4,60 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.ArrayList;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
+import frc.robot.subsystems.ifx.Logger;
 
+/**
+ * 
+ * Log_Subsystem - calls log() functions for robot
+ *     Calls one system every N logFrame counts.
+ * 
+ *   dpl    2/21/20   decoupled from specific subsytems, use anywhere 
+ *                    you need a Logger.
+ * 
+ */
 
-public class Log_Subsystem extends SubsystemBase {
+public class Log_Subsystem extends SubsystemBase implements Logger {
   /**
    * Creates a new Log_Subsystem.
    */
-
-  private Limelight_Subsystem limelight;
-  private VelocityDifferentialDrive_Subsystem drive;
-  private GearShifter gearShifter;
+  ArrayList<Logger> loggers = new ArrayList<Logger>();
   private int counter;
- // private Lidar_Subsystem lidar;
+  private final int logFrame;    //when to call a Logger's log
+  private int lastLog;
 
-  public Log_Subsystem(Limelight_Subsystem limelight, VelocityDifferentialDrive_Subsystem drive, GearShifter gearShifter) {
-    this.limelight = limelight;
-    this.drive = drive;
-    this.gearShifter = gearShifter;
-    //this.lidar = lidar;
+  public Log_Subsystem(int logFrameCount){
     counter = 0;
+    this.logFrame = logFrameCount;
+    this.lastLog = 0;
+    //we are a Logger, so add us as first in list
+    add(this);
   }
 
-  private void log(){
+  /**
+   * General Logger interface, takes anything that implements Logger interface
+   */
+  public synchronized void add(Logger ... devices) {
+    for(Logger dev : devices)
+    loggers.add(dev);
+  }
+
+  public void log() {
     SmartDashboard.putString("Command: ", Robot.command);
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    if (counter == 10) //limelight.log();
-    if (counter == 30) drive.log();
-    if (counter == 50) log();
-    if (counter == 70) gearShifter.log();
-    
-    counter++;
-    if (counter==100) counter = 0;
-
+      if ((counter++ % logFrame) == 0) {
+      loggers.get(lastLog++).log();
+      
+      //reset the lastLog when at the end of array
+      lastLog = (lastLog >= loggers.size()) ? 0 : lastLog;
+    }
   }
 }

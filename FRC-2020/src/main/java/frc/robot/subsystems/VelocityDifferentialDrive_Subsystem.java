@@ -31,9 +31,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	// Chasis details
 	public final double WHEEL_RADIUS = 4; // inches
+	private final double WHEEL_AXLE_DIST = 30.0;   //inches
 	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // rev/feet
 	private final double K_rev_per_ft = 1.0 / K_ft_per_rev;
-
+	private final double K_low_ft_rev;    // Low gear ft/rev of motor shaft
+	private final double K_high_ft_rev;   // High gear ft/rev of motor shaft
+	
 	// CANSpark Max will be used 3 per side, 2 folowing the leader
 	private final CANSparkMax frontRight = new CANSparkMax(FR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax frontLeft = new CANSparkMax(FL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -52,25 +55,36 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private VelController rightController;
 
 	// PID coefficients TODO: move these constants
-	private double kP = 5e-5;
-	private double kI = 0.0; // 1e-6;
-	private double kD = 0;
-	private double kIz = 0;
-	private double kFF = 0;
-	private double kMaxOutput = 1;
-	private double kMinOutput = -1;
-	private double maxRPM;
-	private double maxDPS;
+	private final double kP = 5e-5;
+	private final double kI = 0.0; // 1e-6;
+	private final double kD = 0;
+	private final double kIz = 0;
+	private final double kFF = 0;
+	private final double kMaxOutput = 1;
+	private final double kMinOutput = -1;
+	
+	
+	private final double maxFPSLow;    //max linear speed in ft/s low gear
+	private final double maxFPSHigh;   // 
+	private final double maxDPS;       //max rotation in deg/sec around Z axis
+	private double maxRPM;             //max motor RPM low & high
 
 	private final DifferentialDrive dDrive;
 	private GearShifter gearbox = null;
 	CANError err;
 
-	public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxRPM, final double maxDPS) {
+	public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxFPS_lowGear, final double maxDPS) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
-		this.maxRPM = maxRPM;
-		this.maxDPS = maxDPS;
 		this.gearbox = gear;
+		this.maxDPS = maxDPS;
+
+		//setup physical units - chassis * gearbox
+		K_low_ft_rev = K_ft_per_rev * gearbox.K_low;
+		K_high_ft_rev = K_ft_per_rev * gearbox.K_high;
+		// compute max RPM for motors, use same for low and high gear
+		maxRPM = 60.0*(maxFPS_lowGear / K_low_ft_rev);  // [60s/m]*[ft/s]/[ft/rev] = rev/min
+		maxFPSLow = (maxRPM * K_low_ft_rev) / 60.0;     // same as given in ctor.
+		maxFPSHigh = (maxRPM * K_high_ft_rev) / 60.0;
 
 		// setup SparkMax controllers, sets left and right masters
 		configureControllers();
@@ -84,13 +98,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 * hides some of the ugly setups like delays between programming.
 	 */
 	void configureControllers() {
-		CANSparkMax rMaster = backRight;
-		CANSparkMax lMaster = backLeft;
+		final CANSparkMax rMaster = backRight;
+		final CANSparkMax lMaster = backLeft;
 
 		// velocity setup - using RPM speed controller
 		this.leftController = new VelController(lMaster);
 		this.rightController = new VelController(rMaster);
-		
+
 		// factory reset
 		resetControllers();
 
@@ -108,7 +122,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		adjustCurrentLimit(0);
 
 		// burn the default value incase of brown-out
-		saveControllers();		
+		saveControllers();
 	}
 
 	/**
@@ -118,7 +132,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 * @param deltaRate (seconds) amount to add to current rate
 	 * @return
 	 */
-	public double adjustAccelerationLimit(double deltaRate) {
+	public double adjustAccelerationLimit(final double deltaRate) {
 		rateLimit = MathUtil.limit((rateLimit + deltaRate), 0.0, RATE_MAX_SECONDS);
 		// Just set the ramp limit on the masters
 		leftController.controller.setOpenLoopRampRate(rateLimit);
@@ -135,12 +149,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 * @param deltaCurrent (amps) 0 - 80 amps for max power
 	 * @return
 	 */
-	public int adjustCurrentLimit(int deltaCurrent) {
+	public int adjustCurrentLimit(final int deltaCurrent) {
 		smartCurrentLimit += deltaCurrent;
 		smartCurrentLimit = MathUtil.limit(smartCurrentLimit, 0, SMARTCURRENT_MAX);
-		double secondaryCurrent = smartCurrentLimit * KSecondaryCurrent;
+		final double secondaryCurrent = smartCurrentLimit * KSecondaryCurrent;
 
-		for (CANSparkMax c : controllers) {
+		for (final CANSparkMax c : controllers) {
 			// smart current limit
 			c.setSmartCurrentLimit(smartCurrentLimit);
 
@@ -153,14 +167,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	private void resetControllers() {
-		for (CANSparkMax c : controllers) {
+		for (final CANSparkMax c : controllers) {
 			c.restoreFactoryDefaults(false);
 			sleep(2);
 		}
 	}
 
 	private void saveControllers() {
-		for (CANSparkMax c : controllers) {
+		for (final CANSparkMax c : controllers) {
 			c.burnFlash();
 			sleep(2);
 		}
@@ -171,7 +185,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 * 
 	 * @param useVelocity
 	 */
-	public void setVelocityMode(boolean useVelocity) {
+	public void setVelocityMode(final boolean useVelocity) {
 		leftController.setVelocityMode(useVelocity);
 		rightController.setVelocityMode(useVelocity);
 	}
@@ -201,11 +215,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	// TODO: velocityTankDrive()
 
-	public void arcadeDrive(double xSpeed, double zRotation) {
+	public void arcadeDrive(final double xSpeed, final double zRotation) {
 		dDrive.arcadeDrive(xSpeed, zRotation, false);
 	}
 
-	public void tankDrive(double leftSpeed, double rightSpeed) {
+	public void tankDrive(final double leftSpeed, final double rightSpeed) {
 		dDrive.tankDrive(leftSpeed, rightSpeed, false);
 	}
 
@@ -213,7 +227,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		return K_ft_per_rev * leftController.getPosition();
 	}
 
-	public double getLeftVel(boolean normalized) {
+	public double getLeftVel(final boolean normalized) {
 		double vel = leftController.get();
 		vel = (normalized) ? (vel / maxRPM) : vel;
 		return vel;
@@ -224,7 +238,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	}
 
-	public double getRightVel(boolean normalized) {
+	public double getRightVel(final boolean normalized) {
 		double vel = rightController.get();
 		vel = (normalized) ? (vel / maxRPM) : vel;
 		return vel;
@@ -265,7 +279,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			pid.setOutputRange(kMinOutput, kMaxOutput);
 		}
 
-		public void setVelocityMode(boolean useVelocity) {
+		public void setVelocityMode(final boolean useVelocity) {
 			velocityMode = useVelocity;
 		}
 
@@ -327,10 +341,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		}
 	}
 
-	void sleep(long ms) {
+	void sleep(final long ms) {
 		try {
 			TimeUnit.MILLISECONDS.sleep(ms);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// don't care
 		}
 	}

@@ -7,7 +7,7 @@ import static frc.robot.Constants.*;
 
 public class GearShifter extends SubsystemBase {
     // define the gear ratios for high and low gear
-    private final double K_shaft = (12.0 /30.0) * (24.0 / 60.0); //motor and output stage
+    private final double K_shaft = 1.0 /((12.0 /30.0) * (24.0 / 60.0)); //motor and output stage
     //shifter stage with 
     public final double K_high = 1.0 * K_shaft;
     public final double K_low = (1.0 / 2.65) * K_shaft; 

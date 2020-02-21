@@ -81,6 +81,7 @@ public class RobotContainer {
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
     limelight = new Limelight_Subsystem();
     logSubsystem = new Log_Subsystem(5);   // log every 5 frames - 100mS
+    lidar = new Lidar_Subsystem();
     
     //Add anything that has logging requirements
     logSubsystem.add(driveTrain, limelight);

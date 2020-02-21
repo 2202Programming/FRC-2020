@@ -12,6 +12,7 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 public class auto_cmd_group extends SequentialCommandGroup{
     
@@ -42,11 +43,12 @@ public class auto_cmd_group extends SequentialCommandGroup{
             //     new auto_delay_cmd(switch1, switch2),
             new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetForwardPower), // drive towards target with limelight until lidar valid
             new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower), // drive towards target with limelight until not valid
-            new auto_drive_lidar(drive, lidar, 12, lidar.findAngle(), 0.1), // drive straight with lidar alone at current angle until XX inches from wall
+            new set_departure_angle(lidar.findAngle()), //sets global variable in Robot
+            new auto_drive_lidar(drive, lidar, 12, Robot.departureAngle, 0.1), // drive straight with lidar alone at current angle until XX inches from wall
             new auto_drive_lidar(drive, lidar, 5, 0, 0.1), //drive to angle 0, stop at XX inches
             new ShooterOn(intake, 1200, 0.4).withTimeout(4.0),  //turn shooter on for 4 seconds 1200 rpm
             //new ShooterOnWithDelay(intake, delay),
-            new auto_drive_lidar_until_limelight(drive, lidar, limelight, departure_angle, 0.1), //drive at angle departure_angle, go until limelight valid
+            new auto_drive_lidar_until_limelight(drive, lidar, limelight, Robot.departureAngle, 0.1), //drive at angle departure_angle, go until limelight valid
             new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower)
         );
     }

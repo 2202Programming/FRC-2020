@@ -18,6 +18,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
+import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
@@ -77,7 +78,10 @@ public class RobotContainer {
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
     lidar = new Lidar_Subsystem();
-    logSubsystem = new Log_Subsystem(limelight, driveTrain);
+    logSubsystem = new Log_Subsystem(5);   // log every 5 frames - 100mS
+
+    //Add anything that has logging requirements
+    logSubsystem.add(driveTrain, limelight, lidar);
 
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
@@ -118,6 +122,14 @@ public class RobotContainer {
         .whenPressed(new InvertDriveControls(driverControls));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
+
+    /* FOR AUTO TESTING
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+        .whenPressed(new auto_cmd_group(driverControls, driveTrain, limelight, lidar));
+    */
+
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
+          .whenPressed(new toggleLED(limelight));
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
@@ -197,7 +209,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar ).withTimeout(15.0);
+    return null;
+    //return new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar ).withTimeout(15.0);
   }
 
   /**

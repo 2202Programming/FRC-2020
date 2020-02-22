@@ -8,23 +8,33 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.subsystems.ifx.Logger;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Limelight_Subsystem extends SubsystemBase {
+public class Limelight_Subsystem extends SubsystemBase implements Logger {
   /**
    * Creates a new Limelight_Subsystem.
    */
 
    private NetworkTable table;
    private double x;
+   private double filteredX;
    private double y;
    private double area; //area is between 0 and 100. Calculated as a percentage of image
    private boolean target;
+   private boolean ledStatus; //true = ON
    
+   private LinearFilter x_iir;
+   private double filterTC = 0.8;   //seconds, cutoff 1.25Hz
+
   public Limelight_Subsystem() {
+    disableLED();
+    x_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
   }
 
   @Override
@@ -35,6 +45,7 @@ public class Limelight_Subsystem extends SubsystemBase {
     NetworkTableEntry ty = table.getEntry("ty"); // -20.5 to 20.5 degrees
     NetworkTableEntry ta = table.getEntry("ta");
     NetworkTableEntry tv = table.getEntry("tv"); //target validity (1 or 0)
+    NetworkTableEntry leds = table.getEntry("ledMode"); 
 
     //updates global variables
 
@@ -42,12 +53,17 @@ public class Limelight_Subsystem extends SubsystemBase {
     y = ty.getDouble(0.0);
     area = ta.getDouble(0.0);
     target = (tv.getDouble(0)==0) ? (false) : (true);
-    
+    filteredX = x_iir.calculate(x);
+    ledStatus = (leds.getDouble(0)==3) ? (true) : (false);
 
   }
 
   public double getX(){
     return x;
+  }
+
+  public double getFilteredX(){
+    return filteredX;
   }
 
   public double getY(){
@@ -60,6 +76,10 @@ public class Limelight_Subsystem extends SubsystemBase {
 
   public boolean getTarget(){
     return target;
+  }
+  
+  public boolean getLEDStatus() {
+    return ledStatus;
   }
 
   public void disableLED() {
@@ -77,6 +97,7 @@ public boolean valid(){
   public void log(){
 
       SmartDashboard.putNumber("X value", x);
+      SmartDashboard.putNumber("Filtered X value", filteredX);
       SmartDashboard.putNumber("Y value", y);
       SmartDashboard.putNumber("Area", area);
       SmartDashboard.putBoolean("Limelight Valid", target);

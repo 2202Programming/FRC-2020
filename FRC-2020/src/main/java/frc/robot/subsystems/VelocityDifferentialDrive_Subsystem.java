@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 
 import static frc.robot.Constants.*;
 
-public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements DualDrive, ArcadeDrive, TankDrive {
+public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements DualDrive, ArcadeDrive, TankDrive, Logger {
 	// Current Limits
 	private final int SMARTCURRENT_MAX = 80;
 	private int smartCurrentLimit = 20; // amps

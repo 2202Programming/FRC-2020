@@ -40,7 +40,7 @@ public class auto_cmd_group extends SequentialCommandGroup{
         addCommands(
             new auto_creep_area_cmd(drive, limelight, lidar, 0, 0.4, 0.2, 2.2),
             new auto_drive_straight_until_lidar_cmd(drive,lidar,0.2),
-            new auto_drive_lidar(drive, lidar, 500, lidar.findAngle(), 0.2)
+            new auto_drive_lidar(drive, lidar, 6, lidar.findAngle(), 0.2)
 
         );
 

@@ -96,11 +96,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 		// Have motors follow to use Differential Drive
 		err = middleRight.follow(rMaster);
-		sleep(2); // hack to ensure timing
+		//sleep(2); // hack to ensure timing
 		err = frontRight.follow(rMaster);
-		sleep(2);
+		//sleep(2);
 		err = middleLeft.follow(lMaster);
-		sleep(2); // hack to ensure timing
+		//sleep(2); // hack to ensure timing
 		err = frontLeft.follow(lMaster);
 
 		// zero adjust will set the default limits for accel and currents
@@ -155,14 +155,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private void resetControllers() {
 		for (CANSparkMax c : controllers) {
 			c.restoreFactoryDefaults(false);
-			sleep(2);
+			//sleep(2);
 		}
 	}
 
 	private void saveControllers() {
 		for (CANSparkMax c : controllers) {
 			c.burnFlash();
-			sleep(2);
+			//sleep(2);
 		}
 	}
 

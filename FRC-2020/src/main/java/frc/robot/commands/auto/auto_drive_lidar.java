@@ -22,7 +22,7 @@ public class auto_drive_lidar extends CommandBase {
   private final Lidar_Subsystem lidar;
 
   private final double stopDist; // inches
-  private double tolerancePct = .05;
+  private final double tolerancePct = 2;
   private double angleToleranceDeg = 3;
   private double kInchesToPerPower = 1;
   private double kDegreesToPerPower = -1;
@@ -57,7 +57,7 @@ public class auto_drive_lidar extends CommandBase {
   public void initialize() {
     distancePIDController.reset();
     distancePIDController.setSetpoint(stopDist);
-    distancePIDController.setTolerance(stopDist * tolerancePct, 0.5);
+    distancePIDController.setTolerance(tolerancePct, 0.5);
     distancePIDController.setIntegratorRange(0, 3);
 
     anglePIDController.reset();
@@ -85,19 +85,24 @@ public class auto_drive_lidar extends CommandBase {
     SmartDashboard.putNumber("Angle", lidar.findAngle());
     SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
 
-    drive.arcadeDrive(speedCmd, angleCmd);
+    SmartDashboard.putNumber("Range-Dist", (range-stopDist));
+    SmartDashboard.putNumber("Tolerance", tolerancePct);
+
+    drive.arcadeDrive(Math.abs(speedCmd), angleCmd);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    drive.arcadeDrive(0, 0);
+    Robot.command = "None";
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if ((range < (stopDist + stopDist*tolerancePct)) && (range > (stopDist - stopDist*tolerancePct))) //finish when range is within tolerance of stopDist
-    return true;
+    if ((range-stopDist) <= (tolerancePct))
+      return true;
     else return false;
   }
 }

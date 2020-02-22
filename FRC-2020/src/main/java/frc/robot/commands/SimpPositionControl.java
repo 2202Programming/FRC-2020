@@ -26,7 +26,7 @@ public class SimpPositionControl extends CommandBase {
     this.detector = detector;
     addRequirements(cp, detector);
 
-    targetColor = cp.getTargetColor();
+    targetColor = calcTargetColor(cp.getTargetColor());
   }
 
   // Called when the command is initially scheduled.
@@ -52,5 +52,27 @@ public class SimpPositionControl extends CommandBase {
   @Override
   public boolean isFinished() {
     return detector.getColor().equals(targetColor);
+  }
+
+
+  //Determines which color we should be detecting when the panel is rotated so the field's detector is on the right color
+  public String calcTargetColor(String fieldColor) {
+    String target = "";
+    switch (fieldColor) {
+      case "Blue":
+        target = "Red";
+        break;
+      case "Red":
+        target = "Blue";
+        break;
+      case "Yellow":
+        target = "Green";
+        break;
+      case "Green":
+        target = "Yellow";
+        break;
+    }
+
+    return target;
   }
 }

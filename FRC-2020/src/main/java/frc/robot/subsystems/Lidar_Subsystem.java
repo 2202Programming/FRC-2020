@@ -24,7 +24,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   private TimeOfFlight front_right_lidar;
   private double left_lidar_range;
   private double right_lidar_range;
-  private final double LIDAR_DIST = 368.3;
+  private final double LIDAR_DIST = 348;
   private double angle;
   private boolean validRange;
   private LinearFilter left_iir;

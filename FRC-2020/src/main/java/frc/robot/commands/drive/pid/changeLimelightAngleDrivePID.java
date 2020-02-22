@@ -14,13 +14,13 @@ public class changeLimelightAngleDrivePID extends InstantCommand {
     public void initialize() {
         switch (Character.toUpperCase(valueToChange)) {
         case 'P':
-            DriveWithLimelightToDistanceDegCmd.setKap(incrementValue);
+            DriveWithLimelightToDistanceDegCmd.setKap(DriveWithLimelightToDistanceDegCmd.getKap() + incrementValue);
             break;
         case 'I':
-            DriveWithLimelightToDistanceDegCmd.setKai(incrementValue);
+            DriveWithLimelightToDistanceDegCmd.setKai(DriveWithLimelightToDistanceDegCmd.getKai() + incrementValue);
             break;
         case 'D':
-            DriveWithLimelightToDistanceDegCmd.setKad(incrementValue);
+            DriveWithLimelightToDistanceDegCmd.setKad(DriveWithLimelightToDistanceDegCmd.getKad() + incrementValue);
             break;
         }
     }

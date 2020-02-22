@@ -95,7 +95,17 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
     int listenerHandle = networkTableSmartDashboard.addEntryListener(new SmartDashboardListener(), 0x20);
   }
 
-  
+  public static double getKap() {
+    return Kap;
+  }
+
+  public static double getKai() {
+    return Kai;
+  }
+
+  public static double getKad() {
+    return Kad;
+  }
 
   public static void setKap(double kap) {
     Kap = kap;
@@ -154,8 +164,8 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
     Kad = networkTableSmartDashboard.getEntry("D").getDouble(Kad);
 
     SmartDashboard.putNumber("P", Kap); //TODO: These should be unnecessary if the network table and smart dashboard refer to the same object
-    SmartDashboard.putNumber("I", Kap);
-    SmartDashboard.putNumber("D", Kap);
+    SmartDashboard.putNumber("I", Kai);
+    SmartDashboard.putNumber("D", Kad);
     
     anglePIDController.setPID(Kap, Kai, Kad);
   

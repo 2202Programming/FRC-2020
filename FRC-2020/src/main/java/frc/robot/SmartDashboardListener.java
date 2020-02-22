@@ -17,7 +17,7 @@ public class SmartDashboardListener implements TableEntryListener {
         else if (key.equals("I"))
             DriveWithLimelightToDistanceDegCmd.setKai(value.getDouble());
         else if (key.equals("D"))
-            DriveWithLimelightToDistanceDegCmd.setKai(value.getDouble());
+            DriveWithLimelightToDistanceDegCmd.setKad(value.getDouble());
 
     }
     

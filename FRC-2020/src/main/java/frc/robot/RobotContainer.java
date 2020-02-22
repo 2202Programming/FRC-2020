@@ -27,6 +27,7 @@ import frc.robot.commands.auto.auto_creep_area_cmd;
 // import frc.robot.commands.test.TestCmd;  
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.auto.auto_creep_cmd;
+import frc.robot.commands.auto.auto_drive_straight_until_lidar_cmd;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.SwitchDriveMode;
@@ -84,7 +85,7 @@ public class RobotContainer {
     lidar = new Lidar_Subsystem();
     
     //Add anything that has logging requirements
-    logSubsystem.add(driveTrain, limelight);
+    logSubsystem.add(driveTrain, limelight, lidar);
 
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
@@ -125,9 +126,12 @@ public class RobotContainer {
     //driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
     //    .whileHeld(new auto_creep_cmd(driveTrain, limelight, 0, 0.4, 0.2, -1));
 
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
-        .whileHeld(new auto_creep_area_cmd(driveTrain, limelight, lidar, 0, 0.4, 0.2, 1.8));
+  //  driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+  //     .whenPressed(new auto_creep_area_cmd(driveTrain, limelight, lidar, 0, 0.4, 0.2, 2.2));
     
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+      .whenPressed(new auto_cmd_group(driverControls, driveTrain, limelight, lidar));
+
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
         .whenPressed(new toggleLED(limelight));
 

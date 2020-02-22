@@ -13,8 +13,9 @@ import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.ifx.*;
 
-public class Lidar_Subsystem extends SubsystemBase {
+public class Lidar_Subsystem extends SubsystemBase implements Logger {
   /**
    * Creates a new Lidar_Subsystem.
    */
@@ -56,7 +57,7 @@ public class Lidar_Subsystem extends SubsystemBase {
     return angle;
   }
 
-  public void printLog() {
+  public void log() {
     SmartDashboard.putNumber("Front Left Lidar", left_lidar_range);
     SmartDashboard.putNumber("Front Right Lidar", right_lidar_range);
     SmartDashboard.putNumber("Lidar Angle", angle);
@@ -79,7 +80,5 @@ public class Lidar_Subsystem extends SubsystemBase {
       right_lidar_range = right_iir.calculate(front_right_lidar.getRange());
       findAngle();
     }
-    
-    //printLog();
-    }
+  }
 }

@@ -14,6 +14,7 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Robot;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
+import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.ifx.ArcadeDrive;
 
 public class auto_creep_area_cmd extends CommandBase {
@@ -21,7 +22,7 @@ public class auto_creep_area_cmd extends CommandBase {
    * Creates a new auto_creep_cmd.
    */
 
-  private final ArcadeDrive drive;
+  private final VelocityDifferentialDrive_Subsystem drive;
   private final Limelight_Subsystem limelight;
   private final Lidar_Subsystem lidar;
   private double angleTarget;
@@ -35,9 +36,10 @@ public class auto_creep_area_cmd extends CommandBase {
   private double maxAngleRate;
   private double maxSpeed;
   private double kDegreesToDPS = 1; //convert PID rotation output to degrees per second for VelocityDifferentalDrive
-  private double kAreaToPid = -2; // 
+  private double kAreaToPid = 2; // 
+  private double current_position;
 
-  public auto_creep_area_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final Lidar_Subsystem lidar, final double angleTarget, final double maxSpeed, final double maxAngleRate, final double targetArea) {
+  public auto_creep_area_cmd(final VelocityDifferentialDrive_Subsystem drive, final Limelight_Subsystem limelight, final Lidar_Subsystem lidar, final double angleTarget, final double maxSpeed, final double maxAngleRate, final double targetArea) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drive = drive;
     this.limelight = limelight;
@@ -71,7 +73,7 @@ public class auto_creep_area_cmd extends CommandBase {
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
     anglePIDController.setSetpoint(angleTarget);
 
-    Robot.command = "Auto creep";
+    Robot.command = "Auto Limelight Move";
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -84,7 +86,7 @@ public class auto_creep_area_cmd extends CommandBase {
     angleCmd = MathUtil.clamp(angleCmd, -maxAngleRate, maxAngleRate);
 
     //distanace pid
-    double current_position = limelight.getArea();
+    current_position = limelight.getArea();
     double speedCmd = kAreaToPid * distancePIDController.calculate(current_position);
     speedCmd = MathUtil.clamp(speedCmd, -maxSpeed, maxSpeed);
 
@@ -124,6 +126,9 @@ public class auto_creep_area_cmd extends CommandBase {
     else return false;
     */
     // return !limelight.valid();
-    return false;
+    if ((current_position > (targetArea-targetArea*tolerancePct)) && (current_position < (targetArea+targetArea*tolerancePct)))
+      return true;
+    else 
+      return false;
   }
 }

@@ -18,7 +18,7 @@ public class auto_cmd_group extends SequentialCommandGroup{
     
     double[] startDelay = {0.0, Constants.DELAY_A, Constants.DELAY_B, Constants.DELAY_C};
     
-    public auto_cmd_group(DriverControls dc, VelocityDifferentialDrive_Subsystem drive, Intake_Subsystem intake,
+    public auto_cmd_group(DriverControls dc, VelocityDifferentialDrive_Subsystem drive, 
                             Limelight_Subsystem limelight, Lidar_Subsystem lidar) {
         double angleTarget = 0;
         double maxSpeed = 10;
@@ -38,8 +38,16 @@ public class auto_cmd_group extends SequentialCommandGroup{
         delay =startDelay[delayCode];
 
         addCommands(
+            new auto_creep_area_cmd(drive, limelight, lidar, 0, 0.4, 0.2, 2.2),
+            new auto_drive_straight_until_lidar_cmd(drive,lidar,0.2),
+            new auto_drive_lidar(drive, lidar, 500, lidar.findAngle(), 0.2)
+
+        );
+
+        /*
+        addCommands(
             new WaitCommand(delay),
-            new auto_creep_cmd(drive, limelight, lidar, angleTarget, maxSpeed, maxAngleSpeed, targetDistance),
+            new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, maxSpeed, maxAngleSpeed, targetDistance),
             //     new auto_delay_cmd(switch1, switch2),
             new auto_limelightDrive_cmd(drive, limelight, lidar, stopDist, angleTarget, maxSpeed, targetForwardPower), // drive towards target with limelight until lidar valid
             new set_departure_angle(lidar.findAngle()), //sets global variable in Robot
@@ -50,5 +58,6 @@ public class auto_cmd_group extends SequentialCommandGroup{
             new auto_drive_lidar_until_limelight(drive, lidar, limelight, Robot.departureAngle, 0.1), //drive at angle departure_angle, go until limelight valid
             new auto_limelightLidar_cmd(drive, limelight, stopDist, angleTarget, maxSpeed, targetForwardPower)
         );
+        */
     }
 }

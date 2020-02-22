@@ -24,7 +24,7 @@ public class auto_drive_lidar extends CommandBase {
   private final double stopDist; // inches
   private double tolerancePct = .05;
   private double angleToleranceDeg = 3;
-  private double kInchesToPerPower = -0.8;
+  private double kInchesToPerPower = 1;
   private double kDegreesToPerPower = -1;
   private double maxSpeed;
   private double angleTarget;
@@ -64,7 +64,7 @@ public class auto_drive_lidar extends CommandBase {
     anglePIDController.setSetpoint(angleTarget);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
 
-    Robot.command = "Drive with lidar";
+    Robot.command = "Auto Drive with lidar";
   }
 
   // Called every time the scheduler runs while the command is scheduled.

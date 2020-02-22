@@ -57,8 +57,8 @@ public class RobotContainer {
   public final Limelight_Subsystem limelight;
   public final Log_Subsystem logSubsystem;
 
-  Command tankDriveCmd;
-  Command arcadeDriveCmd;
+  TankDriveCmd tankDriveCmd;
+  ArcadeDriveCmd arcadeDriveCmd;
 
   // Tests to run during test mode
   TestKBSimMode t1;
@@ -83,7 +83,7 @@ public class RobotContainer {
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
-    driveTrain.setDefaultCommand(arcadeDriveCmd);
+    driveTrain.setDefaultCommand(tankDriveCmd);
 
     // Configure the button bindings
     configureButtonBindings();

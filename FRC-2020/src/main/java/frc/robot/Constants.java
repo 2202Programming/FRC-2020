@@ -34,7 +34,7 @@ public final class Constants {
     //endregion
 
     //region PWM
-    public static final int E_ROT_SPARKMAX_PWM = 1; //Extension Arm Rotation Motor
+    public static final int E_ROT_SERVO_PWM = 1; //Extension Arm Rotation Motor
     //endregion
 
     //region CAN

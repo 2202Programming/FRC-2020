@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,14 +20,14 @@ public class ClimberSubsystem extends SubsystemBase
     //endregion
 
     //region Motors
-    private Spark eRotSparkMax = new Spark(Constants.E_ROT_SPARKMAX_PWM); //Arm rotation motor
+    private Servo eRotServo = new Servo(Constants.E_ROT_SERVO_PWM); //Arm rotation motor
     private CANSparkMax wnSparkMax = new CANSparkMax(Constants.WN_SPARKMAX_CANID, MotorType.kBrushless); //Winch motor - extend / retract arm
     //endregion
 
     public ClimberSubsystem() 
     {
         armSolenoid.set(DoubleSolenoid.Value.kOff);
-        eRotSparkMax.set(0);
+        eRotServo.set(0);
         wnSparkMax.set(0);
         wnSparkMax.setIdleMode(IdleMode.kBrake);
     }
@@ -61,7 +62,7 @@ public class ClimberSubsystem extends SubsystemBase
     public void setRotPos(double pos)
     {
         pos = validateDouble(pos);
-        eRotSparkMax.setPosition(pos); //Set motor speed
+        eRotServo.setPosition(pos); //Set motor speed
     }
 
     /**
@@ -69,7 +70,7 @@ public class ClimberSubsystem extends SubsystemBase
      */
     public void stopRot()
     {
-        eRotSparkMax.set(0);
+        eRotServo.set(0);
     }
 
     /**
@@ -110,7 +111,7 @@ public class ClimberSubsystem extends SubsystemBase
 
     public void log()
     {
-        SmartDashboard.putNumber("Arm rotation speed", eRotSparkMax.get());
+        SmartDashboard.putNumber("Arm rotation speed", eRotServo.get());
         SmartDashboard.putNumber("Winch speed", wnSparkMax.get());
     }
 }

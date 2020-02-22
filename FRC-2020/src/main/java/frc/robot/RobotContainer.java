@@ -72,7 +72,7 @@ public class RobotContainer {
     cameraSubsystem = new CameraSubsystem();
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
-    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15.0, 5.0);  //ft/s deg/s
+    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 5.0, 5.0); // low gear ft/s deg/s
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
     logSubsystem = new Log_Subsystem(5);   // log every 5 frames - 100mS

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.*;
 import frc.robot.util.misc.MathUtil;
 import com.revrobotics.CANEncoder;
@@ -33,9 +34,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public final double WHEEL_RADIUS = 4; // inches
 	private final double WHEEL_AXLE_DIST = 30.0;   //inches
 	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // rev/feet
-	private final double K_rev_per_ft = 1.0 / K_ft_per_rev;
-	private final double K_low_ft_rev;    // Low gear ft/rev of motor shaft
-	private final double K_high_ft_rev;   // High gear ft/rev of motor shaft
+	private final double K_low_fps_rpm;    // Low gear ft/s / rpm of motor shaft
+	private final double K_high_fps_rpm;   // High gear ft/s /rpm of motor shaft
 	
 	// CANSpark Max will be used 3 per side, 2 folowing the leader
 	private final CANSparkMax frontRight = new CANSparkMax(FR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -63,11 +63,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final double kMaxOutput = 1;
 	private final double kMinOutput = -1;
 	
-	
+	//Calculated based on desired low-gear max ft/s
 	private final double maxFPSLow;    //max linear speed in ft/s low gear
 	private final double maxFPSHigh;   // 
 	private final double maxDPS;       //max rotation in deg/sec around Z axis
-	private double maxRPM;             //max motor RPM low & high
+	private final double maxRPM;       //max motor RPM low & high
 
 	private final DifferentialDrive dDrive;
 	private GearShifter gearbox = null;
@@ -79,12 +79,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		this.maxDPS = maxDPS;
 
 		//setup physical units - chassis * gearbox
-		K_low_ft_rev = K_ft_per_rev * gearbox.K_low;
-		K_high_ft_rev = K_ft_per_rev * gearbox.K_high;
+		K_low_fps_rpm = K_ft_per_rev * gearbox.K_low / 60.0;
+		K_high_fps_rpm = K_ft_per_rev * gearbox.K_high / 60.0;
 		// compute max RPM for motors, use same for low and high gear
-		maxRPM = 60.0*(maxFPS_lowGear / K_low_ft_rev);  // [60s/m]*[ft/s]/[ft/rev] = rev/min
-		maxFPSLow = (maxRPM * K_low_ft_rev) / 60.0;     // same as given in ctor.
-		maxFPSHigh = (maxRPM * K_high_ft_rev) / 60.0;
+		maxRPM = 60.0*(maxFPS_lowGear / K_low_fps_rpm);  // [60s/m]*[ft/s]/[ft/rev] = rev/min
+		maxFPSLow = (maxRPM * K_low_fps_rpm);     // max speed in low gear 
+		maxFPSHigh = (maxRPM * K_high_fps_rpm);   // max speed in high gear
 
 		// setup SparkMax controllers, sets left and right masters
 		configureControllers();
@@ -152,7 +152,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public int adjustCurrentLimit(final int deltaCurrent) {
 		smartCurrentLimit += deltaCurrent;
 		smartCurrentLimit = MathUtil.limit(smartCurrentLimit, 0, SMARTCURRENT_MAX);
-		final double secondaryCurrent = smartCurrentLimit * KSecondaryCurrent;
+		//final double secondaryCurrent = smartCurrentLimit * KSecondaryCurrent;
 
 		for (final CANSparkMax c : controllers) {
 			// smart current limit
@@ -196,12 +196,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// Spark Max uses RPM for velocity closed loop mode
 		// so we need to convert ft/s to RPM command which is dependent
 		// on the gear ratio.
+		double k = (gearbox.getCurGear() == Gear.HIGH_GEAR) ? K_high_ft_rev : K_low_ft_rev;
+
 		double rpm = velFps * K_rev_per_ft * 60.0;
 
-		// adjust for the gearbox setting
-		if (null != gearbox) {
-			rpm = rpm * gearbox.getGearRatio();
-		}
 		/**
 		 * arcadeDrive require normalized units because it clamps the speed/rotation
 		 * values. This converts to normalized by using our spec'd max speed/rotations.

@@ -19,7 +19,6 @@ public class ClimbCommand extends CommandBase
     @Override
     public void initialize() 
     {
-        climber.stopRot();
         climber.setWinchSpeed(0);
     }
 

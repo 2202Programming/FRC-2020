@@ -56,21 +56,12 @@ public class ClimberSubsystem extends SubsystemBase
     }
 
     /**
-     * Set the speed of the arm rotations motor
-     * @param speed The speed at which to unfold the arm (-1 to 1)
+     * Set the position of the arm rotation servo
+     * @param speed The position to unfold the arm to (between 0 - full left, and 1 - full right)
      */
     public void setRotPos(double pos)
     {
-        pos = validateDouble(pos);
-        eRotServo.setPosition(pos); //Set motor speed
-    }
-
-    /**
-     * Stop the rotation
-     */
-    public void stopRot()
-    {
-        eRotServo.set(0);
+        eRotServo.setPosition(pos); //Set servo position
     }
 
     /**
@@ -83,6 +74,10 @@ public class ClimberSubsystem extends SubsystemBase
     {
         speed = validateDouble(speed);
         wnSparkMax.set(speed); //Set motor speed
+    }
+
+    public double getWinchPosition() {
+        return wnSparkMax.getEncoder().getPosition();
     }
 
     /**
@@ -111,7 +106,7 @@ public class ClimberSubsystem extends SubsystemBase
 
     public void log()
     {
-        SmartDashboard.putNumber("Arm rotation speed", eRotServo.get());
+        SmartDashboard.putNumber("Arm rotation position", eRotServo.get());
         SmartDashboard.putNumber("Winch speed", wnSparkMax.get());
     }
 }

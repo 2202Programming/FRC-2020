@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive {
 	// Current Limits
 	private final int SMARTCURRENT_MAX = 60;
-	private int smartCurrentLimit = 49; // amps
+	private int smartCurrentLimit = 35; // amps
 	//private final double KSecondaryCurrent = 1.40; // set secondary current based on smart current
 
 	//Phyical units deadzone
@@ -30,7 +30,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	// Acceleration limits
 	private final double RATE_MAX_SECONDS = 2;
-	private double rateLimit = 0.2; // seconds to max speed/power
+	private double rateLimit = 0.4; // seconds to max speed/power
 
 	// Chasis details
 	public final double WHEEL_RADIUS = 4; // inches

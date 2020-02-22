@@ -16,15 +16,14 @@ public class SimpRotateControl extends CommandBase {
 
   //Intentionally overrotate to avoid undershoot, just need to be between 3 and 5 full rotations
   private static final double TARGET_PANEL_ROTATIONS = 3.5; 
-  private static final double ROTATOR_WHEEL_CIRCUMFERENCE = 4 * Math.PI;
-  private static final int PANEL_DIAMETER = 20;// 20 inches
-  private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
+  private static final double ROTATOR_WHEEL_CIRCUMFERENCE = 4 * Math.PI; //inches
+  private static final double PANEL_CIRCUMFERENCE = 32 * Math.PI; //inches
   private static final double WHEEL_ROTATIONS_PER_PANEL_ROTATION 
     = PANEL_CIRCUMFERENCE / ROTATOR_WHEEL_CIRCUMFERENCE;
-  private static final double NUM_WHEEL_ROTATIONS 
+  private static final double TARGET_WHEEL_ROTATIONS 
     = WHEEL_ROTATIONS_PER_PANEL_ROTATION * TARGET_PANEL_ROTATIONS;
   private static final double TARGET_WHEEL_COUNT
-    = NUM_WHEEL_ROTATIONS * COUNTS_PER_WHEEL_ROTATION;
+    = TARGET_WHEEL_ROTATIONS * COUNTS_PER_WHEEL_ROTATION;
 
   private Control_Panel cp;
   /**

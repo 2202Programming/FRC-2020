@@ -8,33 +8,21 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.Robot;
 
-public class auto_delay_cmd extends CommandBase {
+public class set_departure_angle extends CommandBase {
   /**
-   * Creates a new auto_delay_cmd.
+   * Creates a new set_departure_angle.
    */
 
-   private double timeStarted;
-   private double delay; //in milliseconds
-
-  public auto_delay_cmd(boolean switch1, boolean switch2) {
+  public set_departure_angle(double departureAngle) {
     // Use addRequirements() here to declare subsystem dependencies.
-    //assuming using two switches on driver's station, switch1 on means A, both off means B, and switch2 on means C
-    if (switch1)
-        delay = Constants.DELAY_A;
-    else if (switch2)
-        delay = Constants.DELAY_C;
-    else
-        delay = Constants.DELAY_B;
+    Robot.departureAngle = departureAngle;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    timeStarted = System.currentTimeMillis();
-    Robot.command = "Auto delay";
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,12 +33,11 @@ public class auto_delay_cmd extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-      return (System.currentTimeMillis() - timeStarted) >= delay;
+    return true;
   }
 }

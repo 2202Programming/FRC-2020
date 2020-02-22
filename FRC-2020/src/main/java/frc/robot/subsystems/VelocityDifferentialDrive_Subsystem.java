@@ -23,8 +23,11 @@ import java.util.concurrent.TimeUnit;
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive {
 	// Current Limits
 	private final int SMARTCURRENT_MAX = 60;
-	private int smartCurrentLimit = 50; // amps
-	private final double KSecondaryCurrent = 1.40; // set secondary current based on smart current
+	private int smartCurrentLimit = 49; // amps
+	//private final double KSecondaryCurrent = 1.40; // set secondary current based on smart current
+
+	//Phyical units deadzone
+	private final double RPM_DZ = 2.0;
 
 	// Acceleration limits
 	private final double RATE_MAX_SECONDS = 2;
@@ -32,7 +35,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	// Chasis details
 	public final double WHEEL_RADIUS = 4; // inches
-	private final double WHEEL_AXLE_DIST = 30.0;   //inches
+	private final double WHEEL_AXLE_DIST = 30.0/12.0;   //feet
 	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // rev/feet
 	private final double K_low_fps_rpm;    // Low gear ft/s / rpm of motor shaft
 	private final double K_high_fps_rpm;   // High gear ft/s /rpm of motor shaft
@@ -196,19 +199,31 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// Spark Max uses RPM for velocity closed loop mode
 		// so we need to convert ft/s to RPM command which is dependent
 		// on the gear ratio.
-		double k = (gearbox.getCurGear() == Gear.HIGH_GEAR) ? K_high_ft_rev : K_low_ft_rev;
-
-		double rpm = velFps * K_rev_per_ft * 60.0;
+		double k = K_low_fps_rpm;
+		double maxSpeed = maxFPSLow;
+		if (gearbox.getCurGear() == Gear.HIGH_GEAR) {
+			k = K_high_fps_rpm;
+			maxSpeed = maxFPSHigh;
+		}
+		// limit vel to max for the gear ratio
+		double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
+		double rpm = vcmd / k;
 
 		/**
-		 * arcadeDrive require normalized units because it clamps the speed/rotation
-		 * values. This converts to normalized by using our spec'd max speed/rotations.
+		 * Rotation controls
 		 */
-		final double xSpeed = rpm / maxRPM;
-		final double zRotation = rotDps / maxDPS;
+		// Convert to rad/s split between each wheel
+		double rps = MathUtil.limit(rotDps, 0.0, maxDPS)*(Math.PI/180.0)/2.0;
+		double vturn_rpm =  (rps * WHEEL_AXLE_DIST) /k;
+		
+		// add in the commanded speed each wheel
+		double vl_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ);
+		double vr_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ);
 
-		// call arcadeDrive with the silly normalized speeds
-		dDrive.arcadeDrive(xSpeed, zRotation, false);
+		// command the velocity to the wheels
+		leftController.setReference(vl_rpm);
+		rightController.setReference(vr_rpm);
+		dDrive.feed();
 	}
 
 	// TODO: velocityTankDrive()
@@ -298,11 +313,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		public void set(final double speed) {
 			if (velocityMode) {
 				final double rpm = speed * maxRPM;
-				pid.setReference(rpm, ControlType.kVelocity);
+				setReference(rpm);
 			} else {
 				controller.set(speed);
-				// pid.setReference(speed, ControlType.kDutyCycle);
 			}
+		}
+
+		public void setReference(double rpm)  {
+			pid.setReference(rpm, ControlType.kVelocity);
 		}
 
 		@Override
@@ -345,6 +363,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		} catch (final InterruptedException e) {
 			// don't care
 		}
+	}
+
+	double applyDeadZone(double value, double dz) {
+		double x = (Math.abs(value) < dz) ? 0.0 : value;
+		return x;
 	}
 
 }

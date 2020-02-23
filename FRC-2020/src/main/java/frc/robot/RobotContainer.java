@@ -89,7 +89,7 @@ public class RobotContainer {
     logSubsystem.add(driveTrain, limelight, lidar);
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
-    driveTrain.setDefaultCommand(tankDriveCmd);
+    driveTrain.setDefaultCommand(arcadeDriveCmd);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -103,7 +103,7 @@ private void jasonsButtons(){
   .whenPressed(new toggleLED(limelight));
 
   driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
-  .whenPressed(new auto_cmd_group(driverControls, driveTrain, limelight, lidar));
+  .whenPressed(new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
 }
 
   private void configureButtonBindings() {

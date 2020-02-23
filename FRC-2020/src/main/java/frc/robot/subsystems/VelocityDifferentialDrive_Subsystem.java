@@ -44,8 +44,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final CANSparkMax frontLeft = new CANSparkMax(FL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax backRight = new CANSparkMax(BR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax backLeft = new CANSparkMax(BL_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
-	private final CANSparkMax middleRight = new CANSparkMax(MR_SPARKMAX_CANID,
-			CANSparkMaxLowLevel.MotorType.kBrushless);
+	private final CANSparkMax middleRight = new CANSparkMax(MR_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 	private final CANSparkMax middleLeft = new CANSparkMax(ML_SPARKMAX_CANID, CANSparkMaxLowLevel.MotorType.kBrushless);
 
 	private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft,
@@ -91,6 +90,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// setup SparkMax controllers, sets left and right masters
 		configureControllers();
 		setVelocityMode(false);
+
+		//zero adjust will set the default limits
+		adjustAccelerationLimit(0.0);
+		adjustCurrentLimit(0);
 
 		dDrive = new DifferentialDrive(leftController, rightController);
 		dDrive.setSafetyEnabled(false);

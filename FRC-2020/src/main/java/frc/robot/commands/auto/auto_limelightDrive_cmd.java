@@ -8,6 +8,7 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 
@@ -34,7 +35,7 @@ public class auto_limelightDrive_cmd extends CommandBase {
   private double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
-  private double targetVelocity;
+  private double targetForwardPower;
 
   /**
    * Creates a new DriveWithLidarToDistanceCmd.
@@ -48,14 +49,14 @@ public class auto_limelightDrive_cmd extends CommandBase {
    * 
    */
   public auto_limelightDrive_cmd(final ArcadeDrive drive, final Limelight_Subsystem limelight, final Lidar_Subsystem lidar,
-      final double stopDist, final double angleTarget, final double maxSpeed, double targetVelocity) {
+      final double stopDist, final double angleTarget, final double maxSpeed, double targetForwardPower) {
     this.drive = drive;
     this.limelight = limelight;
     this.lidar = lidar;
     this.stopDist = stopDist; //inches
     this.maxSpeed = maxSpeed;
     this.angleTarget = angleTarget;
-    this.targetVelocity = targetVelocity;
+    this.targetForwardPower = targetForwardPower;
 
     // create the PID with vel and accl limits
     distancePIDController = new PIDController(Kp, Ki, Kd);
@@ -69,8 +70,8 @@ public class auto_limelightDrive_cmd extends CommandBase {
 
   public auto_limelightDrive_cmd(ArcadeDrive drive, Limelight_Subsystem limelight, final Lidar_Subsystem lidar,
   double stopDist, double maxSpeed, double angleTarget,
-      double tolerancePct, double targetVelocity) {
-    this(drive, limelight, lidar, stopDist, maxSpeed, angleTarget, targetVelocity);
+      double tolerancePct, double targetForwardPower) {
+    this(drive, limelight, lidar, stopDist, maxSpeed, angleTarget, targetForwardPower);
     this.tolerancePct = tolerancePct;
   }
 
@@ -87,6 +88,7 @@ public class auto_limelightDrive_cmd extends CommandBase {
     anglePIDController.setSetpoint(angleTarget);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
 
+    Robot.command = "Auto limelight drive";
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -104,7 +106,7 @@ public class auto_limelightDrive_cmd extends CommandBase {
     SmartDashboard.putData(anglePIDController);
   
     // move rotation only
-    drive.velocityArcadeDrive(targetVelocity, angleCmd);
+    drive.arcadeDrive(targetForwardPower, angleCmd);
   }
 
   // Called once the command ends or is interrupted.
@@ -117,6 +119,6 @@ public class auto_limelightDrive_cmd extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return lidar.valid();
+    return lidar.valid() && !limelight.valid();
   }
 }

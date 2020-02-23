@@ -5,48 +5,39 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.intake;
+package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.Robot;
 
-public class MagazineAdjust extends CommandBase {
-  private Intake_Subsystem intake;
-  private boolean forward;
-  private static final double strength = 0.8;
+public class set_departure_angle extends CommandBase {
   /**
-   * Creates a new MagazineAdjust.
+   * Creates a new set_departure_angle.
    */
-  public MagazineAdjust(Intake_Subsystem intake, boolean forward) {
+
+  public set_departure_angle(double departureAngle) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.intake = intake;
-    this.forward = forward;
+    Robot.departureAngle = departureAngle;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() { 
-    //do the work when the button is pressed, end() called on release
-    if (forward) intake.magazineOn(strength);
-    else intake.magazineOn(-strength);
+  public void initialize() {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //nothing to do, motor is in proper state.
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.magazineOff();
   }
 
   // Returns true when the command should end.
-  // This command ends with button release.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

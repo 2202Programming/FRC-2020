@@ -31,6 +31,7 @@ public class auto_cmd_group extends SequentialCommandGroup{
 
         // Compute delay based on switches 
         int delayCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x03);        // sw 1 & 2
+        //int positionCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x0C)>>2;  // sw 3 & 4
 
         // TODO: Change path based on positionCode from switch
         // int positionCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x0C)>>2;  // sw 3 & 4

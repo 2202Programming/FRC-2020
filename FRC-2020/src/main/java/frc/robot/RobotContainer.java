@@ -7,17 +7,21 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.ifx.*;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
+//import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
+import frc.robot.commands.auto.DriveOffLine;
+//import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.drive.ArcadeDriveCmd;
@@ -31,9 +35,12 @@ import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+//import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
+//import frc.robot.util.input.GeneralTrigger;
+//import frc.robot.util.input.JoystickTrigger;
 import frc.robot.util.misc.DPadButton;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
 
@@ -55,12 +62,8 @@ public class RobotContainer {
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
 
-  Command tankDriveCmd;
-  Command arcadeDriveCmd;
-
-  // private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
-  // private final AutomaticGearShift autoGearShift = new
-  // AutomaticGearShift(driveTrain, gearShifter);
+  TankDriveCmd tankDriveCmd;
+  ArcadeDriveCmd arcadeDriveCmd;
 
   // Tests to run during test mode
   TestKBSimMode t1;
@@ -74,48 +77,28 @@ public class RobotContainer {
     //cameraSubsystem = new CameraSubsystem();
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
-    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 15000.0, 5.0);
+    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 5.0, 5.0); // low gear ft/s deg/s
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
-    lidar = new Lidar_Subsystem();
     logSubsystem = new Log_Subsystem(5);   // log every 5 frames - 100mS
-
+    
     //Add anything that has logging requirements
-    logSubsystem.add(driveTrain, limelight, lidar);
 
     // Create default commads for driver preference
+    lidar = new Lidar_Subsystem();
+    logSubsystem.add(driveTrain, limelight, lidar);
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
     driveTrain.setDefaultCommand(tankDriveCmd);
 
     // Configure the button bindings
-    /// configureButtonBindings();
-    DustinsButtons();
+    configureButtonBindings();
     DPLTestButtons();
-
-    // CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
-    // CommandScheduler.getInstance().setDefaultCommand(gearShifter, autoGearShift);
-
   }
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be
-   * created by instantiating a {@link GenericHID} or one of its subclasses
-   * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
-   * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
+
   private void configureButtonBindings() {
-    /*
-     * driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
-     * .whileHeld(new MagazineAdjust(intake, true));
-     * driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
-     * .whileHeld(new MagazineAdjust(intake, false));
-     */
-
-  }
-
-  private void DustinsButtons() {
-
+    // Drivers buttons
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new GearToggleCmd(gearShifter));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
@@ -123,17 +106,16 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
 
+    // Assistant's buttons
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
+        .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
+          .whenPressed(new toggleLED(limelight));
     /* FOR AUTO TESTING
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
         .whenPressed(new auto_cmd_group(driverControls, driveTrain, limelight, lidar));
     */
-
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
-          .whenPressed(new toggleLED(limelight));
-
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-        .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
         .whenHeld(new ReverseIntake(intake, -0.5));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ToggleIntakeRaised(intake));
@@ -164,7 +146,7 @@ public class RobotContainer {
       }
     });
 
-    // current limit testing  UP/DOWN on driver Pad
+    // current limit testing UP/DOWN on driver Pad
     DPadButton dUp = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), DPadButton.Direction.UP);
     dUp.toggleWhenPressed(new CommandBase() {
       @Override
@@ -173,34 +155,14 @@ public class RobotContainer {
       }
     });
 
-    DPadButton dDown = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
-                  DPadButton.Direction.DOWN);
-    dDown.whenPressed(new CommandBase() {
+    DPadButton dDown = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver),DPadButton.Direction.DOWN);
+    dDown.toggleWhenPressed(new CommandBase() {
       @Override
       public void initialize() {
         driveTrain.adjustCurrentLimit(-1);
       }
     });
-
-    // Use the DPad to change the motor ramp rate - increasing time will slow down response
-    DPadButton dLeft = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
-    DPadButton.Direction.LEFT);
-    dLeft.toggleWhenPressed(new CommandBase() {
-      @Override
-      public void initialize() {
-        driveTrain.adjustAccelerationLimit(0.1);
-      }
-    });
-
-    DPadButton dRight = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), 
-                  DPadButton.Direction.RIGHT);
-    dRight.whenPressed(new CommandBase() {
-      @Override
-      public void initialize() {
-        driveTrain.adjustAccelerationLimit(-0.1);
-      }
-    });
-
+  
   }
 
   /**
@@ -209,8 +171,9 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
-    //return new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar ).withTimeout(15.0);
+    // An ExampleCommand will run in autonomous
+    // return new CommandBase() {};
+    return new DriveOffLine(driveTrain);
   }
 
   /**

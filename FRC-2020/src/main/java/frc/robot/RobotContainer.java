@@ -94,8 +94,17 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     DPLTestButtons();
+    jasonsButtons();
   }
 
+
+private void jasonsButtons(){
+  driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
+  .whenPressed(new toggleLED(limelight));
+
+  driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+  .whenPressed(new auto_cmd_group(driverControls, driveTrain, limelight, lidar));
+}
 
   private void configureButtonBindings() {
     // Drivers buttons
@@ -106,16 +115,12 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
 
+
+
     // Assistant's buttons
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
-          .whenPressed(new toggleLED(limelight));
-    /* FOR AUTO TESTING
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
-        .whenPressed(new auto_cmd_group(driverControls, driveTrain, limelight, lidar));
-    */
         .whenHeld(new ReverseIntake(intake, -0.5));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ToggleIntakeRaised(intake));

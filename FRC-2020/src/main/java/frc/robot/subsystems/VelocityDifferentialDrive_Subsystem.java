@@ -30,7 +30,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	// Acceleration limits
 	private final double RATE_MAX_SECONDS = 2;
-	private double rateLimit = 0.4; // seconds to max speed/power
+	private double rateLimit = 0.6;     // seconds to max speed/power
 
 	// Chasis details
 	public final double WHEEL_RADIUS = 4; // inches
@@ -57,11 +57,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private VelController rightController;
 
 	// PID coefficients TODO: move these constants
-	private final double kP = 5e-5;
+	private final double kP = 1e-5;
 	private final double kI = 0.0; // 1e-6;
 	private final double kD = 0;
 	private final double kIz = 0;
-	private final double kFF = 0;
+	private final double kFF = 0.0000;
 	private final double kMaxOutput = 1;
 	private final double kMinOutput = -1;
 	
@@ -102,14 +102,15 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	void configureControllers() {
 		final CANSparkMax rMaster = backRight;
 		final CANSparkMax lMaster = backLeft;
-
-		// velocity setup - using RPM speed controller
-		this.leftController = new VelController(lMaster);
-		this.rightController = new VelController(rMaster);
-
+		
 		// factory reset
 		resetControllers();
 
+		// velocity setup - using RPM speed controller, sets pid
+		this.leftController = new VelController(lMaster);
+		this.rightController = new VelController(rMaster);
+
+	
 		// Have motors follow to use Differential Drive
 		err = middleRight.follow(rMaster);
 		sleep(2); // hack to ensure timing
@@ -212,12 +213,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		 * Rotation controls
 		 */
 		// Convert to rad/s split between each wheel
-		double rps = MathUtil.limit(rotDps, 0.0, maxDPS)*(Math.PI/180.0)/2.0;
+		double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
+		rps *= (Math.PI/180.0)/2.0;
 		double vturn_rpm =  (rps * WHEEL_AXLE_DIST) /k;
 		
 		// add in the commanded speed each wheel
-		double vl_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ);
-		double vr_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ);
+		double vl_rpm =  applyDeadZone(rpm + vturn_rpm, RPM_DZ);
+		double vr_rpm = -applyDeadZone(rpm - vturn_rpm, RPM_DZ);
 
 		// command the velocity to the wheels
 		leftController.setReference(vl_rpm);

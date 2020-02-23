@@ -57,11 +57,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private VelController rightController;
 
 	// PID coefficients TODO: move these constants
-	private final double kP = 1e-5;
-	private final double kI = 0.0; // 1e-6;
+	private final double kP = 0.00002;
+	private final double kI = 0.000005;
 	private final double kD = 0;
-	private final double kIz = 0;
-	private final double kFF = 0.0000;
+	private final double kIz = 0.001;
+	private final double kFF = 0.00017;
 	private final double kMaxOutput = 1;
 	private final double kMinOutput = -1;
 	
@@ -81,10 +81,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		this.maxDPS = maxDPS;
 
 		//setup physical units - chassis * gearbox
-		K_low_fps_rpm = K_ft_per_rev * gearbox.K_low / 60.0;
-		K_high_fps_rpm = K_ft_per_rev * gearbox.K_high / 60.0;
+		K_low_fps_rpm = K_ft_per_rev * gearbox.K_low / 60;
+		K_high_fps_rpm = K_ft_per_rev * gearbox.K_high / 60;
 		// compute max RPM for motors, use same for low and high gear
-		maxRPM = 60.0*(maxFPS_lowGear / K_low_fps_rpm);  // [60s/m]*[ft/s]/[ft/rev] = rev/min
+		maxRPM = (maxFPS_lowGear / K_low_fps_rpm);  // [60s/m]*[ft/s]/[ft/rev] = rev/min
 		maxFPSLow = (maxRPM * K_low_fps_rpm);     // max speed in low gear 
 		maxFPSHigh = (maxRPM * K_high_fps_rpm);   // max speed in high gear
 
@@ -139,8 +139,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		rateLimit = MathUtil.limit((rateLimit + deltaRate), 0.0, RATE_MAX_SECONDS);
 		// Just set the ramp limit on the masters
 		leftController.controller.setOpenLoopRampRate(rateLimit);
-		sleep(1);
+		sleep(2);
 		rightController.controller.setOpenLoopRampRate(rateLimit);
+		sleep(2);
+		// Use same rate limit on closed loop too
+		leftController.controller.setClosedLoopRampRate(rateLimit);
+		sleep(2);
+		rightController.controller.setClosedLoopRampRate(rateLimit);
 		SmartDashboard.putNumber("motorRate", rateLimit);
 		return rateLimit;
 	}
@@ -160,7 +165,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		for (final CANSparkMax c : controllers) {
 			// smart current limit
 			c.setSmartCurrentLimit(smartCurrentLimit);
-
+			sleep(2);
 			// Set the secondary current based on the smartCurrent
 			// c.setSecondaryCurrentLimit(secondaryCurrent);
 		}
@@ -214,7 +219,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		 */
 		// Convert to rad/s split between each wheel
 		double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
-		rps *= (Math.PI/180.0)/2.0;
+		rps *= (Math.PI/180.0);
 		double vturn_rpm =  (rps * WHEEL_AXLE_DIST) /k;
 		
 		// add in the commanded speed each wheel
@@ -222,6 +227,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		double vr_rpm = -applyDeadZone(rpm - vturn_rpm, RPM_DZ);
 
 		// command the velocity to the wheels
+
 		leftController.setReference(vl_rpm);
 		rightController.setReference(vr_rpm);
 		dDrive.feed();

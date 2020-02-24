@@ -21,27 +21,31 @@ public class auto_drive_lidar extends CommandBase {
   private final ArcadeDrive drive;
   private final Lidar_Subsystem lidar;
 
-  private final double stopDist; // inches
-  private final double tolerancePct = 2;
+  private final double stopDist; // mm
+  private final double tolerancePct = 100; // mm
   private double angleToleranceDeg = 3;
   private double kInchesToPerPower = 1;
   private double kDegreesToPerPower = -1;
   private double maxSpeed;
   private double angleTarget;
   private double range;
+  private boolean forwards;
   private final double Kp = 0.2, Ki = 0.04, Kd = 0.25;
   private final double Kap = 0.05, Kai = 0.001, Kad = 0.0;
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
 
-
   public auto_drive_lidar(final ArcadeDrive drive, final Lidar_Subsystem lidar, final double stopDist,
-  final double angleTarget, final double maxSpeed) {
+      final double angleTarget, final double maxSpeed, final boolean forwards) {
     this.drive = drive;
     this.lidar = lidar;
-    this.stopDist = stopDist; // inches
+    this.stopDist = stopDist; // mm
     this.maxSpeed = maxSpeed;
     this.angleTarget = angleTarget;
+    this.forwards = forwards;
+
+    if (forwards) kInchesToPerPower = 1;
+    else kInchesToPerPower = -1;
 
     // create the PID with vel and accl limits
     distancePIDController = new PIDController(Kp, Ki, Kd);
@@ -70,25 +74,25 @@ public class auto_drive_lidar extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    range = lidar.getAverageRange() * mm2in;
+    range = lidar.getAverageRange();
     double speedCmd = distancePIDController.calculate(range) * kInchesToPerPower;
     double angleCmd = kDegreesToPerPower * anglePIDController.calculate(lidar.findAngle());
     speedCmd = MathUtil.clamp(speedCmd, -maxSpeed, maxSpeed);
     angleCmd = MathUtil.clamp(angleCmd, -maxSpeed, maxSpeed);
 
-    SmartDashboard.putNumber("PID error (inches)", distancePIDController.getPositionError());
+    SmartDashboard.putNumber("PID error (mm)", distancePIDController.getPositionError());
     SmartDashboard.putNumber("PID Verr", distancePIDController.getVelocityError());
-    SmartDashboard.putNumber("Range (inches)", range);
+    SmartDashboard.putNumber("Range (mm)", range);
     SmartDashboard.putNumber("PID Output (%)", speedCmd);
 
     SmartDashboard.putNumber("PID error (degrees)", anglePIDController.getPositionError());
     SmartDashboard.putNumber("Angle", lidar.findAngle());
     SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
 
-    SmartDashboard.putNumber("Range-Dist", (range-stopDist));
-    SmartDashboard.putNumber("Tolerance", tolerancePct);
+    SmartDashboard.putNumber("Range-Dist (mm)", (range - stopDist));
+    SmartDashboard.putNumber("Tolerance (mm)", tolerancePct);
 
-    drive.arcadeDrive(Math.abs(speedCmd), angleCmd);
+    drive.arcadeDrive(speedCmd, angleCmd);
   }
 
   // Called once the command ends or is interrupted.
@@ -101,8 +105,17 @@ public class auto_drive_lidar extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if ((range-stopDist) <= (tolerancePct))
-      return true;
-    else return false;
+    if (forwards) {
+      if ((range - stopDist) <= (tolerancePct))
+        return true;
+      else
+        return false;
+
+    } else {
+      if ((stopDist - range) <= (tolerancePct))
+        return true;
+      else
+        return false;
+    }
   }
 }

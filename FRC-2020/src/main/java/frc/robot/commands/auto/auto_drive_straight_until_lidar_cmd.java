@@ -5,48 +5,53 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.intake;
+package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.Robot;
+import frc.robot.subsystems.Lidar_Subsystem;
+import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.subsystems.ifx.ArcadeDrive;
 
-public class MagazineAdjust extends CommandBase {
-  private Intake_Subsystem intake;
-  private boolean forward;
-  private static final double strength = 0.8;
+public class auto_drive_straight_until_lidar_cmd extends CommandBase {
   /**
-   * Creates a new MagazineAdjust.
+   * Creates a new auto_drive_straight_until_lidar_cmd.
    */
-  public MagazineAdjust(Intake_Subsystem intake, boolean forward) {
+  private final VelocityDifferentialDrive_Subsystem drive;
+  private final Lidar_Subsystem lidar;
+  private final double speed;
+
+  public auto_drive_straight_until_lidar_cmd(VelocityDifferentialDrive_Subsystem drive, Lidar_Subsystem lidar, double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.intake = intake;
-    this.forward = forward;
+    this.lidar = lidar;
+    this.drive = drive;
+    this.speed = speed;
+
+    addRequirements(drive);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() { 
-    //do the work when the button is pressed, end() called on release
-    if (forward) intake.magazineOn(strength);
-    else intake.magazineOn(-strength);
+  public void initialize() {
+    Robot.command = "Auto Drive Straight";
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //nothing to do, motor is in proper state.
+    drive.arcadeDrive(speed, 0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.magazineOff();
+    drive.arcadeDrive(0, 0);
   }
 
   // Returns true when the command should end.
-  // This command ends with button release.
   @Override
   public boolean isFinished() {
-    return false;
+    return lidar.valid();
   }
 }

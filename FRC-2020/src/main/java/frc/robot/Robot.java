@@ -27,6 +27,9 @@ public class Robot extends TimedRobot {
   //what command robot is running
   public static String command = "none";
 
+    //for auto
+    public static double departureAngle;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.

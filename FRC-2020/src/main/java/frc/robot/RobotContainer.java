@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
-//import frc.robot.commands.drive.shift.ShiftGearCmd;
+import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineAdjust;
@@ -22,6 +22,8 @@ import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.commands.auto.DriveOffLine;
 //import frc.robot.commands.auto.auto_creep_cmd;
+import frc.robot.commands.toggleLED;
+import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
@@ -30,11 +32,13 @@ import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 //import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
+import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
 //import frc.robot.util.input.GeneralTrigger;
 //import frc.robot.util.input.JoystickTrigger;
@@ -50,12 +54,13 @@ import frc.robot.subsystems.hid.XboxControllerButtonCode;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  public final CameraSubsystem cameraSubsystem;
+  //public final CameraSubsystem cameraSubsystem;
   public final HID_Xbox_Subsystem driverControls;
   public final GearShifter gearShifter;
   public final VelocityDifferentialDrive_Subsystem driveTrain;
   public final Intake_Subsystem intake;
   public final Limelight_Subsystem limelight;
+  public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
 
   TankDriveCmd tankDriveCmd;
@@ -70,7 +75,7 @@ public class RobotContainer {
   public RobotContainer() {
     // put driver controls first so its periodic() is called first.
 
-    cameraSubsystem = new CameraSubsystem();
+    //cameraSubsystem = new CameraSubsystem();
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 5.0, 5.0); // low gear ft/s deg/s
@@ -79,20 +84,30 @@ public class RobotContainer {
     logSubsystem = new Log_Subsystem(5);   // log every 5 frames - 100mS
     
     //Add anything that has logging requirements
-    logSubsystem.add(driveTrain, limelight);
 
     // Create default commads for driver preference
+    lidar = new Lidar_Subsystem();
+    logSubsystem.add(driveTrain, limelight, lidar);
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
-    //driveTrain.setDefaultCommand(tankDriveCmd);
+    driveTrain.setDefaultCommand(arcadeDriveCmd);
 
-    driveTrain.setDefaultCommand(new ArcadeVelDriveCmd(driverControls, driveTrain, 2.0, 15.0)); // fps, dps
+    //driveTrain.setDefaultCommand(new ArcadeVelDriveCmd(driverControls, driveTrain, 2.0, 15.0)); // fps, dps
 
     // Configure the button bindings
     configureButtonBindings();
     DPLTestButtons();
+    jasonsButtons();
   }
 
+
+private void jasonsButtons(){
+  driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
+  .whenPressed(new toggleLED(limelight));
+
+  driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+  .whenPressed(new auto_cmd_group(driverControls, driveTrain, limelight, lidar));
+}
 
   private void configureButtonBindings() {
     // Drivers buttons
@@ -102,6 +117,8 @@ public class RobotContainer {
         .whenPressed(new InvertDriveControls(driverControls));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
+
+
 
     // Assistant's buttons
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())

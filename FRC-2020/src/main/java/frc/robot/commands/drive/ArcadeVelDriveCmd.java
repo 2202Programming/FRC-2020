@@ -8,21 +8,28 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.ifx.ArcadeDrive;
 import frc.robot.subsystems.ifx.DriverControls;
+import frc.robot.subsystems.ifx.VelocityDrive;
 
 public class ArcadeVelDriveCmd extends CommandBase {
   DriverControls dc;
-  ArcadeDrive drive;
+  VelocityDrive drive;
 
-  //max speeds allowed
-  double vMax;    //fps
-  double rotMax;  //deg per sec
+  // max speeds allowed
+  double vMax; // fps
+  double rotMax; // deg per sec
 
   /**
-   * Creates a new ArcadeVelDriveCmd.
+   * Creates a new ArcadeVelDriveCmd to drive the system using physical
+   * units of speed and rotaion to command the chassis. This will map 
+   * DriverControls using normalized stick inputs in Arcade mode.
+   * 
+   * @param dc           - driver controls IFX
+   * @param driveTrain   - drive train that supports VelocityDrive
+   * @param velMaxFps    - max FPS scales normalized stick value
+   * @param rotMaxDps    - rotation max, scales normalized stick value
    */
-  public ArcadeVelDriveCmd(DriverControls dc, ArcadeDrive driveTrain, double velMaxFps, double rotMaxDps) {
+  public ArcadeVelDriveCmd(DriverControls dc, VelocityDrive driveTrain, double velMaxFps, double rotMaxDps) {
     this.dc = dc;
     this.drive = driveTrain;
     this.vMax = velMaxFps;
@@ -33,6 +40,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    drive.resetPosition();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -43,15 +51,10 @@ public class ArcadeVelDriveCmd extends CommandBase {
     double rot = dc.getRotation();
 
     // scale inputs based on max commands
-    v *=vMax;
-    rot *=rotMax;
+    v *= vMax;
+    rot *= rotMax;
 
     drive.velocityArcadeDrive(v, rot);
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
   }
 
   // This command should never end, it can be a default command

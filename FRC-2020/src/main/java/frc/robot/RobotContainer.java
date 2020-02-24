@@ -97,13 +97,6 @@ public class RobotContainer {
     jasonsButtons();
   }
 
-  private void jasonsButtons() {
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
-        .whenPressed(new toggleLED(limelight));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
-        .whenPressed(new auto_cmd_group(driverControls, driveTrain, limelight, lidar));
-  }
-
 private void jasonsButtons(){
   driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
   .whenPressed(new toggleLED(limelight));

@@ -15,14 +15,15 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import frc.robot.Constants;
-import frc.robot.Gains;
+import frc.robot.subsystems.ifx.Logger;
+import frc.robot.util.misc.Gains;
 //import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Spark;
 
 /**
  * motorStrength should be between -1 and 1 for all methods
  */
-public class Intake_Subsystem extends SubsystemBase {
+public class Intake_Subsystem extends SubsystemBase implements Logger {
   /**
    * Creates a new Intake_Subsystem.
    * 
@@ -206,6 +207,12 @@ public class Intake_Subsystem extends SubsystemBase {
   public void shooterOff() {
     shooterIsOn = false;
     upper_shooter.set(ControlMode.PercentOutput, 0);
+  }
+
+  @Override
+  public void log() {
+   // Put any useful log message here, called about 10x per second
+
   }
 
 

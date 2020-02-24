@@ -1,4 +1,4 @@
-package frc.robot.util.misc;
+package frc.robot.subsystems.hid;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Button;

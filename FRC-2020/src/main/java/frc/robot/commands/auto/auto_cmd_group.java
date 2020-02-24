@@ -40,16 +40,35 @@ public class auto_cmd_group extends SequentialCommandGroup {
 
         delay = startDelay[delayCode];
 
-        addCommands(new auto_creep_area_cmd(drive, limelight, lidar, -9, 0.4, 0.2, 2.5, true),
-                new auto_drive_straight_until_lidar_cmd(drive, lidar, 0.2), 
+        addCommands(
+                //Move forward using limelight to a certain limelight area(distance estimate)
+                new auto_creep_area_cmd(drive, limelight, lidar, -9, 0.4, 0.2, 2.5, true), 
+
+                //Drive open loop forward until lidar valid
+                new auto_drive_straight_until_lidar_cmd(drive, lidar, 0.2),
+                
+                //Set global variable for current angle with lidar, to help with later retreat angle
                 new set_departure_angle(lidar.findAngle()),
+
+                //Drive forward at fixed angle using lidar
                 new auto_drive_lidar(drive, lidar, 600, Robot.departureAngle, 0.1, true),
+
+                //Drive forward rest of the way at angle zero (flatten to wall)
                 new auto_drive_lidar(drive, lidar, 400, 0, 0.07, true),
+
+                //Deploy balls
                 new ShooterOn(intake, 1200, 0.4).withTimeout(2.0), // turn shooter on for 2 seconds 1200 rpm
+
+                //Retreat at angle zero for fixed amount of time (limelight doesn't work too close to wall due to washout)
                 new auto_drive_lidar(drive, lidar, 700, 0, 0.2, false).withTimeout(2),
-                // new auto_drive_lidar(drive, lidar, 700, Robot.departureAngle, 0.2, false)
+
+                //Drive backwards until limelight valid
                 new auto_drive_straight_until_limelight_cmd(drive, lidar, limelight, -0.2),
+
+                //Drive backwards open loop a bit to make sure limelight is fully in view
                 new auto_drive_straight_cmd(drive, lidar, -0.2).withTimeout(2),
+
+                //Drive backwards at angle (departure angle?) until limelight area small enough (far enough)
                 new auto_creep_area_cmd(drive, limelight, lidar, -15, 0.3, 0.2, 1.6, false)
 
         );

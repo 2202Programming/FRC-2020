@@ -10,7 +10,6 @@ package frc.robot.subsystems.hid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.hid.KBSimStick.Axis;
 import frc.robot.subsystems.ifx.DriverControls;
-import frc.robot.util.ExpoShaper;
 
 public class HID_KBStick_Subsystem extends SubsystemBase implements DriverControls {
   KBSimStick driver;

@@ -12,7 +12,7 @@ import java.util.HashMap;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.util.input.JoystickTrigger;
+import frc.robot.subsystems.hid.JoystickTrigger;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public interface DriverControls extends Subsystem {

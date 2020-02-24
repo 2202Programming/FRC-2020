@@ -17,13 +17,16 @@ public class SwitchDriveMode extends InstantCommand {
   }
 
   public void initialize() {
+    Command oldCmd = driveTrain.getDefaultCommand();
     if (isArcade) {
         driveTrain.setDefaultCommand(tankCmd);
-        arcadeCmd.cancel();
     } else {
         driveTrain.setDefaultCommand(arcadeCmd);
-        tankCmd.cancel();
     }
+    // should allow switchout of any default being used
+    oldCmd.cancel();
+    
+    //update state
     isArcade = !isArcade;
   }
 }

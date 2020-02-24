@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
-//import frc.robot.commands.drive.shift.ShiftGearCmd;
+import frc.robot.commands.drive.shift.ShiftGearCmd;
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineAdjust;
@@ -90,9 +90,9 @@ public class RobotContainer {
     logSubsystem.add(driveTrain, limelight, lidar);
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
-    //driveTrain.setDefaultCommand(tankDriveCmd);
+    driveTrain.setDefaultCommand(arcadeDriveCmd);
 
-    driveTrain.setDefaultCommand(new ArcadeVelDriveCmd(driverControls, driveTrain, 2.0, 15.0)); // fps, dps
+    //driveTrain.setDefaultCommand(new ArcadeVelDriveCmd(driverControls, driveTrain, 2.0, 15.0)); // fps, dps
 
     // Configure the button bindings
     configureButtonBindings();

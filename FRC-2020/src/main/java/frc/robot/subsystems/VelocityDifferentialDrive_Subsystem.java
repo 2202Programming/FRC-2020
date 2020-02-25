@@ -18,7 +18,7 @@ import static frc.robot.Constants.*;
 
 import java.util.concurrent.TimeUnit;
 
-public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive {
+public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive, Shifter {
 	// Current Limits
 	private final int SMARTCURRENT_MAX = 60;
 	private int smartCurrentLimit = 35; // amps
@@ -66,10 +66,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final double kMinOutput = -1;
 
 	// Calculated based on desired low-gear max ft/s
-	private final double maxFPSLow; // max linear speed in ft/s low gear
-	private final double maxFPSHigh; //
-	private final double maxDPS; // max rotation in deg/sec around Z axis
-	private final double maxRPM; // max motor RPM low & high
+	private final double maxFPS_Low;   // max linear speed in ft/s low gear
+	private final double maxFPS_High;  //
+	private final double maxDPS;       // max rotation in deg/sec around Z axis
+	private final double maxRPM_Low;   // max motor RPM low & high
+	private final double maxRPM_High;  // max motor RPM low & high
 
 	private final DifferentialDrive dDrive;
 	private GearShifter gearbox;
@@ -77,19 +78,22 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxFPS_lowGear,
-			final double maxDPS) {
+			final double maxFPS_highGear, final double maxDPS) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
 		this.gearbox = gear;
 		this.maxDPS = maxDPS;
-		this.requestedGear = gearbox.getCurGear();
+		this.requestedGear = gearbox.getCurrentGear();
 
 		// setup physical units - chassis * gearbox
 		K_low_fps_rpm = K_ft_per_rev * gearbox.K_low / 60;
 		K_high_fps_rpm = K_ft_per_rev * gearbox.K_high / 60;
 		// compute max RPM for motors, use same for low and high gear
-		maxRPM = (maxFPS_lowGear / K_low_fps_rpm); // [60s/m]*[ft/s]/[ft/rev] = rev/min
-		maxFPSLow = (maxRPM * K_low_fps_rpm); // max speed in low gear
-		maxFPSHigh = (maxRPM * K_high_fps_rpm); // max speed in high gear
+		maxRPM_Low = (maxFPS_lowGear / K_low_fps_rpm); // [60s/m]*[ft/s]/[ft/rev] = rev/min
+		maxRPM_High =(maxFPS_highGear / K_high_fps_rpm);
+		
+		//check the math -save 
+		maxFPS_Low = (maxRPM_Low * K_low_fps_rpm);       // max speed in low gear
+		maxFPS_High = (maxRPM_High * K_high_fps_rpm);    // max speed in high gear
 
 		// setup SparkMax controllers, sets left and right masters
 		configureControllers();
@@ -185,20 +189,20 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	// rotationRate deg/sec
 	public void velocityArcadeDrive(final double velFps, final double rotDps) {
 		// used to handle shifting request
-		Gear currentGear = gearbox.getCurGear(); 
+		Gear currentGear = gearbox.getCurrentGear(); 
 		boolean shifting = (currentGear != requestedGear);
-		//TODO: finish shifting logic
+		//shifting 
+		if (shifting) {
+			// do math on new gear to match RPM of new Vel Cmd
+			currentGear = requestedGear;   
+		}
 
 		// Spark Max uses RPM for velocity closed loop mode
 		// so we need to convert ft/s to RPM command which is dependent
 		// on the gear ratio.
-		double k = K_low_fps_rpm;
-		double maxSpeed = maxFPSLow;
-
-		if (currentGear == Gear.HIGH_GEAR) {
-			k = K_high_fps_rpm;
-			maxSpeed = maxFPSHigh;
-		}
+		double k = getFPSperRPM(currentGear);
+		double maxSpeed = getMaxSpeed(currentGear);
+		
 		// limit vel to max for the gear ratio
 		double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
 		double rpm = vcmd / k;
@@ -215,13 +219,18 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		double vl_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ);
 		double vr_rpm = -applyDeadZone(rpm - vturn_rpm, RPM_DZ);
 
+		/* debugging
 		double v_test = getLeftVel(false);
 		double v_err = v_test - vl_rpm;
-
+		*/
+		
 		// command the velocity to the wheels
 		leftController.setReference(vl_rpm);
 		rightController.setReference(vr_rpm);
 		dDrive.feed();
+		
+		//shifts the gears if needed
+		shiftGears();
 	}
 
 	public void arcadeDrive(final double xSpeed, final double zRotation) {
@@ -233,12 +242,20 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	/**
-	 * getMaxSpeed based on current gear and RPM limits set on motors.
+	 * getMaxSpeed based on gear and RPM limits set on motors.
 	 * 
 	 * @return max speed in ft/s
 	 */
-	public double getMaxSpeed() {
-		return (gearbox.getCurGear() == Gear.HIGH_GEAR) ? maxFPSHigh : maxFPSLow;
+	public double getMaxSpeed( Gear gear) {
+		return (gear == Gear.HIGH_GEAR) ? maxFPS_High : maxFPS_Low;
+	}
+
+	private double getFPSperRPM(Gear gear) {
+		return (gear == Gear.HIGH_GEAR) ?  K_high_fps_rpm : K_low_fps_rpm;
+	}
+
+	private double getMaxRPM(Gear gear) {
+		return (gear == Gear.HIGH_GEAR) ? maxRPM_High : maxRPM_Low;
 	}
 
 	public double getLeftPos() {
@@ -247,17 +264,18 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	public double getLeftVel(final boolean normalized) {
 		double vel = leftController.get();
+		double maxRPM = getMaxRPM(getCurrentGear());
 		vel = (normalized) ? (vel / maxRPM) : vel;
 		return vel;
 	}
 
 	public double getRightPos() {
 		return K_ft_per_rev * rightController.getPosition();
-
 	}
 
 	public double getRightVel(final boolean normalized) {
 		double vel = rightController.get();
+		double maxRPM = getMaxRPM(getCurrentGear());
 		vel = (normalized) ? (vel / maxRPM) : vel;
 		return vel;
 	}
@@ -273,7 +291,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 */
 	void shiftGears() {
 		// do nothing if gears match
-		if (requestedGear == gearbox.getCurGear()) return;
+		if (requestedGear == gearbox.getCurrentGear()) return;
 		
 		// shift based on requested
 		if (requestedGear == Gear.LOW_GEAR) {
@@ -296,7 +314,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public Gear getCurrentGear() {
-		return gearbox.getCurGear();
+		return gearbox.getCurrentGear();
 	}
 
 	public void log() {

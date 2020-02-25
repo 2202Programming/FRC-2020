@@ -20,7 +20,7 @@ import frc.robot.Constants;
 public class Control_Panel extends SubsystemBase {
     private WPI_TalonSRX rotationMotor = new WPI_TalonSRX(Constants.PANEL_ROTATION_CANID);
     // DistPerPulse: 1040, minRate: 10, maxPeriod: 50, sampleAverage: 20
-    private DoubleSolenoid extensionSol = new DoubleSolenoid(Constants.PANEL_PISTON_FORWARD_PCM,
+    private DoubleSolenoid extensionSol = new DoubleSolenoid(Constants.PCM_ID, Constants.PANEL_PISTON_FORWARD_PCM,
             Constants.PANEL_PISTON_REVERSE_PCM);
             
     /* Initialization */

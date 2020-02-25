@@ -23,7 +23,6 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private Color_Subsystem m_color;
   private long lastLogTime;
 
   /**
@@ -56,7 +55,7 @@ public class Robot extends TimedRobot {
     // m_color.updateColorSensor();
     
     if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
-      m_color.printLog();
+      m_robotContainer.detector.printLog();
       lastLogTime = System.currentTimeMillis();
     }
 

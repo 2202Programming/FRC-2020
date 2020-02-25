@@ -81,14 +81,16 @@ public class Color_Subsystem extends SubsystemBase {
   }
 
   public void printLog(){
-    double[] rgb = getRgb();
 
+    SmartDashboard.putString("Color Sensor", m_colorSensor.toString());
+
+    double[] rgb = getRgb();
     SmartDashboard.putString("Color Match", getColor());
     SmartDashboard.putNumber("Color Match Confidence", getMatchConfidence());
     SmartDashboard.putNumber("Red", rgb[0]);
     SmartDashboard.putNumber("Green", rgb[1]);
     SmartDashboard.putNumber("Blue", rgb[2]);
-    SmartDashboard.putNumber("Color Sensor Proximity", getProximity());
+    SmartDashboard.putNumber("Color Sensor Proximity", getProximity()); 
   }
 
 

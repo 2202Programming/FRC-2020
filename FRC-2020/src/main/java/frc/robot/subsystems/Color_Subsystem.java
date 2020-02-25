@@ -31,37 +31,22 @@ public class Color_Subsystem extends SubsystemBase {
   private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
   private final ColorMatch m_colorMatcher = new ColorMatch();
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
-  private Color detectedColor;
-  private ColorMatchResult match;
-  private int proximity;
-  private double lastSensorCheckTime;
 
   public Color_Subsystem() {
     m_colorMatcher.addColorMatch(kBlueTarget);
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
     m_colorMatcher.addColorMatch(kYellowTarget);
-    lastSensorCheckTime = System.currentTimeMillis();
-    detectedColor = Color.kAqua;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    updateColorSensor();
-  }
-
-  public void updateColorSensor(){
-    if ((lastSensorCheckTime + Constants.COLOR_SAMPLE_TIME) < System.currentTimeMillis()) { //don't check color sensor too often
-      detectedColor = m_colorSensor.getColor();
-      match = m_colorMatcher.matchClosestColor(detectedColor);
-      proximity = m_colorSensor.getProximity();
-      lastSensorCheckTime = System.currentTimeMillis();
-    }
   }
 
 
   public String getColor(){
+    ColorMatchResult match = m_colorMatcher.matchClosestColor(m_colorSensor.getColor());
     /**
      * Run the color match algorithm on our detected color
      */
@@ -83,18 +68,23 @@ public class Color_Subsystem extends SubsystemBase {
   }
 
   public double[] getRgb(){
-      return new double[] {detectedColor.red, detectedColor.green, detectedColor.blue};
+    Color detectedColor = m_colorSensor.getColor();
+    return new double[] {detectedColor.red, detectedColor.green, detectedColor.blue};
   }
 
   public int getProximity(){
-    return proximity;
+    return m_colorSensor.getProximity();
+  }
+
+  public double getMatchConfidence() {
+    return m_colorMatcher.matchClosestColor(m_colorSensor.getColor()).confidence;
   }
 
   public void printLog(){
     double[] rgb = getRgb();
 
-    //SmartDashboard.putString("Color Match", getColor());
-    //SmartDashboard.putNumber("Color Confidence", match.confidence);
+    SmartDashboard.putString("Color Match", getColor());
+    SmartDashboard.putNumber("Color Match Confidence", getMatchConfidence());
     SmartDashboard.putNumber("Red", rgb[0]);
     SmartDashboard.putNumber("Green", rgb[1]);
     SmartDashboard.putNumber("Blue", rgb[2]);

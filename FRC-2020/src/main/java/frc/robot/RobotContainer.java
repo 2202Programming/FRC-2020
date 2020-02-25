@@ -33,11 +33,11 @@ import frc.robot.subsystems.GearShifter.Gear;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain driveTrain = new Drivetrain();
+  //private final Drivetrain driveTrain = new Drivetrain();
   private static final Color_Subsystem detector = new Color_Subsystem();
-  private final GearShifter gearShifter = new GearShifter();
+  //private final GearShifter gearShifter = new GearShifter();
   public static final XboxController driver = new XboxController(0);
-  private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
+  //private final ArcadeDrive arcade = new ArcadeDrive(driveTrain, driver);
   private final Control_Panel panel = new Control_Panel();
 
   /**
@@ -46,7 +46,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-    CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
+    //CommandScheduler.getInstance().setDefaultCommand(driveTrain, arcade);
   }
 
   /**

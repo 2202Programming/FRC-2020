@@ -41,12 +41,14 @@ public class Color_Subsystem extends SubsystemBase {
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
     m_colorMatcher.addColorMatch(kYellowTarget);
-    lastSensorCheckTime = System.currentTimeMillis();  
+    lastSensorCheckTime = System.currentTimeMillis();
+    detectedColor = Color.kAqua;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    updateColorSensor();
   }
 
   public void updateColorSensor(){
@@ -91,8 +93,8 @@ public class Color_Subsystem extends SubsystemBase {
   public void printLog(){
     double[] rgb = getRgb();
 
-    SmartDashboard.putString("Color Match", getColor());
-    SmartDashboard.putNumber("Color Confidence", match.confidence);
+    //SmartDashboard.putString("Color Match", getColor());
+    //SmartDashboard.putNumber("Color Confidence", match.confidence);
     SmartDashboard.putNumber("Red", rgb[0]);
     SmartDashboard.putNumber("Green", rgb[1]);
     SmartDashboard.putNumber("Blue", rgb[2]);

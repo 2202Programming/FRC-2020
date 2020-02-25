@@ -18,10 +18,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Control_Panel extends SubsystemBase {
-    private WPI_TalonSRX rotationMotor = new WPI_TalonSRX(Constants.CLIMB_ROTATION_CANID);
+    private WPI_TalonSRX rotationMotor = new WPI_TalonSRX(Constants.PANEL_ROTATION_CANID);
     // DistPerPulse: 1040, minRate: 10, maxPeriod: 50, sampleAverage: 20
-    private DoubleSolenoid extensionSol = new DoubleSolenoid(Constants.CLIMB_PISTON_FORWARD_PCM,
-            Constants.CLIMB_PISTON_REVERSE_PCM);
+    private DoubleSolenoid extensionSol = new DoubleSolenoid(Constants.PANEL_PISTON_FORWARD_PCM,
+            Constants.PANEL_PISTON_REVERSE_PCM);
             
     /* Initialization */
     public Control_Panel() {

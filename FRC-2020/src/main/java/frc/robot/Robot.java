@@ -56,7 +56,7 @@ public class Robot extends TimedRobot {
     // m_color.updateColorSensor();
     
     if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
-      // m_color.printLog();
+      //m_color.printLog();
       lastLogTime = System.currentTimeMillis();
     }
 

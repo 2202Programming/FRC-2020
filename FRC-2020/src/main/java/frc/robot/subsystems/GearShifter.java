@@ -14,8 +14,8 @@ public class GearShifter extends SubsystemBase {
     private boolean autoShiftEnabled = false;
     
     public enum Gear {
-        HIGH_GEAR(DoubleSolenoid.Value.kForward), 
-        LOW_GEAR(DoubleSolenoid.Value.kReverse);
+        LOW_GEAR(DoubleSolenoid.Value.kForward),    // dpl - fliped assignment to match comp bot 2/24/20
+        HIGH_GEAR(DoubleSolenoid.Value.kReverse);
 
         private final DoubleSolenoid.Value gearCode;    
 

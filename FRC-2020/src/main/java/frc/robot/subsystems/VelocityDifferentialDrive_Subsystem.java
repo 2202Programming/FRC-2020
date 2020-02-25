@@ -35,7 +35,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	// Chasis details
 	public final double WHEEL_RADIUS = 7.5/2.0; // inches
 	private final double WHEEL_AXLE_DIST = 25.5 / 12.0; // feet
-	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // rev/feet
+	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // feet/rev
 	private final double K_low_fps_rpm; // Low gear ft/s / rpm of motor shaft
 	private final double K_high_fps_rpm; // High gear ft/s /rpm of motor shaft
 

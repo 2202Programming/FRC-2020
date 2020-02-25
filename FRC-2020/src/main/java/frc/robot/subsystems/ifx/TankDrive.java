@@ -5,20 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.subsystems;
-
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-public class ExampleSubsystem extends SubsystemBase {
-  /**
-   * Creates a new ExampleSubsystem.
-   */
-  public ExampleSubsystem() {
-
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+package frc.robot.subsystems.ifx;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+/**
+ *  Any subsystem that can handle normalized tank commands
+ */
+public interface TankDrive extends Subsystem {
+    public void tankDrive(double xSpeed, double ySpeed);
 }

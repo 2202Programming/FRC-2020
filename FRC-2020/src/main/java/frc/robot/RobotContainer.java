@@ -9,10 +9,13 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.SimpPositionControl;
+import frc.robot.commands.SimpRotateControl;
 import frc.robot.commands.drive.ArcadeDrive;
 import frc.robot.commands.drive.shift.ShiftGear;
 import frc.robot.subsystems.Color_Subsystem;
@@ -53,8 +56,11 @@ public class RobotContainer {
    * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(driver, 4).whenPressed(() -> new ShiftGear(gearShifter, Gear.HIGH_GEAR));
-    new JoystickButton(driver, 1).whenPressed(() -> new ShiftGear(gearShifter, Gear.LOW_GEAR));
+    new JoystickButton(driver, Button.kB.value).whenPressed(new SimpRotateControl(panel));
+    new JoystickButton(driver, Button.kY.value).whenPressed(new SimpPositionControl(panel, detector));
+    new JoystickButton(driver, Button.kA.value).whenPressed(() -> panel.setSpeed(0.5)).whenReleased(() -> panel.setSpeed(0));
+    new JoystickButton(driver, Button.kBumperLeft.value).whenPressed(() -> panel.extendArm());
+    new JoystickButton(driver, Button.kBumperRight.value).whenPressed(() -> panel.retractArm());
   }
 
   /**

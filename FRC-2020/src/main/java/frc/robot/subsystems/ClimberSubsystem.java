@@ -1,90 +1,80 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.*;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import frc.robot.util.misc.Gains;
+import frc.robot.util.misc.MathUtil;
 
+import static frc.robot.Constants.*;
 
 /**
  * Subsystem that manages the climbing arm motors.
  */
 public class ClimberSubsystem extends SubsystemBase
 {
-    //region
-    private DoubleSolenoid armSolenoid = new DoubleSolenoid(6, 7); //Arm valves TODO:put in constants
-    //endregion
+    private DoubleSolenoid armSolenoid = new DoubleSolenoid(CLIMBER_PCM_CAN_ID, 
+                ARMSOLENOID_LOW_CANID, ARMSOLENOID_HIGH_CANID);
+        
+    private final TalonSRX eRotServo = new TalonSRX(CLIMB_ARM_TALON_CANID); // Arm rotation motor 
+    private final ControlMode eRotMode = ControlMode.Position;
+    private final int countsPerRotation = 4096;
+    private final int PID_SLOT = 0;
+    private final int kTO = 0;      // comms timeout for Talons
+    Gains eRotGains = new Gains(0.2, 0, 0, 0, 0, 0);
+    private final int posErrorLimit = 20;  // sensor counts
+    private final double kGearing = 200.0; // motor rev to arm rev todo:fix gearing
+    private final double kCounts_deg = countsPerRotation * kGearing / 90.0;  // 
 
-    //region Motors
-    private TalonSRX eRotServo = new TalonSRX(18); // Arm rotation motor TODO:put in constants
-    private ControlMode mode = ControlMode.Position;
-    private int countsPerRotation = 4096;
     
     private CANSparkMax wnSparkMax = new CANSparkMax(WN_SPARKMAX_CANID, MotorType.kBrushless); //Winch motor - extend / retract arm
-    //endregion
 
     public ClimberSubsystem() 
     {
         armSolenoid.set(DoubleSolenoid.Value.kOff);
-        configureTalon(false, kp, ki, kd, kf);
+        configureTalon(eRotServo, PID_SLOT, eRotGains, false);
 
-        eRotServo.set(0);
         wnSparkMax.set(0);
         wnSparkMax.setIdleMode(IdleMode.kBrake);
     }
 
-    void configureTalon(double kp, double ki, double kd, double kf){
-		eRotServo.i(port,reverse);
-		mode = ControlMode.Position;
-		part.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-		part.config_kP(0, kp, 0);
-		part.config_kI(0, ki, 0);
-		part.config_kD(0, kd, 0);
-		part.config_kF(0, kf, 0);
-		countsPerRotation = 4096;
-		part.setIntegralAccumulator(0.0,0,0);
-		part.setSelectedSensorPosition(0, 0, 0);
+    void configureTalon(TalonSRX c, int slot, Gains g, boolean invert) {
+        // setup the closed loop pid in the Talon
+        c.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, slot, kTO);
+        c.setInverted(invert);
+		c.config_kP(slot, g.kP, kTO);
+		c.config_kI(slot, g.kI, kTO);
+		c.config_kD(slot, g.kD, kTO);
+		c.config_kF(slot, g.kF, kTO);
+        c.config_IntegralZone(slot, g.kIzone, kTO);
+		c.configClosedLoopPeakOutput(slot, g.kPeakOutput, kTO);
+		c.configAllowableClosedloopError(slot, posErrorLimit, kTO);
+
+        resetTalonPosition(c, slot);
+	}
+    
+    void resetTalonPosition(TalonSRX c, int slot){
+		c.setIntegralAccumulator(0.0, slot, kTO);
+		c.setSelectedSensorPosition(0, slot, kTO);
 	}
 
-
     /**
-     * Takes in a number and clamps it so it's min is -1 and it's max is 1
-     * @param in Input number
-     * @return Clamped value
+     * Set the position of the arm rotation using Talon position control
+     * Units should be degrees.
+     * @param pos
      */
-    private double validateDouble(double in)
-    {
-        if (in < -1)
-        {
-            return -1;
-        }
-
-        else if (in > 1)
-        {
-            return 1;
-        }
-
-        else
-        {
-            return in;
-        }
-    }
-
-    /**
-     * Set the position of the arm rotation servo
-     * @param speed The position to unfold the arm to (between 0 - full left, and 1 - full right)
-     */
-    public void setRotPos(double pos)
-    {
-        eRotServo.setPosition(pos); //Set servo position
+    public void setRotPos(double pos) 
+    {   
+        double feedFwdTerm = 0.0;  // could be func of pos
+        pos *= kCounts_deg;        // scale to count target
+        eRotServo.set(eRotMode, pos, DemandType.ArbitraryFeedForward, feedFwdTerm);  //Set servo position
     }
 
     /**
@@ -95,7 +85,7 @@ public class ClimberSubsystem extends SubsystemBase
      */
     public void setWinchSpeed(double speed)
     {
-        speed = validateDouble(speed);
+        speed = MathUtil.limit(speed, -1.0, 1.0);
         wnSparkMax.set(speed); //Set motor speed
     }
 
@@ -129,7 +119,7 @@ public class ClimberSubsystem extends SubsystemBase
 
     public void log()
     {
-        SmartDashboard.putNumber("Arm rotation position", eRotServo.get());
+        SmartDashboard.putNumber("Arm rotation position", eRotServo.getSelectedSensorPosition());
         SmartDashboard.putNumber("Winch speed", wnSparkMax.get());
     }
 }

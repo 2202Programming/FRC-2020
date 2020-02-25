@@ -33,8 +33,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private double rateLimit = 0.6; // seconds to max speed/power
 
 	// Chasis details
-	public final double WHEEL_RADIUS = 4; // inches
-	private final double WHEEL_AXLE_DIST = 30.0 / 12.0; // feet
+	public final double WHEEL_RADIUS = 7.5/2.0; // inches
+	private final double WHEEL_AXLE_DIST = 25.5 / 12.0; // feet
 	private final double K_ft_per_rev = (2.0 * Math.PI * WHEEL_RADIUS) / 12.0; // rev/feet
 	private final double K_low_fps_rpm; // Low gear ft/s / rpm of motor shaft
 	private final double K_high_fps_rpm; // High gear ft/s /rpm of motor shaft
@@ -215,8 +215,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		double vl_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ);
 		double vr_rpm = -applyDeadZone(rpm - vturn_rpm, RPM_DZ);
 
-		// command the velocity to the wheels
+		double v_test = getLeftVel(false);
+		double v_err = v_test - vl_rpm;
 
+		// command the velocity to the wheels
 		leftController.setReference(vl_rpm);
 		rightController.setReference(vr_rpm);
 		dDrive.feed();
@@ -231,7 +233,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	/**
-	 * getMaxSpee based on current gear and RPM limits set on motors.
+	 * getMaxSpeed based on current gear and RPM limits set on motors.
 	 * 
 	 * @return max speed in ft/s
 	 */

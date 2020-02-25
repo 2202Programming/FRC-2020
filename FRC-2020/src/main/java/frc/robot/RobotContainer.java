@@ -89,7 +89,7 @@ public class RobotContainer {
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
     velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, 2.0, 15.0); // fps, dps
 
-    driveTrain.setDefaultCommand(arcadeDriveCmd);
+    driveTrain.setDefaultCommand(velDriveCmd);
 
     // Configure the button bindings
     configureButtonBindings();

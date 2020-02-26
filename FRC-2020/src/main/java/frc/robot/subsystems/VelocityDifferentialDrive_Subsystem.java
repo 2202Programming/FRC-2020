@@ -57,19 +57,19 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private VelController rightController;
 
 	// PID coefficients
-	private final double kP = 0.00002;
-	private final double kI = 0.000005;
+	private final double kP = 0.00005;
+	private final double kI = 0.000006;
 	private final double kD = 0;
-	private final double kIz = 0.001;
-	private final double kFF = 0.00017;
+	private final double kIz = 0.01;
+	private final double kFF = 0.00025;
 	private final double kMaxOutput = 1;
 	private final double kMinOutput = -1;
 
 	// Calculated based on desired low-gear max ft/s
-	private final double maxFPS_Low;   // max linear speed in ft/s low gear
-	private final double maxFPS_High;  //
+	private final double maxFPS_High;  // Assigned
+	private final double maxFPS_Low;   // using HIGH gear RPM
 	private final double maxDPS;       // max rotation in deg/sec around Z axis
-	private final double maxRPM_Low;   // max motor RPM low & high
+	//private final double maxRPM_Low;   // max motor RPM low & high
 	private final double maxRPM_High;  // max motor RPM low & high
 
 	private final DifferentialDrive dDrive;
@@ -77,23 +77,19 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private Gear requestedGear; 
 	
 
-	public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxFPS_lowGear,
-			final double maxFPS_highGear, final double maxDPS) {
+	public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxFPS, final double maxDPS) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
 		this.gearbox = gear;
 		this.maxDPS = maxDPS;
 		this.requestedGear = gearbox.getCurrentGear();
+		this.maxFPS_High = maxFPS;
 
 		// setup physical units - chassis * gearbox
 		K_low_fps_rpm = K_ft_per_rev * gearbox.K_low / 60;
 		K_high_fps_rpm = K_ft_per_rev * gearbox.K_high / 60;
-		// compute max RPM for motors, use same for low and high gear
-		maxRPM_Low = (maxFPS_lowGear / K_low_fps_rpm); // [60s/m]*[ft/s]/[ft/rev] = rev/min
-		maxRPM_High =(maxFPS_highGear / K_high_fps_rpm);
-		
-		//check the math -save 
-		maxFPS_Low = (maxRPM_Low * K_low_fps_rpm);       // max speed in low gear
-		maxFPS_High = (maxRPM_High * K_high_fps_rpm);    // max speed in high gear
+		// compute max RPM for motors
+		maxRPM_High = (maxFPS / K_high_fps_rpm); 
+		maxFPS_Low = (maxRPM_High * K_low_fps_rpm);
 
 		// setup SparkMax controllers, sets left and right masters
 		configureControllers();
@@ -201,7 +197,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// so we need to convert ft/s to RPM command which is dependent
 		// on the gear ratio.
 		double k = getFPSperRPM(currentGear);
-		double maxSpeed = getMaxSpeed(currentGear);
+		double maxSpeed = maxFPS_High;   //getMaxSpeed(currentGear);
 		
 		// limit vel to max for the gear ratio
 		double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
@@ -234,10 +230,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void arcadeDrive(final double xSpeed, final double zRotation) {
+		shiftGears();
 		dDrive.arcadeDrive(xSpeed, zRotation, false);
 	}
 
 	public void tankDrive(final double leftSpeed, final double rightSpeed) {
+		shiftGears();
 		dDrive.tankDrive(leftSpeed, rightSpeed, false);
 	}
 
@@ -254,18 +252,15 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		return (gear == Gear.HIGH_GEAR) ?  K_high_fps_rpm : K_low_fps_rpm;
 	}
 
-	private double getMaxRPM(Gear gear) {
-		return (gear == Gear.HIGH_GEAR) ? maxRPM_High : maxRPM_Low;
-	}
 
 	public double getLeftPos() {
 		return K_ft_per_rev * leftController.getPosition();
 	}
 
 	public double getLeftVel(final boolean normalized) {
-		double vel = leftController.get();
-		double maxRPM = getMaxRPM(getCurrentGear());
-		vel = (normalized) ? (vel / maxRPM) : vel;
+		double vel = - leftController.get();
+		double fps = vel * getFPSperRPM(getCurrentGear());
+		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
 	}
 
@@ -275,8 +270,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	public double getRightVel(final boolean normalized) {
 		double vel = rightController.get();
-		double maxRPM = getMaxRPM(getCurrentGear());
-		vel = (normalized) ? (vel / maxRPM) : vel;
+		double fps = vel * getFPSperRPM(getCurrentGear());
+		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
 	}
 

@@ -23,9 +23,9 @@ public class ArcadeVelDriveCmd extends CommandBase {
   double rotMax; // deg per sec
 
   //AutoShift info
-  double shiftUpSpeed = 6.5;    // ft/s above shift into high gear
-  double shiftDownSpeed = 4.0;  // ft/s below shift into low gear
-  int MinTimeInZone = 25;  // frame counts *.02 = 0.5 seconds
+  double shiftUpSpeed = 5.0;    // ft/s above shift into high gear
+  double shiftDownSpeed = 2.5;  // ft/s below shift into low gear
+  int MinTimeInZone = 20;  // frame counts *.02 = 0.4 seconds
   int timeWantingUp;
   int timeWantingDown;
 
@@ -63,21 +63,29 @@ public class ArcadeVelDriveCmd extends CommandBase {
     timeWantingUp = 0;
   }
 
-  void countTimeInShiftZone(double vel) {
+  void countTimeInShiftZone(double v) {
+    double velCmd = Math.abs(v);
+
+    double vel = Math.abs(drive.getLeftVel(false)+drive.getRightVel(false))/2;
     //count time we want to shift high, if we hit it request it from the shifter
-    if ((vel > shiftUpSpeed) && (shifter.getCurrentGear() == Gear.LOW_GEAR)) {
+    if ((vel > shiftUpSpeed) && //(velCmd >= vel) &&
+        (shifter.getCurrentGear() == Gear.LOW_GEAR)) {
       if (++timeWantingUp >= MinTimeInZone) {
         shifter.shiftUp();
         resetTimeInZone();
       }
     }
+   // else timeWantingUp = 0;
+
     // same thing on the low side
-    if ((vel < shiftDownSpeed) && (shifter.getCurrentGear() == Gear.HIGH_GEAR)) {
+    if ((vel < shiftDownSpeed) && //(velCmd <= vel) &&
+        (shifter.getCurrentGear() == Gear.HIGH_GEAR)) {
       if (timeWantingDown++ >= MinTimeInZone) {
         shifter.shiftDown();
         resetTimeInZone();
       }
-    }
+    } 
+    //else timeWantingDown = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.

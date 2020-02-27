@@ -75,10 +75,9 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   public void periodic() {
     // This method will be called once per scheduler run
     validRange = valid();
-    if (validRange) { // only update lidar variables if both lidar are valid currently
       left_lidar_range = left_iir.calculate(front_left_lidar.getRange());
       right_lidar_range = right_iir.calculate(front_right_lidar.getRange());
       findAngle();
-    }
+    
   }
 }

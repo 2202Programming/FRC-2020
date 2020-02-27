@@ -40,8 +40,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   // Intake
   Spark intake_spark = new Spark(Constants.INTAKE_SPARK_PWM);
 
-  public DoubleSolenoid elevatorSolenoid = new DoubleSolenoid(Constants.ELEVATOR_PCM_CAN_ID,
-      Constants.ELEVATOR_UP_SOLENOID_PCM, Constants.ELEVATOR_DOWN_SOLENOID_PCM);
+  public DoubleSolenoid intakeSolenoid = new DoubleSolenoid(Constants.INTAKE_PCM_CAN_ID,
+      Constants.INTAKE_UP_SOLENOID_PCM, Constants.INTAKE_DOWN_SOLENOID_PCM);
 
   // Intake Pneumatic Sensors
   // public DigitalInput intake_up = new DigitalInput(Constants.INTAKE_UP_DIO);
@@ -162,11 +162,11 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    */
 
   public void raiseIntake(){
-    elevatorSolenoid.set(DoubleSolenoid.Value.kForward);
+    intakeSolenoid.set(DoubleSolenoid.Value.kForward);
   } 
 
   public void lowerIntake(){
-    elevatorSolenoid.set(DoubleSolenoid.Value.kReverse);
+    intakeSolenoid.set(DoubleSolenoid.Value.kReverse);
   } 
 
   public void intakeOn(double motorStrength) {

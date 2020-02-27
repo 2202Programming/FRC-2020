@@ -42,9 +42,9 @@ public final class Constants {
     public static final int UPPER_SHOOTER_TALON_CAN = 18;
     public static final int LOWER_SHOOTER_TALON_CAN = 23;
     public static final int ELEVATOR_TALON_CAN = 24;
-    public static final int ELEVATOR_PCM_CAN_ID = PCM2_CAN_ID;
-    public static final int ELEVATOR_UP_SOLENOID_PCM = 4;    
-    public static final int ELEVATOR_DOWN_SOLENOID_PCM = 5;
+    public static final int INTAKE_PCM_CAN_ID = PCM1_CAN_ID;
+    public static final int INTAKE_UP_SOLENOID_PCM = 4;    
+    public static final int INTAKE_DOWN_SOLENOID_PCM = 5;
 
     //Drivetrain
     public static final int FL_SPARKMAX_CANID = 30;

@@ -5,8 +5,6 @@
 		}
 	],
 	"settings": {
-		"java.configuration.updateBuildConfiguration": "automatic",
-		"scm.alwaysShowActions": true,
-		"scm.alwaysShowProviders": true
+		"java.configuration.updateBuildConfiguration": "automatic"
 	}
 }

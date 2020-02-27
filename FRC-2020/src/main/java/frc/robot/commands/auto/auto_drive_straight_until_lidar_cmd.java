@@ -52,6 +52,6 @@ public class auto_drive_straight_until_lidar_cmd extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return lidar.valid();
+    return lidar.isEitherValid();
   }
 }

@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -28,6 +29,12 @@ import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.SwitchDriveMode;
 import frc.robot.commands.drive.TankDriveCmd;
 //import frc.robot.subsystems.CameraSubsystem;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.commands.SimpPositionControl;
+import frc.robot.commands.SimpRotateControl;
+import frc.robot.subsystems.Color_Subsystem;
+import frc.robot.subsystems.Control_Panel;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -58,6 +65,8 @@ public class RobotContainer {
   public final Limelight_Subsystem limelight;
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
+  public static final Control_Panel panel = new Control_Panel();
+  public static final Color_Subsystem detector = new Color_Subsystem();
 
   TankDriveCmd tankDriveCmd;
   ArcadeDriveCmd arcadeDriveCmd;
@@ -131,6 +140,12 @@ private void jasonsButtons(){
 
     // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
+    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.A.getCode())
+      .whenPressed(new SimpRotateControl(panel));
+    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.B.getCode())
+      .whenPressed(new SimpPositionControl(panel, detector));
+    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.Y.getCode())
+      .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
   }
 
   // Derek's testing...

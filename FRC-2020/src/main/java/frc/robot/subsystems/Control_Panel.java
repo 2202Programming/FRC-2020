@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,6 +23,8 @@ public class Control_Panel extends SubsystemBase {
     // DistPerPulse: 1040, minRate: 10, maxPeriod: 50, sampleAverage: 20
     private DoubleSolenoid extensionSol = new DoubleSolenoid(Constants.PCM_ID, Constants.PANEL_PISTON_FORWARD_PCM,
             Constants.PANEL_PISTON_REVERSE_PCM);
+
+    private DigitalInput limitSwitch = new DigitalInput(Constants.PANEL_LIMIT_SWITCH_CH);
             
     /* Initialization */
     public Control_Panel() {
@@ -57,6 +60,10 @@ public class Control_Panel extends SubsystemBase {
 
     public void retractArm() {
         extensionSol.set(DoubleSolenoid.Value.kReverse);
+    }
+
+    public boolean getLimitSwitch() {
+        return limitSwitch.get();
     }
 
     public String getTargetColor() {
@@ -95,5 +102,6 @@ public class Control_Panel extends SubsystemBase {
 
     public void log() {
         SmartDashboard.putNumber("Distance", getDistance());
+        SmartDashboard.putBoolean("Control Panel Limit", getLimitSwitch());
     }
 }

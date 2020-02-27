@@ -14,7 +14,6 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Robot;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
-import frc.robot.subsystems.ifx.ArcadeDrive;
 
 public class auto_drive_lidar extends CommandBase {
   final double mm2in = 1.0 / 25.4;
@@ -23,7 +22,7 @@ public class auto_drive_lidar extends CommandBase {
   private final Lidar_Subsystem lidar;
 
   private final double stopDist; // mm
-  private final double tolerancePct = 100; // mm
+  private final double tolerance = 100; // mm
   private double angleToleranceDeg = 3;
   private double kInchesToPerPower = 1;
   private double kDegreesToPerPower = -1;
@@ -61,15 +60,22 @@ public class auto_drive_lidar extends CommandBase {
   public void initialize() {
     distancePIDController.reset();
     distancePIDController.setSetpoint(stopDist);
-    distancePIDController.setTolerance(tolerancePct, 0.5);
+    distancePIDController.setTolerance(tolerance, 0.5);
     distancePIDController.setIntegratorRange(0, 3);
 
     anglePIDController.reset();
     anglePIDController.setSetpoint(angleTarget);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
-    angleTarget = lidar.findAngle();
-    Robot.departureAngle = angleTarget;
-    SmartDashboard.putNumber("Departure Angle", Robot.departureAngle);
+
+    if (forwards) { //save current angle for future departure
+      angleTarget = lidar.findAngle();
+      Robot.departureAngle = angleTarget;
+      SmartDashboard.putNumber("Departure Angle", Robot.departureAngle);
+    } 
+    else { //use saved angle
+      angleTarget = Robot.departureAngle;
+    }
+
     Robot.command = "Auto Drive with lidar";
   }
 
@@ -85,14 +91,14 @@ public class auto_drive_lidar extends CommandBase {
     SmartDashboard.putNumber("PID error (mm)", distancePIDController.getPositionError());
     SmartDashboard.putNumber("PID Verr", distancePIDController.getVelocityError());
     SmartDashboard.putNumber("Range (mm)", range);
-    SmartDashboard.putNumber("PID Output (%)", speedCmd);
+    SmartDashboard.putNumber("PID Output (FPS)", speedCmd);
 
     SmartDashboard.putNumber("PID error (degrees)", anglePIDController.getPositionError());
     SmartDashboard.putNumber("Angle", lidar.findAngle());
-    SmartDashboard.putNumber("PID Output (%) (Angle)", angleCmd);
+    SmartDashboard.putNumber("PID Output (DPS) (Angle)", angleCmd);
 
     SmartDashboard.putNumber("Range-Dist (mm)", (range - stopDist));
-    SmartDashboard.putNumber("Tolerance (mm)", tolerancePct);
+    SmartDashboard.putNumber("Tolerance (mm)", tolerance);
 
     drive.velocityArcadeDrive(speedCmd, angleCmd);
   }
@@ -107,17 +113,17 @@ public class auto_drive_lidar extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (forwards) {
-      if ((range - stopDist) <= (tolerancePct))
+    if (forwards) { //moving forward, so end when Current range - target distance is < tolerance
+      if ((range - stopDist) <= (tolerance))
         return true;
       else
         return false;
-
-    } else {
-      if ((stopDist - range) <= (tolerancePct))
-        return false;
-      else
+    }
+    else { //moving backwards, so end when target distance - Current range is < tolerance
+      if ((stopDist - range) <= (tolerance))
         return true;
+      else
+        return false;
     }
   }
 }

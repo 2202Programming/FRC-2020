@@ -55,14 +55,13 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 //Drive open loop forward until lidar valid
                 new auto_drive_straight_until_lidar_cmd(drive, lidar, 1).withTimeout(3),
 
-                //Drive forward at fixed angle using lidar
+                //Drive forward at current angle using lidar
                 new auto_drive_lidar(drive, lidar, 150, 0.5, true),
-
 
                 //Deploy balls
                 new ShooterOn(intake, 1200, 0.4).withTimeout(2.0), // turn shooter on for 2 seconds 1200 rpm
 
-                //Drive forward at fixed angle using lidar
+                //Drive backwards at departure angle using lidar
                 new auto_drive_lidar(drive, lidar, 600, 0.5, false)
 /*
                 //Retreat at angle zero for fixed amount of time (limelight doesn't work too close to wall due to washout)

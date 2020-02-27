@@ -32,7 +32,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   private LinearFilter right_iir;
   private LinearFilter valid_fir;
   private double filterTC = 0.8;   //seconds, cutoff 1.25Hz
-  private final double BUMPER_DISTANCE = 130; //mm from bumber to sensor
+  private final double BUMPER_DISTANCE = 100; //mm from bumber to sensor
   public Lidar_Subsystem() {
 
     front_left_lidar = new TimeOfFlight(Constants.FRONT_LEFT_LIDAR);

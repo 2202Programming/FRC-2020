@@ -7,6 +7,7 @@
 
 package frc.robot.commands.auto;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
 
@@ -18,6 +19,7 @@ public class set_departure_angle extends CommandBase {
   public set_departure_angle(double departureAngle) {
     // Use addRequirements() here to declare subsystem dependencies.
     Robot.departureAngle = departureAngle;
+    SmartDashboard.putNumber("Departure Angle", departureAngle);
   }
 
   // Called when the command is initially scheduled.

@@ -13,12 +13,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Robot;
 import frc.robot.subsystems.Lidar_Subsystem;
+import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.ifx.ArcadeDrive;
 
 public class auto_drive_lidar extends CommandBase {
   final double mm2in = 1.0 / 25.4;
 
-  private final ArcadeDrive drive;
+  private final VelocityDifferentialDrive_Subsystem drive;
   private final Lidar_Subsystem lidar;
 
   private final double stopDist; // mm
@@ -30,22 +31,21 @@ public class auto_drive_lidar extends CommandBase {
   private double angleTarget;
   private double range;
   private boolean forwards;
-  private final double Kp = 0.2, Ki = 0.04, Kd = 0.25;
-  private final double Kap = 0.05, Kai = 0.001, Kad = 0.0;
+  private final double Kp = 2, Ki = 0.04, Kd = 0.25;
+  private final double Kap = 1, Kai = 0.001, Kad = 0.0;
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
 
-  public auto_drive_lidar(final ArcadeDrive drive, final Lidar_Subsystem lidar, final double stopDist,
-      final double angleTarget, final double maxSpeed, final boolean forwards) {
+  public auto_drive_lidar(final VelocityDifferentialDrive_Subsystem drive, final Lidar_Subsystem lidar, final double stopDist,
+      final double maxSpeed, final boolean forwards) {
     this.drive = drive;
     this.lidar = lidar;
     this.stopDist = stopDist; // mm
     this.maxSpeed = maxSpeed;
-    this.angleTarget = angleTarget;
     this.forwards = forwards;
 
-    if (forwards) kInchesToPerPower = 1;
-    else kInchesToPerPower = -1;
+    if (forwards) kInchesToPerPower = -1;
+    else kInchesToPerPower = 1;
 
     // create the PID with vel and accl limits
     distancePIDController = new PIDController(Kp, Ki, Kd);
@@ -67,7 +67,9 @@ public class auto_drive_lidar extends CommandBase {
     anglePIDController.reset();
     anglePIDController.setSetpoint(angleTarget);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
-
+    angleTarget = lidar.findAngle();
+    Robot.departureAngle = angleTarget;
+    SmartDashboard.putNumber("Departure Angle", Robot.departureAngle);
     Robot.command = "Auto Drive with lidar";
   }
 
@@ -92,7 +94,7 @@ public class auto_drive_lidar extends CommandBase {
     SmartDashboard.putNumber("Range-Dist (mm)", (range - stopDist));
     SmartDashboard.putNumber("Tolerance (mm)", tolerancePct);
 
-    drive.arcadeDrive(speedCmd, angleCmd);
+    drive.velocityArcadeDrive(speedCmd, angleCmd);
   }
 
   // Called once the command ends or is interrupted.
@@ -113,9 +115,9 @@ public class auto_drive_lidar extends CommandBase {
 
     } else {
       if ((stopDist - range) <= (tolerancePct))
-        return true;
-      else
         return false;
+      else
+        return true;
     }
   }
 }

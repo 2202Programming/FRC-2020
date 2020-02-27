@@ -32,7 +32,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   private LinearFilter right_iir;
   private LinearFilter valid_fir;
   private double filterTC = 0.8;   //seconds, cutoff 1.25Hz
-
+  private final double BUMPER_DISTANCE = 130; //mm from bumber to sensor
   public Lidar_Subsystem() {
 
     front_left_lidar = new TimeOfFlight(Constants.FRONT_LEFT_LIDAR);
@@ -71,13 +71,14 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   }
 
   public boolean valid(){
-   /* 
+   
     if(front_left_lidar.isRangeValid() == false || front_right_lidar.isRangeValid() == false){
       return false;
     }
     return true;
-    */
-    return (front_left_lidar.getRange() < 1500 && front_right_lidar.getRange() < 1500);
+    
+
+    //return (front_left_lidar.getRange() < 1500 && front_right_lidar.getRange() < 1500);
 
   }
 
@@ -98,8 +99,8 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     validRange = valid();
       double temp = (validRange) ? 1.0 : 0.0;
       filteredValid = valid_fir.calculate(temp);
-      left_lidar_range = left_iir.calculate(front_left_lidar.getRange());
-      right_lidar_range = right_iir.calculate(front_right_lidar.getRange());
+      left_lidar_range = left_iir.calculate(front_left_lidar.getRange())-BUMPER_DISTANCE; 
+      right_lidar_range = right_iir.calculate(front_right_lidar.getRange())-BUMPER_DISTANCE;
       findAngle();
     
   }

@@ -47,11 +47,12 @@ public class auto_drive_straight_until_lidar_cmd extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     drive.arcadeDrive(0, 0);
+    Robot.command = "None";
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return lidar.isEitherValid();
+    return lidar.valid();
   }
 }

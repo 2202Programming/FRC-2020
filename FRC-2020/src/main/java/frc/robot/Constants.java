@@ -30,7 +30,7 @@ public final class Constants {
     //Lidar
     public static final int FRONT_LEFT_LIDAR = 22;
     public static final int FRONT_RIGHT_LIDAR = 21;
-    public static final double LIDAR_SAMPLE_TIME = 100; //in ms
+    public static final double LIDAR_SAMPLE_TIME = 20; //in ms
     public static final double COLOR_SAMPLE_TIME = 100; //in ms
     public static final int LOG_REFRESH_RATE = 100; //in ms
 

@@ -59,6 +59,12 @@ public final class Constants {
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
 
+    public static final int PANEL_LIMIT_SWITCH_CH = 0;
+    public static final int PANEL_ROTATION_CANID = 12;//placeholderA
+    public static final int PCM_ID = 1;
+    public static final int PANEL_PISTON_FORWARD_PCM = 2;
+    public static final int PANEL_PISTON_REVERSE_PCM = 3;
+
     //Auto Delays - values to be adjusted later with testing
     public static final double DELAY_A = 0.0;
     public static final double DELAY_B = 1.0;

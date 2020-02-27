@@ -33,11 +33,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SimpPositionControl;
 import frc.robot.commands.SimpRotateControl;
-import frc.robot.commands.drive.ArcadeDrive;
-import frc.robot.commands.drive.shift.ShiftGear;
 import frc.robot.subsystems.Color_Subsystem;
 import frc.robot.subsystems.Control_Panel;
-import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -143,11 +140,12 @@ private void jasonsButtons(){
 
     // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
-    new JoystickButton(driver, Button.kB.value).whenPressed(new SimpRotateControl(panel));
-    new JoystickButton(driver, Button.kY.value).whenPressed(new SimpPositionControl(panel, detector));
-    new JoystickButton(driver, Button.kA.value).whenPressed(() -> panel.setSpeed(0.5)).whenReleased(() -> panel.setSpeed(0));
-    new JoystickButton(driver, Button.kBumperLeft.value).whenPressed(() -> panel.extendArm());
-    new JoystickButton(driver, Button.kBumperRight.value).whenPressed(() -> panel.retractArm());
+    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.A.getCode())
+      .whenPressed(new SimpRotateControl(panel));
+    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.B.getCode())
+      .whenPressed(new SimpPositionControl(panel, detector));
+    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.Y.getCode())
+      .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
   }
 
   // Derek's testing...

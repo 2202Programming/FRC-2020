@@ -26,7 +26,7 @@ public class DriveOffLine extends CommandBase {
   @Override
   public void initialize() {
     counter = 0;
-    driveTrain.arcadeDrive(-0.4, 0);
+    driveTrain.velocityArcadeDrive(1, 0);
 
   }
 
@@ -45,6 +45,6 @@ public class DriveOffLine extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return counter > 40;
+    return counter > 120;
   }
 }

@@ -62,13 +62,18 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putNumber("Front Right Lidar", right_lidar_range);
     SmartDashboard.putNumber("Lidar Angle", angle);
     SmartDashboard.putBoolean("Range is valid", validRange);
+    SmartDashboard.putBoolean("Left lidar valid", front_left_lidar.isRangeValid());
+    SmartDashboard.putBoolean("Right lidar valid", front_right_lidar.isRangeValid());
+
   }
 
   public boolean valid(){
+    
     if(front_left_lidar.isRangeValid() == false || front_right_lidar.isRangeValid() == false){
       return false;
     }
     return true;
+
   }
 
   @Override

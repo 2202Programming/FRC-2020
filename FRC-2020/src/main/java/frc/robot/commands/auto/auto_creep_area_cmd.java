@@ -27,8 +27,8 @@ public class auto_creep_area_cmd extends CommandBase {
   private final Lidar_Subsystem lidar;
   private double angleTarget;
   private double targetArea;
-  private double Kap = 0.03, Kai = 0.00, Kad = 0.02; // angle drive PIDs
-  private double Kp = 0.2, Ki = 0.01, Kd = 0.02; // distance drive PIDs
+  private double Kap = 2, Kai = 0.00, Kad = 0.02; // angle drive PIDs
+  private double Kp = 1, Ki = 0.01, Kd = 0.02; // distance drive PIDs
   private final PIDController anglePIDController;
   private final PIDController distancePIDController;
   private double tolerancePct = .05;
@@ -114,7 +114,7 @@ public class auto_creep_area_cmd extends CommandBase {
     // SmartDashboard.putData(distancePIDController);
 
     // move rotation only
-    drive.arcadeDrive(speedCmd, angleCmd);
+    drive.velocityArcadeDrive(speedCmd, angleCmd);
   }
 
   // Called once the command ends or is interrupted.

@@ -70,12 +70,12 @@ public class DriveWithLimelightToDistanceDegCmd extends CommandBase {
 
     setPID();
     
-    SmartDashboard.putData("Increase Limelight Angle Drive P", new changeLimelightAngleDrivePID('P', 0.01));
+    /*SmartDashboard.putData("Increase Limelight Angle Drive P", new changeLimelightAngleDrivePID('P', 0.01));
     SmartDashboard.putData("Decrease Limelight Angle Drive P", new changeLimelightAngleDrivePID('P', -0.01));
     SmartDashboard.putData("Increase Limelight Angle Drive I", new changeLimelightAngleDrivePID('I', 0.001));
     SmartDashboard.putData("Decrease Limelight Angle Drive I", new changeLimelightAngleDrivePID('I', -0.001));
     SmartDashboard.putData("Increase Limelight Angle Drive D", new changeLimelightAngleDrivePID('D', 0.001));
-    SmartDashboard.putData("Decrease Limelight Angle Drive D", new changeLimelightAngleDrivePID('D', -0.001));
+    SmartDashboard.putData("Decrease Limelight Angle Drive D", new changeLimelightAngleDrivePID('D', -0.001));*/
     
   }
 

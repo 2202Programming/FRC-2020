@@ -41,6 +41,13 @@ public class auto_cmd_group extends SequentialCommandGroup {
         delay = startDelay[delayCode];
 
         addCommands(
+
+                //drives off line
+                new DriveOffLine(drive), 
+
+                //does nothing for delay seconds
+                new auto_do_nothing().withTimeout(delay),
+
                 //Move forward using limelight to a certain limelight area(distance estimate)
                 new auto_creep_area_cmd(drive, limelight, lidar, -9, 0.4, 0.2, 2.5, true), 
 

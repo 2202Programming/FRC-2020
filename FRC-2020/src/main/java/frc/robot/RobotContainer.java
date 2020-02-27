@@ -115,6 +115,7 @@ private void jasonsButtons(){
 
   driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
   .whenPressed(new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
+  
 }
 
   private void configureButtonBindings() {

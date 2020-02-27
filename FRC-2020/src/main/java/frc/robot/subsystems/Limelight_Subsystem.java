@@ -28,13 +28,17 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
    private double area; //area is between 0 and 100. Calculated as a percentage of image
    private boolean target;
    private boolean ledStatus; //true = ON
+   private double filteredArea;
    
    private LinearFilter x_iir;
+   private LinearFilter area_iir;
+
    private double filterTC = 0.8;   //seconds, cutoff 1.25Hz
 
   public Limelight_Subsystem() {
     disableLED();
     x_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
+    area_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
   }
 
   @Override
@@ -54,6 +58,7 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
     area = ta.getDouble(0.0);
     target = (tv.getDouble(0)==0) ? (false) : (true);
     filteredX = x_iir.calculate(x);
+    filteredArea = area_iir.calculate(area);
     ledStatus = (leds.getDouble(0)==3) ? (true) : (false);
 
   }
@@ -64,6 +69,10 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
 
   public double getFilteredX(){
     return filteredX;
+  }
+
+  public double getFilteredArea(){
+    return filteredArea;
   }
 
   public double getY(){
@@ -101,6 +110,7 @@ public boolean valid(){
       SmartDashboard.putNumber("Y value", y);
       SmartDashboard.putNumber("Area", area);
       SmartDashboard.putBoolean("Limelight Valid", target);
+      SmartDashboard.putNumber("Filtered area", filteredArea);
 
   }
 }

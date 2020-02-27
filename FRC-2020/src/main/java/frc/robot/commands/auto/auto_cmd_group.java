@@ -41,19 +41,19 @@ public class auto_cmd_group extends SequentialCommandGroup {
         delay = startDelay[delayCode];
 
         addCommands(
-
+/*
                 //drives off line
                 new DriveOffLine(drive), 
 
                 //does nothing for delay seconds
                 new auto_do_nothing().withTimeout(delay),
-
+*/
                 //Move forward using limelight to a certain limelight area(distance estimate)
-                new auto_creep_area_cmd(drive, limelight, lidar, -9, 0.4, 0.2, 2.5, true), 
+                new auto_creep_area_cmd(drive, limelight, lidar, -9, 2, 60, 2.5, true),
 
                 //Drive open loop forward until lidar valid
-                new auto_drive_straight_until_lidar_cmd(drive, lidar, 0.2),
-                
+                new auto_drive_straight_until_lidar_cmd(drive, lidar, 2).withTimeout(3)
+  /*              
                 //Set global variable for current angle with lidar, to help with later retreat angle
                 new set_departure_angle(lidar.findAngle()),
 
@@ -77,7 +77,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
 
                 //Drive backwards at angle (departure angle?) until limelight area small enough (far enough)
                 new auto_creep_area_cmd(drive, limelight, lidar, -15, 0.3, 0.2, 1.6, false)
-
+*/
         );
 
         /*

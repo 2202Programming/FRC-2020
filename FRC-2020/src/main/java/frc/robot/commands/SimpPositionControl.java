@@ -32,8 +32,8 @@ public class SimpPositionControl extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    cp.extendArm();
-    cp.setSpeed(0.8);
+    //cp.extendArm();
+    cp.setSpeed(0.3);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,7 +45,7 @@ public class SimpPositionControl extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     cp.setSpeed(0);
-    cp.retractArm();
+    //cp.retractArm();
   }
 
   // Returns true when the command should end.

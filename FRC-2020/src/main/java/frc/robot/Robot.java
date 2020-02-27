@@ -56,6 +56,7 @@ public class Robot extends TimedRobot {
     
     if (lastLogTime + Constants.LOG_REFRESH_RATE < System.currentTimeMillis()){
       m_robotContainer.detector.printLog();
+      m_robotContainer.panel.log();
       lastLogTime = System.currentTimeMillis();
     }
 

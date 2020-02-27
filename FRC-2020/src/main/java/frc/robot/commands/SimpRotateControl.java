@@ -12,7 +12,7 @@ import frc.robot.subsystems.Control_Panel;
 
 public class SimpRotateControl extends CommandBase {
 
-  private static final double COUNTS_PER_WHEEL_ROTATION = 1024; //TODO: Find correct value
+  private static final double COUNTS_PER_WHEEL_ROTATION = 4096; //TODO: Find correct value
 
   //Intentionally overrotate to avoid undershoot, just need to be between 3 and 5 full rotations
   private static final double TARGET_PANEL_ROTATIONS = 3.5; 
@@ -39,9 +39,9 @@ public class SimpRotateControl extends CommandBase {
   @Override
   public void initialize() {
     cp.resetEncoder();
-    cp.extendArm();
+    //cp.extendArm();
     //TODO: See if we need to delay starting the motor after extending
-    cp.setSpeed(1);
+    cp.setSpeed(0.7);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -53,7 +53,7 @@ public class SimpRotateControl extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     cp.setSpeed(0);
-    cp.retractArm();
+    //cp.retractArm();
   }
 
   // Returns true when the command should end.

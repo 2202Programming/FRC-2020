@@ -145,11 +145,11 @@ private void jasonsButtons(){
 
     // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.A.getCode())
+    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new SimpRotateControl(panel));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.B.getCode())
+    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.RB.getCode())
       .whenPressed(new SimpPositionControl(panel, detector));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.Y.getCode())
+    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.START.getCode())
       .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
   }
 

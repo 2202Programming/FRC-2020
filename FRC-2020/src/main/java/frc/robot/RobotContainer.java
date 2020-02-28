@@ -70,7 +70,7 @@ public class RobotContainer {
 
   TankDriveCmd tankDriveCmd;
   ArcadeDriveCmd arcadeDriveCmd;
-  Command velDriveCmd;
+  ArcadeVelDriveCmd velDriveCmd;
 
   // Tests to run during test mode
   
@@ -85,7 +85,7 @@ public class RobotContainer {
     // cameraSubsystem = new CameraSubsystem();
     driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.03); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
-    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 10.0, 120.0); 
+    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 14.0, 100.0); // ft/s, deg/sec
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
     logSubsystem = new Log_Subsystem(5); // log every 5 frames - 100mS
@@ -99,7 +99,8 @@ public class RobotContainer {
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
-    velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, 8.0, 100.0); // fps, dps
+    velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, 14.0, 100.0); // fps, dps
+    velDriveCmd.setShiftProfile(10, 2.5, 6.6);  // counts, ft/s, ft/s
 
     driveTrain.setDefaultCommand(velDriveCmd);
 

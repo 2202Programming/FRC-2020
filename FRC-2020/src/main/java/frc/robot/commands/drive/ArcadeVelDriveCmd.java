@@ -22,25 +22,26 @@ public class ArcadeVelDriveCmd extends CommandBase {
   double vMax; // fps
   double rotMax; // deg per sec
 
-  //AutoShift info
-  double shiftUpSpeed = 5.0;    // ft/s above shift into high gear
-  double shiftDownSpeed = 2.5;  // ft/s below shift into low gear
-  int MinTimeInZone = 20;  // frame counts *.02 = 0.4 seconds
+  // AutoShift info
+  double shiftUpSpeed = 6.0; // ft/s above shift into high gear
+  double shiftDownSpeed = 2.5; // ft/s below shift into low gear
+  int minTimeInZone = 20; // frame counts *.02 = 0.4 seconds
   int timeWantingUp;
   int timeWantingDown;
 
   /**
-   * Creates a new ArcadeVelDriveCmd to drive the system using physical
-   * units of speed and rotaion to command the chassis. This will map 
-   * DriverControls using normalized stick inputs in Arcade mode.
+   * Creates a new ArcadeVelDriveCmd to drive the system using physical units of
+   * speed and rotaion to command the chassis. This will map DriverControls using
+   * normalized stick inputs in Arcade mode.
    * 
-   * @param dc           - driver controls IFX
-   * @param driveTrain   - drive train that supports VelocityDrive
-   * @param shifter      - access to the shift controls (gear box or velocity drive)
-   * @param velMaxFps    - max FPS scales normalized stick value
-   * @param rotMaxDps    - rotation max, scales normalized stick value
+   * @param dc         - driver controls IFX
+   * @param driveTrain - drive train that supports VelocityDrive
+   * @param shifter    - access to the shift controls (gear box or velocity drive)
+   * @param velMaxFps  - max FPS scales normalized stick value
+   * @param rotMaxDps  - rotation max, scales normalized stick value
    */
-  public ArcadeVelDriveCmd(DriverControls dc, VelocityDrive driveTrain, Shifter shifter, double velMaxFps, double rotMaxDps) {
+  public ArcadeVelDriveCmd(DriverControls dc, VelocityDrive driveTrain, Shifter shifter, double velMaxFps,
+      double rotMaxDps) {
     this.dc = dc;
     this.drive = driveTrain;
     this.vMax = velMaxFps;
@@ -65,27 +66,39 @@ public class ArcadeVelDriveCmd extends CommandBase {
 
   void countTimeInShiftZone(double v) {
     double velCmd = Math.abs(v);
-
-    double vel = Math.abs(drive.getLeftVel(false)+drive.getRightVel(false))/2;
-    //count time we want to shift high, if we hit it request it from the shifter
-    if ((vel > shiftUpSpeed) && //(velCmd >= vel) &&
+    // get robot velocity and use that to shift
+    
+    double vel = Math.abs(drive.getLeftVel(false));
+    // count time we want to shift high, if we hit it request it from the shifter
+    if ((vel > shiftUpSpeed) && // (velCmd >= vel) &&
         (shifter.getCurrentGear() == Gear.LOW_GEAR)) {
-      if (++timeWantingUp >= MinTimeInZone) {
+      if (++timeWantingUp >= minTimeInZone) {
         shifter.shiftUp();
         resetTimeInZone();
       }
     }
-   // else timeWantingUp = 0;
+    // else timeWantingUp = 0;
 
     // same thing on the low side
-    if ((vel < shiftDownSpeed) && //(velCmd <= vel) &&
+    if ((vel < shiftDownSpeed) && // (velCmd <= vel) &&
         (shifter.getCurrentGear() == Gear.HIGH_GEAR)) {
-      if (timeWantingDown++ >= MinTimeInZone) {
+      if (timeWantingDown++ >= minTimeInZone) {
         shifter.shiftDown();
         resetTimeInZone();
       }
-    } 
-    //else timeWantingDown = 0;
+    }
+    // else timeWantingDown = 0;
+  }
+/**
+ * 
+ * @param zoneCount  - frames to wait before shifting (10-50 expected)
+ * @param shiftDown  - speed to downshift ft/s
+ * @param shiftUp    - speed to upshift  ft/s
+ */
+  public void setShiftProfile(int zoneCount, double shiftDown, double shiftUp) {
+    this.shiftUpSpeed = shiftUp;
+    this.shiftDownSpeed = shiftDown;
+    this.minTimeInZone = zoneCount;
   }
 
   // Called every time the scheduler runs while the command is scheduled.

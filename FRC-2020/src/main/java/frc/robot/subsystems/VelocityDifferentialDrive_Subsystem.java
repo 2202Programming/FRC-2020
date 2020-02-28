@@ -254,22 +254,35 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 
 	public double getLeftPos() {
-		return K_ft_per_rev * leftController.getPosition();
+		// postion is in units of revs
+		double kft_rev = getFPSperRPM(getCurrentGear())*60.0;
+		double ft =  (-kft_rev) * leftController.getPosition();  // left inverted
+		return ft;
+	}
+
+	public double getRightPos() {
+		// postion is in units of revs
+		double kft_rev = getFPSperRPM(getCurrentGear())*60.0;
+		double ft = kft_rev * rightController.getPosition();
+		return ft;
 	}
 
 	public double getLeftVel(final boolean normalized) {
-		double vel = - leftController.get();
+		double vel = - leftController.get();             // left inverted
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
 	}
 
-	public double getRightPos() {
-		return K_ft_per_rev * rightController.getPosition();
-	}
-
 	public double getRightVel(final boolean normalized) {
 		double vel = rightController.get();
+		double fps = vel * getFPSperRPM(getCurrentGear());
+		vel = (normalized) ? (fps / maxFPS_High) : fps;
+		return vel;
+	}
+
+	public double getAvgVelocity(final boolean normalized) {
+		double vel = 0.5*(rightController.get() - leftController.get()); // leftinverted
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;

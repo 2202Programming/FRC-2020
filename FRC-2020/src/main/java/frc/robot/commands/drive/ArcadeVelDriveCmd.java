@@ -8,10 +8,13 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import static frc.robot.Constants.*;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.Shifter;
 import frc.robot.subsystems.ifx.VelocityDrive;
+import frc.robot.util.misc.RateLimiter;
+import frc.robot.util.misc.RateLimiter.InputModel;
 
 public class ArcadeVelDriveCmd extends CommandBase {
   DriverControls dc;
@@ -28,6 +31,8 @@ public class ArcadeVelDriveCmd extends CommandBase {
   int minTimeInZone = 20; // frame counts *.02 = 0.4 seconds
   int timeWantingUp;
   int timeWantingDown;
+
+  RateLimiter rotRateLimiter;
 
   /**
    * Creates a new ArcadeVelDriveCmd to drive the system using physical units of
@@ -47,6 +52,15 @@ public class ArcadeVelDriveCmd extends CommandBase {
     this.vMax = velMaxFps;
     this.rotMax = rotMaxDps;
     this.shifter = shifter;
+
+    rotRateLimiter = new RateLimiter(DT, dc::getRotation, null,
+         -rotMaxDps,
+          rotMaxDps,
+          -5.0, 5.0,  //rate deg/s^2
+          InputModel.Position);
+    rotRateLimiter.setRateGain(rotMax);
+    rotRateLimiter.setForward(0.0);
+    rotRateLimiter.initialize();
 
     addRequirements(driveTrain);
   }
@@ -107,13 +121,15 @@ public class ArcadeVelDriveCmd extends CommandBase {
     // read controls in normalize units +/- 1.0
     double v = dc.getVelocity();
     double rot = dc.getRotation();
+    rotRateLimiter.execute();
+    double limRot = rotRateLimiter.get();
 
     // scale inputs based on max commands
     v *= vMax;
     rot *= rotMax;
 
     countTimeInShiftZone(v);
-    drive.velocityArcadeDrive(v, rot);
+    drive.velocityArcadeDrive(v, limRot);
   }
 
   // This command should never end, it can be a default command

@@ -99,6 +99,7 @@ public class RobotContainer {
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
+
     velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, 14.0, 100.0); // fps, dps
     velDriveCmd.setShiftProfile(10, 2.5, 6.6);  // counts, ft/s, ft/s
 
@@ -126,8 +127,8 @@ private void jasonsButtons(){
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
         .whenPressed(new InvertDriveControls(driverControls));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
-        .whenPressed(new SwitchDriveMode(driveTrain, arcadeDriveCmd, tankDriveCmd));
-
+        .whenPressed(new SwitchDriveMode(driveTrain, velDriveCmd, arcadeDriveCmd));
+        
     // Assistant's buttons
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake

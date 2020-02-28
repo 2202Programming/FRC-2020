@@ -75,7 +75,7 @@ public class RateLimiter {
 
     // start where we are according to the device if we have one
     // otherwise use the initial value of the input command, cmd.
-    Xprev = (devPos != Double.NaN) ? devPos : cmd;
+    Xprev = (devPos == Double.NaN) ? cmd : devPos;
     X = Xprev;
     devPosPrev = Xprev;
   }
@@ -148,7 +148,7 @@ public class RateLimiter {
   // Read input functions for cmd and device if we have them
   private void getInputs() {
     devPosPrev = devPos;
-    devPos = (devGetter != null) ? devGetter.getAsDouble() : Double.NaN;
+    devPos = (devGetter != null) ? devGetter.getAsDouble() : 0.0;
     cmd = (inFunct != null) ? inFunct.getAsDouble() : 0.0;
   };
 

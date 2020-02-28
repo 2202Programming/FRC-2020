@@ -122,14 +122,14 @@ public class ArcadeVelDriveCmd extends CommandBase {
     double v = dc.getVelocity();
     double rot = dc.getRotation();
     rotRateLimiter.execute();
-    double limRot = rotRateLimiter.get();
+    //double limRot = rotRateLimiter.get();
 
     // scale inputs based on max commands
     v *= vMax;
     rot *= rotMax;
 
     countTimeInShiftZone(v);
-    drive.velocityArcadeDrive(v, limRot);
+    drive.velocityArcadeDrive(v, rot);
   }
 
   // This command should never end, it can be a default command

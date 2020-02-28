@@ -36,7 +36,7 @@ public class SimpPositionControl extends CommandBase {
   @Override
   public void initialize() {
     //cp.extendArm();
-    cp.setSpeed(WHEEL_SPEED));
+    cp.setSpeed(WHEEL_SPEED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

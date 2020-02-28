@@ -49,7 +49,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 //does nothing for delay seconds
                 new auto_do_nothing().withTimeout(delay),
 
-                //Move forward using limelight to a certain limelight area(distance estimate)
+                //Move forward using limelight to a certain limelight area(distance estimate) TODO: Figure out angle
                 new auto_creep_area_cmd(drive, limelight, lidar, -9, 2, 60, 2.9, true),
 
                 //Drive open loop forward until lidar valid
@@ -62,7 +62,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 new ShooterOn(intake, 1200, 0.4).withTimeout(2.0), // turn shooter on for 2 seconds 1200 rpm
 
                 //Drive backwards at departure angle using lidar
-                new auto_drive_lidar(drive, lidar, 600, 0.5, false)
+                new auto_drive_lidar(drive, lidar, 1000, 0.5, false),
+
+                //Move backwards using limelight to a certain limelight area(distance estimate) TODO: Figure out angle
+                new auto_creep_area_cmd(drive, limelight, lidar, -9, 2, 60, 1.9, false)
 /*
                 //Retreat at angle zero for fixed amount of time (limelight doesn't work too close to wall due to washout)
                 new auto_drive_lidar(drive, lidar, 700, 0, 0.2, false).withTimeout(2),

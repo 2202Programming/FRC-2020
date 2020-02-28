@@ -83,7 +83,7 @@ public class RobotContainer {
     // put driver controls first so its periodic() is called first.
 
     // cameraSubsystem = new CameraSubsystem();
-    driverControls = new HID_Xbox_Subsystem(0.3, 0.3, 0.03); // velExpo,rotExpo, deadzone
+    driverControls = new HID_Xbox_Subsystem(0.3, 0.9, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 14.0, 100.0); // ft/s, deg/sec
     intake = new Intake_Subsystem();

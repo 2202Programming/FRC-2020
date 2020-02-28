@@ -30,7 +30,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	// Acceleration limits
 	private final double RATE_MAX_SECONDS = 2;
-	private double rateLimit = 0.6; // seconds to max speed/power
+	private double rateLimit = 0.7; // seconds to max speed/power
 
 	// Chasis details
 	public final double WHEEL_RADIUS = 7.5/2.0; // inches

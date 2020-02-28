@@ -12,7 +12,9 @@ import frc.robot.subsystems.Control_Panel;
 
 public class SimpRotateControl extends CommandBase {
 
-  private static final double COUNTS_PER_WHEEL_ROTATION = 4096; //TODO: Find correct value
+  private static final double WHEEL_SPEED = 0.7;
+
+  private static final double COUNTS_PER_WHEEL_ROTATION = 4096;
 
   //Intentionally overrotate to avoid undershoot, just need to be between 3 and 5 full rotations
   private static final double TARGET_PANEL_ROTATIONS = 3.5; 
@@ -27,36 +29,34 @@ public class SimpRotateControl extends CommandBase {
 
   private Control_Panel cp;
   /**
-   * Creates a new SimpRotateControl.
+   * Rotates the control panel between 3 and 5 full revolutions.
    */
   public SimpRotateControl(Control_Panel controlPanel) {
-    // Use addRequirements() here to declare subsystem dependencies.
     cp = controlPanel;
     addRequirements(cp);
   } 
 
-  // Called when the command is initially scheduled.
+  // Start spinning
   @Override
   public void initialize() {
     cp.resetEncoder();
     //cp.extendArm();
     //TODO: See if we need to delay starting the motor after extending
-    cp.setSpeed(0.7);
+    cp.setSpeed(WHEEL_SPEED);
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
   }
 
-  // Called once the command ends or is interrupted.
+  // Stop spinning when we're done
   @Override
   public void end(boolean interrupted) {
     cp.setSpeed(0);
     //cp.retractArm();
   }
 
-  // Returns true when the command should end.
+  // Check if we've reached the desired number of counts on the wheel's encoder
   @Override
   public boolean isFinished() {
     return cp.getDistance() >= TARGET_WHEEL_COUNT;

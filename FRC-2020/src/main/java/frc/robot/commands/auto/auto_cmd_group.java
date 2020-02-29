@@ -76,10 +76,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 ),
 
                 //Drive backwards at departure angle using lidar
-                new auto_drive_lidar(drive, lidar, 1000, 3, false, false),
+                new auto_drive_lidar(drive, lidar, 800, 3, false, false),
 
                 //Drive open loop backwards until limelight valid
-                new auto_drive_straight_cmd(drive, -3).withTimeout(2),
+                new auto_drive_straight_cmd(drive, -3).withTimeout(1),
 
                 //Move backwards using limelight to a certain limelight area(distance estimate) TODO: Figure out angle
                 new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, 1.9, false)

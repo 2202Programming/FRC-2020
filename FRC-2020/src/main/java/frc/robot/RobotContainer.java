@@ -68,7 +68,7 @@ public class RobotContainer {
   public final Log_Subsystem logSubsystem;
   public final Control_Panel panel;
   public final Color_Subsystem detector;
-  private final ClimberSubsystem climber = new ClimberSubsystem();
+  private final ClimberSubsystem climber;
 
   TankDriveCmd tankDriveCmd;
   ArcadeDriveCmd arcadeDriveCmd;
@@ -94,6 +94,7 @@ public class RobotContainer {
     lidar = new Lidar_Subsystem();
     panel = new Control_Panel();
     detector = new Color_Subsystem();
+    climber = new ClimberSubsystem();
 
     // Add anything that has logging requirements
     logSubsystem.add(driveTrain, limelight, lidar, intake, panel, detector);

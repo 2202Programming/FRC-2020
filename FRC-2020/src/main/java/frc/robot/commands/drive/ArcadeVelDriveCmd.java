@@ -95,7 +95,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
         resetTimeInZone();
       }
     }
-
+/*
     // see if we can coast, using abs vel
     if ((cmd < vel) && (rotCmd == 0.0 )) {
       if (++timeWantingCoast > minTimeEnterCoast)
@@ -105,6 +105,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
       timeWantingCoast = 0;
       drive.setCoastMode(false);
     }
+    */
   }
 
   /**

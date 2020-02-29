@@ -14,6 +14,7 @@ import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineAdjust;
+import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
@@ -66,7 +67,7 @@ public class RobotContainer {
   ArcadeVelDriveCmd velDriveCmd;
 
   // Tests to run during test mode
-  
+
   TestKBSimMode t1;
 
   /**
@@ -94,7 +95,7 @@ public class RobotContainer {
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
 
     velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, 14.0, 100.0); // fps, dps
-    velDriveCmd.setShiftProfile(5, 1.5, 6.8);  // counts, ft/s, ft/s
+    velDriveCmd.setShiftProfile(5, 1.5, 6.8); // counts, ft/s, ft/s
 
     driveTrain.setDefaultCommand(velDriveCmd);
 
@@ -103,24 +104,23 @@ public class RobotContainer {
     jasonsButtons();
   }
 
-private void jasonsButtons(){
-  driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
-  .whenPressed(new toggleLED(limelight));
+  private void jasonsButtons() {
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode()).whenPressed(new toggleLED(limelight));
 
-  driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
-  .whenPressed(new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
-  
-}
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
+        .whenPressed(new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
+
+  }
 
   private void configureButtonBindings() {
     // Drivers buttons
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
-        .whenPressed(new GearToggleCmd(driveTrain)); 
+        .whenPressed(new GearToggleCmd(driveTrain));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
         .whenPressed(new InvertDriveControls(driverControls));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, velDriveCmd, arcadeDriveCmd));
-        
+
     // Assistant's buttons
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
@@ -134,6 +134,8 @@ private void jasonsButtons(){
         .whileHeld(new MagazineAdjust(intake, false));
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
         .whenHeld(new ShooterOn(intake, 1200, 0.4)); // rpm, seconds mag backup
+    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
+        .whenPressed(new MagazineToggleCmd(intake));
 
     // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));

@@ -35,10 +35,12 @@ public final class Constants {
     public static final int LOG_REFRESH_RATE = 100; //in ms
 
     //Intake
-    public static final int INTAKE_UP_DIO = 4;
-    public static final int INTAKE_DOWN_DIO = 5;
-    public static final int INTAKE_SPARK_PWM = 0;
+    public static final int MAGAZINE_PCM_CAN_ID = PCM2_CAN_ID;
+    public static final int MAGAZINE_UP_PCM = 0;
+    public static final int MAGAZINE_DOWN_PCM = 1;
     public static final int MAGAZINE_PWM = 9;
+
+    public static final int INTAKE_SPARK_PWM = 0;
     public static final int UPPER_SHOOTER_TALON_CAN = 18;
     public static final int LOWER_SHOOTER_TALON_CAN = 23;
     public static final int ELEVATOR_TALON_CAN = 24;

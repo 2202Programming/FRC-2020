@@ -23,10 +23,10 @@ public class ArcadeVelDriveCmd extends CommandBase {
   double vMax; // fps
   double rotMax; // deg per sec
 
-  // AutoShift info
-  double shiftUpSpeed = 6.8; // ft/s above shift into high gear (must be less than 10 or so)
-  double shiftDownSpeed = 1.5; // ft/s below shift into low gear
-  int minTimeInZone = 5; // frame counts *.02 = 0.1 seconds
+  // AutoShift info - Change settings in RobotContainer
+  double shiftUpSpeed = 6.8;    // ft/s above shift into high gear (must be less than 10 or so)
+  double shiftDownSpeed = 1.5;  // ft/s below shift into low gear
+  int minTimeInZone = 5;        // frame counts *.02 = 0.1 seconds
   int timeWantingUp;
   int timeWantingDown;
 

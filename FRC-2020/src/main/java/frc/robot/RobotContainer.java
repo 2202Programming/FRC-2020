@@ -94,7 +94,7 @@ public class RobotContainer {
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
 
     velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, 14.0, 100.0); // fps, dps
-    velDriveCmd.setShiftProfile(10, 2.5, 6.6);  // counts, ft/s, ft/s
+    velDriveCmd.setShiftProfile(5, 1.5, 6.8);  // counts, ft/s, ft/s
 
     driveTrain.setDefaultCommand(velDriveCmd);
 

@@ -118,7 +118,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// velocity setup - using RPM speed controller, sets pid
 		this.leftController = new VelController(backLeft);
 		this.rightController = new VelController(backRight);
-		this.leftController.setInverted(true);
 
 		// Have motors follow to use Differential Drive
 		middleRight.follow(backRight);
@@ -238,7 +237,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 		// add in the commanded speed each wheel
 		double vl_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ);
-		double vr_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ);
+		double vr_rpm = -applyDeadZone(rpm - vturn_rpm, RPM_DZ);
 
 		/* debugging
 		double v_test = getLeftVel(false);
@@ -302,7 +301,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getLeftVel(final boolean normalized) {
-		double vel =  leftController.get();           
+		double vel =  -leftController.get();           
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
@@ -316,7 +315,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getAvgVelocity(final boolean normalized) {
-		double vel = 0.5*(rightController.get() + leftController.get()); 
+		double vel = 0.5*(rightController.get() - leftController.get()); 
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;

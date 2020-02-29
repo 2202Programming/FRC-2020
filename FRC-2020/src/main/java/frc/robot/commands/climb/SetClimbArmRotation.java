@@ -5,33 +5,34 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 
-public class ClimberToAngle extends InstantCommand {
+public class SetClimbArmRotation extends InstantCommand {
   private ClimberSubsystem climber;
-  private double targetPosition;
+  private double speed;
   /**
-   * Creates a new ClimberToAngle.
+   * Creates a new SetClimbArmRotation.
    */
-  public ClimberToAngle(ClimberSubsystem climber, double targetPosition) {
+  public SetClimbArmRotation(ClimberSubsystem climber, double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.climber = climber;
-    this.targetPosition = targetPosition;
+    this.speed = speed;
     addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    climber.setRotPos(targetPosition);
+    climber.setRotationSpeed(speed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    climber.setRotationSpeed(0);
   }
 
 }

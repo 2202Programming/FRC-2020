@@ -5,44 +5,37 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands;
+package frc.robot.commands.climb;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ClimberSubsystem;
 
-public class RunWinch extends CommandBase {
+public class SetClimbArmExtension extends InstantCommand {
   private ClimberSubsystem climber;
-  private double speed;
+  private boolean extended;
   /**
-   * Creates a new ClimbWinch.
+   * Creates a new ClimbArmExtend.
    */
-  public RunWinch(ClimberSubsystem climber, double speed) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  public SetClimbArmExtension(ClimberSubsystem climber, boolean extended) {
     this.climber = climber;
-    this.speed = speed;
+    this.extended = extended;
+    // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    climber.setWinchSpeed(speed);
+    if (extended) {
+      climber.extendArm();
+    } else {
+      climber.retractArm();
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    climber.setWinchSpeed(0);
   }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
 }

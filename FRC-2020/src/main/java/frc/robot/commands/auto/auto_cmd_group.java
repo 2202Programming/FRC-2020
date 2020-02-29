@@ -47,7 +47,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
         // & 4
 
         delayCode = 0; // this should be removed to read in from switch
-        positionCode = 1; // this should be removed to read in from switch
+        positionCode = 2; // this should be removed to read in from switch
         //1 = A (far right closest to wall), 2 = B (centeted), 3 = C (far left)
 
         delay = startDelay[delayCode];
@@ -66,10 +66,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, limelightAreaTarget, true).withTimeout(3),
 
                 //Drive open loop forward until lidar valid
-                new auto_drive_straight_until_lidar_cmd(drive, lidar, 1.5).withTimeout(3),
+                new auto_drive_straight_until_lidar_cmd(drive, lidar, 2).withTimeout(3),
 
                 //Drive forward at current angle using lidar
-                new auto_drive_lidar(drive, lidar, 200, 1.25, true, -19),
+                new auto_drive_lidar(drive, lidar, 200, 1.25, true, lidarDepartureAngle[positionCode]),
 
                 //Drive forward at to zero angle using lidar
                 new auto_drive_lidar(drive, lidar, 125, 1, true, 0),
@@ -81,13 +81,13 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 ),
 
                 //Drive backwards at departure angle using lidar
-                new auto_drive_lidar(drive, lidar, 800, 3, false, -19),
+                new auto_drive_lidar(drive, lidar, 800, 3, false, lidarDepartureAngle[positionCode]),
 
                 //Drive open loop backwards until limelight valid
                 new auto_drive_straight_cmd(drive, -3).withTimeout(1),
 
                 //Move backwards using limelight to a certain limelight area(distance estimate) TODO: Figure out angle
-                new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, 1.9, false)
+                new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, departureArea[positionCode], false)
 /*
                 //Retreat at angle zero for fixed amount of time (limelight doesn't work too close to wall due to washout)
                 new auto_drive_lidar(drive, lidar, 700, 0, 0.2, false).withTimeout(2),

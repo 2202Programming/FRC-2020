@@ -92,7 +92,7 @@ public final class Constants {
 
     //Limelight Area of Departure based on starting possition
     public static final double DEPARTURE_AREA_A = 1.1;
-    public static final double DEPARTURE_AREA_B = 1.2;
+    public static final double DEPARTURE_AREA_B = 1.4;
     public static final double DEPARTURE_AREA_C = 1.1;
 
     //camera paths

@@ -20,6 +20,11 @@ public class auto_cmd_group extends SequentialCommandGroup {
     double[] startDelay = { 0.0, Constants.DELAY_A, Constants.DELAY_B, Constants.DELAY_C };
     double[] startAngle = { 0.0, Constants.ANGLE_A, Constants.ANGLE_B, Constants.ANGLE_C };
     double[] limelightArea = { 0.0, Constants.AREA_A, Constants.AREA_B, Constants.AREA_C };
+    double[] limelightDepartureAngle = { 0.0, Constants.LIMELIGHT_DEPARTURE_ANGLE_A, Constants.LIMELIGHT_DEPARTURE_ANGLE_B,
+    Constants.LIMELIGHT_DEPARTURE_ANGLE_C };
+    double[] lidarDepartureAngle = { 0.0, Constants.LIDAR_DEPARTURE_ANGLE_A, Constants.LIDAR_DEPARTURE_ANGLE_B,
+    Constants.LIDAR_DEPARTURE_ANGLE_C };
+    double[] departureArea = { 0.0, Constants.DEPARTURE_AREA_A, Constants.DEPARTURE_AREA_B, Constants.DEPARTURE_AREA_C };
 
     public auto_cmd_group(DriverControls dc, VelocityDifferentialDrive_Subsystem drive, Intake_Subsystem intake,
             Limelight_Subsystem limelight, Lidar_Subsystem lidar) {

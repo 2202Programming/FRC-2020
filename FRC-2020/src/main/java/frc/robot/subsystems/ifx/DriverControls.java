@@ -108,8 +108,8 @@ public interface DriverControls extends Subsystem {
         new JoystickTrigger(deviceMap.get(id), axis, 0.5) : null;
   }
 
-  public default GeneralTrigger bindGeneral(Id id, BooleanSupplier booleanSupplier) {
+  public default GeneralTrigger bindDoubleButton(Id id, int buttonId1, int buttonId2) {
     return (deviceMap.get(id) != null) ?
-        new GeneralTrigger(booleanSupplier) : null;
+        new GeneralTrigger(() -> deviceMap.get(id).getRawButton(buttonId1) && deviceMap.get(id).getRawButton(buttonId2)) : null;
   }
 }

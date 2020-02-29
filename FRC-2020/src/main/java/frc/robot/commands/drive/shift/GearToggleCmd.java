@@ -1,7 +1,7 @@
 package frc.robot.commands.drive.shift;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.GearShifter;
+import frc.robot.subsystems.ifx.Shifter;
 
 public class GearToggleCmd extends CommandBase {
   /**
@@ -11,12 +11,13 @@ public class GearToggleCmd extends CommandBase {
    * so used full command base.
    * 
    */
-  private GearShifter m_shifter;
+  private Shifter m_shifter;
   private boolean m_inLowGear = true; // gets set to true on first call
 
-  public GearToggleCmd(GearShifter shifter) {
+  public GearToggleCmd(Shifter shifter) {
     m_shifter = shifter;
-    addRequirements(shifter);
+    //don't add requiremnts as the gearshift may also be controlled by driveTrain
+    //addRequirements(shifter);  -
   }
 
   // Called when the command is initially scheduled.

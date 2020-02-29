@@ -40,13 +40,14 @@ public class auto_drive_straight_until_lidar_cmd extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.arcadeDrive(speed, 0);
+    drive.velocityArcadeDrive(speed, 0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     drive.arcadeDrive(0, 0);
+    Robot.command = "None";
   }
 
   // Returns true when the command should end.

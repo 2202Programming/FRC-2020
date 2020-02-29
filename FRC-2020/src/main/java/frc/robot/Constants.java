@@ -30,7 +30,7 @@ public final class Constants {
     //Lidar
     public static final int FRONT_LEFT_LIDAR = 22;
     public static final int FRONT_RIGHT_LIDAR = 21;
-    public static final double LIDAR_SAMPLE_TIME = 100; //in ms
+    public static final double LIDAR_SAMPLE_TIME = 20; //in ms
     public static final double COLOR_SAMPLE_TIME = 100; //in ms
     public static final int LOG_REFRESH_RATE = 100; //in ms
 
@@ -42,9 +42,9 @@ public final class Constants {
     public static final int UPPER_SHOOTER_TALON_CAN = 18;
     public static final int LOWER_SHOOTER_TALON_CAN = 23;
     public static final int ELEVATOR_TALON_CAN = 24;
-    public static final int ELEVATOR_PCM_CAN_ID = PCM2_CAN_ID;
-    public static final int ELEVATOR_UP_SOLENOID_PCM = 4;    
-    public static final int ELEVATOR_DOWN_SOLENOID_PCM = 5;
+    public static final int INTAKE_PCM_CAN_ID = PCM1_CAN_ID;
+    public static final int INTAKE_UP_SOLENOID_PCM = 4;    
+    public static final int INTAKE_DOWN_SOLENOID_PCM = 5;
 
     //Drivetrain
     public static final int FL_SPARKMAX_CANID = 30;
@@ -65,6 +65,12 @@ public final class Constants {
     public static final int ARMSOLENOID_HIGH_CANID = 1;
     public static final int WN_SPARKMAX_CANID = 16;       // Winch Motor
     public static final int CLIMB_ARM_TALON_CANID = 18;    // rotate arm 
+
+    public static final int PANEL_LIMIT_SWITCH_CH = 0;
+    public static final int PANEL_ROTATION_CANID = 12;//placeholderA
+    public static final int PCM_ID = 1;
+    public static final int PANEL_PISTON_FORWARD_PCM = 2;
+    public static final int PANEL_PISTON_REVERSE_PCM = 3;
 
     //Auto Delays - values to be adjusted later with testing
     public static final double DELAY_A = 0.0;

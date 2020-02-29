@@ -35,11 +35,11 @@ public class AutomaticGearShiftCmd extends CommandBase {
     }
 
     public void execute() {
-        Gear curGear = shifter.getCurGear();
+        Gear curGear = shifter.getCurrentGear();
         double leftSpeed = Math.abs(drive.getLeftVel(true));
         double rightSpeed = Math.abs(drive.getRightVel(true));
         double curSpeed = (leftSpeed + rightSpeed) / 2;
-        double shiftSpeed = getShiftSpeed(shifter.getCurGear(), getThrottle(true));
+        double shiftSpeed = getShiftSpeed(shifter.getCurrentGear(), getThrottle(true));
 
         if (Math.abs(leftSpeed - rightSpeed) > TURNING_DEADZONE) {
             // If outside of turning deadzone don't shift

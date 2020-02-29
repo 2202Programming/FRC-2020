@@ -3,9 +3,11 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.ifx.Shifter;
+
 import static frc.robot.Constants.*;
 
-public class GearShifter extends SubsystemBase {
+public class GearShifter extends SubsystemBase implements Shifter {
     // define the gear ratios for high and low gear
     private final double K_shaft = 1.0/18.75; //motor revs to wheel revs
     //shifter stage with 
@@ -35,11 +37,11 @@ public class GearShifter extends SubsystemBase {
     private Gear curGear = Gear.LOW_GEAR;
 
     public GearShifter() {
-
     }
     
-    public Gear getCurGear() {
-        return curGear;
+    @Override
+    public Gear getCurrentGear() {
+       return curGear;
     }
 
     public void shiftUp() {
@@ -62,7 +64,7 @@ public class GearShifter extends SubsystemBase {
 
     public void log() {
         SmartDashboard.putBoolean("Auto-Shift Enabled", autoShiftEnabled);
-        SmartDashboard.putString("Current Gear", getCurGear().toString());
+        SmartDashboard.putString("Current Gear", getCurrentGear().toString());
     }
 
     //current gear ratio
@@ -75,4 +77,5 @@ public class GearShifter extends SubsystemBase {
         return (Gear.HIGH_GEAR == g) ? K_high : K_low;
     }
 
+    
 }

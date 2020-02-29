@@ -14,12 +14,14 @@ public interface VelocityDrive extends Subsystem {
     /**
      * Gets velocity from the drive train in physical or normalized units.
      * This should represent the drive trains best estimate of current speed.
+     * Units is ft/s or normalized.
      *  
      * @param normalized  when true, returns vel in range of -1.0 to 1.0
      * @return
      */
     public double getLeftVel(boolean normalized);
     public double getRightVel(boolean normalized);
+    public double getAvgVelocity(boolean normalized);
     
     // Position should be in physical units 
     public double getLeftPos();

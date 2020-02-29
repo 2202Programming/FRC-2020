@@ -55,11 +55,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   // shooters
   WPI_TalonSRX upper_shooter = new WPI_TalonSRX(UPPER_SHOOTER_TALON_CAN);
-  // WPI_TalonSRX lower_shooter = new
-  // WPI_TalonSRX(Constants.LOWER_SHOOTER_TALON_CAN);
-
-  // elevator
-  // WPI_TalonSRX elevator_talon = new WPI_TalonSRX(Constants.ELEVATOR_TALON_CAN);
+  WPI_TalonSRX lower_shooter = new WPI_TalonSRX(LOWER_SHOOTER_TALON_CAN);
 
   /**
    * Which PID slot to pull gains from. Starting 2018, you can choose from 0,1,2
@@ -119,29 +115,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private boolean shooterIsOn;
 
   public Intake_Subsystem() {
-    /* Factory Default all hardware to prevent unexpected behaviour */
-    upper_shooter.configFactoryDefault();
-
-    // use the config to set all values at once
-    shooterCfg.slot0.kP = kGains_Velocit.kP;
-    shooterCfg.slot0.kI = kGains_Velocit.kI;
-    shooterCfg.slot0.kD = kGains_Velocit.kD;
-    shooterCfg.slot0.kF = kGains_Velocit.kF;
-
-    shooterCfg.slot1 = shooterCfg.slot0;
-
-    /* Config sensor used for Primary PID [Velocity] */
-    upper_shooter.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kPIDLoopIdx, kTimeoutMs);
-
-    upper_shooter.configAllSettings(shooterCfg);
-
-    /* Config the peak and nominal outputs */
-    upper_shooter.configNominalOutputForward(0, kTimeoutMs);
-    upper_shooter.configNominalOutputReverse(0, kTimeoutMs);
-    upper_shooter.configPeakOutputForward(1, kTimeoutMs);
-    upper_shooter.configPeakOutputReverse(-1, kTimeoutMs);
-
-    lastError = upper_shooter.getLastError();
+    shooterMotorConfig(upper_shooter);
+    shooterMotorConfig(lower_shooter);
 
     /* Config the Velocity closed loop gains in slot0 */
     // upper_shooter_talon.config_kF(kPIDLoopIdx, 0.0 /*kGains_Velocit.kF */,
@@ -153,14 +128,39 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     intakeIsOn = false;
     shooterIsOn = false;
 
-    magazineDown();  //must start in down positon
-    //TODO: interlock mag up/down and intake. - only one up
+    magazineDown(); // must start in down positon
+    // TODO: interlock mag up/down and intake. - only one up
+  }
+
+  void shooterMotorConfig(WPI_TalonSRX talon) {
+    /* Factory Default all hardware to prevent unexpected behaviour */
+    talon.configFactoryDefault();
+
+    // use the config to set all values at once
+    shooterCfg.slot0.kP = kGains_Velocit.kP;
+    shooterCfg.slot0.kI = kGains_Velocit.kI;
+    shooterCfg.slot0.kD = kGains_Velocit.kD;
+    shooterCfg.slot0.kF = kGains_Velocit.kF;
+
+    shooterCfg.slot1 = shooterCfg.slot0;
+
+    /* Config sensor used for Primary PID [Velocity] */
+    talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kPIDLoopIdx, kTimeoutMs);
+
+    talon.configAllSettings(shooterCfg);
+
+    /* Config the peak and nominal outputs */
+    talon.configNominalOutputForward(0, kTimeoutMs);
+    talon.configNominalOutputReverse(0, kTimeoutMs);
+    talon.configPeakOutputForward(1, kTimeoutMs);
+    talon.configPeakOutputReverse(-1, kTimeoutMs);
+    lastError = talon.getLastError();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    lastError = upper_shooter.getLastError();
+    //lastError = upper_shooter.getLastError();
   }
 
   public void raiseIntake() {
@@ -201,6 +201,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
      */
     // WIP - using simple motorpercent for now - 2/13/20
     upper_shooter.set(ControlMode.PercentOutput, RPM_target);
+    lower_shooter.set(ControlMode.PercentOutput, -RPM_target);
   }
 
   public boolean shooterIsOn() {
@@ -210,6 +211,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   public void shooterOff() {
     shooterIsOn = false;
     upper_shooter.set(ControlMode.PercentOutput, 0);
+    lower_shooter.set(ControlMode.PercentOutput, 0);
   }
 
   public void magazineUp() {
@@ -219,8 +221,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   public void magazineDown() {
     magSolenoid.set(Value.kReverse);
   }
-  public  boolean isMagazineUp() {
-    return ( magSolenoid.get() == Value.kReverse) ? false  :true ;
+
+  public boolean isMagazineUp() {
+    return (magSolenoid.get() == Value.kReverse) ? false : true;
   }
 
   @Override

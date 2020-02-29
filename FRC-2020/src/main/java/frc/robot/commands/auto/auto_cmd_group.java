@@ -44,12 +44,16 @@ public class auto_cmd_group extends SequentialCommandGroup {
         int delayCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x03); // sw 1 & 2
         
         // TODO: Change path based on positionCode from switch
-        // int positionCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x0C)>>2; // sw 3
-        // & 4
+        positionCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x0C)>>2; // sw 3 & 4
+
+        //Switch 5
+        trenchMode = ((dc.getInitialButtons(Id.SwitchBoard) & 0x10) == 1) ? true : false;
 
         delayCode = 0; // this should be removed to read in from switch
         positionCode = 2; // this should be removed to read in from switch
         //1 = A (far right closest to wall), 2 = B (centeted), 3 = C (far left)
+        trenchMode = false;
+
 
         delay = startDelay[delayCode];
         angleTarget = startAngle[positionCode];

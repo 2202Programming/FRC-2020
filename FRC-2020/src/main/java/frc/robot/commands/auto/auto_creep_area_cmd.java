@@ -60,7 +60,8 @@ public class auto_creep_area_cmd extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(limelight);
     addRequirements(drive);
-
+    
+    limelight.enableLED();
 
     }
 
@@ -75,7 +76,6 @@ public class auto_creep_area_cmd extends CommandBase {
  //  else
   //    kAreaToPid = -2;
 
-    limelight.enableLED();
     drive.resetPosition();
 
     distancePIDController.reset();

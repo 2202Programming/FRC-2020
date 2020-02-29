@@ -3,6 +3,7 @@ package frc.robot.commands.auto;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -65,7 +66,8 @@ public class auto_cmd_group extends SequentialCommandGroup {
         if (delay > 0) { // do these only if not first in attack order
             addCommands(
                 new DriveOffLine(drive),
-                new auto_do_nothing().withTimeout(delay));
+                new WaitCommand(delay)
+            );
         }
 
         addCommands(

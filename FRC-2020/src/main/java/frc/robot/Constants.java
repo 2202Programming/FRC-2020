@@ -70,8 +70,8 @@ public final class Constants {
 
     //Auto Delays - values to be adjusted later with testing
     public static final double DELAY_A = 3.0;
-    public static final double DELAY_B = 1.0;
-    public static final double DELAY_C = 2.0;
+    public static final double DELAY_B = 6.0;
+    public static final double DELAY_C = 9.0;
     
     //angle based on starting position
     public static final double ANGLE_A = -10.0;
@@ -94,8 +94,8 @@ public final class Constants {
     public static final double AREA_C = 2.6;
 
     //Limelight Area of Departure based on starting possition
-    public static final double DEPARTURE_AREA_A = 1.1;
-    public static final double DEPARTURE_AREA_B = 1.4;
+    public static final double DEPARTURE_AREA_A = 1.4;
+    public static final double DEPARTURE_AREA_B = 1.9;
     public static final double DEPARTURE_AREA_C = 1.1;
 
     //camera paths

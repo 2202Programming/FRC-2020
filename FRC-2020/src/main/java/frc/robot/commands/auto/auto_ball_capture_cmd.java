@@ -13,9 +13,7 @@ import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
 public class auto_ball_capture_cmd extends CommandBase {
-  /**
-   * Creates a new auto_ball_capture_cmd.
-   */
+  //open loop driving with intake running
 
    private final Intake_Subsystem intake;
    private double intake_strength;
@@ -27,13 +25,15 @@ public class auto_ball_capture_cmd extends CommandBase {
 
   public auto_ball_capture_cmd(Intake_Subsystem intake, VelocityDifferentialDrive_Subsystem drive, Limelight_Subsystem limelight,
   double intake_strength, double magazine_strength, double drive_speed) {
-    // Use addRequirements() here to declare subsystem dependencies.
+
     this.intake = intake; 
     this.intake_strength = intake_strength;
     this.magazine_strength = magazine_strength;
     this.drive = drive;
     this.limelight = limelight;
     this.drive_speed = drive_speed;
+
+    addRequirements(drive);
   }
 
   // Called when the command is initially scheduled.
@@ -55,7 +55,7 @@ public class auto_ball_capture_cmd extends CommandBase {
   public void end(boolean interrupted) {
     intake.intakeOff();
     drive.velocityArcadeDrive(0, 0);
-    limelight.disableLED();
+    limelight.disableLED(); //done with auto, disable LED
   }
 
   // Returns true when the command should end.

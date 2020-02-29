@@ -1,5 +1,6 @@
 package frc.robot.commands.auto;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.DriveWithLidarToDistanceDegCmd;
@@ -17,6 +18,13 @@ import frc.robot.Robot;
 public class auto_cmd_group extends SequentialCommandGroup {
 
     double[] startDelay = { 0.0, Constants.DELAY_A, Constants.DELAY_B, Constants.DELAY_C };
+    double[] startAngle = { 0.0, Constants.ANGLE_A, Constants.ANGLE_B, Constants.ANGLE_C };
+    double[] limelightArea = { 0.0, Constants.AREA_A, Constants.AREA_B, Constants.AREA_C };
+    double[] limelightDepartureAngle = { 0.0, Constants.LIMELIGHT_DEPARTURE_ANGLE_A, Constants.LIMELIGHT_DEPARTURE_ANGLE_B,
+    Constants.LIMELIGHT_DEPARTURE_ANGLE_C };
+    double[] lidarDepartureAngle = { 0.0, Constants.LIDAR_DEPARTURE_ANGLE_A, Constants.LIDAR_DEPARTURE_ANGLE_B,
+    Constants.LIDAR_DEPARTURE_ANGLE_C };
+    double[] departureArea = { 0.0, Constants.DEPARTURE_AREA_A, Constants.DEPARTURE_AREA_B, Constants.DEPARTURE_AREA_C };
 
     public auto_cmd_group(DriverControls dc, VelocityDifferentialDrive_Subsystem drive, Intake_Subsystem intake,
             Limelight_Subsystem limelight, Lidar_Subsystem lidar) {
@@ -28,6 +36,8 @@ public class auto_cmd_group extends SequentialCommandGroup {
         double targetForwardPower = 0.1;
         double delay = 0;
         double departure_angle = 20;
+        int positionCode;
+        double limelightAreaTarget;
 
         // Compute delay based on switches
         int delayCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x03); // sw 1 & 2
@@ -36,35 +46,48 @@ public class auto_cmd_group extends SequentialCommandGroup {
         // int positionCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x0C)>>2; // sw 3
         // & 4
 
+        delayCode = 0; // this should be removed to read in from switch
+        positionCode = 1; // this should be removed to read in from switch
+        //1 = A (far right closest to wall), 2 = B (centeted), 3 = C (far left)
 
         delay = startDelay[delayCode];
-        delay = 1;
+        angleTarget = startAngle[positionCode];
+        limelightAreaTarget = limelightArea[positionCode];
+        
+        if (delay > 0) { // do these only if not first in attack order
+            addCommands(
+                new DriveOffLine(drive),
+                new auto_do_nothing().withTimeout(delay));
+        }
 
         addCommands(
 
-                //drives off line
-                new DriveOffLine(drive),
-
-                //does nothing for delay seconds
-                new auto_do_nothing().withTimeout(delay),
-
                 //Move forward using limelight to a certain limelight area(distance estimate) TODO: Figure out angle
-                new auto_creep_area_cmd(drive, limelight, lidar, -9, 2, 60, 2.9, true),
+                new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, limelightAreaTarget, true).withTimeout(3),
 
                 //Drive open loop forward until lidar valid
-                new auto_drive_straight_until_lidar_cmd(drive, lidar, 1).withTimeout(3),
+                new auto_drive_straight_until_lidar_cmd(drive, lidar, 1.5).withTimeout(3),
 
                 //Drive forward at current angle using lidar
-                new auto_drive_lidar(drive, lidar, 150, 0.5, true),
+                new auto_drive_lidar(drive, lidar, 200, 1.25, true, -19),
 
-                //Deploy balls
-                new ShooterOn(intake, 1200, 0.4).withTimeout(2.0), // turn shooter on for 2 seconds 1200 rpm
+                //Drive forward at to zero angle using lidar
+                new auto_drive_lidar(drive, lidar, 125, 1, true, 0),
+                
+                new ParallelCommandGroup(
+                    new auto_drive_straight_cmd(drive, 0.5).withTimeout(2), // pressure on wall during dump
+                    //Deploy balls
+                    new ShooterOn(intake, 1200, 0.4).withTimeout(2.0) // turn shooter on for 2 seconds 1200 rpm
+                ),
 
                 //Drive backwards at departure angle using lidar
-                new auto_drive_lidar(drive, lidar, 1000, 0.5, false),
+                new auto_drive_lidar(drive, lidar, 800, 3, false, -19),
+
+                //Drive open loop backwards until limelight valid
+                new auto_drive_straight_cmd(drive, -3).withTimeout(1),
 
                 //Move backwards using limelight to a certain limelight area(distance estimate) TODO: Figure out angle
-                new auto_creep_area_cmd(drive, limelight, lidar, -9, 2, 60, 1.9, false)
+                new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, 1.9, false)
 /*
                 //Retreat at angle zero for fixed amount of time (limelight doesn't work too close to wall due to washout)
                 new auto_drive_lidar(drive, lidar, 700, 0, 0.2, false).withTimeout(2),

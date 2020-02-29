@@ -28,7 +28,7 @@ public class auto_creep_area_cmd extends CommandBase {
   private double angleTarget;
   private double targetArea;
   private double Kap = 2, Kai = 0.00, Kad = 0.02; // angle drive PIDs
-  private double Kp = 1, Ki = 0.01, Kd = 0.02; // distance drive PIDs
+  private double Kp = 2, Ki = 0.1, Kd = 0.02; // distance drive PIDs
   private final PIDController anglePIDController;
   private final PIDController distancePIDController;
   private double tolerancePct = .05;
@@ -61,16 +61,20 @@ public class auto_creep_area_cmd extends CommandBase {
     addRequirements(limelight);
     addRequirements(drive);
 
-   // if (forward)
-   //   kAreaToPid = 2;
-   // else
-   //   kAreaToPid = -2;
 
-  }
+    }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    
+    Robot.command = "Auto Limelight Move";
+
+ //   if (forward)
+ //     kAreaToPid = 2;
+ //  else
+  //    kAreaToPid = -2;
+
     limelight.enableLED();
     drive.resetPosition();
 
@@ -83,12 +87,13 @@ public class auto_creep_area_cmd extends CommandBase {
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
     anglePIDController.setSetpoint(angleTarget);
 
-    Robot.command = "Auto Limelight Move";
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
 
     // angle pid to limelight angle
     double current_angle = limelight.getFilteredX();
@@ -96,7 +101,7 @@ public class auto_creep_area_cmd extends CommandBase {
     angleCmd = MathUtil.clamp(angleCmd, -maxAngleRate, maxAngleRate);
 
     // distanace pid
-    current_position = limelight.getArea();
+    current_position = limelight.getFilteredArea();
     double speedCmd = kAreaToPid * distancePIDController.calculate(current_position);
     speedCmd = MathUtil.clamp(speedCmd, -maxSpeed, maxSpeed);
 
@@ -121,7 +126,6 @@ public class auto_creep_area_cmd extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     drive.arcadeDrive(0, 0);
-    limelight.disableLED();
     Robot.command = "None";
     drive.resetPosition();
   }
@@ -129,9 +133,8 @@ public class auto_creep_area_cmd extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-
     if (forward) 
-      return (current_position > targetArea);
+      return (current_position > (targetArea - targetArea*tolerancePct));
     else return (current_position < targetArea); 
   }
 }

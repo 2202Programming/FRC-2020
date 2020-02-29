@@ -18,8 +18,9 @@ public class DriveOnTrajectory extends SequentialCommandGroup {
   private Trajectory path;
   private RamseteController ramseteController;
 
-  private double ramB = 0.9;
-  private double ramZ = 0.9;
+  //Example project w/ controller in units of m/s
+  private double ramB = 2;
+  private double ramZ = 0.7;
   /**
    * Creates a new DriveOnTrajectory.
    */
@@ -32,6 +33,6 @@ public class DriveOnTrajectory extends SequentialCommandGroup {
     ramseteController = new RamseteController(ramB, ramZ);
 
     addCommands(new RamseteCommand(
-      path, driveTrain::getPose, ramseteController, driveTrain.DRIVE_KINEMATICS, driveTrain::tankDrive, driveTrain));
+      path, driveTrain::getPose, ramseteController, driveTrain.DRIVE_KINEMATICS, driveTrain::velocityTankWheelSpeeds, driveTrain));
   }
 }

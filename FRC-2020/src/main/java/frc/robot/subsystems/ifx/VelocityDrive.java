@@ -40,4 +40,12 @@ public interface VelocityDrive extends Subsystem {
      * @param degreePerSecond
      */
     public void velocityArcadeDrive(double feetPerSecond, double degreePerSecond);
+
+    /**
+     * Physical units
+     * 
+     * @param leftFeetPerSecond
+     * @param rightFeetPerSecond
+     */
+    public void velocityTankDrive(double leftFeetPerSecond, double rightFeetPerSecond);
 }

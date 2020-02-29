@@ -280,13 +280,67 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		dDrive.arcadeDrive(xSpeed, zRotation, false);
 	}
 
+	//both speeds are in ft/s
+	public void velocityTankDrive(double leftSpeed, double rightSpeed) {
+		// used to handle shifting request
+		Gear currentGear = gearbox.getCurrentGear(); 
+		boolean shifting = (currentGear != requestedGear);
+		//shifting 
+		if (shifting) {
+			// do math on new gear to match RPM of new Vel Cmd
+			currentGear = requestedGear;   
+		}
+
+		// Spark Max uses RPM for velocity closed loop mode
+		// so we need to convert ft/s to RPM command which is dependent
+		// on the gear ratio.
+		double k = getFPSperRPM(currentGear);
+		double maxSpeed = maxFPS_High;   //getMaxSpeed(currentGear);
+		
+		// limit vel to max for the gear ratio
+		double lVcmd = Math.copySign(MathUtil.limit(Math.abs(leftSpeed), 0.0, maxSpeed), leftSpeed);
+		double lRpm = lVcmd / k;
+
+		double rVcmd = Math.copySign(MathUtil.limit(Math.abs(rightSpeed), 0.0, maxSpeed), rightSpeed);
+		double rRpm = rVcmd / k;
+
+		// add in the commanded speed each wheel
+		double vl_rpm = applyDeadZone(lRpm, RPM_DZ);
+		double vr_rpm = -applyDeadZone(rRpm, RPM_DZ);
+
+		/* debugging
+		double v_test = getLeftVel(false);
+		double v_err = v_test - vl_rpm;
+		*/
+		
+		if (coastMode) {
+			// command doesn't need power, ok to coast, should use PWM and zero power
+			// with the controller setup to coast mode by default.
+			leftController.set(0.0);
+			rightController.set(0.0);
+		}
+		else {
+			// command the velocity to the wheels
+			leftController.setReference(vl_rpm);
+			rightController.setReference(vr_rpm);
+		}
+
+		dDrive.feed();
+		
+		//shifts the gears if needed
+		shiftGears();
+	}
+
+	//Wheel speeds in m/s
+	public void velocityTankWheelSpeeds(final double leftWheelSpeed, final double rightWheelSpeed) {
+		double leftFps = leftWheelSpeed * 0.3048;//Convert meters to feet
+		double rightFps = rightWheelSpeed * 0.3048;
+		velocityTankDrive(leftFps, rightFps);
+	}
+
 	public void tankDrive(final double leftSpeed, final double rightSpeed) {
 		shiftGears();
 		dDrive.tankDrive(leftSpeed, rightSpeed, false);
-	}
-
-	public void tankDriveWheelSpeeds(final double leftWheelSpeed, final double rightWheelSpeed) {
-		
 	}
 
 	public Pose2d getPose(){

@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.*;
 import frc.robot.util.misc.MathUtil;
+
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANPIDController;
@@ -11,6 +13,10 @@ import com.revrobotics.ControlType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SpeedController;
 
@@ -51,6 +57,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft,
 			middleRight, middleLeft };
 
+	private final AHRS navX = new AHRS();
+
 	// VelController can use either Velocity mode or dutycycle modes and is wrapper
 	// around CANSparkMax. These get setup after factory resets.
 	private VelController leftController; 
@@ -78,6 +86,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final double maxRPM_High;  // max motor RPM low & high
 
 	private final DifferentialDrive dDrive;
+	private final DifferentialDriveOdometry odometry;
+	public static final double trackWidthMeters = .9;
+    public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(trackWidthMeters);
+
 	private GearShifter gearbox;
 	private Gear requestedGear; 
 	private boolean coastMode = false;
@@ -105,6 +117,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		adjustCurrentLimit(0);
 
 		dDrive = new DifferentialDrive(leftController, rightController);
+		odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 		dDrive.setSafetyEnabled(false);
 	}
 
@@ -270,6 +283,18 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public void tankDrive(final double leftSpeed, final double rightSpeed) {
 		shiftGears();
 		dDrive.tankDrive(leftSpeed, rightSpeed, false);
+	}
+
+	public void tankDriveWheelSpeeds(final double leftWheelSpeed, final double rightWheelSpeed) {
+		
+	}
+
+	public Pose2d getPose(){
+		return odometry.getPoseMeters();
+	}
+
+	public double getHeading() {
+		return navX.getAngle() % 360;
 	}
 
 	/**

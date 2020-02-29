@@ -1,5 +1,6 @@
 package frc.robot.commands.auto;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.intake.ShooterOn;
@@ -48,12 +49,13 @@ public class auto_cmd_group extends SequentialCommandGroup {
         positionCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x0C)>>2; // sw 3 & 4
 
         //Switch 5
-        trenchMode = ((dc.getInitialButtons(Id.SwitchBoard) & 0x10) == 1) ? true : false;
+        trenchMode = ((dc.getInitialButtons(Id.SwitchBoard) & 0x10)>>4 == 1) ? true : false;
+        SmartDashboard.putBoolean("Trench Mode", trenchMode);
 
-        delayCode = 0; // this should be removed to read in from switch
-        positionCode = 2; // this should be removed to read in from switch
+        //delayCode = 0; // this should be removed to read in from switch
+        //positionCode = 2; // this should be removed to read in from switch
         //1 = A (far right closest to wall), 2 = B (centeted), 3 = C (far left)
-        trenchMode = false; // this should be removed to read in from switch
+        //trenchMode = false; // this should be removed to read in from switch
 
 
         delay = startDelay[delayCode];

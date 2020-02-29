@@ -144,12 +144,16 @@ private void jasonsButtons(){
 
     // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
+
+    /*Not using for now
+    //Control Panel Manual Controls
     driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new SimpRotateControl(panel));
     driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.RB.getCode())
       .whenPressed(new SimpPositionControl(panel, detector));
     driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.START.getCode())
       .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
+      */
   }
 
   
@@ -161,7 +165,7 @@ private void jasonsButtons(){
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     // return new CommandBase() {};
-    return new DriveOffLine(driveTrain);
+    return new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar);
   }
 
   /**

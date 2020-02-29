@@ -118,7 +118,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// velocity setup - using RPM speed controller, sets pid
 		this.leftController = new VelController(backLeft);
 		this.rightController = new VelController(backRight);
-		this.rightController.setInverted(true);
+		this.leftController.setInverted(true);
 
 		// Have motors follow to use Differential Drive
 		middleRight.follow(backRight);

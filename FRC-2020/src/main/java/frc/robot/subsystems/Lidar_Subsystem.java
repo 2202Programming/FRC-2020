@@ -76,10 +76,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
       return false;
     }
     return true;
-    
-
-    //return (front_left_lidar.getRange() < 1500 && front_right_lidar.getRange() < 1500);
-
+  
   }
 
   public boolean isEitherValid(){

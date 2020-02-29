@@ -34,7 +34,6 @@ public class auto_drive_lidar extends CommandBase {
   private final double Kap = 1, Kai = 0.001, Kad = 0.0;
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
-  private boolean straight;
   private double maxAngleSpeed = 60;
 
   public auto_drive_lidar(final VelocityDifferentialDrive_Subsystem drive, final Lidar_Subsystem lidar, final double stopDist,

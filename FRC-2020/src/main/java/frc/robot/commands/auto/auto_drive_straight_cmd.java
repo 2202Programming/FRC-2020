@@ -9,9 +9,7 @@ package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
-import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
-import frc.robot.subsystems.ifx.ArcadeDrive;
 
 public class auto_drive_straight_cmd extends CommandBase {
   /**

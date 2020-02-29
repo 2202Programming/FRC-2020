@@ -8,10 +8,12 @@
 package frc.robot.subsystems.ifx;
 
 import java.util.HashMap;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.subsystems.hid.GeneralTrigger;
 import frc.robot.subsystems.hid.JoystickTrigger;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -104,5 +106,10 @@ public interface DriverControls extends Subsystem {
   public default JoystickTrigger bindJoystick(Id id, int axis) {
     return (deviceMap.get(id) != null) ?  
         new JoystickTrigger(deviceMap.get(id), axis, 0.5) : null;
+  }
+
+  public default GeneralTrigger bindGeneral(Id id, BooleanSupplier booleanSupplier) {
+    return (deviceMap.get(id) != null) ?
+        new GeneralTrigger(booleanSupplier) : null;
   }
 }

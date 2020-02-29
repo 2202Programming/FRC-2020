@@ -61,6 +61,7 @@ public final class Constants {
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
 
+    //Control Panel Manipulator
     public static final int PANEL_LIMIT_SWITCH_CH = 0;
     public static final int PANEL_ROTATION_CANID = 12;//placeholderA
     public static final int PCM_ID = 1;

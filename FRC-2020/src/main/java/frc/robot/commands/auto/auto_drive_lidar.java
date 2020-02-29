@@ -22,7 +22,7 @@ public class auto_drive_lidar extends CommandBase {
   private final Lidar_Subsystem lidar;
 
   private final double stopDist; // mm
-  private final double tolerance = 100; // mm
+  private final double tolerance = 50; // mm
   private double angleToleranceDeg = 3;
   private double kInchesToPerPower = 1;
   private double kDegreesToPerPower = -1;
@@ -34,17 +34,22 @@ public class auto_drive_lidar extends CommandBase {
   private final double Kap = 1, Kai = 0.001, Kad = 0.0;
   private final PIDController distancePIDController;
   private final PIDController anglePIDController;
+  private boolean straight;
 
   public auto_drive_lidar(final VelocityDifferentialDrive_Subsystem drive, final Lidar_Subsystem lidar, final double stopDist,
-      final double maxSpeed, final boolean forwards) {
+      final double maxSpeed, final boolean forwards, final boolean straight) {
     this.drive = drive;
     this.lidar = lidar;
     this.stopDist = stopDist; // mm
     this.maxSpeed = maxSpeed;
     this.forwards = forwards;
+    this.straight = straight;
 
-    if (forwards) kInchesToPerPower = -1;
-    else kInchesToPerPower = 1;
+    kInchesToPerPower = -2;
+
+    if (straight) {
+      angleTarget = 0;
+    }
 
     // create the PID with vel and accl limits
     distancePIDController = new PIDController(Kp, Ki, Kd);
@@ -101,6 +106,7 @@ public class auto_drive_lidar extends CommandBase {
     SmartDashboard.putNumber("Tolerance (mm)", tolerance);
 
     drive.velocityArcadeDrive(speedCmd, angleCmd);
+
   }
 
   // Called once the command ends or is interrupted.

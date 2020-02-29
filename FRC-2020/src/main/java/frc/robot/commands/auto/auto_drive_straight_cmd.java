@@ -18,12 +18,9 @@ public class auto_drive_straight_cmd extends CommandBase {
    * Creates a new auto_drive_straight_until_lidar_cmd.
    */
   private final VelocityDifferentialDrive_Subsystem drive;
-  private final Lidar_Subsystem lidar;
   private final double speed;
 
-  public auto_drive_straight_cmd(VelocityDifferentialDrive_Subsystem drive, Lidar_Subsystem lidar, double speed) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    this.lidar = lidar;
+  public auto_drive_straight_cmd(VelocityDifferentialDrive_Subsystem drive, double speed) {
     this.drive = drive;
     this.speed = speed;
 
@@ -40,7 +37,7 @@ public class auto_drive_straight_cmd extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.arcadeDrive(speed, 0);
+    drive.velocityArcadeDrive(speed, 0);
   }
 
   // Called once the command ends or is interrupted.

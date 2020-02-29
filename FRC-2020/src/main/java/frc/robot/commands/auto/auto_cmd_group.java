@@ -63,16 +63,16 @@ public class auto_cmd_group extends SequentialCommandGroup {
         addCommands(
 
                 //Move forward using limelight to a certain limelight area(distance estimate) TODO: Figure out angle
-                new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, limelightAreaTarget, true),
+                new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, limelightAreaTarget, true).withTimeout(3),
 
                 //Drive open loop forward until lidar valid
                 new auto_drive_straight_until_lidar_cmd(drive, lidar, 1.5).withTimeout(3),
 
                 //Drive forward at current angle using lidar
-                new auto_drive_lidar(drive, lidar, 200, 1.25, true, false),
+                new auto_drive_lidar(drive, lidar, 200, 1.25, true, -19),
 
                 //Drive forward at to zero angle using lidar
-                new auto_drive_lidar(drive, lidar, 125, 1, true, true),
+                new auto_drive_lidar(drive, lidar, 125, 1, true, 0),
                 
                 new ParallelCommandGroup(
                     new auto_drive_straight_cmd(drive, 0.5).withTimeout(2), // pressure on wall during dump
@@ -81,7 +81,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 ),
 
                 //Drive backwards at departure angle using lidar
-                new auto_drive_lidar(drive, lidar, 800, 3, false, false),
+                new auto_drive_lidar(drive, lidar, 800, 3, false, -19),
 
                 //Drive open loop backwards until limelight valid
                 new auto_drive_straight_cmd(drive, -3).withTimeout(1),

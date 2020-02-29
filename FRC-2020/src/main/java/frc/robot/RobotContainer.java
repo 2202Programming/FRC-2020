@@ -107,7 +107,6 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-    DPLTestButtons();
     jasonsButtons();
   }
 
@@ -153,42 +152,7 @@ private void jasonsButtons(){
       .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
   }
 
-  // Derek's testing...
-  private void DPLTestButtons() {
-
-    // testing buttion to enable/disable tankdrive rotation limits
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.START.getCode()).toggleWhenPressed(new CommandBase() {
-      @Override
-      public void initialize() {
-        driverControls.setLimitRotation(true);
-      }
-
-      @Override
-      public void end(boolean interrupted) {
-        driverControls.setLimitRotation(false);
-      }
-    });
-
-    // current limit testing UP/DOWN on driver Pad
-    DPadButton dUp = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver), DPadButton.Direction.UP);
-    dUp.toggleWhenPressed(new CommandBase() {
-      @Override
-      public void initialize() {
-        driveTrain.adjustCurrentLimit(1);
-      }
-    });
-
-    DPadButton dDown = new DPadButton((XboxController) DriverControls.deviceMap.get(Id.Driver),
-        DPadButton.Direction.DOWN);
-    dDown.toggleWhenPressed(new CommandBase() {
-      @Override
-      public void initialize() {
-        driveTrain.adjustCurrentLimit(-1);
-      }
-    });
-
-  }
-
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

@@ -24,6 +24,7 @@ import frc.robot.commands.auto.DriveOffLine;
 //import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
+import frc.robot.commands.climb.ClimbGroup;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
@@ -148,12 +149,16 @@ private void jasonsButtons(){
 
     // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
     // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.LB.getCode())
+
+    //1-4 on the switchboard are taken by auto
+    driverControls.bindButton(Id.SwitchBoard, 6)
       .whenPressed(new SimpRotateControl(panel));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.RB.getCode())
+    driverControls.bindButton(Id.SwitchBoard, 12)
       .whenPressed(new SimpPositionControl(panel, detector));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.START.getCode())
+    driverControls.bindButton(Id.SwitchBoard, 5)
       .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
+    driverControls.bindDoubleButton(Id.SwitchBoard, 7, 11)
+      .whenPressed(new ClimbGroup());
   }
 
   // Derek's testing...

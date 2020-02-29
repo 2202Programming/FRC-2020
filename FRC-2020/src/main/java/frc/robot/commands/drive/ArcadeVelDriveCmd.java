@@ -8,13 +8,11 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import static frc.robot.Constants.*;
+//import static frc.robot.Constants.*;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.Shifter;
 import frc.robot.subsystems.ifx.VelocityDrive;
-import frc.robot.util.misc.RateLimiter;
-import frc.robot.util.misc.RateLimiter.InputModel;
 
 public class ArcadeVelDriveCmd extends CommandBase {
   DriverControls dc;
@@ -26,13 +24,19 @@ public class ArcadeVelDriveCmd extends CommandBase {
   double rotMax; // deg per sec
 
   // AutoShift info
-  double shiftUpSpeed = 6.0; // ft/s above shift into high gear
-  double shiftDownSpeed = 2.5; // ft/s below shift into low gear
-  int minTimeInZone = 20; // frame counts *.02 = 0.4 seconds
+  double shiftUpSpeed = 6.8; // ft/s above shift into high gear (must be less than 10 or so)
+  double shiftDownSpeed = 1.5; // ft/s below shift into low gear
+  int minTimeInZone = 5; // frame counts *.02 = 0.1 seconds
   int timeWantingUp;
   int timeWantingDown;
 
-  RateLimiter rotRateLimiter;
+  int timeWantingCoast; // frames where Vcmd < Vrobot
+  int minTimeEnterCoast = 5; // frames to require before coast
+
+  // robot values measured at start of frame
+  double velAvg;
+  double velCmd;
+  double rotCmd;
 
   /**
    * Creates a new ArcadeVelDriveCmd to drive the system using physical units of
@@ -53,15 +57,6 @@ public class ArcadeVelDriveCmd extends CommandBase {
     this.rotMax = rotMaxDps;
     this.shifter = shifter;
 
-    rotRateLimiter = new RateLimiter(DT, dc::getRotation, null,
-         -rotMaxDps,
-          rotMaxDps,
-          -5.0, 5.0,  //rate deg/s^2
-          InputModel.Position);
-    rotRateLimiter.setRateGain(rotMax);
-    rotRateLimiter.setForward(0.0);
-    rotRateLimiter.initialize();
-
     addRequirements(driveTrain);
   }
 
@@ -78,11 +73,11 @@ public class ArcadeVelDriveCmd extends CommandBase {
     timeWantingUp = 0;
   }
 
-  void countTimeInShiftZone(double v) {
-    double velCmd = Math.abs(v);
-    // get robot velocity and use that to shift
-    
-    double vel = Math.abs(drive.getLeftVel(false));
+  void countTimeInShiftZone() {
+    // use ABS of velocity
+    double cmd = Math.abs(velCmd);
+    double vel = Math.abs(velAvg);
+
     // count time we want to shift high, if we hit it request it from the shifter
     if ((vel > shiftUpSpeed) && // (velCmd >= vel) &&
         (shifter.getCurrentGear() == Gear.LOW_GEAR)) {
@@ -91,7 +86,6 @@ public class ArcadeVelDriveCmd extends CommandBase {
         resetTimeInZone();
       }
     }
-    // else timeWantingUp = 0;
 
     // same thing on the low side
     if ((vel < shiftDownSpeed) && // (velCmd <= vel) &&
@@ -101,14 +95,24 @@ public class ArcadeVelDriveCmd extends CommandBase {
         resetTimeInZone();
       }
     }
-    // else timeWantingDown = 0;
+
+    // see if we can coast, using abs vel
+    if ((cmd < vel) && (rotCmd == 0.0 )) {
+      if (++timeWantingCoast > minTimeEnterCoast)
+        drive.setCoastMode(true);
+    } else {
+      // we want more speed, clear the count
+      timeWantingCoast = 0;
+      drive.setCoastMode(false);
+    }
   }
-/**
- * 
- * @param zoneCount  - frames to wait before shifting (10-50 expected)
- * @param shiftDown  - speed to downshift ft/s
- * @param shiftUp    - speed to upshift  ft/s
- */
+
+  /**
+   * 
+   * @param zoneCount - frames to wait before shifting (10-50 expected)
+   * @param shiftDown - speed to downshift ft/s
+   * @param shiftUp   - speed to upshift ft/s
+   */
   public void setShiftProfile(int zoneCount, double shiftDown, double shiftUp) {
     this.shiftUpSpeed = shiftUp;
     this.shiftDownSpeed = shiftDown;
@@ -118,18 +122,13 @@ public class ArcadeVelDriveCmd extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // read controls in normalize units +/- 1.0
-    double v = dc.getVelocity();
-    double rot = dc.getRotation();
-    rotRateLimiter.execute();
-    //double limRot = rotRateLimiter.get();
+    // read controls in normalize units +/- 1.0, scale to physical units
+    velCmd = dc.getVelocity() * vMax;
+    rotCmd = dc.getRotation() * rotMax;
+    velAvg = drive.getLeftVel(false);
 
-    // scale inputs based on max commands
-    v *= vMax;
-    rot *= rotMax;
-
-    countTimeInShiftZone(v);
-    drive.velocityArcadeDrive(v, rot);
+    countTimeInShiftZone();
+    drive.velocityArcadeDrive(velCmd, rotCmd);
   }
 
   // This command should never end, it can be a default command

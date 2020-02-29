@@ -30,7 +30,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	// Acceleration limits
 	private final double RATE_MAX_SECONDS = 2;
-	private double rateLimit = 0.7; // seconds to max speed/power
+	private double rateLimit = 0.9; // seconds to max speed/power
 
 	// Chasis details
 	public final double WHEEL_RADIUS = 7.5/2.0; // inches
@@ -64,6 +64,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final double kFF = 0.00025;
 	private final double kMaxOutput = 1;
 	private final double kMinOutput = -1;
+	private final int pidSlot = 0;
+	
+	// likely not needed because it is so low to get robot to move.
+	private final double FEEDFWD_MAX_VOLT = 0.0;   //0.15 was enough to move Alfred.
+	private double feedFwd = 0.0;
 
 	// Calculated based on desired low-gear max ft/s
 	private final double maxFPS_High;  // Assigned
@@ -75,6 +80,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final DifferentialDrive dDrive;
 	private GearShifter gearbox;
 	private Gear requestedGear; 
+	private boolean coastMode = false;
 	
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear, final double maxFPS, final double maxDPS) {
@@ -112,6 +118,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// velocity setup - using RPM speed controller, sets pid
 		this.leftController = new VelController(backLeft);
 		this.rightController = new VelController(backRight);
+		this.rightController.setInverted(true);
 
 		// Have motors follow to use Differential Drive
 		middleRight.follow(backRight);
@@ -127,6 +134,24 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// burn the default value incase of brown-out
 		saveControllers();
 	}
+
+	/**
+	 * adjust the feedforward voltage sent to the motors.  This should
+	 * be positive, but sign is flipped when going backward.
+	 * 
+	 * Tune to the value the motor/robot just starts to move.
+	 * 
+	 * @param deltaFF voltage to go up or down from current value
+	 * @return
+	 */
+	public double adjustFeedForward(final double deltaFF) {
+		feedFwd = MathUtil.limit((feedFwd + deltaFF), 0.0, FEEDFWD_MAX_VOLT);
+
+		SmartDashboard.putNumber("motorFF", feedFwd);
+		return feedFwd;
+	}
+
+
 
 	/**
 	 * adjust the acceleration time - limit on how fast the output gets to max spped
@@ -213,16 +238,25 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 		// add in the commanded speed each wheel
 		double vl_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ);
-		double vr_rpm = -applyDeadZone(rpm - vturn_rpm, RPM_DZ);
+		double vr_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ);
 
 		/* debugging
 		double v_test = getLeftVel(false);
 		double v_err = v_test - vl_rpm;
 		*/
 		
-		// command the velocity to the wheels
-		leftController.setReference(vl_rpm);
-		rightController.setReference(vr_rpm);
+		if (coastMode) {
+			// command doesn't need power, ok to coast, should use PWM and zero power
+			// with the controller setup to coast mode by default.
+			leftController.set(0.0);
+			rightController.set(0.0);
+		}
+		else {
+			// command the velocity to the wheels
+			leftController.setReference(vl_rpm);
+			rightController.setReference(vr_rpm);
+		}
+
 		dDrive.feed();
 		
 		//shifts the gears if needed
@@ -256,7 +290,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public double getLeftPos() {
 		// postion is in units of revs
 		double kft_rev = getFPSperRPM(getCurrentGear())*60.0;
-		double ft =  (-kft_rev) * leftController.getPosition();  // left inverted
+		double ft =  (kft_rev) * leftController.getPosition();  
 		return ft;
 	}
 
@@ -268,7 +302,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getLeftVel(final boolean normalized) {
-		double vel = - leftController.get();             // left inverted
+		double vel =  leftController.get();           
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
@@ -282,7 +316,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getAvgVelocity(final boolean normalized) {
-		double vel = 0.5*(rightController.get() - leftController.get()); // leftinverted
+		double vel = 0.5*(rightController.get() + leftController.get()); 
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
@@ -308,6 +342,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		else {
 			gearbox.shiftUp();
 		}
+	}
+
+	/**
+	 * setCoastMode()
+	 */
+	public void setCoastMode(boolean coast) {
+		coastMode = coast;
 	}
 
 	/**
@@ -354,11 +395,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			pid = controller.getPIDController();
 
 			// set PID coefficients
-			pid.setP(kP);
-			pid.setI(kI);
-			pid.setD(kD);
-			pid.setIZone(kIz);
-			pid.setFF(kFF);
+			pid.setP(kP, pidSlot);
+			pid.setI(kI, pidSlot);
+			pid.setD(kD, pidSlot);
+			pid.setIZone(kIz, pidSlot);
+			pid.setFF(kFF, pidSlot);
 			pid.setOutputRange(kMinOutput, kMaxOutput);
 		}
 
@@ -378,7 +419,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		 * @param rpm - revs per minute
 		 */
 		public void setReference(double rpm) {
-			pid.setReference(rpm, ControlType.kVelocity);
+			double ffSign = (rpm >= 0) ? -1.0 : 1.0;
+
+			//rpm haz a deadzone so == 0.0 is a fair test.
+			if (rpm ==0.0) ffSign = 0.0;
+			pid.setReference(rpm, ControlType.kVelocity, pidSlot, ffSign*feedFwd); 
 		}
 
 		@Override

@@ -51,6 +51,8 @@ public class auto_cmd_group extends SequentialCommandGroup {
         positionCode = 2; // this should be removed to read in from switch
         //1 = A (far right closest to wall), 2 = B (centeted), 3 = C (far left)
 
+        trenchMode = ((dc.getInitialButtons(Id.SwitchBoard) & 0x10) == 1) ? true : false;
+
         delay = startDelay[delayCode];
         angleTarget = startAngle[positionCode];
         limelightAreaTarget = limelightArea[positionCode];

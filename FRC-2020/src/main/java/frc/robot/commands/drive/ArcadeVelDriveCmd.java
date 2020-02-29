@@ -31,7 +31,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
   int timeWantingDown;
 
   int timeWantingCoast; // frames where Vcmd < Vrobot
-  int minTimeEnterCoast = 5; // frames to require before coast
+  int minTimeEnterCoast = 3; // frames to require before coast
 
   // robot values measured at start of frame
   double velAvg;
@@ -125,7 +125,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
     // read controls in normalize units +/- 1.0, scale to physical units
     velCmd = dc.getVelocity() * vMax;
     rotCmd = dc.getRotation() * rotMax;
-    velAvg = drive.getLeftVel(false);
+    velAvg = drive.getAvgVelocity(false);   // ft/s
 
     countTimeInShiftZone();
     drive.velocityArcadeDrive(velCmd, rotCmd);

@@ -289,7 +289,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public double getLeftPos() {
 		// postion is in units of revs
 		double kft_rev = getFPSperRPM(getCurrentGear())*60.0;
-		double ft =  (kft_rev) * leftController.getPosition();  
+		double ft =  (-kft_rev) * leftController.getPosition();  
 		return ft;
 	}
 

@@ -7,8 +7,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -29,8 +27,6 @@ import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.SwitchDriveMode;
 import frc.robot.commands.drive.TankDriveCmd;
 //import frc.robot.subsystems.CameraSubsystem;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.panel.SimpPositionControl;
 import frc.robot.commands.panel.SimpRotateControl;
 import frc.robot.subsystems.Color_Subsystem;
@@ -41,11 +37,8 @@ import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
-
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
-import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
-import frc.robot.subsystems.hid.DPadButton;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
 
 /**

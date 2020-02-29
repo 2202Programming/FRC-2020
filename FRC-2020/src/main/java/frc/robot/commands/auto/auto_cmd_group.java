@@ -38,6 +38,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
         double departure_angle = 20;
         int positionCode;
         double limelightAreaTarget;
+        boolean trenchMode = false;
 
         // Compute delay based on switches
         int delayCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x03); // sw 1 & 2
@@ -102,6 +103,16 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 new auto_creep_area_cmd(drive, limelight, lidar, -15, 0.3, 0.2, 1.6, false)
 */
         );
+        if(trenchMode){
+        addCommands(
+            
+                //turn only with limelight 
+                new auto_creep_area_turn_cmd(drive, limelight, lidar, -29, 60),
+
+                //drive backwards and pick up balls
+                new auto_ball_capture_cmd(intake, drive, limelight, 0.75, 0.75, 60).withTimeout(10)
+        );
+        }
 
         /*
          * addCommands( new WaitCommand(delay), new auto_creep_area_cmd(drive,

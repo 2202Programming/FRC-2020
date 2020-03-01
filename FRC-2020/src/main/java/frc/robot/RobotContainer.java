@@ -7,8 +7,15 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -20,6 +27,7 @@ import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.commands.auto.DriveOffLine;
+import frc.robot.commands.DriveOnTrajectory;
 //import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
@@ -161,7 +169,13 @@ private void jasonsButtons(){
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     // return new CommandBase() {};
-    return new DriveOffLine(driveTrain);
+    Trajectory testTraj = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)), 
+      List.of(
+        new Translation2d(0, -0.5),
+        new Translation2d(0.5, -1)
+      ), 
+      new Pose2d(1, -3, new Rotation2d(0)), driveTrain.TRAJ_CONFIG);
+    return new DriveOnTrajectory(driveTrain, testTraj);
   }
 
   /**

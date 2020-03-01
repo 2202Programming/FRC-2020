@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.SpeedController;
 
 import static frc.robot.Constants.*;
@@ -88,7 +89,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final DifferentialDrive dDrive;
 	private final DifferentialDriveOdometry odometry;
 	public static final double trackWidthMeters = .9;
-    public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(trackWidthMeters);
+	public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(trackWidthMeters);
+	public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(3, 3).setKinematics(DRIVE_KINEMATICS);
 
 	private GearShifter gearbox;
 	private Gear requestedGear; 

@@ -161,7 +161,7 @@ public class RobotContainer {
     // An ExampleCommand will run in autonomous
     // return new CommandBase() {};
     return new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar);
-  }
+   }
 
   /**
    * InitTest() called from Robot when test mode is used. Put code here to fire up

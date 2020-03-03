@@ -88,7 +88,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
                     new auto_drive_straight_cmd(drive, 0.5).withTimeout(2), // pressure on wall during dump
 
                     //Deploy balls
-                    new ShooterOn(intake, 1200, 0.4).withTimeout(2.0) // turn shooter on for 2 seconds 1200 rpm
+                    new ShooterOn(intake, 0.3, 0.9, 0.4).withTimeout(2.0) // turn shooter on for 2 seconds 1200 rpm
                 ),
 
                 //Drive backwards at departure angle using lidar

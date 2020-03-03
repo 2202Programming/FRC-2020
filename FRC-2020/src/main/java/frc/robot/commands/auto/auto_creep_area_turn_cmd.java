@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Robot;
-import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
@@ -22,15 +21,13 @@ public class auto_creep_area_turn_cmd extends CommandBase {
   private final VelocityDifferentialDrive_Subsystem drive;
   private final Limelight_Subsystem limelight;
   private double angleTarget;
-  //private double targetArea;
-  private double Kap = 2, Kai = 0.00, Kad = 0.02; // angle drive PIDs
+  private double Kap = 1.2, Kai = 0.01, Kad = 0.02; // angle drive PIDs
   private final PIDController anglePIDController;
   private double angleToleranceDeg = 3;
   private double maxAngleRate;
-  //private double maxSpeed;
   private double current_angle;
   private double kDegreesToDPS = 1; // convert PID rotation output to degrees per second for
-                                    // VelocityDifferentalDrive
+
 
   //private boolean forward;
 
@@ -61,7 +58,8 @@ public class auto_creep_area_turn_cmd extends CommandBase {
     anglePIDController.reset();
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);
     anglePIDController.setSetpoint(angleTarget);
-
+    anglePIDController.enableContinuousInput(-180, 180);
+    anglePIDController.setIntegratorRange(-5, 5);
 
   }
 
@@ -76,8 +74,10 @@ public class auto_creep_area_turn_cmd extends CommandBase {
     angleCmd = MathUtil.clamp(angleCmd, -maxAngleRate, maxAngleRate);
 
     SmartDashboard.putNumber("Max Angle Rate", maxAngleRate);
-    SmartDashboard.putNumber("Filtered Angle", current_angle);
+    SmartDashboard.putNumber("Angle", current_angle);
     SmartDashboard.putNumber("PID Output DPS", angleCmd);
+    SmartDashboard.putNumber("Target Angle", angleTarget);
+    SmartDashboard.putNumber("Finished Angle Math", Math.abs(current_angle - angleTarget));
 
     // move rotation only
     drive.velocityArcadeDrive(0, angleCmd);
@@ -89,11 +89,12 @@ public class auto_creep_area_turn_cmd extends CommandBase {
     drive.arcadeDrive(0, 0);
     Robot.command = "None";
     drive.resetPosition();
+    limelight.disableLED();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-      return (Math.abs(current_angle - angleTarget) < angleToleranceDeg);
+      return (Math.abs(current_angle - angleTarget) < angleToleranceDeg) || !limelight.valid();
   }
 }

@@ -69,6 +69,8 @@ public class auto_creep_area_cmd extends CommandBase {
   @Override
   public void initialize() {
     
+    drive.shiftDown();
+    limelight.enableLED();
     Robot.command = "Auto Limelight Move";
 
  //   if (forward)

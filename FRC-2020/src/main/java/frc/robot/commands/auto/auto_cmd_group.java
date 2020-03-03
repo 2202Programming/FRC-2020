@@ -53,10 +53,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
         trenchMode = ((dc.getInitialButtons(Id.SwitchBoard) & 0x10)>>4 == 1) ? true : false;
         SmartDashboard.putBoolean("Trench Mode", trenchMode);
 
-        //delayCode = 0; // this should be removed to read in from switch
-        //positionCode = 2; // this should be removed to read in from switch
+//        delayCode = 0; // this should be removed to read in from switch
+//        positionCode = 1; // this should be removed to read in from switch
         //1 = A (far right closest to wall), 2 = B (centeted), 3 = C (far left)
-        //trenchMode = false; // this should be removed to read in from switch
+//        trenchMode = true; // this should be removed to read in from switch
 
 
         delay = startDelay[delayCode];
@@ -107,10 +107,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
             addCommands(
                 
                     //turn only with limelight to face balls to pick up
-                    new auto_creep_area_turn_cmd(drive, limelight, -29, 60),
+                    new auto_creep_area_turn_cmd(drive, limelight, -24, 60),
 
                     //drive forwards and pick up balls
-                    new auto_ball_capture_cmd(intake, drive, limelight, 0.75, 0.75, 60).withTimeout(10)
+                    new auto_ball_capture_cmd(intake, drive, 0.5, 0.7, -3).withTimeout(3)
             );
         }
 

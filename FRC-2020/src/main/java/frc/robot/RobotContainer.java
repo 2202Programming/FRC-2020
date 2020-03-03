@@ -133,7 +133,7 @@ public class RobotContainer {
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
         .whileHeld(new MagazineAdjust(intake, false));
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-        .whenHeld(new ShooterOn(intake, 1200, 0.4)); // rpm, seconds mag backup
+        .whenHeld(new ShooterOn(intake, 0.3, 0.8, 0.4)); // pwr_low, pwr_high, seconds mag backup
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new MagazineToggleCmd(intake));
 

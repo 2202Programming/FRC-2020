@@ -43,20 +43,23 @@ public class auto_cmd_group extends SequentialCommandGroup {
         double limelightAreaTarget;
         boolean trenchMode;
 
-        // Compute delay based on switches
-        int delayCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x03); // sw 1 & 2
+        // Compute delay based on switches 1 and 2 (1 is first bit, 2 is second)
+        int delayCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x03);
         
-        // TODO: Change path based on positionCode from switch
+        // Get position based on switches 3 and 4 (3 is first bit, 4 is second)
         positionCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x0C)>>2; // sw 3 & 4
 
-        //Switch 5
+        //Switch 5 Trench Mode
         trenchMode = ((dc.getInitialButtons(Id.SwitchBoard) & 0x10)>>4 == 1) ? true : false;
         SmartDashboard.putBoolean("Trench Mode", trenchMode);
 
+        //Test Code
+        /** 
         delayCode = 0; // this should be removed to read in from switch
         positionCode = 3; // this should be removed to read in from switch
         //1 = A (far right closest to wall), 2 = B (centeted), 3 = C (far left)
         trenchMode = false; // this should be removed to read in from switch
+        */
 
 
         delay = startDelay[delayCode];

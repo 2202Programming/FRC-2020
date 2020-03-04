@@ -66,9 +66,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
         angleTarget = startAngle[positionCode];
         limelightAreaTarget = limelightArea[positionCode];
         
-        if (delay > 0) { // do these only if not first in attack order
+        if (delayCode > 0) { // do these only if not first in attack order
             addCommands(
-                new DriveOffLine(drive),
+                new DriveOffLine(drive, -0.9).withTimeout(1.5),
+                new DriveOffLine(drive, 0.9).withTimeout(1.5),
                 new WaitCommand(delay)
             );
         }
@@ -104,7 +105,8 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 new auto_creep_area_cmd(drive, limelight, lidar, limelightDepartureAngle[positionCode], 3, 60, departureArea[positionCode], false),
 
                 //Drive open loop backwards until limelight valid
-                new auto_drive_straight_cmd(drive, -2).withTimeout(0.8)
+                new auto_drive_straight_cmd(drive, -2).withTimeout(0.8),
+                new toggleLED(limelight)
 
         );
 

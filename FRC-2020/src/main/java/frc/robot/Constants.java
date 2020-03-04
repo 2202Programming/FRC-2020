@@ -69,9 +69,9 @@ public final class Constants {
     public static final int PANEL_PISTON_REVERSE_PCM = 3;
 
     //Auto Delays - values to be adjusted later with testing
-    public static final double DELAY_A = 1.0;
-    public static final double DELAY_B = 4.0;
-    public static final double DELAY_C = 7.0;
+    public static final double DELAY_A = 0.0;
+    public static final double DELAY_B = 3.0;
+    public static final double DELAY_C = 6.0;
     
     //angle based on starting position
     public static final double ANGLE_A = 0;

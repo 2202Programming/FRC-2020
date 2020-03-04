@@ -53,10 +53,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
         trenchMode = ((dc.getInitialButtons(Id.SwitchBoard) & 0x10)>>4 == 1) ? true : false;
         SmartDashboard.putBoolean("Trench Mode", trenchMode);
 
-//        delayCode = 0; // this should be removed to read in from switch
-//        positionCode = 1; // this should be removed to read in from switch
+        delayCode = 0; // this should be removed to read in from switch
+        positionCode = 3; // this should be removed to read in from switch
         //1 = A (far right closest to wall), 2 = B (centeted), 3 = C (far left)
-//        trenchMode = true; // this should be removed to read in from switch
+        trenchMode = false; // this should be removed to read in from switch
 
 
         delay = startDelay[delayCode];
@@ -85,32 +85,37 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 new auto_drive_lidar(drive, lidar, 125, 1, true, 0),
                 
                 new ParallelCommandGroup( //wall pressure + deployment simultaneously
-                    new auto_drive_straight_cmd(drive, 0.5).withTimeout(2), // pressure on wall during dump
+                    new auto_drive_straight_cmd(drive, 1.5).withTimeout(2.5), // pressure on wall during dump
 
                     //Deploy balls
-                    new ShooterOn(intake, 0.3, 0.9, 0.4).withTimeout(2.0) // turn shooter on for 2 seconds 1200 rpm
+                    new ShooterOn(intake, 0.9, 1, 0.4).withTimeout(2.5) // turn shooter on for 2 seconds 1200 rpm
                 ),
 
                 //Drive backwards at departure angle using lidar
                 new auto_drive_lidar(drive, lidar, 800, 3, false, lidarDepartureAngle[positionCode]),
 
                 //Drive open loop backwards until limelight valid
-                new auto_drive_straight_cmd(drive, -3).withTimeout(1),
+                new auto_drive_straight_cmd(drive, -1).withTimeout(1),
 
                 //Move backwards using limelight to a certain limelight area(distance estimate) 
-                new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, departureArea[positionCode], false)
+                new auto_creep_area_cmd(drive, limelight, lidar, limelightDepartureAngle[positionCode], 3, 60, departureArea[positionCode], false),
 
+                //Drive open loop backwards until limelight valid
+                new auto_drive_straight_cmd(drive, -2).withTimeout(0.8)
 
         );
 
         if(trenchMode){ //only move to pickup balls after first 3 are delivered if switch enables this behavior
             addCommands(
                 
+
+
+
                     //turn only with limelight to face balls to pick up
                     new auto_creep_area_turn_cmd(drive, limelight, -24, 60),
 
                     //drive forwards and pick up balls
-                    new auto_ball_capture_cmd(intake, drive, 0.5, 0.7, -3).withTimeout(3)
+                    new auto_ball_capture_cmd(intake, drive, 0.5, 0.7, -4).withTimeout(4)
             );
         }
 

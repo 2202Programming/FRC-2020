@@ -74,17 +74,17 @@ public final class Constants {
     public static final double DELAY_C = 7.0;
     
     //angle based on starting position
-    public static final double ANGLE_A = -10.0;
-    public static final double ANGLE_B = -15.0;
-    public static final double ANGLE_C = -14.0;
+    public static final double ANGLE_A = 0;
+    public static final double ANGLE_B = 2;
+    public static final double ANGLE_C = -2.3;
 
     //departure angle based on starting position
-    public static final double LIMELIGHT_DEPARTURE_ANGLE_A = -6.0;
-    public static final double LIMELIGHT_DEPARTURE_ANGLE_B = -15.0;
-    public static final double LIMELIGHT_DEPARTURE_ANGLE_C = -14.0;
+    public static final double LIMELIGHT_DEPARTURE_ANGLE_A =  25.0;
+    public static final double LIMELIGHT_DEPARTURE_ANGLE_B =  2;
+    public static final double LIMELIGHT_DEPARTURE_ANGLE_C = -2.3;
 
     //departure angle based on starting position
-    public static final double LIDAR_DEPARTURE_ANGLE_A = -25.0;
+    public static final double LIDAR_DEPARTURE_ANGLE_A = -30.0;
     public static final double LIDAR_DEPARTURE_ANGLE_B = 0.0;
     public static final double LIDAR_DEPARTURE_ANGLE_C = 19.0;
 
@@ -94,9 +94,9 @@ public final class Constants {
     public static final double AREA_C = 2.6;
 
     //Limelight Area of Departure based on starting possition
-    public static final double DEPARTURE_AREA_A = 1.1;
-    public static final double DEPARTURE_AREA_B = 1.9;
-    public static final double DEPARTURE_AREA_C = 1.1;
+    public static final double DEPARTURE_AREA_A = 2.7;
+    public static final double DEPARTURE_AREA_B = 2.7;
+    public static final double DEPARTURE_AREA_C = 2.7;
 
     //camera paths
     public static final String FRONT_DRIVE_CAMERA_PATH = "/dev/video1";

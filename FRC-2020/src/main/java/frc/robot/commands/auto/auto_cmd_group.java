@@ -47,9 +47,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
 
         // Compute delay based on switches 1 and 2 (1 is first bit, 2 is second)
         int delayCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x03);
-
+        
         // Get position based on switches 3 and 4 (3 is first bit, 4 is second)
         positionCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x0C) >> 2; // sw 3 & 4
+        SmartDashboard.putNumber("Position Code", positionCode);
 
         // Switch 5 Trench Mode
         trenchMode = ((dc.getInitialButtons(Id.SwitchBoard) & 0x10) >> 4 == 1) ? true : false;
@@ -64,6 +65,8 @@ public class auto_cmd_group extends SequentialCommandGroup {
          */
 
         delay = startDelay[delayCode];
+        SmartDashboard.putNumber("Delay", delay);
+
         angleTarget = startAngle[positionCode];
         limelightAreaTarget = limelightArea[positionCode];
 

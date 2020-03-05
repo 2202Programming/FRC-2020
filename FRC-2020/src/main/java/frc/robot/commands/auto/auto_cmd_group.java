@@ -65,7 +65,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
          */
 
         delay = startDelay[delayCode];
-        SmartDashboard.putNumber("Delay", delay);
+        SmartDashboard.putNumber("Delay (secs)", delay+3); //add 3 b/c the driveoffline takes 3 secs
 
         angleTarget = startAngle[positionCode];
         limelightAreaTarget = limelightArea[positionCode];

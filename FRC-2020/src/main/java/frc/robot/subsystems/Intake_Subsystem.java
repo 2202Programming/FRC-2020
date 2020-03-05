@@ -234,7 +234,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
-
   }
 
 }

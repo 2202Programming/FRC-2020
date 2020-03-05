@@ -8,9 +8,11 @@
 package frc.robot.subsystems.hid;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.ifx.DriverControls;
+import frc.robot.subsystems.ifx.Logger;
 
 
 /**
@@ -27,7 +29,7 @@ import frc.robot.subsystems.ifx.DriverControls;
  * run first by being first on the list.
  * 
  */
-public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls {
+public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls, Logger {
   /**
    * Creates a new HID_Subsystem.
    */
@@ -202,4 +204,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls 
     }
   }
 
+  public void log() {
+    SmartDashboard.putBoolean("Controls Inverted", isControlInverted());
+  }
 }

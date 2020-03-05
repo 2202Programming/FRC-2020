@@ -59,8 +59,8 @@ public class RobotContainer {
   public final Limelight_Subsystem limelight;
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
-  public final Control_Panel panel;
-  public final Color_Subsystem detector;
+  //public final Control_Panel panel;
+  //public final Color_Subsystem detector;
 
   TankDriveCmd tankDriveCmd;
   ArcadeDriveCmd arcadeDriveCmd;
@@ -84,11 +84,11 @@ public class RobotContainer {
     limelight = new Limelight_Subsystem();
     logSubsystem = new Log_Subsystem(5); // log every 5 frames - 100mS
     lidar = new Lidar_Subsystem();
-    panel = new Control_Panel();
-    detector = new Color_Subsystem();
+    //panel = new Control_Panel();
+    //detector = new Color_Subsystem();
 
     // Add anything that has logging requirements
-    logSubsystem.add(driveTrain, limelight, lidar, intake, panel, detector);
+    logSubsystem.add(driveTrain, limelight, lidar, intake, driverControls/**, panel, detector*/);
 
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);

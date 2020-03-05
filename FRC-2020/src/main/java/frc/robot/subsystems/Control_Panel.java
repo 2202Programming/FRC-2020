@@ -102,7 +102,9 @@ public class Control_Panel extends SubsystemBase implements Logger{
     }
 
     public void log() {
+        /**
         SmartDashboard.putNumber("Distance", getDistance());
         SmartDashboard.putBoolean("Control Panel Limit", getLimitSwitch());
+        */
     }
 }

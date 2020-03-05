@@ -79,12 +79,12 @@ public final class Constants {
     public static final double ANGLE_C = -2.3;
 
     //departure angle based on starting position
-    public static final double LIMELIGHT_DEPARTURE_ANGLE_A =  25.0;
+    public static final double LIMELIGHT_DEPARTURE_ANGLE_A =  10;
     public static final double LIMELIGHT_DEPARTURE_ANGLE_B =  2;
     public static final double LIMELIGHT_DEPARTURE_ANGLE_C = -2.3;
 
     //departure angle based on starting position
-    public static final double LIDAR_DEPARTURE_ANGLE_A = -30.0;
+    public static final double LIDAR_DEPARTURE_ANGLE_A = -18.0;
     public static final double LIDAR_DEPARTURE_ANGLE_B = 0.0;
     public static final double LIDAR_DEPARTURE_ANGLE_C = 19.0;
 

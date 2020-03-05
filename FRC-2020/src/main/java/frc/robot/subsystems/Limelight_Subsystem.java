@@ -106,12 +106,13 @@ public boolean valid(){
   public void log(){
     /** 
       SmartDashboard.putNumber("X value", x);
-      SmartDashboard.putNumber("Filtered X value", filteredX);
+      
       SmartDashboard.putNumber("Y value", y);
       SmartDashboard.putNumber("Area", area);
       SmartDashboard.putNumber("Filtered area", filteredArea);
     */
 
+    SmartDashboard.putNumber("Filtered X value (Angle)", filteredX);
     SmartDashboard.putBoolean("Limelight Valid", target);
   }
 }

@@ -12,7 +12,6 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
 public class DriveOffLine extends CommandBase {
   private VelocityDifferentialDrive_Subsystem driveTrain;
-  private int counter;
   private double power;
   /**
    * Creates a new DriveOffLine.
@@ -27,7 +26,6 @@ public class DriveOffLine extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    counter = 0;
     driveTrain.velocityArcadeDrive(power, 0);
 
   }

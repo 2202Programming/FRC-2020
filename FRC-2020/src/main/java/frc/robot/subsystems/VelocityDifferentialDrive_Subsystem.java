@@ -373,6 +373,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		 * SmartDashboard.putNumber("Left Position", getLeftPos());
 		 */
 		SmartDashboard.putString("Drive Train Default Command", getDefaultCommand().toString());
+		SmartDashboard.putString("Current Gear", gearbox.getCurrentGear().toString());
 	}
 
 	/**

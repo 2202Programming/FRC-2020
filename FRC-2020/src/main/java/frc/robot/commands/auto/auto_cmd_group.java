@@ -95,9 +95,12 @@ public class auto_cmd_group extends SequentialCommandGroup {
             addCommands(
                     //TODO: Replace with lidar or limelight to get exact shooting distance
                     new DriveOffLine(drive, 0.8).withTimeout(2.7),
+                    new ToggleIntakeRaised(intake),
+                    new WaitCommand(0.7),
                     new MagazineToggleCmd(intake),
-                    new WaitCommand(1),
+                    new WaitCommand(1.2),
                     new ShooterOn(intake, 0.6, 1.0, 0.5).withTimeout(3),
+                    new MagazineToggleCmd(intake),
                     new ToggleIntakeRaised(intake)
             );
         }

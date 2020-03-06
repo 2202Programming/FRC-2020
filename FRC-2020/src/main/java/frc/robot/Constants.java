@@ -86,7 +86,7 @@ public final class Constants {
     //departure angle based on starting position
     public static final double LIDAR_DEPARTURE_ANGLE_A = -18.0;
     public static final double LIDAR_DEPARTURE_ANGLE_B = 0.0;
-    public static final double LIDAR_DEPARTURE_ANGLE_C = 19.0;
+    public static final double LIDAR_DEPARTURE_ANGLE_C = 21.0;
 
     //Limelight Area based on starting position
     public static final double AREA_A = 2.5;

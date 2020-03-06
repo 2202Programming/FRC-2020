@@ -86,7 +86,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
         //Just drive off line backwards if not in position A,B, or C
         //(or if we don't want to interfere at all)
         if (positionCode == 0) {
-            addCommands(new DriveOffLine(drive, -0.9).withTimeout(3));
+            addCommands(new DriveOffLine(drive, -0.9).withTimeout(3.7));
         }
         //TODO: Make this more legit
         else if (highMode) {
@@ -109,16 +109,16 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 new auto_drive_straight_until_lidar_cmd(drive, lidar, 2).withTimeout(3),
 
                 // Drive forward at current angle using lidar
-                new auto_drive_lidar(drive, lidar, 200, 1.25, true, lidarDepartureAngle[positionCode]),
+                new auto_drive_lidar(drive, lidar, 300, 1.25, true, lidarDepartureAngle[positionCode]),
 
                 // Drive forward at to zero angle using lidar
-                new auto_drive_lidar(drive, lidar, 125, 1, true, 0),
+                new auto_drive_lidar(drive, lidar, 120, 2, true, 0).withTimeout(2),
 
                 new ParallelCommandGroup( // wall pressure + deployment simultaneously
                         new auto_drive_straight_cmd(drive, 1.5).withTimeout(2), // pressure on wall during dump
 
                         // Deploy balls
-                        new ShooterOn(intake, 0.6, 1, 0.4).withTimeout(2) // turn shooter on for 2 seconds 1200
+                        new ShooterOn(intake, 0.65, 1, 0.4).withTimeout(2) // turn shooter on for 2 seconds 1200
                                                                                 // rpm
                 ),
 

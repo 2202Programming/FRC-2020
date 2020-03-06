@@ -5,8 +5,10 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.toggleLED;
+import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ShooterOn;
+import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
@@ -92,10 +94,11 @@ public class auto_cmd_group extends SequentialCommandGroup {
         else if (highMode) {
             addCommands(
                     //TODO: Replace with lidar or limelight to get exact shooting distance
-                    new DriveOffLine(drive, 0.8).withTimeout(2.5),
+                    new DriveOffLine(drive, 0.8).withTimeout(2.7),
                     new MagazineToggleCmd(intake),
-                    new ShooterOn(intake, 0.6, 1.0, 0.5).withTimeout(2.5),
-                    new MagazineToggleCmd(intake)
+                    new WaitCommand(1),
+                    new ShooterOn(intake, 0.6, 1.0, 0.5).withTimeout(3),
+                    new ToggleIntakeRaised(intake)
             );
         }
         else {
@@ -112,7 +115,8 @@ public class auto_cmd_group extends SequentialCommandGroup {
                 new auto_drive_lidar(drive, lidar, 300, 1.25, true, lidarDepartureAngle[positionCode]),
 
                 // Drive forward at to zero angle using lidar
-                new auto_drive_lidar(drive, lidar, 120, 2, true, 0).withTimeout(2),
+                // Timeout to shoot otherwise we don't make it in time
+                new auto_drive_lidar(drive, lidar, 120, 3, true, 0).withTimeout(2),
 
                 new ParallelCommandGroup( // wall pressure + deployment simultaneously
                         new auto_drive_straight_cmd(drive, 1.5).withTimeout(2), // pressure on wall during dump

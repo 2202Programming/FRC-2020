@@ -23,6 +23,7 @@ public class DriveOnTrajectory extends SequentialCommandGroup {
   private double ramZ = 0.7;
   /**
    * Creates a new DriveOnTrajectory.
+   * This is functionally a wrapper for RamseteCommand that cleans up everything that needs to be passed into it
    */
   public DriveOnTrajectory(VelocityDifferentialDrive_Subsystem driveTrain, Trajectory path) {
     // Use addRequirements() here to declare subsystem dependencies.

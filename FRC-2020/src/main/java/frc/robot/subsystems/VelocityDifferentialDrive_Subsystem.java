@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.I2C.Port;
 
 import static frc.robot.Constants.*;
 
@@ -58,7 +59,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft,
 			middleRight, middleLeft };
 
-	private final AHRS navX = new AHRS();
+	private final AHRS navX = new AHRS(Port.kMXP);
 
 	// VelController can use either Velocity mode or dutycycle modes and is wrapper
 	// around CANSparkMax. These get setup after factory resets.
@@ -121,11 +122,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		dDrive = new DifferentialDrive(leftController, rightController);
 		odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 		dDrive.setSafetyEnabled(false);
+
+		resetHeading();
+
 	}
 
 	public void periodic() {
-		//TODO: Get unit conversion
-		odometry.update(Rotation2d.fromDegrees(getHeading()), leftController.getPosition(), rightController.getPosition());
+		odometry.update(Rotation2d.fromDegrees(getHeading()), getLeftPos()*0.3048, getRightPos()*0.3048);
 	}
 
 	/**
@@ -149,6 +152,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// zero adjust will set the default limits for accel and currents
 		adjustAccelerationLimit(0.0);
 		adjustCurrentLimit(0);
+
+		resetPosition();
 
 		// burn the default value incase of brown-out
 		saveControllers();
@@ -355,7 +360,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getHeading() {
-		return navX.getAngle() % 360;
+		return navX.getAngle();
+	}
+
+	public void resetHeading() {
+		navX.reset();
 	}
 
 	/**
@@ -376,7 +385,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// postion is in units of revs
 		double kft_rev = getFPSperRPM(getCurrentGear())*60.0;
 		double ft =  (kft_rev) * leftController.getPosition();  
-		return ft;
+		return -ft;
 	}
 
 	public double getRightPos() {
@@ -455,9 +464,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		/**
 		 * SmartDashboard.putNumber("Right Velocity", getRightVel(false));
 		 * SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
-		 * SmartDashboard.putNumber("Right Position", getRightPos());
-		 * SmartDashboard.putNumber("Left Position", getLeftPos());
+		 * 
 		 */
+		SmartDashboard.putNumber("Right Position", getRightPos());
+		SmartDashboard.putNumber("Left Position", getLeftPos());
+		SmartDashboard.putNumber("Robot Heading", getHeading());
 		SmartDashboard.putString("Drive Train Default Command", getDefaultCommand().toString());
 	}
 

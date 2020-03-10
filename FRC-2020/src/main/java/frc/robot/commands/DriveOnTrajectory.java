@@ -33,6 +33,9 @@ public class DriveOnTrajectory extends SequentialCommandGroup {
     
     ramseteController = new RamseteController(ramB, ramZ);
 
+    driveTrain.resetHeading();
+    driveTrain.resetPosition();
+
     addCommands(new RamseteCommand(
       path, driveTrain::getPose, ramseteController, driveTrain.DRIVE_KINEMATICS, driveTrain::velocityTankWheelSpeeds, driveTrain));
   }

@@ -171,10 +171,8 @@ private void jasonsButtons(){
     // return new CommandBase() {};
     Trajectory testTraj = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)), 
       List.of(
-        new Translation2d(0.5, -1.5),
-        new Translation2d(1.5, -2.5)
       ), 
-      new Pose2d(2, -5, new Rotation2d(0)), driveTrain.TRAJ_CONFIG);
+      new Pose2d(2, 0, new Rotation2d(0)), driveTrain.TRAJ_CONFIG);
     return new DriveOnTrajectory(driveTrain, testTraj);
   }
 

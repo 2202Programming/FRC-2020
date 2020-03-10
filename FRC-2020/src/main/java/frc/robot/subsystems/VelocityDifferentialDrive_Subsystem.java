@@ -19,6 +19,9 @@ import static frc.robot.Constants.*;
 import java.util.concurrent.TimeUnit;
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive, Shifter {
+	// RPM Limits
+	final double MAXRPM = 5600;
+
 	// Current Limits
 	private final int SMARTCURRENT_MAX = 60;
 	private int smartCurrentLimit = 35; // amps
@@ -95,7 +98,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		K_high_fps_rpm = K_ft_per_rev * gearbox.K_high / 60;
 		// compute max RPM for motors
 		maxRPM_High = (maxFPS / K_high_fps_rpm); 
-		maxFPS_Low = (maxRPM_High * K_low_fps_rpm);
+		maxFPS_Low = (MAXRPM * K_low_fps_rpm);
+
+		// check we can hit max requested speed in high gear
+		if (maxRPM_High > MAXRPM) {
+			System.out.println("Warning: targeted maxFPS not reachable. maxFPS= " + 
+				(MAXRPM*K_high_fps_rpm));
+		}
 
 		// setup SparkMax controllers, sets left and right masters
 		configureControllers();

@@ -123,6 +123,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		dDrive.setSafetyEnabled(false);
 	}
 
+	public void periodic() {
+		//TODO: Get unit conversion
+		odometry.update(Rotation2d.fromDegrees(getHeading()), leftController.getPosition(), rightController.getPosition());
+	}
+
 	/**
 	 * hides some of the ugly setups like delays between programming.
 	 */

@@ -64,7 +64,7 @@ public class AutoPanelRun extends SequentialCommandGroup {
 
     addCommands(
       //Retract panel arm
-      new SetPanelArmExtension(panel, false);
+      new SetPanelArmExtension(panel, false)
     );
   }
 }

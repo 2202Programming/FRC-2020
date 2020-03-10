@@ -31,6 +31,7 @@ import frc.robot.commands.drive.TankDriveCmd;
 //import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.commands.panel.SimpPositionControl;
 import frc.robot.commands.panel.SimpRotateControl;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Color_Subsystem;
 import frc.robot.subsystems.Control_Panel;
 import frc.robot.subsystems.GearShifter;
@@ -153,7 +154,7 @@ public class RobotContainer {
       .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
       */
     driverControls.bindDoubleButton(Id.SwitchBoard, 7, 11)
-      .whenPressed(new ClimbGroup());
+      .whenPressed(new ClimbGroup(climber));
   }
 
   

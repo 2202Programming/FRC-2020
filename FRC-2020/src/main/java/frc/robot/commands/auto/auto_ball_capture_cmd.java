@@ -8,19 +8,27 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
+import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
-public class auto_drive_straight_cmd extends CommandBase {
-  /**
-   * Creates a new auto_drive_straight_until_lidar_cmd.
-   */
-  private final VelocityDifferentialDrive_Subsystem drive;
-  private final double speed;
+public class auto_ball_capture_cmd extends CommandBase {
+  //open loop driving with intake running
 
-  public auto_drive_straight_cmd(VelocityDifferentialDrive_Subsystem drive, double speed) {
+   private final Intake_Subsystem intake;
+   private double intake_strength;
+   private double magazine_strength;
+   private final VelocityDifferentialDrive_Subsystem drive;
+   private double drive_speed;
+
+
+  public auto_ball_capture_cmd(Intake_Subsystem intake, VelocityDifferentialDrive_Subsystem drive,
+  double intake_strength, double magazine_strength, double drive_speed) {
+
+    this.intake = intake; 
+    this.intake_strength = intake_strength;
+    this.magazine_strength = magazine_strength;
     this.drive = drive;
-    this.speed = speed;
+    this.drive_speed = drive_speed;
 
     addRequirements(drive);
   }
@@ -28,20 +36,23 @@ public class auto_drive_straight_cmd extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Robot.command = "Auto Drive Straight";
-    
+    intake.lowerIntake();
+    intake.intakeOn(intake_strength);
+    intake.magazineOn(magazine_strength);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.velocityArcadeDrive(speed, 0);
+    drive.velocityArcadeDrive(drive_speed, 0);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.arcadeDrive(0, 0);
+    intake.intakeOff();
+    intake.magazineOff();
+    drive.velocityArcadeDrive(0, 0);
   }
 
   // Returns true when the command should end.

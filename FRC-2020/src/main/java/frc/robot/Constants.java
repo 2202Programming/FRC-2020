@@ -35,13 +35,15 @@ public final class Constants {
     public static final int LOG_REFRESH_RATE = 100; //in ms
 
     //Intake
-    public static final int INTAKE_UP_DIO = 4;
-    public static final int INTAKE_DOWN_DIO = 5;
-    public static final int INTAKE_SPARK_PWM = 0;
+    public static final int MAGAZINE_PCM_CAN_ID = PCM2_CAN_ID;
+    public static final int MAGAZINE_UP_PCM = 0;
+    public static final int MAGAZINE_DOWN_PCM = 1;
     public static final int MAGAZINE_PWM = 9;
+
+    public static final int INTAKE_SPARK_PWM = 0;
     public static final int UPPER_SHOOTER_TALON_CAN = 18;
-    public static final int LOWER_SHOOTER_TALON_CAN = 23;
-    public static final int ELEVATOR_TALON_CAN = 24;
+    public static final int LOWER_SHOOTER_TALON_CAN = 19;
+    
     public static final int INTAKE_PCM_CAN_ID = PCM1_CAN_ID;
     public static final int INTAKE_UP_SOLENOID_PCM = 4;    
     public static final int INTAKE_DOWN_SOLENOID_PCM = 5;
@@ -66,6 +68,7 @@ public final class Constants {
     public static final int WN_SPARKMAX_CANID = 16;       // Winch Motor
     public static final int CLIMB_ARM_TALON_CANID = 18;    // rotate arm 
 
+    //Control Panel Manipulator
     public static final int PANEL_LIMIT_SWITCH_CH = 0;
     public static final int PANEL_ROTATION_CANID = 12;//placeholderA
     public static final int PCM_ID = 1;
@@ -74,8 +77,33 @@ public final class Constants {
 
     //Auto Delays - values to be adjusted later with testing
     public static final double DELAY_A = 0.0;
-    public static final double DELAY_B = 1.0;
-    public static final double DELAY_C = 2.0;
+    public static final double DELAY_B = 3.0;
+    public static final double DELAY_C = 6.0;
+    
+    //angle based on starting position
+    public static final double ANGLE_A = 0;
+    public static final double ANGLE_B = 2;
+    public static final double ANGLE_C = -2.3;
+
+    //departure angle based on starting position
+    public static final double LIMELIGHT_DEPARTURE_ANGLE_A =  10;
+    public static final double LIMELIGHT_DEPARTURE_ANGLE_B =  2;
+    public static final double LIMELIGHT_DEPARTURE_ANGLE_C = -2.3;
+
+    //departure angle based on starting position
+    public static final double LIDAR_DEPARTURE_ANGLE_A = -17.0;
+    public static final double LIDAR_DEPARTURE_ANGLE_B = 0.0;
+    public static final double LIDAR_DEPARTURE_ANGLE_C = 21.0;
+
+    //Limelight Area based on starting position
+    public static final double AREA_A = 2.5;
+    public static final double AREA_B = 2.9;
+    public static final double AREA_C = 2.6;
+
+    //Limelight Area of Departure based on starting possition
+    public static final double DEPARTURE_AREA_A = 2.7;
+    public static final double DEPARTURE_AREA_B = 2.7;
+    public static final double DEPARTURE_AREA_C = 2.7;
 
     //camera paths
     public static final String FRONT_DRIVE_CAMERA_PATH = "/dev/video1";

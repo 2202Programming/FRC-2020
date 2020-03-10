@@ -28,7 +28,7 @@ public class Robot extends TimedRobot {
   public static String command = "none";
 
     //for auto
-    public static double departureAngle;
+    public static double departureAngle = 0;
 
   /**
    * This function is run when the robot is first started up and should be used for any

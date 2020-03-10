@@ -9,7 +9,7 @@ import frc.robot.subsystems.ifx.DualDrive;
  */
 public class SwitchDriveMode extends InstantCommand {
   public final DualDrive driveTrain;
-  private boolean isCmd1 = false;
+  private boolean isCmd1 = true;
   private final Command cmd1;
   private final Command cmd2;
 

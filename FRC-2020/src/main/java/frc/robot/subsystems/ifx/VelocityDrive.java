@@ -30,6 +30,9 @@ public interface VelocityDrive extends Subsystem {
     // resets the position counters on the drive train encoder
     public void resetPosition();
 
+    // allow some coasting if wanted
+    public void setCoastMode(boolean coast);
+
     /**
      * Commands to the drive train should be in physical units.
      * 

@@ -12,28 +12,28 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
 public class DriveOffLine extends CommandBase {
   private VelocityDifferentialDrive_Subsystem driveTrain;
-  private int counter;
+  private double power;
   /**
    * Creates a new DriveOffLine.
    */
-  public DriveOffLine(VelocityDifferentialDrive_Subsystem driveTrain) {
+  public DriveOffLine(VelocityDifferentialDrive_Subsystem driveTrain, double power) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.driveTrain = driveTrain;
+    this.power = power;
     addRequirements(driveTrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    counter = 0;
-    driveTrain.velocityArcadeDrive(0.5, 0);
+    driveTrain.velocityArcadeDrive(power, 0);
 
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    counter++;
+    
   }
 
   // Called once the command ends or is interrupted.
@@ -45,6 +45,6 @@ public class DriveOffLine extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return counter > 100;
+    return false;
   }
 }

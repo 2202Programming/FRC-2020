@@ -22,6 +22,7 @@ import frc.robot.commands.auto.DriveOffLine;
 //import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
+import frc.robot.commands.climb.ClimbGroup;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
@@ -30,6 +31,7 @@ import frc.robot.commands.drive.TankDriveCmd;
 //import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.commands.panel.SimpPositionControl;
 import frc.robot.commands.panel.SimpRotateControl;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Color_Subsystem;
 import frc.robot.subsystems.Control_Panel;
 import frc.robot.subsystems.GearShifter;
@@ -61,6 +63,7 @@ public class RobotContainer {
   public final Log_Subsystem logSubsystem;
   //public final Control_Panel panel;
   //public final Color_Subsystem detector;
+  private final ClimberSubsystem climber;
 
   TankDriveCmd tankDriveCmd;
   ArcadeDriveCmd arcadeDriveCmd;
@@ -86,6 +89,7 @@ public class RobotContainer {
     lidar = new Lidar_Subsystem();
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
+    climber = new ClimberSubsystem();
 
     // Add anything that has logging requirements
     logSubsystem.add(driveTrain, limelight, lidar, intake, driverControls/**, panel, detector*/);
@@ -144,11 +148,13 @@ public class RobotContainer {
     //Control Panel Manual Controls
     driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new SimpRotateControl(panel));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.RB.getCode())
+    driverControls.bindButton(Id.SwitchBoard, 12)
       .whenPressed(new SimpPositionControl(panel, detector));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.START.getCode())
+    driverControls.bindButton(Id.SwitchBoard, 5)
       .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
       */
+    driverControls.bindDoubleButton(Id.SwitchBoard, 7, 11)
+      .whenPressed(new ClimbGroup(climber));
   }
 
   

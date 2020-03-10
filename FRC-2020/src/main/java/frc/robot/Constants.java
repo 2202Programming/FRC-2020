@@ -61,6 +61,13 @@ public final class Constants {
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
 
+    //Climber
+    public static final int CLIMBER_PCM_CAN_ID = PCM2_CAN_ID;
+    public static final int ARMSOLENOID_LOW_CANID = 0;
+    public static final int ARMSOLENOID_HIGH_CANID = 1;
+    public static final int WN_SPARKMAX_CANID = 16;       // Winch Motor
+    public static final int CLIMB_ARM_TALON_CANID = 18;    // rotate arm 
+
     //Control Panel Manipulator
     public static final int PANEL_LIMIT_SWITCH_CH = 0;
     public static final int PANEL_ROTATION_CANID = 12;//placeholderA
@@ -102,4 +109,7 @@ public final class Constants {
     public static final String FRONT_DRIVE_CAMERA_PATH = "/dev/video1";
     public static final String REAR_DRIVE_CAMERA_PATH = "/dev/video0";
     public static final String ARM_CAMERA_PATH = "/dev/video2";
+
+    
+    public static final int FLOOR_SENSOR = 17; //Time of Flight sensor, measures distance from floor
 }

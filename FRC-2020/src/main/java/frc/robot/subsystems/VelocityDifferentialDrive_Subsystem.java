@@ -345,8 +345,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	//Wheel speeds in m/s
 	public void velocityTankWheelSpeeds(final double leftWheelSpeed, final double rightWheelSpeed) {
-		double leftFps = leftWheelSpeed * 0.3048;//Convert meters to feet
-		double rightFps = rightWheelSpeed * 0.3048;
+		double leftFps = leftWheelSpeed / 0.3048;//Convert meters to feet
+		double rightFps = rightWheelSpeed / 0.3048;
 		velocityTankDrive(leftFps, rightFps);
 	}
 

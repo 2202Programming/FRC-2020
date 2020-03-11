@@ -111,7 +111,7 @@ public class RobotContainer {
     velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, 14.0, 100.0); // fps, dps
     velDriveCmd.setShiftProfile(10, 2.5, 6.6);  // counts, ft/s, ft/s
 
-    driveTrain.setDefaultCommand(velDriveCmd);
+    //driveTrain.setDefaultCommand(velDriveCmd);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -138,7 +138,7 @@ private void jasonsButtons(){
 
     //Test
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
-        .whenPressed(() -> driveTrain.velocityTankWheelSpeeds(1, 1));
+        .whenPressed(() -> driveTrain.velocityTankWheelSpeeds(1, 0));
         
     // Assistant's buttons
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
@@ -173,10 +173,10 @@ private void jasonsButtons(){
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     // return new CommandBase() {};
-    Trajectory testTraj = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)), 
+    Trajectory testTraj = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, Rotation2d.fromDegrees(0)), 
       List.of(
       ), 
-      new Pose2d(2, 0, new Rotation2d(0)), driveTrain.TRAJ_CONFIG);
+      new Pose2d(1, 0, Rotation2d.fromDegrees(0)), driveTrain.TRAJ_CONFIG);
     return new DriveOnTrajectory(driveTrain, testTraj);
   }
 

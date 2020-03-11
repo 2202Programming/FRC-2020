@@ -91,7 +91,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final DifferentialDriveOdometry odometry;
 	public static final double trackWidthMeters = .61;
 	public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(trackWidthMeters);
-	public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(3, 3).setKinematics(DRIVE_KINEMATICS);
+	public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(1.3, 2).setKinematics(DRIVE_KINEMATICS);
 
 	private GearShifter gearbox;
 	private Gear requestedGear; 
@@ -333,8 +333,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		}
 		else {
 			// command the velocity to the wheels
-			leftController.setReference(vl_rpm);
-			rightController.setReference(vr_rpm);
+			//TODO: WOrk out the jank since left and right are flipped
+			leftController.setReference(-vl_rpm);
+			rightController.setReference(-vr_rpm);
 		}
 
 		dDrive.feed();
@@ -466,10 +467,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		 * SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
 		 * 
 		 */
-		SmartDashboard.putNumber("Right Position", getRightPos());
-		SmartDashboard.putNumber("Left Position", getLeftPos());
+		SmartDashboard.putNumber("Right Position", getRightPos()*0.3048);
+		SmartDashboard.putNumber("Left Position", getLeftPos()*0.3048);
 		SmartDashboard.putNumber("Robot Heading", getHeading());
-		SmartDashboard.putString("Drive Train Default Command", getDefaultCommand().toString());
+		//SmartDashboard.putString("Drive Train Default Command", getDefaultCommand().toString());
 	}
 
 	/**

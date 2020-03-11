@@ -135,6 +135,10 @@ private void jasonsButtons(){
         .whenPressed(new InvertDriveControls(driverControls));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, velDriveCmd, arcadeDriveCmd));
+
+    //Test
+    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode())
+        .whenPressed(() -> driveTrain.velocityTankWheelSpeeds(1, 1));
         
     // Assistant's buttons
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())

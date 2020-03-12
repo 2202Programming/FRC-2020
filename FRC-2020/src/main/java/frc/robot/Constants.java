@@ -115,12 +115,38 @@ public final class Constants {
     public static final double DEPARTURE_AREA_B = 2.7;
     public static final double DEPARTURE_AREA_C = 2.7;
 
-    //Drive Train Info for Trajectory Shit
+    //Drive Train Kinematics and Trajectory Config(s)
     public static final double trackWidthMeters = .61;
 	public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(trackWidthMeters);
-	public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(1.3, 2).setKinematics(DRIVE_KINEMATICS);
+    public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(1.2, 2).setKinematics(DRIVE_KINEMATICS);
+    public static final TrajectoryConfig TRAJ_CONFIG_FAST = new TrajectoryConfig(2, 2).setKinematics(DRIVE_KINEMATICS);
 
-    //Trajectories for auto
+    //Trajectories for normal auto
+    public static final Trajectory HIGH_A = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
+        List.of(                                    // Waypoints
+            new Translation2d()
+        ),
+        new Pose2d(),                               // End
+        TRAJ_CONFIG);
+    
+    public static final Trajectory HIGH_B = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
+        List.of(                                    // Waypoints
+            new Translation2d()
+        ),
+        new Pose2d(),                               // End
+        TRAJ_CONFIG);
+
+    public static final Trajectory HIGH_C = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
+        List.of(                                    // Waypoints
+            new Translation2d()
+        ),
+        new Pose2d(),                               // End
+        TRAJ_CONFIG);
+
+    //Trajectories for auto backup to grab more balls
     public static final Trajectory TRENCH_A = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
         List.of(                                    // Waypoints

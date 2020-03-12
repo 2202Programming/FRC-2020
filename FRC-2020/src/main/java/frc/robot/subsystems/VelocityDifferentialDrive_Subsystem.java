@@ -340,7 +340,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		}
 		else {
 			// command the velocity to the wheels
-			//TODO: WOrk out the jank since left and right are flipped
+			//Flipped so that intake side is positive
 			leftController.setReference(-vl_rpm);
 			rightController.setReference(-vr_rpm);
 		}
@@ -368,7 +368,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getHeading() {
-		return -navX.getAngle();
+		return -navX.getAngle(); //flip b/c counter-clockwise should be positive
 	}
 
 	public void resetHeading() {

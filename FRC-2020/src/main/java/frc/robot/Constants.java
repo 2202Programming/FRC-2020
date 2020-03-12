@@ -121,27 +121,35 @@ public final class Constants {
     public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(1.2, 2).setKinematics(DRIVE_KINEMATICS);
     public static final TrajectoryConfig TRAJ_CONFIG_FAST = new TrajectoryConfig(2, 2).setKinematics(DRIVE_KINEMATICS);
 
-    //Trajectories for normal auto
+    /**
+     *  TRAJECTORIES FOR AUTO
+     *  TODO: Determine which convention to go by:
+     *  1: Have the starting position always be (0,0) heading 0
+     *  2: Reset Pose at the start of each trajectory we run 
+     *  
+     * 
+     */
+
+    //Drive straight at angle 
     public static final Trajectory HIGH_A = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
-        List.of(                                    // Waypoints
-            new Translation2d()
+        new Pose2d(0, 0, Rotation2d.fromDegrees(30)),//Start
+        List.of(
         ),
         new Pose2d(),                               // End
         TRAJ_CONFIG);
     
+        //Drive straight
     public static final Trajectory HIGH_B = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
-        List.of(                                    // Waypoints
-            new Translation2d()
+        List.of(
         ),
-        new Pose2d(),                               // End
+        new Pose2d(0.5, 0, Rotation2d.fromDegrees(0)),                               // End
         TRAJ_CONFIG);
 
+    //Drive straight at angle
     public static final Trajectory HIGH_C = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
-        List.of(                                    // Waypoints
-            new Translation2d()
+        new Pose2d(0, 0, Rotation2d.fromDegrees(-30)),//Start
+        List.of(
         ),
         new Pose2d(),                               // End
         TRAJ_CONFIG);

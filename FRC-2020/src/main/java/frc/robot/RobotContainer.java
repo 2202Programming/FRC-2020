@@ -67,7 +67,7 @@ public class RobotContainer {
   public final Log_Subsystem logSubsystem;
   //public final Control_Panel panel;
   //public final Color_Subsystem detector;
-  private final ClimberSubsystem climber;
+  //private final ClimberSubsystem climber;
 
   TankDriveCmd tankDriveCmd;
   ArcadeDriveCmd arcadeDriveCmd;
@@ -131,7 +131,7 @@ public class RobotContainer {
 
     // Assistant's buttons
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-        .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
+        .whenPressed(new IntakeToggleCmd(intake, 0, 0.5)); // mag, intake
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
         .whenHeld(new ReverseIntake(intake, -0.5));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())

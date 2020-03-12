@@ -86,9 +86,9 @@ public final class Constants {
     public static final int PANEL_PISTON_REVERSE_PCM = 3;
 
     //Auto Delays - values to be adjusted later with testing
-    public static final double DELAY_A = 0.0;
-    public static final double DELAY_B = 3.0;
-    public static final double DELAY_C = 6.0;
+    public static final double DELAY_A = 3.0;
+    public static final double DELAY_B = 6.0;
+    public static final double DELAY_C = 9.0;
     
     //angle based on starting position
     public static final double ANGLE_A = 0;
@@ -124,75 +124,6 @@ public final class Constants {
     
     //Config if we have a lot of room for error. Any faster = too much overshoot
     public static final TrajectoryConfig TRAJ_CONFIG_FAST = new TrajectoryConfig(2, 3).setKinematics(DRIVE_KINEMATICS);
-
-    /**
-     *  TRAJECTORIES FOR AUTO
-     *  TODO: Determine which convention to go by:
-     *  1: Have the starting position always be (0,0) heading 0
-     *  2: Reset Pose at the start of each trajectory we run 
-     *  
-     * 
-     */
-
-    //Drive straight at angle 
-    
-    public Trajectory HIGH_A = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(30)),//Start
-        List.of(
-        ),
-        new Pose2d(),                               // End
-        TRAJ_CONFIG);
-    
-    
-        //Drive straight
-    public Trajectory HIGH_B = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
-        List.of(
-        ),
-        new Pose2d(0.5, 0, Rotation2d.fromDegrees(0)),                               // End
-        TRAJ_CONFIG);
-
-    //Drive straight at angle
-    public Trajectory HIGH_C = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(-30)),//Start
-        List.of(
-        ),
-        new Pose2d(),                               // End
-        TRAJ_CONFIG);
-
-    //Trajectories for auto backup to grab more balls
-    public Trajectory TRENCH_A = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
-        List.of(                                    // Waypoints
-            new Translation2d()
-        ),
-        new Pose2d(),                               // End
-        TRAJ_CONFIG);
-    
-    public Trajectory TRENCH_B = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
-        List.of(                                    // Waypoints
-            new Translation2d()
-        ),
-        new Pose2d(),                               // End
-        TRAJ_CONFIG);
-
-    public Trajectory SHIELD_B = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
-        List.of(                                    // Waypoints
-            new Translation2d()
-        ),
-        new Pose2d(),                               // End
-        TRAJ_CONFIG);
-
-    public Trajectory SHIELD_C = TrajectoryGenerator.generateTrajectory(
-        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
-        List.of(                                    // Waypoints
-            new Translation2d()
-        ),
-        new Pose2d(),                               // End
-        TRAJ_CONFIG);
-
 
     //camera paths
     public static final String FRONT_DRIVE_CAMERA_PATH = "/dev/video1";

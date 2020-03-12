@@ -39,7 +39,7 @@ public class Sensors_Subsystem extends SubsystemBase implements Logger {
        * See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for
        * details.
        */
-      ahrs = new AHRS(SPI.Port.kMXP); 
+      //ahrs = new AHRS(SPI.Port.kMXP); 
       ahrs.reset();
     } catch (RuntimeException ex) {
       DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);

@@ -92,9 +92,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	private final DifferentialDrive dDrive;
 	private final DifferentialDriveOdometry odometry;
-	public static final double trackWidthMeters = .61;
-	public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(trackWidthMeters);
-	public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(1.3, 2).setKinematics(DRIVE_KINEMATICS);
+	
 
 	private GearShifter gearbox;
 	private Gear requestedGear; 

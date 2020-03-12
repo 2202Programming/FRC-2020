@@ -7,6 +7,16 @@
 
 package frc.robot;
 
+import java.util.List;
+
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean constants. This class should not be used for any other
@@ -104,6 +114,44 @@ public final class Constants {
     public static final double DEPARTURE_AREA_A = 2.7;
     public static final double DEPARTURE_AREA_B = 2.7;
     public static final double DEPARTURE_AREA_C = 2.7;
+
+    //Drive Train Info for Trajectory Shit
+    public static final double trackWidthMeters = .61;
+	public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(trackWidthMeters);
+	public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(1.3, 2).setKinematics(DRIVE_KINEMATICS);
+
+    //Trajectories for auto
+    public static final Trajectory TRENCH_A = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
+        List.of(                                    // Waypoints
+            new Translation2d()
+        ),
+        new Pose2d(),                               // End
+        TRAJ_CONFIG);
+    
+    public static final Trajectory TRENCH_B = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
+        List.of(                                    // Waypoints
+            new Translation2d()
+        ),
+        new Pose2d(),                               // End
+        TRAJ_CONFIG);
+
+    public static final Trajectory SHIELD_B = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
+        List.of(                                    // Waypoints
+            new Translation2d()
+        ),
+        new Pose2d(),                               // End
+        TRAJ_CONFIG);
+
+    public static final Trajectory SHIELD_C = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
+        List.of(                                    // Waypoints
+            new Translation2d()
+        ),
+        new Pose2d(),                               // End
+        TRAJ_CONFIG);
 
     //camera paths
     public static final String FRONT_DRIVE_CAMERA_PATH = "/dev/video1";

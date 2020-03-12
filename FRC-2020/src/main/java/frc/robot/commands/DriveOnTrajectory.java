@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
 public class DriveOnTrajectory extends SequentialCommandGroup {
@@ -37,6 +38,6 @@ public class DriveOnTrajectory extends SequentialCommandGroup {
     driveTrain.resetPosition();
 
     addCommands(new RamseteCommand(
-      path, driveTrain::getPose, ramseteController, driveTrain.DRIVE_KINEMATICS, driveTrain::velocityTankWheelSpeeds, driveTrain));
+      path, driveTrain::getPose, ramseteController, Constants.DRIVE_KINEMATICS, driveTrain::velocityTankWheelSpeeds, driveTrain));
   }
 }

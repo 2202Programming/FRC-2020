@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.commands.panel.SetPanelArmExtension;
 import frc.robot.commands.panel.SimpPositionControl;
 import frc.robot.commands.panel.SimpRotateControl;
@@ -40,7 +41,7 @@ public class AutoPanelRun extends SequentialCommandGroup {
         new Translation2d(0, 1),
         new Translation2d(1, 2)
       )
-      ,new Pose2d(1, 3, new Rotation2d(0)), driveTrain.TRAJ_CONFIG);
+      ,new Pose2d(1, 3, new Rotation2d(0)), Constants.TRAJ_CONFIG);
 
 
     addCommands(

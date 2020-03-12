@@ -24,9 +24,9 @@ public class ClimberSubsystem extends SubsystemBase
     private DoubleSolenoid armSolenoid = new DoubleSolenoid(CLIMBER_PCM_CAN_ID, 
                 ARMSOLENOID_LOW_CANID, ARMSOLENOID_HIGH_CANID);
         
-    private final Spark armRotationMotor = new Spark(CLIMB_ARM_TALON_CANID); // Arm rotation motor 
+    private final TalonSRX armRotationMotor = new TalonSRX(CLIMB_ARM_TALON_CANID); // Arm rotation motor 
 
-    /*
+    
     //Talon configuration constants
     private final ControlMode eRotMode = ControlMode.Position;
     private final int countsPerRotation = 4096;
@@ -36,7 +36,7 @@ public class ClimberSubsystem extends SubsystemBase
     private final int posErrorLimit = 20;  // sensor counts
     private final double kGearing = 200.0; // motor rev to arm rev todo:fix gearing
     private final double kCounts_deg = countsPerRotation * kGearing / 90.0;  // 
-    */
+    
     
     private CANSparkMax wnSparkMax = new CANSparkMax(WN_SPARKMAX_CANID, MotorType.kBrushless); //Winch motor - extend / retract arm
 
@@ -49,7 +49,7 @@ public class ClimberSubsystem extends SubsystemBase
         wnSparkMax.setIdleMode(IdleMode.kBrake);
     }
 
-    /*
+    
     //Talon configuration
     void configureTalon(TalonSRX c, int slot, Gains g, boolean invert) {
         // setup the closed loop pid in the Talon
@@ -70,12 +70,21 @@ public class ClimberSubsystem extends SubsystemBase
 		c.setIntegralAccumulator(0.0, slot, kTO);
 		c.setSelectedSensorPosition(0, slot, kTO);
     }
-    */
+    
     
     //Set the speed of the arm rotation motor
     //There's a hard limit so it will stop at a specific angle
     public void setRotationSpeed(double speed) {
-        armRotationMotor.setPosition(speed);
+        armRotationMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+
+    public void setRotationPosition(double position) {
+        armRotationMotor.set(ControlMode.Position, position);
+    }
+
+    public double getRotationPosition() {
+        return armRotationMotor.getSelectedSensorPosition();
     }
 
     /*
@@ -134,7 +143,7 @@ public class ClimberSubsystem extends SubsystemBase
 
     public void log()
     {
-        SmartDashboard.putNumber("Arm rotation position", armRotationMotor.getPosition());
+        SmartDashboard.putNumber("Arm rotation position", getRotationPosition());
         SmartDashboard.putNumber("Winch speed", wnSparkMax.get());
     }
 }

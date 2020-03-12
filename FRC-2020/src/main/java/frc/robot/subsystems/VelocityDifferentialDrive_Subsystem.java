@@ -361,7 +361,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getHeading() {
-		return navX.getAngle();
+		return -navX.getAngle();
 	}
 
 	public void resetHeading() {

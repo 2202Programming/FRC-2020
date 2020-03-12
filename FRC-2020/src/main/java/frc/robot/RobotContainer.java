@@ -23,6 +23,9 @@ import frc.robot.commands.auto.DriveOffLine;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.climb.ClimbGroup;
+import frc.robot.commands.climb.RunWinch;
+import frc.robot.commands.climb.SetClimbArmExtension;
+import frc.robot.commands.climb.SetClimbArmRotation;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
@@ -153,8 +156,23 @@ public class RobotContainer {
     driverControls.bindButton(Id.SwitchBoard, 5)
       .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
       */
-    driverControls.bindDoubleButton(Id.SwitchBoard, 7, 11)
-      .whenPressed(new ClimbGroup(climber));
+    
+    driverControls.bindButton(Id.SwitchBoard, 7)
+        .whenHeld(new SetClimbArmRotation(climber, 0.5));
+    driverControls.bindButton(Id.SwitchBoard, 8)
+        .whenHeld(new SetClimbArmRotation(climber, -0.5));
+    driverControls.bindButton(Id.SwitchBoard, 9)
+        .whenPressed(new SetClimbArmExtension(climber, true))
+        .whenReleased(new SetClimbArmExtension(climber, false));
+    driverControls.bindButton(Id.SwitchBoard, 10)
+        .whenHeld(new RunWinch(climber, 0.8));
+    driverControls.bindButton(Id.SwitchBoard, 11)
+        .whenHeld(new RunWinch(climber, -0.8));
+    
+    
+    
+    //driverControls.bindDoubleButton(Id.SwitchBoard, 7, 11)
+    //  .whenPressed(new ClimbGroup(climber));
   }
 
   

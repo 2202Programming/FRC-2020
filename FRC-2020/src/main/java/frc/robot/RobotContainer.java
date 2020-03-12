@@ -93,7 +93,7 @@ public class RobotContainer {
     lidar = new Lidar_Subsystem();
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
-    climber = new ClimberSubsystem();
+    //climber = new ClimberSubsystem();
 
     // Add anything that has logging requirements
     logSubsystem.add(driveTrain, limelight, lidar, intake, driverControls/**, panel, detector*/);
@@ -158,6 +158,7 @@ public class RobotContainer {
       .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
       */
     
+      /*
     driverControls.bindButton(Id.SwitchBoard, 7)
         .whenHeld(new SetClimbArmRotation(climber, 0.5));
     driverControls.bindButton(Id.SwitchBoard, 8)
@@ -169,6 +170,7 @@ public class RobotContainer {
         .whenHeld(new RunWinch(climber, 0.8));
     driverControls.bindButton(Id.SwitchBoard, 11)
         .whenHeld(new RunWinch(climber, -0.8));
+    */
     
     
     

@@ -118,8 +118,12 @@ public final class Constants {
     //Drive Train Kinematics and Trajectory Config(s)
     public static final double trackWidthMeters = .61;
 	public static final DifferentialDriveKinematics DRIVE_KINEMATICS = new DifferentialDriveKinematics(trackWidthMeters);
-    public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(1.2, 2).setKinematics(DRIVE_KINEMATICS);
-    public static final TrajectoryConfig TRAJ_CONFIG_FAST = new TrajectoryConfig(2, 2).setKinematics(DRIVE_KINEMATICS);
+    
+    //Default Config
+    public static final TrajectoryConfig TRAJ_CONFIG = new TrajectoryConfig(1.3, 2).setKinematics(DRIVE_KINEMATICS);
+    
+    //Config if we have a lot of room for error. Any faster = too much overshoot
+    public static final TrajectoryConfig TRAJ_CONFIG_FAST = new TrajectoryConfig(2, 3).setKinematics(DRIVE_KINEMATICS);
 
     /**
      *  TRAJECTORIES FOR AUTO
@@ -131,15 +135,17 @@ public final class Constants {
      */
 
     //Drive straight at angle 
-    public static final Trajectory HIGH_A = TrajectoryGenerator.generateTrajectory(
+    
+    public Trajectory HIGH_A = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, Rotation2d.fromDegrees(30)),//Start
         List.of(
         ),
         new Pose2d(),                               // End
         TRAJ_CONFIG);
     
+    
         //Drive straight
-    public static final Trajectory HIGH_B = TrajectoryGenerator.generateTrajectory(
+    public Trajectory HIGH_B = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
         List.of(
         ),
@@ -147,7 +153,7 @@ public final class Constants {
         TRAJ_CONFIG);
 
     //Drive straight at angle
-    public static final Trajectory HIGH_C = TrajectoryGenerator.generateTrajectory(
+    public Trajectory HIGH_C = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, Rotation2d.fromDegrees(-30)),//Start
         List.of(
         ),
@@ -155,7 +161,7 @@ public final class Constants {
         TRAJ_CONFIG);
 
     //Trajectories for auto backup to grab more balls
-    public static final Trajectory TRENCH_A = TrajectoryGenerator.generateTrajectory(
+    public Trajectory TRENCH_A = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
         List.of(                                    // Waypoints
             new Translation2d()
@@ -163,7 +169,7 @@ public final class Constants {
         new Pose2d(),                               // End
         TRAJ_CONFIG);
     
-    public static final Trajectory TRENCH_B = TrajectoryGenerator.generateTrajectory(
+    public Trajectory TRENCH_B = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
         List.of(                                    // Waypoints
             new Translation2d()
@@ -171,7 +177,7 @@ public final class Constants {
         new Pose2d(),                               // End
         TRAJ_CONFIG);
 
-    public static final Trajectory SHIELD_B = TrajectoryGenerator.generateTrajectory(
+    public Trajectory SHIELD_B = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
         List.of(                                    // Waypoints
             new Translation2d()
@@ -179,13 +185,14 @@ public final class Constants {
         new Pose2d(),                               // End
         TRAJ_CONFIG);
 
-    public static final Trajectory SHIELD_C = TrajectoryGenerator.generateTrajectory(
+    public Trajectory SHIELD_C = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0, 0, Rotation2d.fromDegrees(0)),//Start
         List.of(                                    // Waypoints
             new Translation2d()
         ),
         new Pose2d(),                               // End
         TRAJ_CONFIG);
+
 
     //camera paths
     public static final String FRONT_DRIVE_CAMERA_PATH = "/dev/video1";

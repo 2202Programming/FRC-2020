@@ -9,32 +9,36 @@ package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake_Subsystem;
+import static frc.robot.Constants.*;
 
 public class MagazineAdjust extends CommandBase {
   private Intake_Subsystem intake;
-  private boolean forward;
-  private static final double strength = 0.8;
+  private double strength = 0.8;
+  private int pulseCounts = -1;
+  private int counts; // count down timer
   /**
    * Creates a new MagazineAdjust.
    */
-  public MagazineAdjust(Intake_Subsystem intake, boolean forward) {
+  public MagazineAdjust(Intake_Subsystem intake, boolean forward, double pulseTime) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.intake = intake;
-    this.forward = forward;
+
+    //set the direction
+    strength *= (forward) ? 1.0 : -1.0;
+    pulseCounts = (pulseTime > 0.0) ? (int) ((pulseTime / DT) + 1) : -1;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() { 
-    //do the work when the button is pressed, end() called on release
-    if (forward) intake.magazineOn(strength);
-    else intake.magazineOn(-strength);
+    counts = pulseCounts;
+    intake.magazineOn(strength);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //nothing to do, motor is in proper state.
+    counts--;
   }
 
   // Called once the command ends or is interrupted.
@@ -47,6 +51,7 @@ public class MagazineAdjust extends CommandBase {
   // This command ends with button release.
   @Override
   public boolean isFinished() {
-    return false;
+    // we countdown to zero if a pulse is given.
+    return (counts == 0);
   }
 }

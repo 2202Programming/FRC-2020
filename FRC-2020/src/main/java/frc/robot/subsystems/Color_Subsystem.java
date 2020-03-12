@@ -84,6 +84,7 @@ public class Color_Subsystem extends SubsystemBase implements Logger {
 
   public void log(){
 
+    /**
     SmartDashboard.putString("Color Sensor", m_colorSensor.toString());
 
     double[] rgb = getRgb();
@@ -93,6 +94,7 @@ public class Color_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putNumber("Green", rgb[1]);
     SmartDashboard.putNumber("Blue", rgb[2]);
     SmartDashboard.putNumber("Color Sensor Proximity", getProximity()); 
+    */
   }
 
 

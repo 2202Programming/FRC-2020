@@ -5,43 +5,39 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.auto;
+package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 
-public class auto_drive_straight_cmd extends CommandBase {
+public class RunWinch extends CommandBase {
+  private ClimberSubsystem climber;
+  private double speed;
   /**
-   * Creates a new auto_drive_straight_until_lidar_cmd.
+   * Creates a new ClimbWinch.
    */
-  private final VelocityDifferentialDrive_Subsystem drive;
-  private final double speed;
-
-  public auto_drive_straight_cmd(VelocityDifferentialDrive_Subsystem drive, double speed) {
-    this.drive = drive;
+  public RunWinch(ClimberSubsystem climber, double speed) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    this.climber = climber;
     this.speed = speed;
-
-    addRequirements(drive);
+    addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Robot.command = "Auto Drive Straight";
-    
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.velocityArcadeDrive(speed, 0);
+    climber.setWinchSpeed(speed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.arcadeDrive(0, 0);
+    climber.setWinchSpeed(0);
   }
 
   // Returns true when the command should end.

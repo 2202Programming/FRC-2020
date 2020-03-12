@@ -23,15 +23,15 @@ public class ArcadeVelDriveCmd extends CommandBase {
   double vMax; // fps
   double rotMax; // deg per sec
 
-  // AutoShift info
-  double shiftUpSpeed = 6.8; // ft/s above shift into high gear (must be less than 10 or so)
-  double shiftDownSpeed = 1.5; // ft/s below shift into low gear
-  int minTimeInZone = 5; // frame counts *.02 = 0.1 seconds
+  // AutoShift info - Change settings in RobotContainer
+  double shiftUpSpeed = 6.8;    // ft/s above shift into high gear (must be less than 10 or so)
+  double shiftDownSpeed = 1.5;  // ft/s below shift into low gear
+  int minTimeInZone = 5;        // frame counts *.02 = 0.1 seconds
   int timeWantingUp;
   int timeWantingDown;
 
   int timeWantingCoast; // frames where Vcmd < Vrobot
-  int minTimeEnterCoast = 5; // frames to require before coast
+  int minTimeEnterCoast = 3; // frames to require before coast
 
   // robot values measured at start of frame
   double velAvg;
@@ -95,7 +95,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
         resetTimeInZone();
       }
     }
-
+/*
     // see if we can coast, using abs vel
     if ((cmd < vel) && (rotCmd == 0.0 )) {
       if (++timeWantingCoast > minTimeEnterCoast)
@@ -105,6 +105,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
       timeWantingCoast = 0;
       drive.setCoastMode(false);
     }
+    */
   }
 
   /**
@@ -125,7 +126,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
     // read controls in normalize units +/- 1.0, scale to physical units
     velCmd = dc.getVelocity() * vMax;
     rotCmd = dc.getRotation() * rotMax;
-    velAvg = drive.getLeftVel(false);
+    velAvg = drive.getAvgVelocity(false);   // ft/s
 
     countTimeInShiftZone();
     drive.velocityArcadeDrive(velCmd, rotCmd);

@@ -48,7 +48,7 @@ public class Log_Subsystem extends SubsystemBase implements Logger {
   }
 
   public void log() {
-    SmartDashboard.putString("Command: ", Robot.command);
+    //SmartDashboard.putString("Command: ", Robot.command);
   }
 
   @Override

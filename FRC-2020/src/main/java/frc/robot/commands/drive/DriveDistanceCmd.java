@@ -5,43 +5,45 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.auto;
+package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.subsystems.ifx.VelocityDrive;
 
-public class auto_drive_straight_cmd extends CommandBase {
+public class DriveDistanceCmd extends CommandBase {
+  final VelocityDrive drive;
+  double distRight;          //ft
+  double distLeft;           //ft
+
   /**
-   * Creates a new auto_drive_straight_until_lidar_cmd.
+   * Creates a new DriveDistanceCmd.
    */
-  private final VelocityDifferentialDrive_Subsystem drive;
-  private final double speed;
+  public DriveDistanceCmd(VelocityDrive driveTrain, double distLeft, double distRight) {
+    this.drive = driveTrain;
+    this.distLeft  = distLeft;
+    this.distRight = distRight;
+  }
 
-  public auto_drive_straight_cmd(VelocityDifferentialDrive_Subsystem drive, double speed) {
-    this.drive = drive;
-    this.speed = speed;
-
-    addRequirements(drive);
+  public DriveDistanceCmd(VelocityDrive driveTrain, double dist) {
+    this(driveTrain, dist, dist);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    Robot.command = "Auto Drive Straight";
-    
+    drive.resetPosition();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    drive.velocityArcadeDrive(speed, 0);
+
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.arcadeDrive(0, 0);
   }
 
   // Returns true when the command should end.

@@ -15,7 +15,6 @@ import frc.robot.subsystems.Intake_Subsystem;
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class MagazineToggleCmd extends InstantCommand {
   Intake_Subsystem intake;
-  boolean isDown = true;  //must start down
 
   public MagazineToggleCmd(Intake_Subsystem intake) {
     this.intake = intake;
@@ -24,8 +23,8 @@ public class MagazineToggleCmd extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    boolean isDown = !intake.isMagazineUp();
     if (isDown)  intake.magazineUp();
     else intake.magazineDown();
-    isDown = !isDown;
   }
 }

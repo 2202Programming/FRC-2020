@@ -15,13 +15,16 @@ public class ShooterOn extends CommandBase {
   private double SLOW_MAG_REVERSE = -0.8; // motor power
   private double FAST_MAG_FORWARD =  1; // motor power
   private Intake_Subsystem m_intake;
-  private final double m_rpmTarget;
+  private final double m_rpmTarget_low;
+  private final double m_rpmTarget_high;
   private final int m_backupCount;
   private int m_count;
+  private double m_rpm;  // speed to use based on high/low mag position
 
-  public ShooterOn(Intake_Subsystem intake, double rpmTarget, double backupSec) {
+  public ShooterOn(Intake_Subsystem intake, double rpmTarget_low, double rpmTarget_high, double backupSec) {
     m_intake = intake;
-    m_rpmTarget = rpmTarget;
+    m_rpmTarget_low = rpmTarget_low;
+    m_rpmTarget_high = rpmTarget_high;
     m_backupCount = (int) Math.floor(backupSec / Constants.DT);
 
   }
@@ -32,6 +35,9 @@ public class ShooterOn extends CommandBase {
     m_intake.magazineOff();
     m_intake.intakeOff();
     m_count = 0;
+
+    // use the mag position to determine shooter speed.
+    m_rpm = calcShooterSpeed();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -43,9 +49,14 @@ public class ShooterOn extends CommandBase {
       m_intake.magazineOn(SLOW_MAG_REVERSE);
     } else {
       m_intake.magazineOn(FAST_MAG_FORWARD);
-      m_intake.shooterOn(m_rpmTarget);
+      m_intake.shooterOn(m_rpm);
     }
   }
+
+  double calcShooterSpeed() {
+    return (m_intake.isMagazineUp()) ?  m_rpmTarget_high : m_rpmTarget_low;
+  }
+
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {

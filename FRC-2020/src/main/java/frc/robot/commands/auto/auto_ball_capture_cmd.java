@@ -9,7 +9,6 @@ package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake_Subsystem;
-import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
 public class auto_ball_capture_cmd extends CommandBase {
@@ -19,18 +18,16 @@ public class auto_ball_capture_cmd extends CommandBase {
    private double intake_strength;
    private double magazine_strength;
    private final VelocityDifferentialDrive_Subsystem drive;
-   private final Limelight_Subsystem limelight;
    private double drive_speed;
 
 
-  public auto_ball_capture_cmd(Intake_Subsystem intake, VelocityDifferentialDrive_Subsystem drive, Limelight_Subsystem limelight,
+  public auto_ball_capture_cmd(Intake_Subsystem intake, VelocityDifferentialDrive_Subsystem drive,
   double intake_strength, double magazine_strength, double drive_speed) {
 
     this.intake = intake; 
     this.intake_strength = intake_strength;
     this.magazine_strength = magazine_strength;
     this.drive = drive;
-    this.limelight = limelight;
     this.drive_speed = drive_speed;
 
     addRequirements(drive);
@@ -54,8 +51,8 @@ public class auto_ball_capture_cmd extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     intake.intakeOff();
+    intake.magazineOff();
     drive.velocityArcadeDrive(0, 0);
-    limelight.disableLED(); //done with auto, disable LED
   }
 
   // Returns true when the command should end.

@@ -22,6 +22,10 @@ import frc.robot.commands.auto.DriveOffLine;
 //import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
+import frc.robot.commands.climb.ClimbGroup;
+import frc.robot.commands.climb.RunWinch;
+import frc.robot.commands.climb.SetClimbArmExtension;
+import frc.robot.commands.climb.SetClimbArmRotation;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
@@ -30,6 +34,7 @@ import frc.robot.commands.drive.TankDriveCmd;
 //import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.commands.panel.SimpPositionControl;
 import frc.robot.commands.panel.SimpRotateControl;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Color_Subsystem;
 import frc.robot.subsystems.Control_Panel;
 import frc.robot.subsystems.GearShifter;
@@ -59,8 +64,9 @@ public class RobotContainer {
   public final Limelight_Subsystem limelight;
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
-  public final Control_Panel panel;
-  public final Color_Subsystem detector;
+  //public final Control_Panel panel;
+  //public final Color_Subsystem detector;
+  private final ClimberSubsystem climber;
 
   TankDriveCmd tankDriveCmd;
   ArcadeDriveCmd arcadeDriveCmd;
@@ -85,11 +91,12 @@ public class RobotContainer {
     limelight = new Limelight_Subsystem();
     logSubsystem = new Log_Subsystem(5); // log every 5 frames - 100mS
     lidar = new Lidar_Subsystem(SIMULATION); //no parameter is not simulation
-    panel = new Control_Panel();
-    detector = new Color_Subsystem();
+    //panel = new Control_Panel();
+    //detector = new Color_Subsystem();
+    climber = new ClimberSubsystem();
 
     // Add anything that has logging requirements
-    logSubsystem.add(driveTrain, limelight, lidar, intake, panel, detector);
+    logSubsystem.add(driveTrain, limelight, lidar, intake, driverControls/**, panel, detector*/);
 
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
@@ -130,11 +137,11 @@ public class RobotContainer {
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
         .whenPressed(new ToggleIntakeRaised(intake));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
-        .whileHeld(new MagazineAdjust(intake, true));
+      .whenPressed(new MagazineAdjust(intake, true, 0.4), true);
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
-        .whileHeld(new MagazineAdjust(intake, false));
+        .whileHeld(new MagazineAdjust(intake, false, 0.0));
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-        .whenHeld(new ShooterOn(intake, 1200, 0.4)); // rpm, seconds mag backup
+        .whenHeld(new ShooterOn(intake, 0.5, 1, 0.4)); // pwr_low, pwr_high, seconds mag backup
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new MagazineToggleCmd(intake));
 
@@ -145,11 +152,28 @@ public class RobotContainer {
     //Control Panel Manual Controls
     driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.LB.getCode())
       .whenPressed(new SimpRotateControl(panel));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.RB.getCode())
+    driverControls.bindButton(Id.SwitchBoard, 12)
       .whenPressed(new SimpPositionControl(panel, detector));
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.START.getCode())
+    driverControls.bindButton(Id.SwitchBoard, 5)
       .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
       */
+    
+    driverControls.bindButton(Id.SwitchBoard, 7)
+        .whenHeld(new SetClimbArmRotation(climber, 0.5));
+    driverControls.bindButton(Id.SwitchBoard, 8)
+        .whenHeld(new SetClimbArmRotation(climber, -0.5));
+    driverControls.bindButton(Id.SwitchBoard, 9)
+        .whenPressed(new SetClimbArmExtension(climber, true))
+        .whenReleased(new SetClimbArmExtension(climber, false));
+    driverControls.bindButton(Id.SwitchBoard, 10)
+        .whenHeld(new RunWinch(climber, 0.8));
+    driverControls.bindButton(Id.SwitchBoard, 11)
+        .whenHeld(new RunWinch(climber, -0.8));
+    
+    
+    
+    //driverControls.bindDoubleButton(Id.SwitchBoard, 7, 11)
+    //  .whenPressed(new ClimbGroup(climber));
   }
 
   
@@ -162,7 +186,7 @@ public class RobotContainer {
     // An ExampleCommand will run in autonomous
     // return new CommandBase() {};
     return new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar);
-  }
+   }
 
   /**
    * InitTest() called from Robot when test mode is used. Put code here to fire up

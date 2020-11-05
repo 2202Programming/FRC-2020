@@ -45,11 +45,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   DoubleSolenoid magSolenoid = new DoubleSolenoid(MAGAZINE_PCM_CAN_ID, MAGAZINE_UP_PCM, MAGAZINE_DOWN_PCM);
 
-  // Intake Pneumatic Sensors
-  // public DigitalInput intake_up = new DigitalInput(Constants.INTAKE_UP_DIO);
-  // public DigitalInput intake_down = new
-  // DigitalInput(Constants.INTAKE_DOWN_DIO);
-
   // magazine
   Spark magazine = new Spark(MAGAZINE_PWM);
 
@@ -129,7 +124,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     shooterIsOn = false;
 
     magazineDown(); // must start in down positon
-    // TODO: interlock mag up/down and intake. - only one up
+    raiseIntake();  // must start in the up position
   }
 
   void shooterMotorConfig(WPI_TalonSRX talon) {
@@ -164,11 +159,18 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
   public void raiseIntake() {
+    // can't have magazine up with intake up, force it down.
+    // Magazine goes down faster, so should be ok...
+    if (isMagazineUp()) { magazineDown();}
     intakeSolenoid.set(DoubleSolenoid.Value.kForward);
   }
 
   public void lowerIntake() {
     intakeSolenoid.set(DoubleSolenoid.Value.kReverse);
+  }
+
+  public boolean isIntakeUp() {
+    return (intakeSolenoid.get() == Value.kForward);
   }
 
   public void intakeOn(double motorStrength) {
@@ -201,7 +203,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
      */
     // WIP - using simple motorpercent for now - 2/13/20
     upper_shooter.set(ControlMode.PercentOutput, RPM_target);
-    lower_shooter.set(ControlMode.PercentOutput, -RPM_target);
+    lower_shooter.set(ControlMode.PercentOutput, RPM_target);
   }
 
   public boolean shooterIsOn() {
@@ -215,6 +217,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
   public void magazineUp() {
+    // intake will come down much faster than magazine will go up
+    // so no delay here should be OK... famous last words.
+    if  (isIntakeUp()) { lowerIntake();}
     magSolenoid.set(Value.kForward);
   }
 
@@ -223,13 +228,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
   public boolean isMagazineUp() {
-    return (magSolenoid.get() == Value.kReverse) ? false : true;
+    return (magSolenoid.get() == Value.kForward);
   }
 
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
-
   }
 
 }

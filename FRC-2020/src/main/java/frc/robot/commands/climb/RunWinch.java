@@ -5,53 +5,44 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.intake;
+package frc.robot.commands.climb;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake_Subsystem;
-import static frc.robot.Constants.*;
+import frc.robot.subsystems.ClimberSubsystem;
 
-public class MagazineAdjust extends CommandBase {
-  private Intake_Subsystem intake;
-  private double strength = 0.8;
-  private int pulseCounts = -1;
-  private int counts; // count down timer
+public class RunWinch extends CommandBase {
+  private ClimberSubsystem climber;
+  private double speed;
   /**
-   * Creates a new MagazineAdjust.
+   * Creates a new ClimbWinch.
    */
-  public MagazineAdjust(Intake_Subsystem intake, boolean forward, double pulseTime) {
+  public RunWinch(ClimberSubsystem climber, double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.intake = intake;
-
-    //set the direction
-    strength *= (forward) ? 1.0 : -1.0;
-    pulseCounts = (pulseTime > 0.0) ? (int) ((pulseTime / DT) + 1) : -1;
+    this.climber = climber;
+    this.speed = speed;
+    addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() { 
-    counts = pulseCounts;
-    intake.magazineOn(strength);
+  public void initialize() {
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    counts--;
+    climber.setWinchSpeed(speed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.magazineOff();
+    climber.setWinchSpeed(0);
   }
 
   // Returns true when the command should end.
-  // This command ends with button release.
   @Override
   public boolean isFinished() {
-    // we countdown to zero if a pulse is given.
-    return (counts == 0);
+    return false;
   }
 }

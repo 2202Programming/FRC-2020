@@ -44,7 +44,7 @@ public class Log_Subsystem extends SubsystemBase implements Logger {
    */
   public synchronized void add(Logger ... devices) {
     for(Logger dev : devices)
-    loggers.add(dev);
+      loggers.add(dev);
   }
 
   public void log() {

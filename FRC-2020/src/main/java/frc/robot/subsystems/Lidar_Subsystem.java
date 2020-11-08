@@ -36,8 +36,8 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   private final double BUMPER_DISTANCE = 100; //mm from bumber to sensor
 
 
-  public Lidar_Subsystem(boolean sim) {
-    this.sim = sim; //if simulation mode, do not construct lidar and all methods return 0 or nothing.
+  public Lidar_Subsystem(boolean isreal) {
+    this.sim = !isreal; //if simulation mode, do not construct lidar and all methods return 0 or nothing.
 
     if (!sim){
       front_left_lidar = new TimeOfFlight(Constants.FRONT_LEFT_LIDAR);
@@ -78,7 +78,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putBoolean("Range is valid", validRange);
     SmartDashboard.putBoolean("Left lidar valid", front_left_lidar.isRangeValid());
     SmartDashboard.putBoolean("Right lidar valid", front_right_lidar.isRangeValid());
-    */
+   
 
     SmartDashboard.putNumber("Lidar Angle", angle);
 

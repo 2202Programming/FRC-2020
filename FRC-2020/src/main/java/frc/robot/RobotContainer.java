@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -75,7 +76,6 @@ public class RobotContainer {
   // Tests to run during test mode
 
   TestKBSimMode t1;
-  public final boolean SIMULATION = false; //set to true if running in simulator
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -90,7 +90,7 @@ public class RobotContainer {
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
     logSubsystem = new Log_Subsystem(5); // log every 5 frames - 100mS
-    lidar = new Lidar_Subsystem(SIMULATION); //no parameter is not simulation
+    lidar = new Lidar_Subsystem(RobotBase.isReal()); //no parameter is not simulation
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();

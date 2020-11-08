@@ -27,7 +27,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   private final double LIDAR_DIST = 348;
   private double angle;
   private boolean validRange;
-  private boolean sim;
+  private boolean isreal; //if simulation mode, do not construct lidar and all methods return 0 or nothing.
   private double filteredValid;
   private LinearFilter left_iir;
   private LinearFilter right_iir;
@@ -37,9 +37,9 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
 
 
   public Lidar_Subsystem(boolean isreal) {
-    this.sim = !isreal; //if simulation mode, do not construct lidar and all methods return 0 or nothing.
+    this.isreal = isreal; 
 
-    if (!sim){
+    if (isreal){
       front_left_lidar = new TimeOfFlight(Constants.FRONT_LEFT_LIDAR);
       front_right_lidar = new TimeOfFlight(Constants.FRONT_RIGHT_LIDAR);
   
@@ -54,12 +54,12 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   }
 
   public double getAverageRange() {
-    if (sim) return 0;
+    if (!isreal) return 0;
     return ((left_lidar_range+right_lidar_range)/2);
   }
 
   public double findAngle(){
-    if (sim) return 0;
+    if (!isreal) return 0;
 
     //getRange() returns distance in milimeters 
     double dist2 = left_lidar_range;
@@ -70,7 +70,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   }
 
   public void log() {
-    if (sim) return;
+    if (!isreal) return;
 
     SmartDashboard.putNumber("Front Left Lidar", left_lidar_range);
     SmartDashboard.putNumber("Front Right Lidar", right_lidar_range);
@@ -85,7 +85,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   }
 
   public boolean valid(){
-    if (sim) return false;
+    if (!isreal) return false;
 
     if(front_left_lidar.isRangeValid() == false || front_right_lidar.isRangeValid() == false){
       return false;
@@ -95,7 +95,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   }
 
   public boolean isEitherValid(){
-    if (sim) return false;
+    if (!isreal) return false;
 
     if(front_left_lidar.isRangeValid() == false && front_right_lidar.isRangeValid() == false){
       return false;
@@ -104,14 +104,14 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   }
 
   public boolean isFilteredValid(){
-    if (sim) return false;
+    if (!isreal) return false;
 
     return (filteredValid >= 0.6);
   }
 
   @Override
   public void periodic() {
-    if (sim) return;
+    if (!isreal) return;
 
     // This method will be called once per scheduler run
     validRange = valid();

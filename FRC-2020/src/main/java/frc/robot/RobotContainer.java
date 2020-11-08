@@ -90,7 +90,7 @@ public class RobotContainer {
     intake = new Intake_Subsystem();
     limelight = new Limelight_Subsystem();
     logSubsystem = new Log_Subsystem(5); // log every 5 frames - 100mS
-    lidar = new Lidar_Subsystem(RobotBase.isReal()); //no parameter is not simulation
+    lidar = new Lidar_Subsystem(RobotBase.isReal()); 
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();

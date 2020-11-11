@@ -49,8 +49,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   Spark magazine = new Spark(MAGAZINE_PWM);
 
   // shooters
-  WPI_TalonSRX upper_shooter = new WPI_TalonSRX(UPPER_SHOOTER_TALON_CAN);
-  WPI_TalonSRX lower_shooter = new WPI_TalonSRX(LOWER_SHOOTER_TALON_CAN);
+  public WPI_TalonSRX upper_shooter = new WPI_TalonSRX(UPPER_SHOOTER_TALON_CAN);
+  public WPI_TalonSRX lower_shooter = new WPI_TalonSRX(LOWER_SHOOTER_TALON_CAN);
 
   /**
    * Which PID slot to pull gains from. Starting 2018, you can choose from 0,1,2

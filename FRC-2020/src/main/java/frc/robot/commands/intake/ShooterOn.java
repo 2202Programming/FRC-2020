@@ -43,13 +43,13 @@ public class ShooterOn extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_intake.shooterOn(m_rpm);
     if (m_count++ < m_backupCount) {
       // We will want to backup the mag a little bit before shooter gets engaged
       // this will prevent balls getting stuck.
       m_intake.magazineOn(SLOW_MAG_REVERSE);
     } else {
       m_intake.magazineOn(FAST_MAG_FORWARD);
-      m_intake.shooterOn(m_rpm);
     }
   }
 

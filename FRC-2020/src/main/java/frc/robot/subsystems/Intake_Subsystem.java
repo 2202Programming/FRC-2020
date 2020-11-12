@@ -49,8 +49,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   Spark magazine = new Spark(MAGAZINE_PWM);
 
   // shooters
-  public WPI_TalonSRX upper_shooter = new WPI_TalonSRX(UPPER_SHOOTER_TALON_CAN);
-  public WPI_TalonSRX lower_shooter = new WPI_TalonSRX(LOWER_SHOOTER_TALON_CAN);
+  WPI_TalonSRX upper_shooter = new WPI_TalonSRX(UPPER_SHOOTER_TALON_CAN);
+  WPI_TalonSRX lower_shooter = new WPI_TalonSRX(LOWER_SHOOTER_TALON_CAN);
 
   /**
    * Which PID slot to pull gains from. Starting 2018, you can choose from 0,1,2
@@ -229,6 +229,15 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   public boolean isMagazineUp() {
     return (magSolenoid.get() == Value.kForward);
+  }
+
+  public double getShooterRPM() {
+    // Get the current output percent of the upper and lower shooter motors
+    double upperRPM = upper_shooter.getMotorOutputPercent();
+    double lowerRPM = lower_shooter.getMotorOutputPercent();
+    // Gets the lower of the upper and lower shooter current speed
+    //dpl may want average here?
+    return Math.min(upperRPM, lowerRPM);
   }
 
   @Override

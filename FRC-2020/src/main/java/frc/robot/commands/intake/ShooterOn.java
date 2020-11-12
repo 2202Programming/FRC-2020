@@ -43,18 +43,15 @@ public class ShooterOn extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // Get the current output percent of the upper and lower shooter motors
-    int m_upperShooter_RPM = (int) m_intake.upper_shooter.getMotorOutputPercent();
-    int m_lowerShooter_RPM = (int) m_intake.lower_shooter.getMotorOutputPercent();
     
-    // Gets the lower of the upper and lower shooter current speed
-    int m_shooter_RPM = Math.min(m_upperShooter_RPM, m_lowerShooter_RPM);
+    //check our speed
+    double shooterRPM =  m_intake.getShooterRPM();
 
     if (m_count++ < m_backupCount) {
       // We will want to backup the mag a little bit before shooter gets engaged
       // this will prevent balls getting stuck.
       m_intake.magazineOn(SLOW_MAG_REVERSE);
-    } else if(m_shooter_RPM <= m_rpm) {
+    } else if(shooterRPM <= m_rpm) {
       // Runs while the shooters are getting up to their desired speed
       // This will not work if the upper and lower shooters speeds are ever 
       // changed separately

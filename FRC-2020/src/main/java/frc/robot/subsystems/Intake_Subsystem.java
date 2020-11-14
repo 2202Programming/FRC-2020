@@ -20,6 +20,7 @@ import frc.robot.util.misc.Gains;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * motorStrength should be between -1 and 1 for all methods
@@ -82,6 +83,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   final double ShooterEncoder = 4096; // counts per rev
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
   final double kRPM2Counts = (GEAR * ShooterEncoder) / RPM2CountsPer100ms;
+
+  private double lowerRPM;
+  private double upperRPM;
 
   private boolean intakeIsOn;
   private boolean shooterIsOn;
@@ -203,28 +207,32 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
 
   public double getShooterRPM() {
-    // Get the current output percent of the upper and lower shooter motors
+    // Get the current output percent of the upper and lower shooter motor
     double upperVelocity = upper_shooter.getSelectedSensorVelocity();
     double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
-
-    double upperRPM = upperVelocity/kRPM2Counts;
-    double lowerRPM = lowerVelocity/kRPM2Counts;
-
+    upperRPM = upperVelocity/kRPM2Counts;
+    lowerRPM = lowerVelocity/kRPM2Counts;
     return (upperRPM+lowerRPM)/2;
   }
 
   public double getShooterPercent() {
     // Get the current output percent of the upper and lower shooter motors
-    double upperRPM = upper_shooter.getMotorOutputPercent();
-    double lowerRPM = lower_shooter.getMotorOutputPercent();
+    double upperPerc = upper_shooter.getMotorOutputPercent();
+    double lowerPerc = lower_shooter.getMotorOutputPercent();
     // Gets the lower of the upper and lower shooter current speed
     //dpl may want average here?
-    return Math.min(upperRPM, lowerRPM);
+    return Math.min(upperPerc, lowerPerc);
   }
 
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
+    double upperVelocity = upper_shooter.getSelectedSensorVelocity();
+    double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
+    upperRPM = upperVelocity/kRPM2Counts;
+    lowerRPM = lowerVelocity/kRPM2Counts;
+    SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
+    SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
   }
 
 }

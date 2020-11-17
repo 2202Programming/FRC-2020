@@ -17,9 +17,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import static frc.robot.Constants.*;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.util.misc.Gains;
-//import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * motorStrength should be between -1 and 1 for all methods
@@ -52,33 +53,10 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   WPI_TalonSRX upper_shooter = new WPI_TalonSRX(UPPER_SHOOTER_TALON_CAN);
   WPI_TalonSRX lower_shooter = new WPI_TalonSRX(LOWER_SHOOTER_TALON_CAN);
 
-  /**
-   * Which PID slot to pull gains from. Starting 2018, you can choose from 0,1,2
-   * or 3. Only the first two (0,1) are visible in web-based configuration.
-   */
   final int kSlotIdx = 0;
-
-  /**
-   * Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops. For now
-   * we just want the primary one.
-   */
   final int kPIDLoopIdx = 0;
-
-  /**
-   * Set to zero to skip waiting for confirmation, set to nonzero to wait and
-   * report to DS if action fails.
-   */
   final int kTimeoutMs = 30;
-
-  /**
-   * PID Gains may have to be adjusted based on the responsiveness of control
-   * loop. kF: 1023 represents output value to Talon at 100%, 7200 represents
-   * Velocity units at 100% output
-   * 
-   * kP kI kD kF Iz PeakOut
-   */
-  // final static Gains kGains_Velocit = new Gains(0.25, 0.001, 20, 1023.0 /
-  // 7200.0, 300, 1.00);
+  
   ErrorCode lastError;
   TalonSRXConfiguration shooterCfg = new TalonSRXConfiguration();
 
@@ -106,20 +84,16 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
   final double kRPM2Counts = (GEAR * ShooterEncoder) / RPM2CountsPer100ms;
 
+  private double lowerRPM;
+  private double upperRPM;
+
   private boolean intakeIsOn;
   private boolean shooterIsOn;
 
   public Intake_Subsystem() {
     shooterMotorConfig(upper_shooter);
     shooterMotorConfig(lower_shooter);
-
-    /* Config the Velocity closed loop gains in slot0 */
-    // upper_shooter_talon.config_kF(kPIDLoopIdx, 0.0 /*kGains_Velocit.kF */,
-    // kTimeoutMs);
-    // upper_shooter_talon.config_kP(kPIDLoopIdx, kGains_Velocit.kP, kTimeoutMs);
-    // upper_shooter_talon.config_kI(kPIDLoopIdx, kGains_Velocit.kI, kTimeoutMs);
-    // upper_shooter_talon.config_kD(kPIDLoopIdx, kGains_Velocit.kD, kTimeoutMs);
-
+    
     intakeIsOn = false;
     shooterIsOn = false;
 
@@ -200,10 +174,10 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     /*
      * Velocity Closed Loop double targetVelocity_UnitsPer100ms = RPM_target *
      * kRPM2Counts;
-     */
-    // WIP - using simple motorpercent for now - 2/13/20
-    upper_shooter.set(ControlMode.PercentOutput, RPM_target);
-    lower_shooter.set(ControlMode.PercentOutput, RPM_target);
+    */
+
+    upper_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
+    lower_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
   }
 
   public boolean shooterIsOn() {
@@ -231,18 +205,34 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     return (magSolenoid.get() == Value.kForward);
   }
 
+
   public double getShooterRPM() {
+    // Get the current output percent of the upper and lower shooter motor
+    double upperVelocity = upper_shooter.getSelectedSensorVelocity();
+    double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
+    upperRPM = upperVelocity/kRPM2Counts;
+    lowerRPM = lowerVelocity/kRPM2Counts;
+    return (upperRPM+lowerRPM)/2;
+  }
+
+  public double getShooterPercent() {
     // Get the current output percent of the upper and lower shooter motors
-    double upperRPM = upper_shooter.getMotorOutputPercent();
-    double lowerRPM = lower_shooter.getMotorOutputPercent();
+    double upperPerc = upper_shooter.getMotorOutputPercent();
+    double lowerPerc = lower_shooter.getMotorOutputPercent();
     // Gets the lower of the upper and lower shooter current speed
     //dpl may want average here?
-    return Math.min(upperRPM, lowerRPM);
+    return Math.min(upperPerc, lowerPerc);
   }
 
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
+    double upperVelocity = upper_shooter.getSelectedSensorVelocity();
+    double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
+    upperRPM = upperVelocity/kRPM2Counts;
+    lowerRPM = lowerVelocity/kRPM2Counts;
+    SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
+    SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
   }
 
 }

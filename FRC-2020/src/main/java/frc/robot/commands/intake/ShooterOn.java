@@ -45,7 +45,7 @@ public class ShooterOn extends CommandBase {
   public void execute() {
     
     //check our speed
-    double shooterRPM =  m_intake.getShooterPercent();
+    double shooterRPM =  m_intake.getShooterRPM();
 
     if (m_count++ < m_backupCount) {
       // We will want to backup the mag a little bit before shooter gets engaged

@@ -8,7 +8,7 @@ public class SetDefaultCmd extends InstantCommand{
     private Subsystem system;
     private Command defaultCommand;
     /**
-     * Makes the wrist track a specific angle from vertical
+     * Command to change a default command of a subsystem.
      */
     public SetDefaultCmd(Subsystem system, Command newDefault){
         addRequirements(system);

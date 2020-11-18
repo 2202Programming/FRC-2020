@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 
 import static frc.robot.Constants.*;
 
-import java.util.concurrent.TimeUnit;
+
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive, Shifter {
 	// RPM Limits
@@ -469,19 +469,24 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		}
 	}
 
-	
-
 	/**
-	 *  sleep - eat the exception
-	 * @param ms
+	 *  Implement Shifter interface by deferring to the gearbox being used.
 	 */
-	void sleep(final long ms) {
-		try {
-			TimeUnit.MILLISECONDS.sleep(ms);
-		} catch (final InterruptedException e) {
-			// don't care
-		}
+	@Override
+	public boolean isAutoShiftEnabled() {
+		return gearbox.isAutoShiftEnabled();
 	}
+
+	@Override
+	public boolean enableAutoShift() {
+		return gearbox.enableAutoShift();
+	}
+
+	@Override
+	public boolean disableAutoShift() {
+		return gearbox.disableAutoShift();
+	}
+
 
 	/**
 	 * Applies a symetric deadzone around zero.
@@ -494,5 +499,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		double x = (Math.abs(value) < dz) ? 0.0 : value;
 		return x;
 	}
+
 
 }

@@ -19,25 +19,25 @@ import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
-import frc.robot.commands.auto.DriveOffLine;
+//import frc.robot.commands.auto.DriveOffLine;
 //import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
-import frc.robot.commands.climb.ClimbGroup;
-import frc.robot.commands.climb.RunWinch;
-import frc.robot.commands.climb.SetClimbArmExtension;
-import frc.robot.commands.climb.SetClimbArmRotation;
+//import frc.robot.commands.climb.ClimbGroup;
+//import frc.robot.commands.climb.RunWinch;
+//import frc.robot.commands.climb.SetClimbArmExtension;
+//import frc.robot.commands.climb.SetClimbArmRotation;
 import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.SwitchDriveMode;
 import frc.robot.commands.drive.TankDriveCmd;
 //import frc.robot.subsystems.CameraSubsystem;
-import frc.robot.commands.panel.SimpPositionControl;
-import frc.robot.commands.panel.SimpRotateControl;
-import frc.robot.subsystems.ClimberSubsystem;
-import frc.robot.subsystems.Color_Subsystem;
-import frc.robot.subsystems.Control_Panel;
+//import frc.robot.commands.panel.SimpPositionControl;
+//import frc.robot.commands.panel.SimpRotateControl;
+//import frc.robot.subsystems.ClimberSubsystem;
+//import frc.robot.subsystems.Color_Subsystem;
+//import frc.robot.subsystems.Control_Panel;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -118,7 +118,7 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
         .whenPressed(new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
 
-  }
+  } 
 
   private void configureButtonBindings() {
     // Drivers buttons
@@ -129,7 +129,7 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new SwitchDriveMode(driveTrain, velDriveCmd, arcadeDriveCmd));
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.Y.getCode())
-        .whenPressed(new ToggleAutoShiftCmd(driverControls, gearShifter, driveTrain));
+        .whenPressed(new ToggleAutoShiftCmd(gearShifter));
 
     // Assistant's buttons
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())

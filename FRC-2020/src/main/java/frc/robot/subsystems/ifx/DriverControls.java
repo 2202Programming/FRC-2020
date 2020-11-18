@@ -8,7 +8,6 @@
 package frc.robot.subsystems.ifx;
 
 import java.util.HashMap;
-import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Subsystem;
@@ -35,7 +34,7 @@ public interface DriverControls extends Subsystem {
   //Id to Controller map
   public HashMap<Id, GenericHID> deviceMap = new HashMap<Id, GenericHID>();
 
-  //mech
+  //mech & gield relative
   public double getVelocityX();
   public double getVelocityY();
 

@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems.hid;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 
 /**
@@ -29,15 +30,20 @@ public class SideboardController extends GenericHID {
       }
     }
 
+    /** These functions are not supported by our sideboard but are required for GenericHID.
+     *  so just retrun zero and log an error with the driverstation.
+     */
     @Override
     public double getX(Hand hand) {
-        // TODO Auto-generated method stub
+        // doesn't exist on sideboard, return zero
+        DriverStation.reportError("getX() called on Sideboard", false);
         return 0;
     }
 
     @Override
     public double getY(Hand hand) {
-        // TODO Auto-generated method stub
+        // doesn't exist on sideboard, return zero
+        DriverStation.reportError("getY() called on Sideboard", false);
         return 0;
     }
 

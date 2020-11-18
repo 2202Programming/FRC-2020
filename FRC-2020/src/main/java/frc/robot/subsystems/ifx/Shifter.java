@@ -16,4 +16,9 @@ public interface Shifter {
     public void shiftDown();
     public void shiftUp();
     public Gear getCurrentGear();
+
+    // Added autoshift control 
+    public boolean isAutoShiftEnabled();   //return true if enabled
+    public boolean enableAutoShift();      //return true if autoshift was set
+    public boolean disableAutoShift();     //always false
 }

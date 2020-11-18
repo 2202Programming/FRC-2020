@@ -21,9 +21,4 @@ public class ArcadeDriveCmd extends CommandBase {
 
         drive.arcadeDrive(vel, rot);
     }
-
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
 }

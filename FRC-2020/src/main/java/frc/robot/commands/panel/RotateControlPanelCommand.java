@@ -9,6 +9,7 @@ import frc.robot.subsystems.Control_Panel;
  * Rotates the control panel an indicated number of times.
  */
 public class RotateControlPanelCommand extends CommandBase {
+    @SuppressWarnings("unused")
     private static final double FULL_SPEED = 1;
     private static final int GEAR_RATIO = 2; // wrong
     private static final int FULL_ROTATION = 360;

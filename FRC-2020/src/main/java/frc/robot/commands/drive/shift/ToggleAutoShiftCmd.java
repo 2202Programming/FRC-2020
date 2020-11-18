@@ -1,41 +1,27 @@
 package frc.robot.commands.drive.shift;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.ifx.ArcadeDrive;
-import frc.robot.subsystems.ifx.DriverControls;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.GearShifter;
 
-public class ToggleAutoShiftCmd extends CommandBase {
+public class ToggleAutoShiftCmd extends InstantCommand {
     private GearShifter shifter;
-    private ArcadeDrive drive;
-    private DriverControls dc;
 
-    public ToggleAutoShiftCmd(DriverControls dc, GearShifter shifter, ArcadeDrive drive) {
+    /*
+     * Instant command to toggle the autoshift on the shifter It doesn't care what
+     * shifting algorithm (cmd) is being used, as this simply enables/disables on
+     * the sub-system.
+     * 
+     * Any autoshift control commands will check that value before engaging any
+     * automatic up/down requests.
+     * 
+     */
+    public ToggleAutoShiftCmd(GearShifter shifter) {
         this.shifter = shifter;
-        this.drive = drive;
-        this.dc = dc;      //don't register, called in periodic
-
-        addRequirements(drive, shifter);
     }
 
     @Override
     public void execute() {
-        if (CommandScheduler.getInstance().getDefaultCommand(shifter) != null
-                && CommandScheduler.getInstance().getDefaultCommand(shifter).getName().equals("AutomaticGearShift")) {
-            shifter.setAutoShift(false);
-            CommandScheduler scheduler = CommandScheduler.getInstance();
-            scheduler.setDefaultCommand(shifter, null);
-        } else {
-            CommandScheduler.getInstance().setDefaultCommand(shifter,
-             new AutomaticGearShiftCmd(dc, drive, shifter));
-            shifter.setAutoShift(true);
-        }
+        @SuppressWarnings("unused")
+        boolean status = (shifter.isAutoShiftEnabled()) ? shifter.disableAutoShift() : shifter.enableAutoShift();
     }
-
-    @Override
-    public boolean isFinished() {
-        return true;
-    }
-
 }

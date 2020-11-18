@@ -54,13 +54,7 @@ public class GearShifter extends SubsystemBase implements Shifter {
         curGear = Gear.LOW_GEAR;
     }
 
-    public void setAutoShift(boolean autoShifting) {
-        autoShiftEnabled = autoShifting;
-    }
-
-    public boolean isAutoShift() {
-        return autoShiftEnabled;
-    }
+    
 
     public void log() {
         SmartDashboard.putBoolean("Auto-Shift Enabled", autoShiftEnabled);
@@ -77,5 +71,24 @@ public class GearShifter extends SubsystemBase implements Shifter {
         return (Gear.HIGH_GEAR == g) ? K_high : K_low;
     }
 
-    
+    /*
+    *  AutoSifter interface 
+    */
+
+    @Override
+    public boolean isAutoShiftEnabled() {
+        return autoShiftEnabled;
+    }
+
+    @Override
+    public boolean enableAutoShift() {
+        autoShiftEnabled = true;
+        return autoShiftEnabled;
+    }
+
+    @Override
+    public boolean disableAutoShift() {
+       autoShiftEnabled = false;
+       return autoShiftEnabled;
+    }
 }

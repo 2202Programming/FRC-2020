@@ -75,6 +75,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
 
   void countTimeInShiftZone() {
     // use ABS of velocity
+    @SuppressWarnings("unused")
     double cmd = Math.abs(velCmd);
     double vel = Math.abs(velAvg);
 
@@ -95,9 +96,12 @@ public class ArcadeVelDriveCmd extends CommandBase {
         resetTimeInZone();
       }
     }
-/*
+  }
+
+  @SuppressWarnings("unused")
+  private void checkCoastMode(double absCmd, double absVel) {
     // see if we can coast, using abs vel
-    if ((cmd < vel) && (rotCmd == 0.0 )) {
+    if ((absCmd < absVel) && (rotCmd == 0.0 )) {
       if (++timeWantingCoast > minTimeEnterCoast)
         drive.setCoastMode(true);
     } else {
@@ -105,7 +109,6 @@ public class ArcadeVelDriveCmd extends CommandBase {
       timeWantingCoast = 0;
       drive.setCoastMode(false);
     }
-    */
   }
 
   /**
@@ -128,7 +131,11 @@ public class ArcadeVelDriveCmd extends CommandBase {
     rotCmd = dc.getRotation() * rotMax;
     velAvg = drive.getAvgVelocity(false);   // ft/s
 
-    countTimeInShiftZone();
+    // implement auto-shift if it is enabled
+    if (shifter.isAutoShiftEnabled()) { 
+      // handles all the shift up/down requests based on time in the zone.
+      countTimeInShiftZone(); 
+    }
     drive.velocityArcadeDrive(velCmd, rotCmd);
   }
 

@@ -1,6 +1,5 @@
 package frc.robot.util.misc;
 
-import frc.robot.util.misc.MathUtil;
 import java.util.function.DoubleSupplier;
 
 /**

@@ -1,14 +1,14 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Spark;
+//import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
+//import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.util.misc.Gains;
@@ -28,13 +28,16 @@ public class ClimberSubsystem extends SubsystemBase
 
     
     //Talon configuration constants
+    @SuppressWarnings("unused")
     private final ControlMode eRotMode = ControlMode.Position;
     private final int countsPerRotation = 4096;
+    @SuppressWarnings("unused")
     private final int PID_SLOT = 0;
     private final int kTO = 0;      // comms timeout for Talons
     Gains eRotGains = new Gains(0.2, 0, 0, 0, 0, 0);
     private final int posErrorLimit = 20;  // sensor counts
     private final double kGearing = 200.0; // motor rev to arm rev todo:fix gearing
+    @SuppressWarnings("unused")
     private final double kCounts_deg = countsPerRotation * kGearing / 90.0;  // 
     
     

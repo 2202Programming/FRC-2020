@@ -4,8 +4,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class IntakeToggleCmd extends InstantCommand {
-  private boolean intakeOn = false;
+  private boolean intakeOn = false;    //TODO:should get initial value from subsystem
   private final Intake_Subsystem m_intake;
+  @SuppressWarnings("unused")
   private double m_magMotor;
   private double m_intakeMotor;
 

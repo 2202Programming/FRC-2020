@@ -1,21 +1,24 @@
 package frc.robot.commands.climb;
 
 import frc.robot.subsystems.ClimberSubsystem;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutonomousClimbCommand extends CommandBase
 {
     private ClimberSubsystem climber;
-
+    @SuppressWarnings("unused")
     private double rotStartTime = 0;
+    @SuppressWarnings("unused")
     private double wnStartTime = 0;
 
+    @SuppressWarnings("unused")
     private final double ROT_DUR_TIME = 2;
+    @SuppressWarnings("unused")
     private final double WN_DUR_TIME = 2;
 
     private RotState rotState = RotState.FOLDED;
     private WinchState wnState = WinchState.RETRACTED;
+    @SuppressWarnings("unused")
     private TargetState targetState;
 
     public RotState getRotState()

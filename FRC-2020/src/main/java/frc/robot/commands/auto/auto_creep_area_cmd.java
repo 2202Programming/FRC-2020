@@ -14,16 +14,19 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Robot;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
-import frc.robot.subsystems.ifx.ArcadeDrive;
+// use the interface over a specific type for drive
+import frc.robot.subsystems.ifx.VelocityDrive;    
+import frc.robot.subsystems.ifx.Shifter;
 
 public class auto_creep_area_cmd extends CommandBase {
   /**
    * Creates a new auto_creep_cmd.
    */
 
-  private final VelocityDifferentialDrive_Subsystem drive;
+  private final VelocityDrive drive;
+  private final Shifter shifter;
   private final Limelight_Subsystem limelight;
+  @SuppressWarnings("unused")
   private final Lidar_Subsystem lidar;
   private double angleTarget;
   private double targetArea;
@@ -41,11 +44,12 @@ public class auto_creep_area_cmd extends CommandBase {
   private double current_position;
   private boolean forward;
 
-  public auto_creep_area_cmd(final VelocityDifferentialDrive_Subsystem drive, final Limelight_Subsystem limelight,
+  public auto_creep_area_cmd(final VelocityDrive drive, final Limelight_Subsystem limelight,
       final Lidar_Subsystem lidar, final double angleTarget, final double maxSpeed, final double maxAngleRate,
       final double targetArea, final boolean forward) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.drive = drive;
+    this.shifter = drive.getShifter();    //could be null, so check
     this.limelight = limelight;
     this.targetArea = targetArea; // feet
     this.maxSpeed = maxSpeed;
@@ -69,7 +73,10 @@ public class auto_creep_area_cmd extends CommandBase {
   @Override
   public void initialize() {
     
-    drive.shiftDown();
+    // put the drive system into low gear if we have it.
+    if (shifter != null) {
+      shifter.shiftDown(); 
+    }
     limelight.enableLED();
     Robot.command = "Auto Limelight Move";
 
@@ -127,7 +134,7 @@ public class auto_creep_area_cmd extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    drive.arcadeDrive(0, 0);
+    drive.velocityArcadeDrive(0, 0); 
     Robot.command = "None";
     drive.resetPosition();
   }

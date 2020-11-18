@@ -359,6 +359,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		coastMode = coast;
 	}
 
+	/** Shifter is implemented by this class */
+	public Shifter getShifter() {
+		return this;
+	}
+
 	/**
 	 * Shifter controls encapsulation
 	 */

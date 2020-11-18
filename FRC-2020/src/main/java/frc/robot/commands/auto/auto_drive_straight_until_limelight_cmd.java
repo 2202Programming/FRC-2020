@@ -11,19 +11,21 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+//import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+//prefer interface over specific implementation
 import frc.robot.subsystems.ifx.ArcadeDrive;
 
 public class auto_drive_straight_until_limelight_cmd extends CommandBase {
   /**
    * Creates a new auto_drive_straight_until_lidar_cmd.
    */
-  private final VelocityDifferentialDrive_Subsystem drive;
+  private final ArcadeDrive drive;
+  @SuppressWarnings("unused")
   private final Lidar_Subsystem lidar;
   private final Limelight_Subsystem limelight;
   private final double speed;
 
-  public auto_drive_straight_until_limelight_cmd(VelocityDifferentialDrive_Subsystem drive, Lidar_Subsystem lidar, Limelight_Subsystem limelight, double speed) {
+  public auto_drive_straight_until_limelight_cmd(ArcadeDrive drive, Lidar_Subsystem lidar, Limelight_Subsystem limelight, double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.lidar = lidar;
     this.drive = drive;

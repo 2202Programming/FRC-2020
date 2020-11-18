@@ -40,4 +40,9 @@ public interface VelocityDrive extends Subsystem {
      * @param degreePerSecond
      */
     public void velocityArcadeDrive(double feetPerSecond, double degreePerSecond);
+
+
+    /** Some drive systems may have shifting, Expose the shifter if there is one. Null returned if none. */
+    public Shifter getShifter();
+
 }

@@ -23,6 +23,7 @@ public class auto_creep_cmd extends CommandBase {
 
   private final ArcadeDrive drive;
   private final Limelight_Subsystem limelight;
+  @SuppressWarnings("unused")
   private final Lidar_Subsystem lidar;
   private double angleTarget;
   private double targetDistance;

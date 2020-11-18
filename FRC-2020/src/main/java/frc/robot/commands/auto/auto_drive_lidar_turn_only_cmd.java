@@ -28,7 +28,7 @@ public class auto_drive_lidar_turn_only_cmd extends CommandBase {
   private double maxSpeed;
   private double angleTarget;
   private double range;
-  private boolean forwards;
+  
   private final double Kp = 2, Ki = 0.04, Kd = 0.25;
   private final double Kap = 1, Kai = 0.001, Kad = 0.0;
   private final PIDController distancePIDController;

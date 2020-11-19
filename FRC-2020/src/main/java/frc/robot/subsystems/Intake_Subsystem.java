@@ -176,7 +176,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     */
 
     upper_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
-    lower_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
+    lower_shooter.set(ControlMode.Velocity, -RPM_target*kRPM2Counts);
   }
 
   public boolean shooterIsOn() {

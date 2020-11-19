@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import static frc.robot.Constants.*;
@@ -103,7 +104,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   void shooterMotorConfig(WPI_TalonSRX talon) {
     /* Factory Default all hardware to prevent unexpected behaviour */
     talon.configFactoryDefault();
-
+    
     // use the config to set all values at once
     shooterCfg.slot0.kP = kGains_Velocit.kP;
     shooterCfg.slot0.kI = kGains_Velocit.kI;
@@ -116,7 +117,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, kPIDLoopIdx, kTimeoutMs);
 
     talon.configAllSettings(shooterCfg);
-
+    talon.setNeutralMode(NeutralMode.Brake);
     /* Config the peak and nominal outputs */
     talon.configNominalOutputForward(0, kTimeoutMs);
     talon.configNominalOutputReverse(0, kTimeoutMs);

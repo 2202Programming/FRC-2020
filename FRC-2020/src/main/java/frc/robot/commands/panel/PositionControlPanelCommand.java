@@ -14,8 +14,8 @@ public class PositionControlPanelCommand extends CommandBase {
     private static final double RATE = 0.2;
     private static final int FULL_ROTATION = 360;
     private static final double STOP = 0;
-    private static final double WHEEL_CIRCUMFERENCE = 4*Math.PI;//wrong
-    private static final int PANEL_DIAMETER = 32;//32 inches
+    private static final double WHEEL_CIRCUMFERENCE = 2.5*Math.PI;  //inches (TODO: fix wheel diameter)
+    private static final int PANEL_DIAMETER = 32;  //inches
     private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
 
     
@@ -44,8 +44,6 @@ public class PositionControlPanelCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        // TODO Auto-generated method stub
-        //Command.super.initialize();
         init_color = color_detector.getColor();
         curr_color = init_color;
         final_color = panel.getTargetColor();
@@ -63,8 +61,7 @@ public class PositionControlPanelCommand extends CommandBase {
 
     @Override
     public void execute() {
-        // TODO Auto-generated method stub
-        //Command.super.execute();
+        // look for color changes from last cycle
         if(!color_detector.getColor().equals(curr_color))
         {
             count--;
@@ -117,6 +114,7 @@ public class PositionControlPanelCommand extends CommandBase {
         panel.retractArm();
     }
 
+    // ramp the motor - check this works speeding up and slowing down.
     public void ramp()
     {
         if(degreesRotated <= ((findShortest() * SLICE_DEGREE * FULL_ROTATION)/3))

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Paths name="xyz">
+
+    <Path ID="HighMode">
+        <DriveOffLineCommand power=".8" timeout="2.7">
+        </DriveOffLineCommand>
+
+    </Path>
+
+</Paths>

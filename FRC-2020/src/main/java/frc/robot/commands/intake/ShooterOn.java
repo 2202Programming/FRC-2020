@@ -52,6 +52,7 @@ public class ShooterOn extends CommandBase {
       // this will prevent balls getting stuck.
       m_intake.magazineOn(SLOW_MAG_REVERSE);
     } else if(shooterRPM <= m_rpm) {
+      m_intake.magazineOff();
       // Runs while the shooters are getting up to their desired speed
       // This will not work if the upper and lower shooters speeds are ever 
       // changed separately

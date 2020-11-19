@@ -113,7 +113,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     shooterCfg.slot1 = shooterCfg.slot0;
 
     /* Config sensor used for Primary PID [Velocity] */
-    talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kPIDLoopIdx, kTimeoutMs);
+    talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, kPIDLoopIdx, kTimeoutMs);
 
     talon.configAllSettings(shooterCfg);
 

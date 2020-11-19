@@ -206,11 +206,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
 
   public double getShooterRPM() {
-    // Get the current output percent of the upper and lower shooter motor
-    double upperVelocity = upper_shooter.getSelectedSensorVelocity();
-    double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
-    upperRPM = upperVelocity/kRPM2Counts;
-    lowerRPM = -lowerVelocity/kRPM2Counts; // Accounting for wiring and encoder differences
     return (upperRPM+lowerRPM)/2;
   }
 

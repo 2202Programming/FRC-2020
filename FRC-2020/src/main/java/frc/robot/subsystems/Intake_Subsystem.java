@@ -69,7 +69,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * 
    * kP kI kD kF Iz PeakOut
    */
-  Gains kGains_Velocit = new Gains(1.0, 0.001, 0.0, 0.0, 300, 1.00);
+  Gains kGains_Velocit = new Gains(16.0, 0.001, 0.0, 0.0, 300, 1.00);
 
   /**
    * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =
@@ -176,7 +176,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     */
 
     upper_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
-    lower_shooter.set(ControlMode.Velocity, -RPM_target*kRPM2Counts);
+    lower_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
   }
 
   public boolean shooterIsOn() {
@@ -210,7 +210,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     double upperVelocity = upper_shooter.getSelectedSensorVelocity();
     double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
     upperRPM = upperVelocity/kRPM2Counts;
-    lowerRPM = lowerVelocity/kRPM2Counts;
+    lowerRPM = -lowerVelocity/kRPM2Counts; // Accounting for wiring and encoder differences
     return (upperRPM+lowerRPM)/2;
   }
 
@@ -229,7 +229,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     double upperVelocity = upper_shooter.getSelectedSensorVelocity();
     double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
     upperRPM = upperVelocity/kRPM2Counts;
-    lowerRPM = lowerVelocity/kRPM2Counts;
+    lowerRPM = -lowerVelocity/kRPM2Counts;
+    SmartDashboard.putNumber("Upper Percent", upper_shooter.getMotorOutputPercent());
+    SmartDashboard.putNumber("Lower Percent", lower_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
     SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
   }

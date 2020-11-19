@@ -131,7 +131,7 @@ public class RobotContainer {
     driverControls.bindButton(Id.Driver, XboxControllerButtonCode.Y.getCode())
         .whenPressed(new ToggleAutoShiftCmd(gearShifter));
 
-    // Assistant's buttons
+        // Assistant's buttons
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
         .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
@@ -147,7 +147,7 @@ public class RobotContainer {
     .whenHeld(new ShooterOn(intake, 0.5, 1, 0.4)); // pwr_low, pwr_high, seconds mag backup 
     */   
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-        .whenHeld(new ShooterOn(intake, 1000, 4000, 0.4)); // rpm_low, rpm_high, seconds mag backup
+        .whenHeld(new ShooterOn(intake, 100, 150, 0.4)); // rpm_low, rpm_high, seconds mag backup
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new MagazineToggleCmd(intake));
 

@@ -210,7 +210,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     double upperVelocity = upper_shooter.getSelectedSensorVelocity();
     double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
     upperRPM = upperVelocity/kRPM2Counts;
-    lowerRPM = lowerVelocity/kRPM2Counts;
+    lowerRPM = -lowerVelocity/kRPM2Counts;
     return (upperRPM+lowerRPM)/2;
   }
 
@@ -229,7 +229,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     double upperVelocity = upper_shooter.getSelectedSensorVelocity();
     double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
     upperRPM = upperVelocity/kRPM2Counts;
-    lowerRPM = lowerVelocity/kRPM2Counts;
+    lowerRPM = -lowerVelocity/kRPM2Counts;
     SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
     SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
   }

@@ -90,9 +90,14 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private boolean intakeIsOn;
   private boolean shooterIsOn;
 
-  public Intake_Subsystem() {
-    shooterMotorConfig(upper_shooter);
-    shooterMotorConfig(lower_shooter);
+  private boolean percentControlled;
+
+  public Intake_Subsystem(boolean percentControlled) {
+    this.percentControlled = percentControlled;
+    if(!percentControlled){
+      shooterMotorConfig(upper_shooter);
+      shooterMotorConfig(lower_shooter);
+    }
     
     intakeIsOn = false;
     shooterIsOn = false;
@@ -175,9 +180,14 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
      * Velocity Closed Loop double targetVelocity_UnitsPer100ms = RPM_target *
      * kRPM2Counts;
     */
-
-    upper_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
-    lower_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
+    if(percentControlled){
+      upper_shooter.set(ControlMode.PercentOutput, RPM_target); //for percent control
+      lower_shooter.set(ControlMode.PercentOutput, RPM_target); 
+    }
+    else{
+      upper_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
+      lower_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
+    }
   }
 
   public boolean shooterIsOn() {

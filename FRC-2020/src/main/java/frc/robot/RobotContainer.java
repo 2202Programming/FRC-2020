@@ -76,6 +76,7 @@ public class RobotContainer {
   // Tests to run during test mode
 
   TestKBSimMode t1;
+  final boolean PERCENT_CONTROLLED = false;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -87,7 +88,7 @@ public class RobotContainer {
     driverControls = new HID_Xbox_Subsystem(0.3, 0.9, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 14.0, 100.0); // ft/s, deg/sec
-    intake = new Intake_Subsystem();
+    intake = new Intake_Subsystem(PERCENT_CONTROLLED);
     limelight = new Limelight_Subsystem();
     logSubsystem = new Log_Subsystem(5); // log every 5 frames - 100mS
     lidar = new Lidar_Subsystem(RobotBase.isReal()); 

@@ -86,6 +86,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   private double lowerRPM;
   private double upperRPM;
+  private double targetRPM;
 
   private boolean intakeIsOn;
   private boolean shooterIsOn;
@@ -176,6 +177,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   public void shooterOn(double RPM_target) {
     shooterIsOn = true;
+    targetRPM = RPM_target;
+
     /*
      * Velocity Closed Loop double targetVelocity_UnitsPer100ms = RPM_target *
      * kRPM2Counts;
@@ -236,10 +239,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
     upperRPM = upperVelocity/kRPM2Counts;
     lowerRPM = -lowerVelocity/kRPM2Counts;
-    SmartDashboard.putNumber("Upper Percent", upper_shooter.getMotorOutputPercent());
-    SmartDashboard.putNumber("Lower Percent", lower_shooter.getMotorOutputPercent());
+    SmartDashboard.putNumber("Upper Shooter Percent", upper_shooter.getMotorOutputPercent());
+    SmartDashboard.putNumber("Lower Shooter Percent", lower_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
     SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
+    SmartDashboard.putNumber("Shooter RPM", getShooterRPM());
+    SmartDashboard.putNumber("Shooter Velocity Target", targetRPM*kRPM2Counts); // Logs the target velocity
   }
 
 }

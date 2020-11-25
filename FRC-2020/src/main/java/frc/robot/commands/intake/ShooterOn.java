@@ -46,7 +46,8 @@ public class ShooterOn extends CommandBase {
     
     //check our speed
     double shooterRPM =  m_intake.getShooterRPM();
-
+    m_intake.magazineOn(1.0);
+    /*
     if (m_count++ < m_backupCount) {
       // We will want to backup the mag a little bit before shooter gets engaged
       // this will prevent balls getting stuck.
@@ -60,6 +61,7 @@ public class ShooterOn extends CommandBase {
     } else {
       m_intake.magazineOn(FAST_MAG_FORWARD);
     }
+    */
   }
 
   double calcShooterSpeed() {

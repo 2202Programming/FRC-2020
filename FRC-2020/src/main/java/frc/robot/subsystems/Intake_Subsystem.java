@@ -82,8 +82,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   final double GEAR = 10.; // 10:1 gear, encoder after the gears
   final double ShooterEncoder = 4096; // counts per rev
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
-  final double kRPM2Counts = (GEAR * ShooterEncoder) / RPM2CountsPer100ms;
-
+  //final double kRPM2Counts = (GEAR * ShooterEncoder) / RPM2CountsPer100ms;
+  final double kRPM2Counts = 1.611328125; // (60s / 409.6 which is 1 RPS)
+  
   private double lowerRPM;
   private double upperRPM;
   private double targetRPM;
@@ -219,10 +220,13 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
 
-  public double getShooterRPM() {
-
-    
+  public double getShooterRPM() {    
     return (upperRPM+lowerRPM)/2;
+  }
+
+  public boolean atGoalRPM(double upperGoal, double lowerGoal, double tol){
+    // return true if BOTH upper and lower are within tolerance
+    return ((upperGoal-upperRPM < (upperGoal*tol)) && (lowerGoal-lowerRPM < (lowerGoal*tol)));
   }
 
   public double getShooterPercent() {
@@ -241,7 +245,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
     upperRPM = upperVelocity/kRPM2Counts;
     lowerRPM = -lowerVelocity/kRPM2Counts;
-    
+
     SmartDashboard.putNumber("Upper Shooter Percent", upper_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Lower Shooter Percent", lower_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);

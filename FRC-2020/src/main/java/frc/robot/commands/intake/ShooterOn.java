@@ -71,6 +71,7 @@ public class ShooterOn extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    trueOnce = false;
     m_intake.shooterOff();
     m_intake.magazineOff();
     m_intake.intakeOff();

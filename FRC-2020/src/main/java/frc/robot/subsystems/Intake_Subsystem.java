@@ -251,7 +251,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
     SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
     SmartDashboard.putNumber("Shooter RPM", getShooterRPM());
-    SmartDashboard.putNumber("Shooter Velocity Target", targetRPM*kRPM2Counts); // Logs the target velocity
+    SmartDashboard.putNumber("Shooter Velocity Target", targetRPM); // Logs the target velocity
   }
 
 }

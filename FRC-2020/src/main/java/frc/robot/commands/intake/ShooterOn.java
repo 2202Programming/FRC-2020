@@ -19,6 +19,7 @@ public class ShooterOn extends CommandBase {
   private final double m_rpmTarget_high;
   private final int m_backupCount;
   private int m_count;
+  private boolean trueOnce = false;
   private double m_rpm;  // speed to use based on high/low mag position
 
   public ShooterOn(Intake_Subsystem intake, double rpmTarget_low, double rpmTarget_high, double backupSec) {
@@ -57,7 +58,8 @@ public class ShooterOn extends CommandBase {
       // This will not work if the upper and lower shooters speeds are ever 
       // changed separately
       m_intake.shooterOn(m_rpm);
-    } else {
+    } else if(!trueOnce){
+      trueOnce = true;
       m_intake.magazineOn(FAST_MAG_FORWARD);
     }
   }

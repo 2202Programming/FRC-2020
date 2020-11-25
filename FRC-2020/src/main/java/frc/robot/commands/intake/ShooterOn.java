@@ -52,13 +52,13 @@ public class ShooterOn extends CommandBase {
       // We will want to backup the mag a little bit before shooter gets engaged
       // this will prevent balls getting stuck.
       m_intake.magazineOn(SLOW_MAG_REVERSE);
-    } else if(shooterRPM <= m_rpm) {
+    } else if(shooterRPM <= m_rpm && !trueOnce) {
       m_intake.magazineOff();
       // Runs while the shooters are getting up to their desired speed
       // This will not work if the upper and lower shooters speeds are ever 
       // changed separately
       m_intake.shooterOn(m_rpm);
-    } else if(!trueOnce){
+    } else {
       trueOnce = true;
       m_intake.magazineOn(FAST_MAG_FORWARD);
     }

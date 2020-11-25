@@ -59,7 +59,7 @@ public class ShooterOn extends CommandBase {
       // changed separately
       m_intake.shooterOn(m_rpm);
     } else {
-      trueOnce = true;
+      trueOnce = true; //this keeps the magazine running even if RPMs drop back below target briefly.
       m_intake.magazineOn(FAST_MAG_FORWARD);
     }
   }

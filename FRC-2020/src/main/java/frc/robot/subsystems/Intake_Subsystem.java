@@ -96,10 +96,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private boolean shooterIsOn;
 
   private boolean percentControlled;
-  private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
-  private NetworkTableEntry test =
-     tab.add("test value", 1)
-        .getEntry();
 
   public Intake_Subsystem(boolean percentControlled) {
     this.percentControlled = percentControlled;
@@ -185,19 +181,17 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   public void shooterOn(double UpperRPM_target, double LowerRPM_target) {
     shooterIsOn = true;
-    targetRPM = RPM_target;
-
     /*
      * Velocity Closed Loop double targetVelocity_UnitsPer100ms = RPM_target *
      * kRPM2Counts;
     */
     if(percentControlled){
-      upper_shooter.set(ControlMode.PercentOutput, RPM_target); //for percent control
-      lower_shooter.set(ControlMode.PercentOutput, RPM_target); 
+      upper_shooter.set(ControlMode.PercentOutput, UpperRPM_target); //for percent control
+      lower_shooter.set(ControlMode.PercentOutput, LowerRPM_target); 
     }
     else{
-      upper_shooter.set(ControlMode.Velocity, RPM_target*kRPM2Counts);
-      lower_shooter.set(ControlMode.Velocity, -RPM_target*kRPM2Counts);
+      upper_shooter.set(ControlMode.Velocity, UpperRPM_target*kRPM2Counts);
+      lower_shooter.set(ControlMode.Velocity, -LowerRPM_target*kRPM2Counts);
     }
   }
 
@@ -233,7 +227,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   public boolean atGoalRPM(double upperGoal, double lowerGoal, double tol){
     // return true if BOTH upper and lower are within tolerance
-    return ((upperGoal-upperRPM < (upperGoal*tol)) && (lowerGoal-lowerRPM < (lowerGoal*tol)));
+    return ((Math.abs(upperGoal-upperRPM) < (upperGoal*tol)) && (Math.abs(lowerGoal-lowerRPM) < (lowerGoal*tol)));
   }
 
   public double getShooterPercent() {
@@ -257,8 +251,5 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putNumber("Lower Shooter Percent", lower_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
     SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
-    SmartDashboard.putNumber("Shooter RPM", getShooterRPM());
-    SmartDashboard.putNumber("Shooter Velocity Target", targetRPM); // Logs the target velocity
-    SmartDashboard.putNumber("Input test", test.getDouble(1.0));
   }
 }

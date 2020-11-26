@@ -21,6 +21,9 @@ import frc.robot.util.misc.Gains;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.networktables.NetworkTableEntry;
 
 /**
  * motorStrength should be between -1 and 1 for all methods
@@ -93,6 +96,10 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private boolean shooterIsOn;
 
   private boolean percentControlled;
+  private ShuffleboardTab tab = Shuffleboard.getTab("Drive");
+  private NetworkTableEntry test =
+     tab.add("test value", 1)
+        .getEntry();
 
   public Intake_Subsystem(boolean percentControlled) {
     this.percentControlled = percentControlled;
@@ -176,7 +183,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     magazine.set(0);
   }
 
-  public void shooterOn(double RPM_target) {
+  public void shooterOn(double UpperRPM_target, double LowerRPM_target) {
     shooterIsOn = true;
     targetRPM = RPM_target;
 
@@ -252,6 +259,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
     SmartDashboard.putNumber("Shooter RPM", getShooterRPM());
     SmartDashboard.putNumber("Shooter Velocity Target", targetRPM); // Logs the target velocity
+    SmartDashboard.putNumber("Input test", test.getDouble(1.0));
   }
-
 }

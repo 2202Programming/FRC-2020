@@ -53,14 +53,12 @@ public class ShooterOn extends CommandBase {
   @Override
   public void execute() {
     
-    //check our speed
-    double shooterRPM =  m_intake.getShooterRPM();
 
     if (m_count++ < m_backupCount) {
       // We will want to backup the mag a little bit before shooter gets engaged
       // this will prevent balls getting stuck.
       m_intake.magazineOn(SLOW_MAG_REVERSE);
-    } else if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1) && !trueOnce) {
+    } else if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1) && !trueOnce) {
       m_intake.magazineOff();
       // Runs while the shooters are getting up to their desired speed
       // This will not work if the upper and lower shooters speeds are ever 

@@ -81,7 +81,7 @@ public class RobotContainer {
   TestKBSimMode t1;
   final boolean PERCENT_CONTROLLED = false;
 
-  //taking input
+  //taking input from shuffleboard
   private ShuffleboardTab tab = Shuffleboard.getTab("Shooter Rpm Goals");
   private NetworkTableEntry rpmUpper_low =
      tab.add("rpm upper low goal", 3000)
@@ -110,14 +110,14 @@ public class RobotContainer {
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 14.0, 100.0); // ft/s, deg/sec
     intake = new Intake_Subsystem(PERCENT_CONTROLLED); //shooter percent controlled vs. velocity controlled
     limelight = new Limelight_Subsystem();
-    logSubsystem = new Log_Subsystem(5); // log every 5 frames - 100mS
+    logSubsystem = new Log_Subsystem(10); // log every 5 frames - 100mS
     lidar = new Lidar_Subsystem(RobotBase.isReal()); 
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();
 
     // Add anything that has logging requirements
-    logSubsystem.add(driveTrain, limelight, lidar, intake, driverControls/**, panel, detector*/);
+    logSubsystem.add(/*driveTrain, limelight, lidar,*/ intake /*,driverControls, panel, detector*/);
 
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);

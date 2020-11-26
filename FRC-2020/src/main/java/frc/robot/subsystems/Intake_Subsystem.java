@@ -90,7 +90,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   
   private double lowerRPM;
   private double upperRPM;
-  private double targetRPM;
+  private double upperRPM_target;
+  private double lowerRPM_target;
+  
 
   private boolean intakeIsOn;
   private boolean shooterIsOn;
@@ -179,19 +181,21 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     magazine.set(0);
   }
 
-  public void shooterOn(double UpperRPM_target, double LowerRPM_target) {
+  public void shooterOn(double upperRPM_target, double lowerRPM_target) {
     shooterIsOn = true;
+    this.upperRPM_target = upperRPM_target;
+    this.lowerRPM_target = lowerRPM_target;
     /*
      * Velocity Closed Loop double targetVelocity_UnitsPer100ms = RPM_target *
      * kRPM2Counts;
     */
     if(percentControlled){
-      upper_shooter.set(ControlMode.PercentOutput, UpperRPM_target); //for percent control
-      lower_shooter.set(ControlMode.PercentOutput, LowerRPM_target); 
+      upper_shooter.set(ControlMode.PercentOutput, upperRPM_target); //for percent control
+      lower_shooter.set(ControlMode.PercentOutput, lowerRPM_target); 
     }
     else{
-      upper_shooter.set(ControlMode.Velocity, UpperRPM_target*kRPM2Counts);
-      lower_shooter.set(ControlMode.Velocity, -LowerRPM_target*kRPM2Counts);
+      upper_shooter.set(ControlMode.Velocity, upperRPM_target*kRPM2Counts);
+      lower_shooter.set(ControlMode.Velocity, -lowerRPM_target*kRPM2Counts);
     }
   }
 
@@ -251,5 +255,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putNumber("Lower Shooter Percent", lower_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
     SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
+    SmartDashboard.putNumber("Current Upper Goal", upperRPM_target);
+    SmartDashboard.putNumber("Current Lower Goal", lowerRPM_target);
   }
 }

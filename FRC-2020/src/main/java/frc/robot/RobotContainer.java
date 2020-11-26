@@ -47,6 +47,9 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.networktables.NetworkTableEntry;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -78,6 +81,23 @@ public class RobotContainer {
   TestKBSimMode t1;
   final boolean PERCENT_CONTROLLED = false;
 
+  //taking input
+  private ShuffleboardTab tab = Shuffleboard.getTab("Shooter Rpm Goals");
+  private NetworkTableEntry rpmUpper_low =
+     tab.add("rpm upper low goal", 3000)
+        .getEntry();
+
+  private NetworkTableEntry rpmLower_low =
+      tab.add("rpm lower low goal", 3000)
+        .getEntry();
+
+  private NetworkTableEntry rpmUpper_high =
+      tab.add("rpm upper high goal", 6000)
+          .getEntry();
+   
+  private NetworkTableEntry rpmLower_high =
+      tab.add("rpm lower high goal", 6000)
+        .getEntry();
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */

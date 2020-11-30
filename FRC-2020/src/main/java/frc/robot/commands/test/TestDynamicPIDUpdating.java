@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
  * Test command for dynamically updating PID values via SmartDashboard.
- * TODO: Test this program by constructing this in the program, simulating it, and manually altering a value in the SmartDashboard. The program should log the changes and, if in debug mode, reach a breakpoint.
+ * Test this program by constructing this in the program, simulating it, and manually altering a value in the SmartDashboard.
+ * The program should log the changes and, if in debug mode, reach a breakpoint.
+ * Update: The command is tested, and it works (as long as the command is constructed and scheduled).
  * @author Kevin Li
  */
 public class TestDynamicPIDUpdating extends CommandBase {

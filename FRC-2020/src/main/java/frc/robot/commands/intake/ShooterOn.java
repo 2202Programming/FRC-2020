@@ -21,9 +21,9 @@ public class ShooterOn extends CommandBase {
   private final double m_lowerRpmTarget_high;
   private final int m_backupCount;
   private int m_count;
-  private boolean trueOnce = false;
   private double m_rpmUpper;  // speed to use based on high/low mag position
   private double m_rpmLower;  // speed to use based on high/low mag position
+  private int stage = 0;
 
 
   public ShooterOn(Intake_Subsystem intake, double upperRpmTarget_low, double upperRpmTarget_high, double lowerRpmTarget_low, double lowerRpmTarget_high, double backupSec) {
@@ -53,21 +53,45 @@ public class ShooterOn extends CommandBase {
   @Override
   public void execute() {
     
-
-    if (m_count++ < m_backupCount) {
-      // We will want to backup the mag a little bit before shooter gets engaged
-      // this will prevent balls getting stuck.
-      m_intake.magazineOn(SLOW_MAG_REVERSE);
-    } else if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1) && !trueOnce) {
-      m_intake.magazineOff();
-      // Runs while the shooters are getting up to their desired speed
-      // This will not work if the upper and lower shooters speeds are ever 
-      // changed separately
-      m_intake.shooterOn(m_rpmUpper, m_rpmLower);
-    } else {
-      trueOnce = true;
-      m_intake.magazineOn(FAST_MAG_FORWARD);
+    switch(stage){
+      case 0:
+        if(m_count++ > m_backupCount){
+          stage = 1;
+        }
+        m_intake.magazineOn(SLOW_MAG_REVERSE);
+      break;
+      case 1:
+        if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1)){
+          stage = 2;
+        }
+        m_intake.magazineOff();
+        // Runs while the shooters are getting up to their desired speed
+        // This will not work if the upper and lower shooters speeds are ever 
+        // changed separately
+        m_intake.shooterOn(m_rpmUpper, m_rpmLower);
+      break;
+      case 2:
+        if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1)){
+          stage = 1;
+        }
+        m_intake.magazineOn(FAST_MAG_FORWARD);
+      break;
     }
+
+    // if (m_count++ < m_backupCount) {
+    //   // We will want to backup the mag a little bit before shooter gets engaged
+    //   // this will prevent balls getting stuck.
+    //   m_intake.magazineOn(SLOW_MAG_REVERSE);
+    // } else if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1) && !trueOnce) {
+    //   m_intake.magazineOff();
+    //   // Runs while the shooters are getting up to their desired speed
+    //   // This will not work if the upper and lower shooters speeds are ever 
+    //   // changed separately
+    //   m_intake.shooterOn(m_rpmUpper, m_rpmLower);
+    // } else {
+    //   trueOnce = true;
+    //   m_intake.magazineOn(FAST_MAG_FORWARD);
+    // }
   }
 
   double calcShooterSpeedUpper() {
@@ -81,7 +105,6 @@ public class ShooterOn extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    trueOnce = false;
     m_intake.shooterOff();
     m_intake.magazineOff();
     m_intake.intakeOff();

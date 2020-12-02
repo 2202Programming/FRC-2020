@@ -24,6 +24,7 @@ public class ShooterOn extends CommandBase {
   private double m_rpmUpper;  // speed to use based on high/low mag position
   private double m_rpmLower;  // speed to use based on high/low mag position
   private int stage = 0;
+  private double time;
 
 
   public ShooterOn(Intake_Subsystem intake, double upperRpmTarget_low, double upperRpmTarget_high, double lowerRpmTarget_low, double lowerRpmTarget_high, double backupSec) {
@@ -57,11 +58,13 @@ public class ShooterOn extends CommandBase {
       case 0:
         if(m_count++ > m_backupCount){
           stage = 1;
+          time = System.currentTimeMillis();
         }
         m_intake.magazineOn(SLOW_MAG_REVERSE);
       break;
       case 1:
         if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1)){
+          System.out.println("Time taken in stage 1: " + (time-System.currentTimeMillis()));
           stage = 2;
         }
         m_intake.magazineOff();

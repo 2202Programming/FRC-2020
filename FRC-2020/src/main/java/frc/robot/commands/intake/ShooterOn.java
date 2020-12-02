@@ -64,7 +64,7 @@ public class ShooterOn extends CommandBase {
       break;
       case 1:
         if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1)){
-          System.out.println("Time taken in stage 1: " + (time-System.currentTimeMillis()));
+          System.out.println("Time taken in stage 1: " + (System.currentTimeMillis() - time) + " miliseconds");
           stage = 2;
         }
         m_intake.magazineOff();

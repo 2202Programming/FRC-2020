@@ -3,7 +3,9 @@
 <Paths name="xyz">
 
     <Path ID="HighMode">
-        <DriveOffLineCommand power=".8" timeout="2.7">
+        <DriveOffLineCommand timeout="2.7">
+            <power>.8</power>
+            <timeout>2.7</timeout>
         </DriveOffLineCommand>
 
     </Path>

@@ -110,6 +110,8 @@ public class RobotContainer {
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 14.0, 100.0); // ft/s, deg/sec
     intake = new Intake_Subsystem(PERCENT_CONTROLLED); //shooter percent controlled vs. velocity controlled
     limelight = new Limelight_Subsystem();
+    limelight.disableLED();
+    
     logSubsystem = new Log_Subsystem(10); // log every 5 frames - 100mS
     lidar = new Lidar_Subsystem(RobotBase.isReal()); 
     //panel = new Control_Panel();

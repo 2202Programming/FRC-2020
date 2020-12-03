@@ -158,7 +158,7 @@ public class RobotContainer {
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
         .whenHeld(new ReverseIntake(intake, -0.5));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
-        .whenPressed(new ToggleIntakeRaised(intake));
+       .whenPressed(new ToggleIntakeRaised(intake));
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
       .whenPressed(new MagazineAdjust(intake, true, 0.4), true);
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
@@ -174,8 +174,8 @@ public class RobotContainer {
     //velocity based shooter (pick one, power or velocity)
     
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-        .whenHeld(new ShooterOn(intake, rpmUpper_low.getDouble(1.0), rpmUpper_high.getDouble(1.0), rpmLower_low.getDouble(1.0), rpmLower_high.getDouble(1.0), 0.2)); // rpm_low, rpm_high, seconds mag backup
-    
+        .whenPressed(new ShooterOn(intake, rpmUpper_low.getDouble(1.0), rpmUpper_high.getDouble(1.0), rpmLower_low.getDouble(1.0), rpmLower_high.getDouble(1.0), 0.2)); // rpm_low, rpm_high, seconds mag backup
+  
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new MagazineToggleCmd(intake));

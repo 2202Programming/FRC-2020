@@ -3,10 +3,9 @@
 <Paths name="xyz">
 
     <Path ID="HighMode">
-        <DriveOffLineCommand timeout="2.7">
-            <power>.8</power>
-            <timeout>2.7</timeout>
-        </DriveOffLineCommand>
+        <CommandGroup name="Group1">
+            <Command name="frc.robot.commands.auto.DriveOffLine" power=".8" timeout="2.7"/>
+        </CommandGroup>
 
     </Path>
 

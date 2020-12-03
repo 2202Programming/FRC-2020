@@ -7,7 +7,7 @@ import org.w3c.dom.*;
 public class xmlParser {
     public static void main(String args[]) {
         try {
-            File robotFile = new File("Auto.xml");
+            File robotFile = new File("Auto.xml"); //move to deploy once done
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setIgnoringElementContentWhitespace(true);
             DocumentBuilder builder = factory.newDocumentBuilder();

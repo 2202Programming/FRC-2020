@@ -55,14 +55,14 @@ public class ShooterOn extends CommandBase {
   public void execute() {
     
     switch(stage){
-      case 0:
+      case 0: //stage 0, backup magazine for backup_count to get balls off flywheels
         if(m_count++ > m_backupCount){
           stage = 1;
           time = System.currentTimeMillis();
         }
         m_intake.magazineOn(SLOW_MAG_REVERSE);
       break;
-      case 1:
+      case 1: //stage 1, pause magazine while shooters get to RPM goal
         if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1)){
           System.out.println("*** Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms.");
           stage = 2;
@@ -73,7 +73,7 @@ public class ShooterOn extends CommandBase {
         // changed separately
         m_intake.shooterOn(m_rpmUpper, m_rpmLower);
       break;
-      case 2:
+      case 2: //stage 2, magazine forward fast to shoot while at RPM goals
         if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1)){
           stage = 1;
           time = System.currentTimeMillis();

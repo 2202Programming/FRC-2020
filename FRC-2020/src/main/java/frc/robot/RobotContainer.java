@@ -50,6 +50,8 @@ import frc.robot.subsystems.hid.XboxControllerButtonCode;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import java.io.*;
+import java.util.Scanner;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -68,6 +70,8 @@ public class RobotContainer {
   public final Limelight_Subsystem limelight;
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
+  public static PrintWriter outputStream;
+
   //public final Control_Panel panel;
   //public final Color_Subsystem detector;
   //private final ClimberSubsystem climber;
@@ -133,6 +137,13 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     jasonsButtons();
+
+    //makes an output file
+    try {
+      outputStream = new PrintWriter(new File("Robot_Log.txt"));
+    } catch(FileNotFoundException e){
+      e.printStackTrace();
+    }
   }
 
   private void jasonsButtons() {

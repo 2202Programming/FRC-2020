@@ -9,6 +9,7 @@ package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class ShooterOn extends CommandBase {
@@ -34,7 +35,6 @@ public class ShooterOn extends CommandBase {
     m_lowerRpmTarget_low = lowerRpmTarget_low;
     m_lowerRpmTarget_high = lowerRpmTarget_high;
     m_backupCount = (int) Math.floor(backupSec / Constants.DT);
-
   }
 
   // Called when the command is initially scheduled.
@@ -64,7 +64,14 @@ public class ShooterOn extends CommandBase {
       break;
       case 1: //stage 1, pause magazine while shooters get to RPM goal
         if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1)){
-          System.out.println("*** Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms.");
+          String output = "*** Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n";
+          output = output + "Upper shooter output: " + m_intake.getUpper_shooter().getMotorOutputPercent() + "\nLower shooter output: " + m_intake.getUpper_shooter().getMotorOutputPercent() +"\n";
+          output = output + "Upper Goal: " + m_intake.upperRPM_target + ", Achieved Upper RPM: " + m_intake.upperRPM + "\n";
+          output = output + "Lower Goal: " + m_intake.lowerRPM_target + ", Achieved Lower RPM: " + m_intake.lowerRPM + "\n\n";
+
+          RobotContainer.outputStream.println(output);
+          RobotContainer.outputStream.flush();
+          System.out.println(output);
           stage = 2;
         }
         m_intake.magazineOff();

@@ -88,10 +88,10 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   //final double kRPM2Counts = (GEAR * ShooterEncoder) / RPM2CountsPer100ms;
   final double kRPM2Counts = 1.611328125; // (60s / 409.6 which is 1 RPS, seems more reasonable with 7000 RPMs now at full output)
   
-  private double lowerRPM;
-  private double upperRPM;
-  private double upperRPM_target;
-  private double lowerRPM_target;
+  public double lowerRPM;
+  public double upperRPM;
+  public double upperRPM_target;
+  public double lowerRPM_target;
   
 
   private boolean intakeIsOn;
@@ -243,6 +243,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     return Math.min(upperPerc, lowerPerc);
   }
 
+  
+
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
@@ -258,4 +260,13 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putNumber("Current Upper Goal", upperRPM_target);
     SmartDashboard.putNumber("Current Lower Goal", lowerRPM_target);
   }
+
+  public WPI_TalonSRX getUpper_shooter() {
+    return upper_shooter;
+  }
+
+  public WPI_TalonSRX getLower_shooter() {
+    return lower_shooter;
+  }
+
 }

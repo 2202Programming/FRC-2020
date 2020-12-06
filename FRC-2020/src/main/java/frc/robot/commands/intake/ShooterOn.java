@@ -81,7 +81,7 @@ public class ShooterOn extends CommandBase {
         m_intake.shooterOn(m_rpmUpper, m_rpmLower);
       break;
       case 2: //stage 2, magazine forward fast to shoot while at RPM goals
-        if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1)){
+        if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){
           stage = 1;
           time = System.currentTimeMillis();
         }

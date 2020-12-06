@@ -49,6 +49,7 @@ import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import java.io.*;
 import java.util.Scanner;
@@ -86,22 +87,11 @@ public class RobotContainer {
   final boolean PERCENT_CONTROLLED = false;
 
   //taking input from shuffleboard
-  private ShuffleboardTab tab = Shuffleboard.getTab("Shooter Rpm Goals");
-  private NetworkTableEntry rpmUpper_low =
-     tab.add("rpm upper low goal", 3000)
-        .getEntry();
-
-  private NetworkTableEntry rpmLower_low =
-      tab.add("rpm lower low goal", 3000)
-        .getEntry();
-
-  private NetworkTableEntry rpmUpper_high =
-      tab.add("rpm upper high goal", 6000)
-          .getEntry();
-   
-  private NetworkTableEntry rpmLower_high =
-      tab.add("rpm lower high goal", 6000)
-        .getEntry();
+  //private ShuffleboardTab tab = Shuffleboard.getTab("Shooter Rpm Goals");
+  private double rpmUpper_low = SmartDashboard.getNumber("rpm upper low goal", 3000);
+  private double rpmLower_low = SmartDashboard.getNumber("rpm lower low goal", 3000);
+  private double rpmUpper_high = SmartDashboard.getNumber("rpm upper high goal", 6000);
+  private double rpmLower_high = SmartDashboard.getNumber("rpm lower high goal", 6000);
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -187,7 +177,7 @@ public class RobotContainer {
     //velocity based shooter (pick one, power or velocity)
     
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-        .whenPressed(new ShooterOn(intake, rpmUpper_low.getDouble(1.0), rpmUpper_high.getDouble(1.0), rpmLower_low.getDouble(1.0), rpmLower_high.getDouble(1.0), 0.2)); // rpm_low, rpm_high, seconds mag backup
+        .whenPressed(new ShooterOn(intake, rpmUpper_low, rpmUpper_high, rpmLower_low, rpmLower_high, 0.2)); // rpm_low, rpm_high, seconds mag backup
   
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())

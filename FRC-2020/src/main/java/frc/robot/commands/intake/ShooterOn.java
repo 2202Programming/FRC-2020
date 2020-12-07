@@ -63,9 +63,8 @@ public class ShooterOn extends CommandBase {
         m_intake.magazineOn(SLOW_MAG_REVERSE);
       break;
       case 1: //stage 1, pause magazine while shooters get to RPM goal
-        if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1)){
+        if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){
           String output = "*** Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n";
-          output = output + "Upper shooter output: " + m_intake.getUpper_shooter().getMotorOutputPercent() + "\nLower shooter output: " + m_intake.getUpper_shooter().getMotorOutputPercent() +"\n";
           output = output + "Upper Goal: " + m_intake.upperRPM_target + ", Achieved Upper RPM: " + m_intake.upperRPM + "\n";
           output = output + "Lower Goal: " + m_intake.lowerRPM_target + ", Achieved Lower RPM: " + m_intake.lowerRPM + "\n\n";
 
@@ -81,28 +80,13 @@ public class ShooterOn extends CommandBase {
         m_intake.shooterOn(m_rpmUpper, m_rpmLower);
       break;
       case 2: //stage 2, magazine forward fast to shoot while at RPM goals
-        if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){
+        if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){ //back to stage 1 if RPMs fall below tolerance
           stage = 1;
           time = System.currentTimeMillis();
         }
         m_intake.magazineOn(FAST_MAG_FORWARD);
       break;
     }
-
-    // if (m_count++ < m_backupCount) {
-    //   // We will want to backup the mag a little bit before shooter gets engaged
-    //   // this will prevent balls getting stuck.
-    //   m_intake.magazineOn(SLOW_MAG_REVERSE);
-    // } else if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .1) && !trueOnce) {
-    //   m_intake.magazineOff();
-    //   // Runs while the shooters are getting up to their desired speed
-    //   // This will not work if the upper and lower shooters speeds are ever 
-    //   // changed separately
-    //   m_intake.shooterOn(m_rpmUpper, m_rpmLower);
-    // } else {
-    //   trueOnce = true;
-    //   m_intake.magazineOn(FAST_MAG_FORWARD);
-    // }
   }
 
   double calcShooterSpeedUpper() {

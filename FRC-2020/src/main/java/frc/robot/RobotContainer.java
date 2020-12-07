@@ -47,12 +47,9 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import java.io.*;
-import java.util.Scanner;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -86,8 +83,7 @@ public class RobotContainer {
   TestKBSimMode t1;
   final boolean PERCENT_CONTROLLED = false;
 
-  //taking input from shuffleboard
-  //private ShuffleboardTab tab = Shuffleboard.getTab("Shooter Rpm Goals");
+  //taking input from smartdashboard (probably needs to be moved to shooter_on cmd)
   private double rpmUpper_low = SmartDashboard.getNumber("rpm upper low goal", 3000);
   private double rpmLower_low = SmartDashboard.getNumber("rpm lower low goal", 3000);
   private double rpmUpper_high = SmartDashboard.getNumber("rpm upper high goal", 6000);

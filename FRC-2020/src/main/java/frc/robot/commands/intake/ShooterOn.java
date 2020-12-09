@@ -68,8 +68,8 @@ public class ShooterOn extends CommandBase {
           output = output + "Upper Goal: " + m_intake.upperRPM_target + ", Achieved Upper RPM: " + m_intake.upperRPM + "\n";
           output = output + "Lower Goal: " + m_intake.lowerRPM_target + ", Achieved Lower RPM: " + m_intake.lowerRPM + "\n\n";
 
-          RobotContainer.outputStream.println(output);
-          RobotContainer.outputStream.flush();
+          //RobotContainer.outputStream.println(output);
+          //RobotContainer.outputStream.flush();
           System.out.println(output);
           stage = 2;
         }

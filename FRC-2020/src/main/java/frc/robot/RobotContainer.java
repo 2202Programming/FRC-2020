@@ -68,7 +68,7 @@ public class RobotContainer {
   public final Limelight_Subsystem limelight;
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
-  public static PrintWriter outputStream;
+  //public static PrintWriter outputStream;
 
   //public final Control_Panel panel;
   //public final Color_Subsystem detector;
@@ -125,11 +125,12 @@ public class RobotContainer {
     jasonsButtons();
 
     //makes an output file
-    try {
+   /* try {
       outputStream = new PrintWriter(new File("Robot_Log.txt"));
     } catch(FileNotFoundException e){
       e.printStackTrace();
     }
+    */
   }
 
   private void jasonsButtons() {
@@ -173,7 +174,7 @@ public class RobotContainer {
     //velocity based shooter (pick one, power or velocity)
     
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-        .whenPressed(new ShooterOn(intake, rpmUpper_low, rpmUpper_high, rpmLower_low, rpmLower_high, 0.2)); // rpm_low, rpm_high, seconds mag backup
+        .whenHeld(new ShooterOn(intake, rpmUpper_low, rpmUpper_high, rpmLower_low, rpmLower_high, 0.2)); // rpm_low, rpm_high, seconds mag backup
   
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())

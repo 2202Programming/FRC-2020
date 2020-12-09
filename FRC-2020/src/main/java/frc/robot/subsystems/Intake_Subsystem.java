@@ -203,7 +203,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
      */
     // WIP - using simple motorpercent for now - 2/13/20
     upper_shooter.set(ControlMode.PercentOutput, RPM_target);
-    lower_shooter.set(ControlMode.PercentOutput, RPM_target);
+    lower_shooter.set(ControlMode.PercentOutput, -RPM_target);
   }
 
   public boolean shooterIsOn() {

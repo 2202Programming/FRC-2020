@@ -18,6 +18,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
+import frc.robot.commands.intake.ShooterOnPerc;
 import frc.robot.commands.intake.ToggleIntakeRaised;
 //import frc.robot.commands.auto.DriveOffLine;
 //import frc.robot.commands.auto.auto_creep_cmd;
@@ -168,7 +169,7 @@ public class RobotContainer {
 
   
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-    .whenHeld(new ShooterOn(intake, 0.5, 0.5, 1, 1, 0.2)); // pwr_low, pwr_high, seconds mag backup 
+    .whenHeld(new ShooterOnPerc(intake, 0.5, 0.5, 1, 1, 0.2)); // pwr_low, pwr_high, seconds mag backup 
 
 
     //velocity based shooter (pick one, power or velocity)

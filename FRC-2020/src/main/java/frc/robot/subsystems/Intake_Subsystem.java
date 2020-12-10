@@ -79,11 +79,11 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * Gear ratio is 10:1 and sensor is after the gears
    */
 
-  final double GEAR = 10.; // 10:1 gear, encoder after the gears
-  final double ShooterEncoder = 4096; // counts per rev
+ 
+  final double ShooterEncoder = 1024; // counts per rev
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
-  //final double kRPM2Counts = (GEAR * ShooterEncoder) / RPM2CountsPer100ms;
-  final double kRPM2Counts = 1.611328125; // (60s / 409.6 which is 1 RPS, seems more reasonable with 7000 RPMs now at full output)
+  final double kRPM2Counts = ShooterEncoder / RPM2CountsPer100ms;
+
   
   public double lowerRPM;
   public double upperRPM;

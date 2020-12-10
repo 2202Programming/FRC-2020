@@ -1,6 +1,8 @@
 package frc.robot;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 
@@ -13,18 +15,42 @@ public class xmlParser {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(robotFile);
             
-            NodeList paths = doc.getElementsByTagName("Path");
-            System.out.println(paths.getLength()); //currently prints 1
+            List<Node> commandGroups = removeWhitespaceNodes(doc.getElementsByTagName("CommandGroup"));
 
-            Node selectedPath = paths.item(0);
-            System.out.println(selectedPath); //currently prints [Path: null]
+            Node selectedCommandGroup = commandGroups.get(0);
 
-            System.out.println(selectedPath.getAttributes().item(0)); //currently prints ID="HighMode"
+            List<Node> commands = removeWhitespaceNodes(selectedCommandGroup.getChildNodes());
+            Node selectedCommand = commands.get(0);
 
+            NamedNodeMap attributes = selectedCommand.getAttributes();
 
+            for(int i = 0; i < attributes.getLength(); i++) {
+                System.out.println(attributes.item(i));
+            }
+
+            
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    private static boolean isWhitespaceNode(Node n) {
+        if (n.getNodeType() == Node.TEXT_NODE) {
+            String val = n.getNodeValue();
+            return val.trim().length() == 0;
+        } else {
+            return false;
+        }
+    }
+
+    private static List<Node> removeWhitespaceNodes(NodeList nodes) {
+        List<Node> validNodes = new ArrayList<Node>();
+        for(int i = 0; i < nodes.getLength(); i++) {
+            if (!isWhitespaceNode(nodes.item(i)))
+                validNodes.add(nodes.item(i));
+        }
+        return validNodes;
+    }
+
 }

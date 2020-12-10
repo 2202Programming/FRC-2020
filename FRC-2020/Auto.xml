@@ -2,11 +2,12 @@
 
 <Paths name="xyz">
 
-    <Path ID="HighMode">
-        <CommandGroup name="Group1">
-            <Command name="frc.robot.commands.auto.DriveOffLine" power=".8" timeout="2.7"/>
-        </CommandGroup>
+    <CommandGroup ID="HighMode">
+        <Command name="frc.robot.commands.auto.DriveOffLine" power=".8" timeout="2.7"/>
 
-    </Path>
+    </CommandGroup>
+
+    <CommandGroup ID="Test">
+    </CommandGroup>
 
 </Paths>

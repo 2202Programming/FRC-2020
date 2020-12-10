@@ -80,7 +80,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    */
 
  
-  final double ShooterEncoder = 1024; // counts per rev
+  final double ShooterEncoder = 4096; // counts per rev
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
   final double kRPM2Counts = ShooterEncoder / RPM2CountsPer100ms;
 

@@ -3,6 +3,7 @@ package frc.robot.util.pid;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.EditablePID;
+import frc.robot.subsystems.Log_Subsystem;
 
 /**
  * A PIDEditor class. Used as a seperate object to be used by subsystems implementing the EditablePID interface.
@@ -19,7 +20,7 @@ public class PIDEditor { // as a separate object to be used by subsystems
         // empty constructor to allow for construction by EditablePID interface
     }
 
-    public void initialize(EditablePID subsystem, double p, double i, double d) {
+    public void initialize(EditablePID subsystem) {
         if (this.initialized)
             throw new IllegalStateException("PIDEditor for subsystem " + SendableRegistry.getName(subsystem) + " was already initialized.");
 
@@ -32,26 +33,27 @@ public class PIDEditor { // as a separate object to be used by subsystems
 
         this.initialized = true;
 
-        // unless if we can have subsystems inherit PID values from EditablePID,
-        // initial values will need to be passed as parameters
-        SmartDashboard.putNumber(pKey, p);
-        SmartDashboard.putNumber(iKey, i);
-        SmartDashboard.putNumber(dKey, d);
+        SmartDashboard.putNumber(pKey, subsystem.getP());
+        SmartDashboard.putNumber(iKey, subsystem.getI());
+        SmartDashboard.putNumber(dKey, subsystem.getD());
     }
 
     public EditablePID getSubsystem() {
         return subsystem;
     }
 
-    public double getP(double defaultP) {
-        return SmartDashboard.getNumber(pKey, defaultP);
+    public double updateP() {
+        double newP = SmartDashboard.getNumber(pKey, subsystem.getP());
+        return newP;
     }
 
-    public double getI(double defaultI) {
-        return SmartDashboard.getNumber(iKey, defaultI);
+    public double updateI() {
+        double newI = SmartDashboard.getNumber(iKey, subsystem.getI());
+        return newI;
     }
 
-    public double getD(double defaultD) {
-        return SmartDashboard.getNumber(dKey, defaultD);
+    public double updateD() {
+        double newD = SmartDashboard.getNumber(dKey, subsystem.getD());
+        return newD;
     }
 }

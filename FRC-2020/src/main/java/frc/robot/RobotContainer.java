@@ -166,16 +166,16 @@ public class RobotContainer {
 
     // power based shooter (pick one, power or velocity)
 
-    /*
+  
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-    .whenHeld(new ShooterOn(intake, 0.5, 1, 0.2)); // pwr_low, pwr_high, seconds mag backup 
-    */
+    .whenHeld(new ShooterOn(intake, 0.5, 0.5, 1, 1, 0.2)); // pwr_low, pwr_high, seconds mag backup 
+
 
     //velocity based shooter (pick one, power or velocity)
-    
+    /*
     driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
         .whenHeld(new ShooterOn(intake, rpmUpper_low, rpmUpper_high, rpmLower_low, rpmLower_high, 0.2)); // rpm_low, rpm_high, seconds mag backup
-  
+  */
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new MagazineToggleCmd(intake));

@@ -24,7 +24,7 @@ public class ShooterOn extends CommandBase {
   private int m_count;
   private double m_rpmUpper;  // speed to use based on high/low mag position
   private double m_rpmLower;  // speed to use based on high/low mag position
-  private int stage = 0;
+  private int stage = -1;
   private double time;
 
 
@@ -63,17 +63,18 @@ public class ShooterOn extends CommandBase {
   public void execute() {
     
     switch(stage){
+      case -1:
+        m_intake.magazineOn(SLOW_MAG_REVERSE);
+        stage = 0;
+      break;
       case 0: //stage 0, backup magazine for backup_count to get balls off flywheels
         if(m_count++ > m_backupCount){
           stage = 1;
           time = System.currentTimeMillis();
           m_intake.magazineOff();
           m_intake.shooterOn(m_rpmUpper, m_rpmLower);
-        } else {
-          m_intake.magazineOn(SLOW_MAG_REVERSE);
         }
       break;
-
       case 1: //stage 1, pause magazine while shooters get to RPM goal
         if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){
           String output = "*** MAG RESUME - Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n";
@@ -81,6 +82,7 @@ public class ShooterOn extends CommandBase {
           output = output + "Lower Goal: " + m_intake.lowerRPM_target + ", Achieved Lower RPM: " + m_intake.lowerRPM + "\n\n";
           System.out.println(output);
           stage = 2;
+          m_intake.magazineOn(FAST_MAG_FORWARD);
         } else {
           System.out.println("Upper RPM: " + m_intake.upperRPM + ", Lower RPM: " + m_intake.lowerRPM + "\n");
         }
@@ -91,8 +93,6 @@ public class ShooterOn extends CommandBase {
           time = System.currentTimeMillis();
           m_intake.magazineOff();
           System.out.println("**MAG PAUSE - Upper RPM: " + m_intake.upperRPM + ", Lower RPM: " + m_intake.lowerRPM + "\n");
-        } else {
-          m_intake.magazineOn(FAST_MAG_FORWARD);
         }
       break;
     }
@@ -109,7 +109,7 @@ public class ShooterOn extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    stage = 0;
+    stage = -1;
     m_intake.shooterOff();
     m_intake.magazineOff();
     m_intake.intakeOff();

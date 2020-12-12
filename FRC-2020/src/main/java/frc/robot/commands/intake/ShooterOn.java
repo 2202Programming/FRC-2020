@@ -84,7 +84,7 @@ public class ShooterOn extends CommandBase {
           stage = 2;
           m_intake.magazineOn(FAST_MAG_FORWARD);
         } else {
-          System.out.println("Upper RPM: " + m_intake.upperRPM + ", Lower RPM: " + m_intake.lowerRPM + "\n");
+          //System.out.println("Upper Target: " + m_intake.upperRPM_target + ", Upper RPM: " + m_intake.upperRPM + ", Lower RPM: " + m_intake.lowerRPM + "\n");
         }
       break;
       case 2: //stage 2, magazine forward fast to shoot while at RPM goals

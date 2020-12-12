@@ -85,10 +85,10 @@ public class RobotContainer {
   final boolean PERCENT_CONTROLLED = false;
 
   //taking input from smartdashboard (probably needs to be moved to shooter_on cmd)
-  private double rpmUpper_low = SmartDashboard.getNumber("rpm upper low goal", 200);
-  private double rpmLower_low = SmartDashboard.getNumber("rpm lower low goal", 200);
-  private double rpmUpper_high = SmartDashboard.getNumber("rpm upper high goal", 200);
-  private double rpmLower_high = SmartDashboard.getNumber("rpm lower high goal", 200);
+  private double rpmUpper_low = SmartDashboard.getNumber("rpm upper low goal", -1000);
+  private double rpmLower_low = SmartDashboard.getNumber("rpm lower low goal", 1000);
+  private double rpmUpper_high = SmartDashboard.getNumber("rpm upper high goal", -2000);
+  private double rpmLower_high = SmartDashboard.getNumber("rpm lower high goal", 2000);
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -167,16 +167,15 @@ public class RobotContainer {
 
     // power based shooter (pick one, power or velocity)
 
-  /*
-    driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-    .whenHeld(new ShooterOnPerc(intake, 0.5, 0.5, 1, 1, 0.2)); // pwr_low, pwr_high, seconds mag backup 
-  */
-
+    if (PERCENT_CONTROLLED) {
+      driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
+    .whenHeld(new ShooterOnPerc(intake, 0.5, 1, -0.5, -1, 0.2)); // pwr_low, pwr_high, seconds mag backup 
+    }
+    else {
     //velocity based shooter (pick one, power or velocity)
-  
-    driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
+      driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
         .whenHeld(new ShooterOn(intake, rpmUpper_low, rpmUpper_high, rpmLower_low, rpmLower_high, 0.2)); // rpm_low, rpm_high, seconds mag backup
-  
+    }
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new MagazineToggleCmd(intake));

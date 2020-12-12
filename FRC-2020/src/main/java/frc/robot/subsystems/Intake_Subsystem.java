@@ -124,7 +124,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
     /* Config sensor used for Primary PID [Velocity] */
     talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, kPIDLoopIdx, kTimeoutMs);
-    talon.configSelectedFeedbackCoefficient(-1);
+    //talon.configSelectedFeedbackCoefficient(-1);
 
     talon.configAllSettings(shooterCfg);
     talon.setNeutralMode(NeutralMode.Brake);
@@ -193,7 +193,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     }
     else{
       upper_shooter.set(ControlMode.Velocity, upperRPM_target*kRPM2Counts);
-      lower_shooter.set(ControlMode.Velocity, -lowerRPM_target*kRPM2Counts);
+      lower_shooter.set(ControlMode.Velocity, lowerRPM_target*kRPM2Counts);
     }
   }
 

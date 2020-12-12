@@ -124,6 +124,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
     /* Config sensor used for Primary PID [Velocity] */
     talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, kPIDLoopIdx, kTimeoutMs);
+    talon.configSelectedFeedbackCoefficient(-1);
 
     talon.configAllSettings(shooterCfg);
     talon.setNeutralMode(NeutralMode.Brake);

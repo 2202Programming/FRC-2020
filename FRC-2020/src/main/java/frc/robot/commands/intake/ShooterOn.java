@@ -76,7 +76,7 @@ public class ShooterOn extends CommandBase {
         }
       break;
       case 1: //stage 1, pause magazine while shooters get to RPM goal
-        if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){
+        if(m_count++%10 == 0 && m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){
           String output = "*** MAG RESUME - Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n";
           output = output + "Upper Goal: " + m_intake.upperRPM_target + ", Achieved Upper RPM: " + m_intake.upperRPM + "\n";
           output = output + "Lower Goal: " + m_intake.lowerRPM_target + ", Achieved Lower RPM: " + m_intake.lowerRPM + "\n\n";
@@ -88,7 +88,7 @@ public class ShooterOn extends CommandBase {
         }
       break;
       case 2: //stage 2, magazine forward fast to shoot while at RPM goals
-        if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){ //back to stage 1 if RPMs fall below tolerance
+        if(m_count++%10 == 0 && !m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){ //back to stage 1 if RPMs fall below tolerance
           stage = 1;
           time = System.currentTimeMillis();
           m_intake.magazineOff();

@@ -16,6 +16,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import static frc.robot.Constants.*;
+
+import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.util.misc.Gains;
 import edu.wpi.first.wpilibj.Spark;
@@ -70,19 +72,19 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * 
    * kP kI kD kF Iz PeakOut
    */
-  Gains kGains_Velocit = new Gains(16.0, 0.001, 0.0, 0.0, 300, 1.00);
+  Gains kGains_Velocit = new Gains(0.1, 0.0001, 0.0, 0.0, 300, 1.00);
 
   /**
    * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =
    * velocity setpoint is in units/100ms
    * 
-   * Gear ratio is 10:1 and sensor is after the gears
+   * Gear ratio is 5:1 and sensor is before gearbox 12/12/20
    */
 
   final double Gear = 5.0; //account for gearbox reduction
   final double ShooterEncoder = 4096; // counts per rev
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
-  final double kRPM2Counts = (Gear * ShooterEncoder) / RPM2CountsPer100ms;
+  final double kRPM2Counts = (ShooterEncoder) / RPM2CountsPer100ms;
 
   
   public double lowerRPM;
@@ -121,12 +123,15 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     shooterCfg.slot0.kF = kGains_Velocit.kF;
 
     shooterCfg.slot1 = shooterCfg.slot0;
+    talon.configAllSettings(shooterCfg);
 
     /* Config sensor used for Primary PID [Velocity] */
     talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, kPIDLoopIdx, kTimeoutMs);
     //talon.configSelectedFeedbackCoefficient(-1);
+    talon.setSensorPhase(false); //flip encoder sign
+    talon.configOpenloopRamp(2);
 
-    talon.configAllSettings(shooterCfg);
+
     talon.setNeutralMode(NeutralMode.Brake);
     /* Config the peak and nominal outputs */
     talon.configNominalOutputForward(0, kTimeoutMs);
@@ -181,8 +186,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   public void shooterOn(double upperRPM_target, double lowerRPM_target) {
     shooterIsOn = true;
-    this.upperRPM_target = upperRPM_target;
-    this.lowerRPM_target = lowerRPM_target;
+    this.upperRPM_target = upperRPM_target*Gear;
+    this.lowerRPM_target = -lowerRPM_target*Gear; //inverted shooter directions 
     /*
      * Velocity Closed Loop double targetVelocity_UnitsPer100ms = RPM_target *
      * kRPM2Counts;
@@ -192,8 +197,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
       lower_shooter.set(ControlMode.PercentOutput, lowerRPM_target); 
     }
     else{
-      upper_shooter.set(ControlMode.Velocity, upperRPM_target*kRPM2Counts);
-      lower_shooter.set(ControlMode.Velocity, lowerRPM_target*kRPM2Counts);
+      upper_shooter.set(ControlMode.Velocity, this.upperRPM_target*kRPM2Counts);
+      lower_shooter.set(ControlMode.Velocity, this.lowerRPM_target*kRPM2Counts);
     }
   }
 
@@ -228,8 +233,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
   public boolean atGoalRPM(double upperGoal, double lowerGoal, double tol){
-    // return true if BOTH upper and lower are within tolerance
-    return ((Math.abs(upperGoal-upperRPM) < (upperGoal*tol)) && (Math.abs(lowerGoal-lowerRPM) < (lowerGoal*tol)));
+    // return true if BOTH upper and lower are within tolerance 
+    // Convert from passed flywheel RPMs to motor RPMs
+    //System.out.println("Upper Goal:" + upperGoal + ", UpperRPM: " + upperRPM);
+    //System.out.println("Lower Goal:" + lowerGoal + ", lowerRPM: " + lowerRPM +"/n");
+    return ((Math.abs(upperGoal*Gear-upperRPM) < (upperGoal*Gear*tol)) &&
+            (Math.abs(lowerGoal*Gear+lowerRPM) < (lowerGoal*Gear*tol)));
   }
 
   public double getShooterPercent() {
@@ -246,17 +255,20 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
+
+    
     double upperVelocity = upper_shooter.getSelectedSensorVelocity();
     double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
-    upperRPM = upperVelocity/kRPM2Counts;
-    lowerRPM = -lowerVelocity/kRPM2Counts;
+    upperRPM = upperVelocity/kRPM2Counts; //motor speed
+    lowerRPM = lowerVelocity/kRPM2Counts;
 
     SmartDashboard.putNumber("Upper Shooter Percent", upper_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Lower Shooter Percent", lower_shooter.getMotorOutputPercent());
-    SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
-    SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
+    SmartDashboard.putNumber("Upper Shooter RPM", upperRPM/Gear);
+    SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM/Gear);
     SmartDashboard.putNumber("Current Upper Goal", upperRPM_target);
     SmartDashboard.putNumber("Current Lower Goal", lowerRPM_target);
+    
   }
 
   public WPI_TalonSRX getUpper_shooter() {

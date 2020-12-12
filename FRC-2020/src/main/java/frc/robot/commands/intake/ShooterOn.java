@@ -48,13 +48,6 @@ public class ShooterOn extends CommandBase {
     m_rpmUpper = calcShooterSpeedUpper();
     m_rpmLower = calcShooterSpeedLower();
 
-    String output = "*** Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n";
-    output = output + "Upper Goal: " + m_intake.upperRPM_target + ", Achieved Upper RPM: " + m_intake.upperRPM + "\n";
-    output = output + "Lower Goal: " + m_intake.lowerRPM_target + ", Achieved Lower RPM: " + m_intake.lowerRPM + "\n\n";
-
-    //RobotContainer.outputStream.println(output);
-    //RobotContainer.outputStream.flush();
-    System.out.println(output);
 
   }
 
@@ -64,6 +57,7 @@ public class ShooterOn extends CommandBase {
     
     switch(stage){
       case -1:
+        System.out.println("Stage -1\n");
         m_intake.magazineOn(SLOW_MAG_REVERSE);
         stage = 0;
       break;
@@ -73,27 +67,35 @@ public class ShooterOn extends CommandBase {
           time = System.currentTimeMillis();
           m_intake.magazineOff();
           m_intake.shooterOn(m_rpmUpper, m_rpmLower);
+          System.out.println("Stage 1\n");
         }
       break;
+
       case 1: //stage 1, pause magazine while shooters get to RPM goal
-        if(m_count++%10 == 0 && m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){
-          String output = "*** MAG RESUME - Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n";
-          output = output + "Upper Goal: " + m_intake.upperRPM_target + ", Achieved Upper RPM: " + m_intake.upperRPM + "\n";
-          output = output + "Lower Goal: " + m_intake.lowerRPM_target + ", Achieved Lower RPM: " + m_intake.lowerRPM + "\n\n";
-          System.out.println(output);
-          stage = 2;
-          m_intake.magazineOn(FAST_MAG_FORWARD);
-        } else {
-          //System.out.println("Upper Target: " + m_intake.upperRPM_target + ", Upper RPM: " + m_intake.upperRPM + ", Lower RPM: " + m_intake.lowerRPM + "\n");
-        }
+        m_count++;
+        if (m_count%5 == 0) {
+          if(m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){
+            String output = "*** MAG RESUME - Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n";
+            output = output + "Upper Goal: " + m_intake.upperRPM_target + ", Achieved Upper RPM: " + m_intake.upperRPM + "\n";
+            output = output + "Lower Goal: " + m_intake.lowerRPM_target + ", Achieved Lower RPM: " + m_intake.lowerRPM + "\n\n";
+            System.out.println(output);
+            stage = 2;
+            m_intake.magazineOn(FAST_MAG_FORWARD);
+          }
+          //System.out.println("Upper Motor RPM:" + m_intake.upperRPM +", Lower: "+m_intake.lowerRPM +"\n");
+         }
       break;
+
       case 2: //stage 2, magazine forward fast to shoot while at RPM goals
-        if(m_count++%10 == 0 && !m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){ //back to stage 1 if RPMs fall below tolerance
+      m_count++;
+      if (m_count%5 == 0) {
+        if(!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){ //back to stage 1 if RPMs fall below tolerance
           stage = 1;
           time = System.currentTimeMillis();
           m_intake.magazineOff();
           System.out.println("**MAG PAUSE - Upper RPM: " + m_intake.upperRPM + ", Lower RPM: " + m_intake.lowerRPM + "\n");
         }
+      }
       break;
     }
   }

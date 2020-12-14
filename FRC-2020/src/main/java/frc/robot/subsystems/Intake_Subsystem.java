@@ -255,8 +255,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
-
-    
     double upperVelocity = upper_shooter.getSelectedSensorVelocity();
     double lowerVelocity = lower_shooter.getSelectedSensorVelocity();
     upperRPM = upperVelocity/kRPM2Counts; //motor speed
@@ -270,7 +268,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putNumber("Current Lower Goal", lowerRPM_target);
     
   }
-
+/*
   public WPI_TalonSRX getUpper_shooter() {
     return upper_shooter;
   }
@@ -278,5 +276,5 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   public WPI_TalonSRX getLower_shooter() {
     return lower_shooter;
   }
-
+*/
 }

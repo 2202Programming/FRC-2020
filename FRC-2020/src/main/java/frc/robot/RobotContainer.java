@@ -46,6 +46,7 @@ import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls.Id;
+import frc.robot.subsystems.test.ExamplePIDSubsystem;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
 
 /**
@@ -68,6 +69,7 @@ public class RobotContainer {
   //public final Control_Panel panel;
   //public final Color_Subsystem detector;
   //private final ClimberSubsystem climber;
+  public final ExamplePIDSubsystem examplePIDSubsystem;
 
   TankDriveCmd tankDriveCmd;
   ArcadeDriveCmd arcadeDriveCmd;
@@ -94,6 +96,7 @@ public class RobotContainer {
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();
+    examplePIDSubsystem = new ExamplePIDSubsystem(1, 1, 1, 1, 1, 1);
 
     // Add anything that has logging requirements
     logSubsystem.add(driveTrain, limelight, lidar, intake, driverControls/**, panel, detector*/);

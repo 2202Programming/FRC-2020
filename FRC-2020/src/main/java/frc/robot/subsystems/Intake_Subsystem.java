@@ -22,9 +22,6 @@ import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/**
- * motorStrength should be between -1 and 1 for all methods
- */
 public class Intake_Subsystem extends SubsystemBase implements Logger {
   /**
    * Creates a new Intake_Subsystem.
@@ -37,6 +34,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    *  DPL 2/09/2020 removed publics, use WPI_TalonSRX, Gear gain Also removed some debug code.
    *  DPL 12/12/2020  setup for Kevin' PID UX, Moved motor stuff to flywheel class
    *                  invert flag for feedback, setInvert for motor polarity.
+   * 
+   *  DPL 12/15/2020  tested in lab, sort of worked but oscilated. Found Ki was 10x what 
+   *                  we tested 12/12 in DifferentialShooter branch.  Changed, need to retest.
    */
 
   // Intake
@@ -59,15 +59,24 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    *  Calculate Kf to get us close to desired speed and pid will fine tune it.
    * 
    *     MU max out = +/- 1023   - given by CTRE docs
-   *     65% motor pct gave  2000 RPM   - measured in the lab 12/12/2020
+   *     60% motor pct gave  2000 RPM   - measured in the lab 12/12/2020
+   *     2000 fw-rpm * Kf  = (0.60)*1023    60% output gave 2000FW-RPM in testing
    * 
-   *     2000 fw-rpm * Kf  = (0.65)*1023    ### should remeasure this with new fly wheel
+   *     Kf = 6138/2000 = 0.3069 [MU/FW_RPM]
+  *
+   *     [FW-RPM] = flywheel rpm
+   *     [MU-100] = motor units per 100mS which is the controller's vel uint, [MU] for short
+   *     2000 RPM * 34.133 [MU-100ms]/[FW-RPM]  = 68267 MU/FW-RPM
    * 
-   *      Kf = 664.95 /2000 = 0.332475 [MU/FW_RPM]
+   *     Initial Err = 68267 MU
+   *     Max Kp contribution = 15% (1023)[MO] = 153 MO
+   *      Kp*Error = 153 [MO]
+   *      Kp = 153/68267 = 0.002248  [MO / MUerr]
    * 
-   * Use same values as starting point for both upper and lower FW.                             
+   * 
+   * Use same values as starting point for both upper and lower FW PIDF.                             
    */
-  PIDFController pidValues = new PIDFController(0.1, 0.001, 0.0, 0.0);   // kP kI kD kF 
+  PIDFController pidValues = new PIDFController(0.002248, 0.0001, 0.0, 0.3069);   // kP kI kD kF 
 
   /**
    * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =
@@ -77,13 +86,13 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * (Motor turns 5x the flywheel)
    */
 
-  final double maxOpenLoopRPM = 3300;   //TODO:measure this
-  final double Gear = 5.0;              //account for gearbox reduction to flywheel
+  final double maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
+  final double Gear = 5.0;              // account for gearbox reduction to flywheel
   final double ShooterEncoder = 4096;   // counts per rev
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
-  final double kRPM2Counts = (ShooterEncoder) / RPM2CountsPer100ms;  // motor-units
+  final double kRPM2Counts = (ShooterEncoder) / RPM2CountsPer100ms;  // motor-units (no gearing)
 
-  
+  // All RPM are in FW-RPM 
   public double lowerRPM;
   public double upperRPM;
   public double upperRPM_target;
@@ -97,7 +106,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   public Intake_Subsystem(boolean percentControlled) {
     this.percentControlled = percentControlled;
     
-    upper_shooter = new FlyWheel(UPPER_SHOOTER_TALON_CAN, pidValues,  false, maxOpenLoopRPM);
+    upper_shooter = new FlyWheel(UPPER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);
     upper_shooter.setMotorTurnsPerFlywheelTurn(Gear);
     lower_shooter = new FlyWheel(LOWER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);
     lower_shooter.setMotorTurnsPerFlywheelTurn(Gear);
@@ -202,7 +211,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
 
   public double getShooterRPM() {    
-    return (upperRPM+lowerRPM)/2;
+    return (upperRPM+lowerRPM)*0.5;
   }
 
   /**

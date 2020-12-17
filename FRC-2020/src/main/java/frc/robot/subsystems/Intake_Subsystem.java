@@ -76,7 +76,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * 
    * Use same values as starting point for both upper and lower FW PIDF.                             
    */
-  PIDFController pidValues = new PIDFController(0.002248, 0.0001, 0.0, 0.3069);   // kP kI kD kF 
+  PIDFController pidValues = new PIDFController(0.2248, 0.00001, 0.0, 0.3069);   // kP kI kD kF 
 
   /**
    * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =

@@ -18,6 +18,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
+import frc.robot.commands.intake.ShooterOnAuto;
 import frc.robot.commands.intake.ShooterOnPerc;
 import frc.robot.commands.intake.ToggleIntakeRaised;
 //import frc.robot.commands.auto.DriveOffLine;
@@ -176,6 +177,9 @@ public class RobotContainer {
       driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode()) //flywheel RPM targets
         .whenHeld(new ShooterOn(intake, rpmUpper_low, rpmUpper_high, rpmLower_low, rpmLower_high, 0.2)); // rpm_low, rpm_high, seconds mag backup
     }
+
+    driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_LEFT.getCode()) //auto RPM adjustment from limelight area based on calculated trendlines
+    .whenHeld(new ShooterOnAuto(intake, 0.2, -220.0, 3000.0, -220.0, 3000.0, limelight));
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new MagazineToggleCmd(intake));

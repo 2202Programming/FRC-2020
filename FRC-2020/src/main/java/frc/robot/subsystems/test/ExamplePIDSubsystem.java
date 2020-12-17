@@ -4,11 +4,7 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.ifx.Logger;
-<<<<<<< HEAD
 // import frc.robot.triggers.PIDUpdateButtonTrigger;
-=======
-import frc.robot.triggers.PIDUpdateButtonTrigger;
->>>>>>> DynamicPIDUpdating
 
 public class ExamplePIDSubsystem extends SubsystemBase implements Logger {
     public static final String KEY = "Example PID Subsystem";

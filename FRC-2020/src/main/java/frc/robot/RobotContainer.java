@@ -99,7 +99,7 @@ public class RobotContainer {
     examplePIDSubsystem = new ExamplePIDSubsystem(1, 1, 1, 1, 1, 1);
 
     // Add anything that has logging requirements
-    logSubsystem.add(driveTrain, limelight, lidar, intake, driverControls/**, panel, detector*/);
+    logSubsystem.add(driveTrain, limelight, lidar, intake, driverControls/**, panel, detector*/, examplePIDSubsystem);
 
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);

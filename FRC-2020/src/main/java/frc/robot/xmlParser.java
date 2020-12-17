@@ -16,9 +16,14 @@ import edu.wpi.first.wpilibj2.command.CommandGroupBase;
  * the element level.
  * 
  * 
- * XML Syntax <Command name="fq-classname" /> <!-- No args --> <CommandGroup>
- * <Command name="fq-classname"> <Arg type="fq-type" value="stringValue") />
- * <Arg robotDevice="name"/> </Command> ... </CommandGroup>
+ * XML Syntax 
+ * <Command name="fq-classname" /> <!-- No args --> 
+ * <CommandGroup>
+ *    <Command name="fq-classname"   withTimeout="3.3"> 
+ *        <Arg type="fq-type" value="stringValue") />
+ *        <Arg robotDevice="name"/> 
+ *    </Command> ... 
+ * </CommandGroup>
  * 
  * Usage:
  * 
@@ -35,7 +40,7 @@ public class xmlParser {
     static final String ARG = "Arg";
     static final String SEQ_GRP = "SequenceGrp";
     static final String PARA_GRP = "ParallelGrp";
-    static final String RACE_GRP = "SequenceGrp";
+    static final String RACE_GRP = "RaceGrp";
     // attribute key words
     static final String NAME = "name";
     static final String TYPE = "type";

@@ -247,10 +247,14 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
+
+    upperRPM = upper_shooter.getRPM(); // update RPM variables here so it's not so often (like in periodic) to save the CAN
+    lowerRPM = lower_shooter.getRPM();
+
     SmartDashboard.putNumber("Upper Shooter Percent", upper_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Lower Shooter Percent", lower_shooter.getMotorOutputPercent());
-    SmartDashboard.putNumber("Upper Shooter RPM", upper_shooter.getRPM());
-    SmartDashboard.putNumber("Lower Shooter RPM", lower_shooter.getRPM());
+    SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
+    SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
     SmartDashboard.putNumber("Current Upper Goal", upperRPM_target);
     SmartDashboard.putNumber("Current Lower Goal", lowerRPM_target);
   }

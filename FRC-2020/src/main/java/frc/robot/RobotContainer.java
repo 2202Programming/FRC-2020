@@ -178,8 +178,11 @@ public class RobotContainer {
         .whenHeld(new ShooterOn(intake, rpmUpper_low, rpmUpper_high, rpmLower_low, rpmLower_high, 0.2)); // rpm_low, rpm_high, seconds mag backup
     }
 
-    driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_LEFT.getCode()) //auto RPM adjustment from limelight area based on calculated trendlines
-    .whenHeld(new ShooterOnAuto(intake, 0.2, -220.0, 3000.0, -220.0, 3000.0, limelight));
+    driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_LEFT.getCode())
+    .whenHeld(new ShooterOnPerc(intake, 0.5, 0.8, -0.5, -0.8, 0.2)); // pwr_low, pwr_high, seconds mag backup 
+
+//    driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_LEFT.getCode()) //auto RPM adjustment from limelight area based on calculated trendlines
+//    .whenHeld(new ShooterOnAuto(intake, 0.2, -220.0, 3000.0, -220.0, 3000.0, limelight));
 
     driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
         .whenPressed(new MagazineToggleCmd(intake));

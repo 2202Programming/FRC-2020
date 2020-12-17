@@ -93,8 +93,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   final double kRPM2Counts = (ShooterEncoder) / RPM2CountsPer100ms;  // motor-units (no gearing)
 
   // All RPM are in FW-RPM 
-  public double lowerRPM;
-  public double upperRPM;
+  double lowerRPM;  //measured in periodic()
+  double upperRPM;  //measured in periodic()
   public double upperRPM_target;
   public double lowerRPM_target;
   
@@ -123,6 +123,11 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   @Override
   public void periodic() {
+    // update RPM variables here, because we do controls on them and don't
+    // want to have measurement lag.
+    upperRPM = upper_shooter.getRPM(); 
+    lowerRPM = lower_shooter.getRPM();
+
     // This method will be called once per scheduler run
     //lastError = upper_shooter.getLastError();
   }
@@ -219,10 +224,23 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     return (magSolenoid.get() == Value.kForward);
   }
 
-
+  /**
+   * getShooterRPM()  - average of upper and lower wheels
+   * @return
+   */
   public double getShooterRPM() {    
     return (upperRPM+lowerRPM)*0.5;
   }
+
+  /**
+   * getUpperRPM(), getLowerRPM()
+   *   gets value measures in periodic() call
+   * 
+   * @return
+   */
+  public double getUpperRPM() {return upperRPM;}
+  public double getLowerRPM() {return lowerRPM;}
+
 
   /**
    * Checks to see if both flywheels are at the desired speed
@@ -257,9 +275,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
-
-    upperRPM = upper_shooter.getRPM(); // update RPM variables here so it's not so often (like in periodic) to save the CAN
-    lowerRPM = lower_shooter.getRPM();
 
     SmartDashboard.putNumber("Upper Shooter Percent", upper_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Lower Shooter Percent", lower_shooter.getMotorOutputPercent());

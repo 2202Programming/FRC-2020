@@ -111,7 +111,7 @@ public class RobotContainer {
     //climber = new ClimberSubsystem();
 
     // Add anything that has logging requirements
-    logSubsystem.add(/*driveTrain, limelight, lidar,*/ intake /*,driverControls, panel, detector*/);
+    logSubsystem.add(/*driveTrain, lidar,*/limelight, intake /*,driverControls, panel, detector*/);
 
     // Create default commads for driver preference
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);

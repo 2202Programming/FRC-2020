@@ -184,6 +184,16 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     }
   }
 
+  public void shooterOnPerc(double upperRPM_target, double lowerRPM_target) {
+    shooterIsOn = true;
+    this.upperRPM_target = upperRPM_target;
+    this.lowerRPM_target = lowerRPM_target; 
+
+      upper_shooter.setPercent(upperRPM_target); 
+      lower_shooter.setPercent(lowerRPM_target); 
+
+  }
+
   public boolean shooterIsOn() {
     return shooterIsOn;
   }

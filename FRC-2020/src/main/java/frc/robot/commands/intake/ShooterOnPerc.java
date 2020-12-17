@@ -64,7 +64,7 @@ public class ShooterOnPerc extends CommandBase {
       break;
 
       case 1: //stage 1, pause magazine while shooters get to RPM goal
-        m_intake.shooterOn(m_rpmUpper, m_rpmLower);
+        m_intake.shooterOnPerc(m_rpmUpper, m_rpmLower);
         m_intake.magazineOn(FAST_MAG_FORWARD);
       break;
     }

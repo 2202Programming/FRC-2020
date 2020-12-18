@@ -42,7 +42,6 @@ public class ShooterOnAuto extends ShooterOn  {
    */
   @Override
   public boolean calculateShooterSpeed() {
-    
      if (m_limelight.getTarget()){
           calculateRPMFromLimelight();
           m_intake.shooterOn(m_rpmUpper, m_rpmLower); //Start shooter spin up to actual RPM goals

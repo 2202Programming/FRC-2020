@@ -95,8 +95,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   // All RPM are in FW-RPM 
   double lowerRPM;  //measured in periodic()
   double upperRPM;  //measured in periodic()
-  public double upperRPM_target;
-  public double lowerRPM_target;
+  double upperRPM_target;
+  double lowerRPM_target;
   
   //state variables
   private boolean intakeIsOn;
@@ -119,7 +119,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     raiseIntake();  // must start in the up position
   }
 
- 
 
   @Override
   public void periodic() {
@@ -176,6 +175,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    */
   public void shooterOn(double upperRPM_target, double lowerRPM_target) {
     shooterIsOn = true;
+    // save the targets for at goal calcs
     this.upperRPM_target = upperRPM_target;
     this.lowerRPM_target = lowerRPM_target; 
    
@@ -241,6 +241,14 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   public double getUpperRPM() {return upperRPM;}
   public double getLowerRPM() {return lowerRPM;}
 
+  /**
+   * getUpperTargetRPM(), getLowerTargetRPM()
+   *  
+   * @return last commanded upper/lower Flywheel target RPM
+   */
+  public double getUpperTargetRPM() {return upperRPM_target;}
+  public double getLowerTargetRPM() {return lowerRPM_target;}
+
 
   /**
    * Checks to see if both flywheels are at the desired speed
@@ -253,13 +261,13 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * @param tol
    * @return
    */
-  public boolean atGoalRPM(double upperGoal, double lowerGoal, double tol){
+  public boolean atGoalRPM(double tol) {
     // return true if BOTH upper and lower are within tolerance 
     // Convert from passed flywheel RPMs to motor RPMs
     //System.out.println("Upper Goal:" + upperGoal + ", UpperRPM: " + upperRPM);
     //System.out.println("Lower Goal:" + lowerGoal + ", lowerRPM: " + lowerRPM +"/n");
-    return ((Math.abs(upperGoal - upperRPM) < (upperGoal*tol)) &&
-            (Math.abs(lowerGoal - lowerRPM) < (lowerGoal*tol)) );
+    return ((Math.abs(upperRPM_target - upperRPM) < (upperRPM_target*tol)) &&
+            (Math.abs(lowerRPM_target - lowerRPM) < (lowerRPM_target*tol)) );
   }
 
   public double getShooterPercent() {

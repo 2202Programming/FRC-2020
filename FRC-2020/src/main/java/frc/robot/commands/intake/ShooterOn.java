@@ -14,6 +14,7 @@ import frc.robot.subsystems.Intake_Subsystem;
 public class ShooterOn extends CommandBase {
   private double SLOW_MAG_REVERSE = -0.8; // motor power
   private double FAST_MAG_FORWARD =  1; // motor power
+  
   Intake_Subsystem m_intake;
   private final double m_upperRpmTarget_low;
   private final double m_upperRpmTarget_high;
@@ -24,6 +25,7 @@ public class ShooterOn extends CommandBase {
 
   // Speed to use speed to use based on high/low mag position, distance or other function
   // set by call to calculateShooterSpeed().
+  double m_tolerance = 0.05;     //percent - RPM of flywheel
   double m_rpmUpper;  
   double m_rpmLower;  
   
@@ -84,6 +86,8 @@ public class ShooterOn extends CommandBase {
           m_intake.magazineOff();
           stage = Stage.WaitingForSolution;
           
+          // TODO: consider starting the flywheels with an estimate while we wait
+          // for a computed solution.  In the fixed cases, this doesn't matter much. (one frame delay - 20ms)
         }
       break;
 
@@ -99,10 +103,10 @@ public class ShooterOn extends CommandBase {
 
       case WaitingForFlyWheel: //stage 1, pause magazine while shooters get to RPM goal
         if (m_count % frameSkip == 0) {
-          if (m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)){
+          if (m_intake.atGoalRPM(m_tolerance)){
             String output = "*** MAG RESUME - Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n" +
-                  "Upper Goal: " + m_intake.upperRPM_target + ", Achieved Upper RPM: " + m_intake.getUpperRPM() + "\n" +
-                  "Lower Goal: " + m_intake.lowerRPM_target + ", Achieved Lower RPM: " + m_intake.getLowerRPM() + "\n\n";
+                  "Upper Goal: " + m_intake.getUpperTargetRPM() + ", Achieved Upper RPM: " + m_intake.getUpperRPM() + "\n" +
+                  "Lower Goal: " + m_intake.getLowerTargetRPM() + ", Achieved Lower RPM: " + m_intake.getLowerRPM() + "\n\n";
             System.out.println(output);
             //Flywheel at speed, move to shooting
             stage = Stage.Shooting;
@@ -115,7 +119,7 @@ public class ShooterOn extends CommandBase {
       case Shooting: 
         //magazine forward fast to shoot while at RPM goals
         if (m_count % frameSkip == 0) {                   
-          if (!m_intake.atGoalRPM(m_rpmUpper, m_rpmLower, .05)) { //back to WaitingForFlywheel if RPMs fall below tolerance
+          if (!m_intake.atGoalRPM(m_tolerance)) { //back to WaitingForFlywheel if RPMs fall below tolerance
             time = System.currentTimeMillis();
             // hold off mag until flywheel is at target
             stage = Stage.WaitingForFlyWheel;

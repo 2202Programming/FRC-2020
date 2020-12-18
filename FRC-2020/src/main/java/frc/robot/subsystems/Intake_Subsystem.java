@@ -93,10 +93,10 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   final double kRPM2Counts = (ShooterEncoder) / RPM2CountsPer100ms;  // motor-units (no gearing)
 
   // All RPM are in FW-RPM 
-  public double lowerRPM;
-  public double upperRPM;
-  public double upperRPM_target;
-  public double lowerRPM_target;
+  double lowerRPM;  //measured in periodic()
+  double upperRPM;  //measured in periodic()
+  double upperRPM_target;
+  double lowerRPM_target;
   
   //state variables
   private boolean intakeIsOn;
@@ -119,10 +119,14 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     raiseIntake();  // must start in the up position
   }
 
- 
 
   @Override
   public void periodic() {
+    // update RPM variables here, because we do controls on them and don't
+    // want to have measurement lag.
+    upperRPM = upper_shooter.getRPM(); 
+    lowerRPM = lower_shooter.getRPM();
+
     // This method will be called once per scheduler run
     //lastError = upper_shooter.getLastError();
   }
@@ -171,6 +175,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    */
   public void shooterOn(double upperRPM_target, double lowerRPM_target) {
     shooterIsOn = true;
+    // save the targets for at goal calcs
     this.upperRPM_target = upperRPM_target;
     this.lowerRPM_target = lowerRPM_target; 
    
@@ -219,10 +224,31 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     return (magSolenoid.get() == Value.kForward);
   }
 
-
+  /**
+   * getShooterRPM()  - average of upper and lower wheels
+   * @return
+   */
   public double getShooterRPM() {    
     return (upperRPM+lowerRPM)*0.5;
   }
+
+  /**
+   * getUpperRPM(), getLowerRPM()
+   *   gets value measures in periodic() call
+   * 
+   * @return
+   */
+  public double getUpperRPM() {return upperRPM;}
+  public double getLowerRPM() {return lowerRPM;}
+
+  /**
+   * getUpperTargetRPM(), getLowerTargetRPM()
+   *  
+   * @return last commanded upper/lower Flywheel target RPM
+   */
+  public double getUpperTargetRPM() {return upperRPM_target;}
+  public double getLowerTargetRPM() {return lowerRPM_target;}
+
 
   /**
    * Checks to see if both flywheels are at the desired speed
@@ -235,13 +261,13 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * @param tol
    * @return
    */
-  public boolean atGoalRPM(double upperGoal, double lowerGoal, double tol){
+  public boolean atGoalRPM(double tol) {
     // return true if BOTH upper and lower are within tolerance 
     // Convert from passed flywheel RPMs to motor RPMs
     //System.out.println("Upper Goal:" + upperGoal + ", UpperRPM: " + upperRPM);
     //System.out.println("Lower Goal:" + lowerGoal + ", lowerRPM: " + lowerRPM +"/n");
-    return ((Math.abs(upperGoal - upperRPM) < (upperGoal*tol)) &&
-            (Math.abs(lowerGoal - lowerRPM) < (lowerGoal*tol)) );
+    return ((Math.abs(upperRPM_target - upperRPM) < (upperRPM_target*tol)) &&
+            (Math.abs(lowerRPM_target - lowerRPM) < (lowerRPM_target*tol)) );
   }
 
   public double getShooterPercent() {
@@ -257,9 +283,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
-
-    upperRPM = upper_shooter.getRPM(); // update RPM variables here so it's not so often (like in periodic) to save the CAN
-    lowerRPM = lower_shooter.getRPM();
 
     SmartDashboard.putNumber("Upper Shooter Percent", upper_shooter.getMotorOutputPercent());
     SmartDashboard.putNumber("Lower Shooter Percent", lower_shooter.getMotorOutputPercent());

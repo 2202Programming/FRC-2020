@@ -25,12 +25,12 @@ public class ShooterOn extends CommandBase {
 
   // Speed to use speed to use based on high/low mag position, distance or other function
   // set by call to calculateShooterSpeed().
-  double m_tolerance = 0.05;     //percent - RPM of flywheel
+  double m_tolerance = 0.025;     //percent - RPM of flywheel
   double m_rpmUpper;  
   double m_rpmLower;  
   
   // testing/reporting controls
-  int frameSkip = 5;        // used to skip N frames in Stage state machine
+  int frameSkip = 1;        // used to skip N frames in Stage state machine
   double time;
 
   // Shooter states (verbs) for state machine

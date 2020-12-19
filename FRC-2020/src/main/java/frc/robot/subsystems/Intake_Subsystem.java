@@ -68,8 +68,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    *     [MU-100] = motor units per 100mS which is the controller's vel uint, [MU] for short
    *     2000 RPM * 34.133 [MU-100ms]/[FW-RPM]  = 68267 MU/FW-RPM
    * 
-   *     New Flywheels - need new KF.
-   *     Kf = .458 as measured/calculated 12/19/2020  DPL/Alek O.
+   *     New Flywheels - need new KF. Compromise between 1000 and 2000 Open-loop
+   *     Kf = .00934 as measured/calculated 12/19/2020  DPL/Alek O.
    * 
    *     Initial Err = 68267 MU
    *     Max Kp contribution = 15% (1023)[MO] = 153 MO
@@ -79,7 +79,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * 
    * Use same values as starting point for both upper and lower FW PIDF.                             
    */
-  PIDFController pidValues = new PIDFController(0.2248, 0.00001, 0.0, 0.458);   // kP kI kD kF 
+  PIDFController pidValues = new PIDFController(0.1, 0.00000, 6, 0.00934);   // kP kI kD kF 
 
   /**
    * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =

@@ -22,6 +22,7 @@ public class PIDFController extends PIDController {
 
     public PIDFController(double Kp, double Ki, double Kd, double Kf, double period) {
         super(Kp, Ki, Kd, period);
+        setF(Kf);
     }
 
     // Accessors for the Kf

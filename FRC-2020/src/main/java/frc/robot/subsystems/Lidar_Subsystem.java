@@ -9,11 +9,13 @@ package frc.robot.subsystems;
 
 import com.playingwithfusion.TimeOfFlight;
 
+import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.ifx.*;
 
-public class Lidar_Subsystem extends SubsystemBase {
+public class Lidar_Subsystem extends SubsystemBase implements Logger {
   /**
    * Creates a new Lidar_Subsystem.
    */
@@ -22,35 +24,102 @@ public class Lidar_Subsystem extends SubsystemBase {
   private TimeOfFlight front_right_lidar;
   private double left_lidar_range;
   private double right_lidar_range;
-  private long lastLidarTime;
+  private final double LIDAR_DIST = 348;
+  private double angle;
+  private boolean validRange;
+  private boolean isreal; //if simulation mode, do not construct lidar and all methods return 0 or nothing.
+  private double filteredValid;
+  private LinearFilter left_iir;
+  private LinearFilter right_iir;
+  private LinearFilter valid_fir;
+  private double filterTC = 0.8;   //seconds, cutoff 1.25Hz
+  private final double BUMPER_DISTANCE = 100; //mm from bumber to sensor
 
-  public Lidar_Subsystem() {
 
-    lastLidarTime = System.currentTimeMillis();
+  public Lidar_Subsystem(boolean isreal) {
+    this.isreal = isreal; 
 
-    front_left_lidar = new TimeOfFlight(Constants.FRONT_LEFT_LIDAR);
-    front_right_lidar = new TimeOfFlight(Constants.FRONT_RIGHT_LIDAR);
-
-    front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Medium, Constants.LIDAR_SAMPLE_TIME);
-    front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Medium, Constants.LIDAR_SAMPLE_TIME);
-
-  }
-
-  public void updateLidar(){
-    if ((lastLidarTime + Constants.LIDAR_SAMPLE_TIME + 10) < System.currentTimeMillis()){ //dont check lidar faster than it's sample rate, with 10ms buffer
-      left_lidar_range = front_left_lidar.getRange();
-      right_lidar_range = front_right_lidar.getRange();
-      lastLidarTime = System.currentTimeMillis();
+    if (isreal){
+      front_left_lidar = new TimeOfFlight(Constants.FRONT_LEFT_LIDAR);
+      front_right_lidar = new TimeOfFlight(Constants.FRONT_RIGHT_LIDAR);
+  
+      front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, Constants.LIDAR_SAMPLE_TIME);
+      front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, Constants.LIDAR_SAMPLE_TIME);
+  
+      // use a lowpass filter to clean up high freq noise. Helpful if you use a PID with any D.
+      left_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
+      right_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
+      valid_fir = LinearFilter.movingAverage(5); //takes int taps as parameter (random)
     }
   }
 
-  public void printLog() {
+  public double getAverageRange() {
+    if (!isreal) return 0;
+    return ((left_lidar_range+right_lidar_range)/2);
+  }
+
+  public double findAngle(){
+    if (!isreal) return 0;
+
+    //getRange() returns distance in milimeters 
+    double dist2 = left_lidar_range;
+    double dist1 = right_lidar_range;
+    double difference = dist1 - dist2;
+    angle = Math.toDegrees(Math.atan(difference/LIDAR_DIST));
+    return angle;
+  }
+
+  public void log() {
+    if (!isreal) return;
+
     SmartDashboard.putNumber("Front Left Lidar", left_lidar_range);
     SmartDashboard.putNumber("Front Right Lidar", right_lidar_range);
+    
+    SmartDashboard.putBoolean("Range is valid", validRange);
+    SmartDashboard.putBoolean("Left lidar valid", front_left_lidar.isRangeValid());
+    SmartDashboard.putBoolean("Right lidar valid", front_right_lidar.isRangeValid());
+   
+
+    SmartDashboard.putNumber("Lidar Angle", angle);
+
+  }
+
+  public boolean valid(){
+    if (!isreal) return false;
+
+    if(front_left_lidar.isRangeValid() == false || front_right_lidar.isRangeValid() == false){
+      return false;
+    }
+    return true;
+  
+  }
+
+  public boolean isEitherValid(){
+    if (!isreal) return false;
+
+    if(front_left_lidar.isRangeValid() == false && front_right_lidar.isRangeValid() == false){
+      return false;
+    }
+    return true;
+  }
+
+  public boolean isFilteredValid(){
+    if (!isreal) return false;
+
+    return (filteredValid >= 0.6);
   }
 
   @Override
   public void periodic() {
+    if (!isreal) return;
+
     // This method will be called once per scheduler run
+    validRange = valid();
+      double temp = (validRange) ? 1.0 : 0.0;
+      filteredValid = valid_fir.calculate(temp);
+      left_lidar_range = left_iir.calculate(front_left_lidar.getRange())-BUMPER_DISTANCE; 
+      right_lidar_range = right_iir.calculate(front_right_lidar.getRange())-BUMPER_DISTANCE;
+      findAngle();
+    
   }
 }

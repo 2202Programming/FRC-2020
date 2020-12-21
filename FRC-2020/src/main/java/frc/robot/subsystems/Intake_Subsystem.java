@@ -74,7 +74,11 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    *     Initial Err = 68267 MU
    *     Max Kp contribution = 15% (1023)[MO] = 153 MO
    *      Kp*Error = 153 [MO]
-   *      Kp = 153/68267 = 0.002248  [MO / MUerr]
+   *      Kp = 153/68267 = 0.002248  [MO / MUerr]  (very safe)
+   * 
+   *      Kp = 0.1 worked well and still has lots of margin.
+   *      KD = 6 damped out with out adding ringing or lag
+   *      Ki = 0   not needed for velocity loop
    * 
    * 
    * Use same values as starting point for both upper and lower FW PIDF.                             
@@ -91,7 +95,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   final double maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
   final double Gear = 5.0;              // account for gearbox reduction to flywheel
-  final double ShooterEncoder = 4096;   // counts per rev
+  final double ShooterEncoder = 4096;   // counts per rev motor 
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
   final double kRPM2Counts = (ShooterEncoder) / RPM2CountsPer100ms;  // motor-units (no gearing)
 
@@ -121,7 +125,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     magazineDown(); // must start in down positon
     raiseIntake();  // must start in the up position
   }
-
 
   @Override
   public void periodic() {
@@ -341,10 +344,10 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
       /* Config sensor used for Primary PID [Velocity] */
       //motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, kPIDLoopIdx, kTimeoutMs);
-      // dpl - 12/12/20 - TODO: test the Relative encoding, should support higher rpm
+      // dpl - 12/19/20  Relative encoding worked very well.  See plots in Slack.
+      //
       motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kPIDLoopIdx, kTimeoutMs);
       motor.setSensorPhase(sensorPhase);   // fix feedback direction
-  
       motor.setNeutralMode(NeutralMode.Coast);
 
       /* Config the peak and nominal outputs */

@@ -30,7 +30,6 @@ public class ShooterOn extends CommandBase {
   double m_rpmLower;  
   
   // testing/reporting controls
-  int frameSkip = 1;        // used to skip N frames in Stage state machine
   double time;
 
   // Shooter states (verbs) for state machine
@@ -46,7 +45,7 @@ public class ShooterOn extends CommandBase {
   public ShooterOn(Intake_Subsystem intake, double backupSec) {
     // using dummy upper/lower target rpm.  If this construsctor is used, calculateShooterSpeed()
     // will be overriden
-    this(intake, 2000, 2000, 500, 500, backupSec);  
+    this(intake, 2000, 2000, 500, 500, backupSec);  //dummy args except intake and backup.
   }
 
   public ShooterOn(Intake_Subsystem intake, double upperRpmTarget_low, double upperRpmTarget_high, double lowerRpmTarget_low, double lowerRpmTarget_high, double backupSec) {
@@ -98,35 +97,29 @@ public class ShooterOn extends CommandBase {
         m_intake.shooterOn(m_rpmUpper, m_rpmLower);
         time = System.currentTimeMillis();    //time for spin up start
         stage =Stage.WaitingForFlyWheel;
-        m_count = frameSkip - 1;              // force no delay on checking FW speed next pass
       break;
 
       case WaitingForFlyWheel: //stage 1, pause magazine while shooters get to RPM goal
-        if (m_count % frameSkip == 0) {
-          if (m_intake.atGoalRPM(m_tolerance)){
-            String output = "*** MAG RESUME - Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n" +
+        if (m_intake.atGoalRPM(m_tolerance)) {
+         /** String output = "*** MAG RESUME - Shooter Ramp-up Delay: " + (System.currentTimeMillis() - time) + " ms. \n" +
                   "Upper Goal: " + m_intake.getUpperTargetRPM() + ", Achieved Upper RPM: " + m_intake.getUpperRPM() + "\n" +
                   "Lower Goal: " + m_intake.getLowerTargetRPM() + ", Achieved Lower RPM: " + m_intake.getLowerRPM() + "\n\n";
             System.out.println(output);
-            //Flywheel at speed, move to shooting
-            stage = Stage.Shooting;
-            m_intake.magazineOn(FAST_MAG_FORWARD);
-          }
-          //System.out.println("Upper Motor RPM:" + m_intake.upperRPM +", Lower: "+m_intake.lowerRPM +"\n");
-         }
+          */
+          //Flywheel at speed, move to shooting
+          stage = Stage.Shooting;
+          m_intake.magazineOn(FAST_MAG_FORWARD);
+        }
       break;
 
       case Shooting: 
-        //magazine forward fast to shoot while at RPM goals
-        if (m_count % frameSkip == 0) {                   
-          if (!m_intake.atGoalRPM(m_tolerance)) { //back to WaitingForFlywheel if RPMs fall below tolerance
-            time = System.currentTimeMillis();
-            // hold off mag until flywheel is at target
-            stage = Stage.WaitingForFlyWheel;
-            m_intake.magazineOff();
-            System.out.println("**MAG PAUSE - Upper RPM: " + m_intake.getUpperRPM() + ", Lower RPM: " + m_intake.getLowerRPM() + "\n");
-         }
-        }
+        //magazine forward fast to shoot while at RPM goals              
+        if (!m_intake.atGoalRPM(m_tolerance)) { //back to WaitingForFlywheel if RPMs fall below tolerance
+          time = System.currentTimeMillis();
+          // hold off mag until flywheel is at target
+          stage = Stage.WaitingForFlyWheel;
+          m_intake.magazineOff();
+       }
       break;
     }
     m_count++;   

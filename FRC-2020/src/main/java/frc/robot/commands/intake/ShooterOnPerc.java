@@ -9,7 +9,6 @@ package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.Intake_Subsystem;
 
 public class ShooterOnPerc extends CommandBase {
@@ -25,7 +24,6 @@ public class ShooterOnPerc extends CommandBase {
   private double m_rpmUpper;  // speed to use based on high/low mag position
   private double m_rpmLower;  // speed to use based on high/low mag position
   private int stage = 0;
-  private double time;
 
 
   public ShooterOnPerc(Intake_Subsystem intake, double upperRpmTarget_low, double upperRpmTarget_high, double lowerRpmTarget_low, double lowerRpmTarget_high, double backupSec) {
@@ -58,7 +56,6 @@ public class ShooterOnPerc extends CommandBase {
       case 0: //stage 0, backup magazine for backup_count to get balls off flywheels
         if(m_count++ > m_backupCount){
           stage = 1;
-          time = System.currentTimeMillis();
         }
         m_intake.magazineOn(SLOW_MAG_REVERSE);
       break;

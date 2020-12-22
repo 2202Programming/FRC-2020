@@ -18,7 +18,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
-import frc.robot.commands.intake.ShooterOnAuto;
+//import frc.robot.commands.intake.ShooterOnAuto;
 import frc.robot.commands.intake.ShooterOnPerc;
 import frc.robot.commands.intake.ToggleIntakeRaised;
 //import frc.robot.commands.auto.DriveOffLine;
@@ -50,7 +50,6 @@ import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.subsystems.hid.XboxControllerButtonCode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import java.io.*;
 
 
 /**

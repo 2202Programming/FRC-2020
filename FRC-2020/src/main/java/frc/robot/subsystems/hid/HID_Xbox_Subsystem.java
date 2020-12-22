@@ -53,34 +53,55 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
   ExpoShaper velLeftShaper;
   ExpoShaper velRightShaper;
 
-  double vel, z_rot;
-  double vLeft, vRight;
+  //XYRot / Swerve (field or robot relative)
+  ExpoShaper velXShaper;    // left/right  
+  ExpoShaper velYShaper;    // forward/backward 
+  ExpoShaper swRotShaper;   // rotation for XYRot
+
+  //values updated each frame
+  double vel, z_rot;           //arcade
+  double velLeft, velRight;    //tank
+  double velX,velY, xyRot;     //XTRot
 
   // invertGain is used to change the controls for driving backwards easily.
   // A negative value indicates you're driving backwards with forwards controls.
   double invertGain = 1.0;
 
   public HID_Xbox_Subsystem(final double velExpo, final double rotExpo, final double deadzone) {
+
+
     // register the devices
     driver = (XboxController) registerController(Id.Driver, new XboxController(Id.Driver.value));
     assistant = (XboxController) registerController(Id.Assistant, new XboxController(Id.Assistant.value));
     switchBoard = (XboxController) registerController(Id.SwitchBoard, new XboxController(Id.SwitchBoard.value));
+
     // Driver inputs for acade style in normalized units,
-    // left Y-stick throttle
-    // right X-stick turn rate
+    // left Y-stick throttle right X-stick turn rate
     velShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft));
     rotShaper = new ExpoShaper(rotExpo, () -> (driver.getX(Hand.kRight) * -1.0));
 
-    // Tank drive
+    // Tank drive Left/Right Y-axis used
     velLeftShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft));
     velRightShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
 
+    // XYRot or Swerve Drive
+    // Rotation on Left-X axis,  X-Y throttle on Right
+    velXShaper = new ExpoShaper(velExpo, () -> driver.getX(Hand.kRight));     
+    velXShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
+    swRotShaper = new ExpoShaper(rotExpo, () -> (- driver.getX(Hand.kLeft)));  //inverted rot
+    
     // add some deadzone in normalized coordinates
     rotShaper.setDeadzone(deadzone);
     velShaper.setDeadzone(deadzone);
+
     // add deadzone for tank
     velLeftShaper.setDeadzone(deadzone);
     velRightShaper.setDeadzone(deadzone);
+
+    // deadzone for swerve
+    velXShaper.setDeadzone(deadzone);
+    velYShaper.setDeadzone(deadzone);
+    swRotShaper.setDeadzone(deadzone);
 
     // read some values to remove unused warning
     assistant.getX();
@@ -90,26 +111,32 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
     initDriverButtons = getButtonsRaw(Id.Driver);
     initAssistentButtons = getButtonsRaw(Id.Assistant);
     initSwitchBoardButtons = getButtonsRaw(Id.SwitchBoard);
-
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run, use this to read all
-    // needed inputs.
+    // This method will be called once per scheduler frame and read all stick inputs
+    // for all possible modes.  This is a few extra calcs and could be made modal to
+    // only read/shape the stick mode.
+    
+    //Arcade
     z_rot = rotShaper.get();
     vel = velShaper.get() * invertGain;
 
     // tank
     if (isControlInverted()) {
-      vLeft = velRightShaper.get() * invertGain;
-      vRight = velLeftShaper.get() * invertGain;
+      velLeft = velRightShaper.get() * invertGain;
+      velRight = velLeftShaper.get() * invertGain;
     } else {
-      vLeft = velLeftShaper.get() * invertGain;
-      vRight = velRightShaper.get() * invertGain;
+      velLeft = velLeftShaper.get() * invertGain;
+      velRight = velRightShaper.get() * invertGain;
     }
-
     limitTankRotation();
+
+    //XYRot
+    velX = velXShaper.get();
+    velY = velYShaper.get();
+    xyRot = swRotShaper.get();
   }
   
   public void setLimitRotation(boolean enableLimit) {
@@ -121,20 +148,20 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
 
     // Apply a rotation limit on tank based on command
     double Kv = 33.0;
-    double avg = (vRight + vLeft) / 2.0;
+    double avg = (velRight + velLeft) / 2.0;
     double absV = Math.abs(avg);
 
     double maxDelta = 1.0 / (Kv * absV * absV * absV + 1.0);
-    double absDelta = Math.abs(vLeft - vRight);
+    double absDelta = Math.abs(velLeft - velRight);
 
     // Handle the different quadrents of the stick for tank drive
-    if ((vLeft > 0) && (vRight > 0) || (vLeft < 0) && (vRight < 0)) {
+    if ((velLeft > 0) && (velRight > 0) || (velLeft < 0) && (velRight < 0)) {
       // Commanding forward or reverse, sticks in same direction
 
       if (absDelta > maxDelta) {
         // equalize the sticks so no rotation
-        vLeft = avg;
-        vRight = avg;
+        velLeft = avg;
+        velRight = avg;
       }
     }
     else {
@@ -144,12 +171,17 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
 
   @Override
   public double getVelocityX() {
-    return 0; // todo:fix for mechanum
+    return velX;
   }
 
   @Override
   public double getVelocityY() {
-    return vLeft;
+    return velY;
+  }
+
+  @Override
+  public double getXYRotation() {
+    return xyRot;
   }
 
   @Override
@@ -170,12 +202,12 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
   // Tank Drive controls
   @Override
   public double getVelocityLeft() {
-    return vLeft;
+    return velLeft;
   }
 
   @Override
   public double getVelocityRight() {
-    return vRight;
+    return velRight;
   }
 
   @Override

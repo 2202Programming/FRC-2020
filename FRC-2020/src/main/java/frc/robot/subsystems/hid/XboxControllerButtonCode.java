@@ -3,7 +3,8 @@ package frc.robot.subsystems.hid;
 /**
  * Class for a bunch of WPI button constants
  */
-public enum XboxControllerButtonCode {
+public enum 
+XboxControllerButtonCode {
     A(1),
 	B(2),
 	X(3),

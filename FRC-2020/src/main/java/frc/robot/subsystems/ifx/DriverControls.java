@@ -30,13 +30,27 @@ public interface DriverControls extends Subsystem {
       this.value = value;
     }
   }
+
+  public enum DriverMode {
+    Arcade(0),
+    Tank(1),
+    XYRot(2);
+
+    public final int value;
+
+    DriverMode(int value) {
+      this.value = value;
+    }
+  }
+
   //Static vars to help with implementation
   //Id to Controller map
   public HashMap<Id, GenericHID> deviceMap = new HashMap<Id, GenericHID>();
 
-  //mech & gield relative
+  //mech & field relative
   public double getVelocityX();
   public double getVelocityY();
+  public double getXYRotation();
 
   //tank
   public double getVelocityLeft();

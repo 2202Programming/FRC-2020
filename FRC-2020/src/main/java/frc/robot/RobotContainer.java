@@ -87,8 +87,8 @@ public class RobotContainer {
   //taking input from smartdashboard (probably needs to be moved to shooter_on cmd)
   private double rpmUpper_low = SmartDashboard.getNumber("rpm upper low goal", 1000);
   private double rpmLower_low = SmartDashboard.getNumber("rpm lower low goal", 1000);
-  private double rpmUpper_high = SmartDashboard.getNumber("rpm upper high goal", 2000);
-  private double rpmLower_high = SmartDashboard.getNumber("rpm lower high goal", 2000);
+  private double rpmUpper_high = SmartDashboard.getNumber("rpm upper high goal", 1900);
+  private double rpmLower_high = SmartDashboard.getNumber("rpm lower high goal", 1900);
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */

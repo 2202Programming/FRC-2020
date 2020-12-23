@@ -14,15 +14,18 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.hid.GeneralTrigger;
 import frc.robot.subsystems.hid.JoystickTrigger;
+import frc.robot.subsystems.hid.XboxAxis;
+import frc.robot.subsystems.hid.XboxButton;
 import edu.wpi.first.wpilibj.DriverStation;
 
+/**
+ * 
+ * 2020/12/23   DPL  Strong type Axis vs Button. no getCode() needed when binding commands
+ */
 public interface DriverControls extends Subsystem {
 
   public enum Id {
-    Driver(0),
-    Assistant(1),
-    SwitchBoard(2),
-    Phantom(3);
+    Driver(0), Assistant(1), SwitchBoard(2), Phantom(3);
 
     public final int value;
 
@@ -32,9 +35,7 @@ public interface DriverControls extends Subsystem {
   }
 
   public enum DriverMode {
-    Arcade(0),
-    Tank(1),
-    XYRot(2);
+    Arcade(0), Tank(1), XYRot(2);
 
     public final int value;
 
@@ -43,52 +44,53 @@ public interface DriverControls extends Subsystem {
     }
   }
 
-  //Static vars to help with implementation
-  //Id to Controller map
+  // Static vars to help with implementation
+  // Id to Controller map
   public HashMap<Id, GenericHID> deviceMap = new HashMap<Id, GenericHID>();
 
-  //mech & field relative
+  // mech & field relative
   public double getVelocityX();
+
   public double getVelocityY();
+
   public double getXYRotation();
 
-  //tank
+  // tank
   public double getVelocityLeft();
+
   public double getVelocityRight();
 
-  //arcade drive
+  // arcade drive
   public double getVelocity();
+
   public double getRotation();
-  
-  //physical or normalize (-1.0, 1.0) values
+
+  // physical or normalize (-1.0, 1.0) values
   public boolean isNormalized();
 
-  //Invert controls is a common need - force it
-  public  void setInvertControls(boolean invert);
+  // Invert controls is a common need - force it
+  public void setInvertControls(boolean invert);
+
   public boolean isControlInverted();
 
   // Buttons set at powerup -saved for later use.
   public int getInitialButtons(Id id);
 
-  /** 
+  /**
    * SideBoard low level access or just fixed configuration for a controls set
-   * This is a bit field that must be decoded into something meaningful.
-   * Buttons start counting at 1, bits at zero
-   * button 1 = bit 0  1/0
-   * button 2 = bit 1  2/0
-   * ...
-   * button n = bit (n-1)   2^(n-1)/0
+   * This is a bit field that must be decoded into something meaningful. Buttons
+   * start counting at 1, bits at zero button 1 = bit 0 1/0 button 2 = bit 1 2/0
+   * ... button n = bit (n-1) 2^(n-1)/0
    * 
    * Use and/or logic to decode as needed.
-  */
-  public default int getButtonsRaw(Id id){
+   */
+  public default int getButtonsRaw(Id id) {
     return DriverStation.getInstance().getStickButtons(id.value);
   }
 
-
   /**
-   * Register each of the controllers the DriverControls will use.
-   * Do this in the constructor of the implementing class.
+   * Register each of the controllers the DriverControls will use. Do this in the
+   * constructor of the implementing class.
    * 
    * @see HID_Xbox_Subsystem
    * 
@@ -96,33 +98,41 @@ public interface DriverControls extends Subsystem {
    * @param hid Input device, xbox or other stick
    * @return
    */
-  public default GenericHID registerController(Id id, GenericHID hid ) {
+  public default GenericHID registerController(Id id, GenericHID hid) {
     deviceMap.put(id, hid);
     return hid;
   }
 
-/**
- * Use this to bind a controller's button to a command.
- * 
- * example:
- *  bindButton(Id.Driver, XboxController.A.getCode()).whenPressed(cmd)
- * 
- * @param id  Id.Driver, Id.Assistent, Id.Sideboard
- * @param button  int that represents the button
- * @return
- */
-  public default JoystickButton bindButton(Id id, int button) {
-    return (deviceMap.get(id) != null) ?  
-        new JoystickButton(deviceMap.get(id) , button) : null;
+  /**
+   * Use this to bind a controller's button to a command.
+   * 
+   * example: bindButton(Id.Driver, XboxButton.A).whenPressed(cmd)
+   * 
+   * @param id     Id.Driver, Id.Assistant, Id.Sideboard
+   * @param button XboxButton 
+   * @return JoystickButton
+   */
+   public default JoystickButton bind(Id id, XboxButton button) {
+    return bindButton(id, button.getCode());
+  }
+  
+  public default JoystickTrigger bind(Id id, XboxAxis axis) {
+    return (deviceMap.get(id) != null) ? new JoystickTrigger(deviceMap.get(id), axis.getCode(), 0.5) : null;
   }
 
-  public default JoystickTrigger bindJoystick(Id id, int axis) {
-    return (deviceMap.get(id) != null) ?  
-        new JoystickTrigger(deviceMap.get(id), axis, 0.5) : null;
+  public default GeneralTrigger bind(Id id, XboxButton buttonId1, XboxButton buttonId2) {
+    return (deviceMap.get(id) != null) ? new GeneralTrigger(
+        () -> deviceMap.get(id).getRawButton(buttonId1.getCode()) && 
+              deviceMap.get(id).getRawButton(buttonId2.getCode())) : null;
   }
 
-  public default GeneralTrigger bindDoubleButton(Id id, int buttonId1, int buttonId2) {
-    return (deviceMap.get(id) != null) ?
-        new GeneralTrigger(() -> deviceMap.get(id).getRawButton(buttonId1) && deviceMap.get(id).getRawButton(buttonId2)) : null;
+  /**
+   * prefer the strongly typed calls
+   * @param id        Driver, Assisteant, Sideboard
+   * @param button
+   * @return
+   */
+  default JoystickButton bindButton(Id id, int button) {
+    return (deviceMap.get(id) != null) ? new JoystickButton(deviceMap.get(id), button) : null;
   }
 }

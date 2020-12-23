@@ -128,6 +128,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
       velLeft = velRightShaper.get() * invertGain;
       velRight = velLeftShaper.get() * invertGain;
     } else {
+      
       velLeft = velLeftShaper.get() * invertGain;
       velRight = velRightShaper.get() * invertGain;
     }

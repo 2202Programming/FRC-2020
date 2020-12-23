@@ -108,11 +108,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   //state variables
   private boolean intakeIsOn;
   private boolean shooterIsOn;
-  private boolean percentControlled;
 
-  public Intake_Subsystem(boolean percentControlled) {
-    this.percentControlled = percentControlled;
-    
+  public Intake_Subsystem() {
     upper_shooter = new FlyWheel(UPPER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);
     upper_shooter.setMotorTurnsPerFlywheelTurn(Gear);
     lower_shooter = new FlyWheel(LOWER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);
@@ -175,9 +172,10 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
   /**
-   * Turns shooter flwwheels on
-   * @param upperRPM_target
-   * @param lowerRPM_target
+   * TCommands shooter flwwheels to target RPM
+   * 
+   * @param upperRPM_target   (measured at flywheel)
+   * @param lowerRPM_target   (measured at flywheel)
    */
   public void shooterOn(double upperRPM_target, double lowerRPM_target) {
     shooterIsOn = true;
@@ -185,24 +183,14 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     this.upperRPM_target = upperRPM_target;
     this.lowerRPM_target = lowerRPM_target; 
    
-    if(percentControlled){
-      upper_shooter.setPercent(upperRPM_target); 
-      lower_shooter.setPercent(lowerRPM_target); 
-    }
-    else{
-      upper_shooter.setRPM(upperRPM_target);
-      lower_shooter.setRPM(lowerRPM_target);
-    }
+    upper_shooter.setRPM(upperRPM_target);
+    lower_shooter.setRPM(lowerRPM_target);
   }
 
   public void shooterOnPerc(double upperRPM_target, double lowerRPM_target) {
     shooterIsOn = true;
-    this.upperRPM_target = upperRPM_target;
-    this.lowerRPM_target = lowerRPM_target; 
-
       upper_shooter.setPercent(upperRPM_target); 
       lower_shooter.setPercent(lowerRPM_target); 
-
   }
 
   public boolean shooterIsOn() {
@@ -231,10 +219,10 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
   /**
-   * getShooterRPM()  - average of upper and lower wheels
+   * getShooterAvgRPM()  - average of upper and lower wheels
    * @return
    */
-  public double getShooterRPM() {    
+  public double getShooterAvgRPM() {    
     return (upperRPM+lowerRPM)*0.5;
   }
 
@@ -284,18 +272,13 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     return (upperPerc + lowerPerc)*0.5;
   }
 
-  
-
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
-
-    SmartDashboard.putNumber("Upper Shooter Percent", upper_shooter.getMotorOutputPercent());
-    SmartDashboard.putNumber("Lower Shooter Percent", lower_shooter.getMotorOutputPercent());
-    SmartDashboard.putNumber("Upper Shooter RPM", upperRPM);
-    SmartDashboard.putNumber("Lower Shooter RPM", lowerRPM);
-    SmartDashboard.putNumber("Current Upper Goal", upperRPM_target);
-    SmartDashboard.putNumber("Current Lower Goal", lowerRPM_target);
+    SmartDashboard.putNumber("/Shooter/U-MO", upper_shooter.getMotorOutputPercent());
+    SmartDashboard.putNumber("/Shooter/L-MO", lower_shooter.getMotorOutputPercent());
+    SmartDashboard.putNumber("/Shooter/U-RPM", upperRPM);
+    SmartDashboard.putNumber("/Shooter/L-RPM", lowerRPM);
   }
 
 /**

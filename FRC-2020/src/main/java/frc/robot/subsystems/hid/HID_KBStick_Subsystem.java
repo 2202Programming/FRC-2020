@@ -20,7 +20,7 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
    //XYRot / Swerve (field or robot relative)
    ExpoShaper velXShaper;    // left/right  
    ExpoShaper velYShaper;    // forward/backward 
-   ExpoShaper swRotShaper;   // rotation for XYRot
+   ExpoShaper xyRotShaper;   // rotation for XYRot
 
    //values updated each frame
   double vel, z_rot;         //arcade
@@ -31,14 +31,14 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
   // A negative value indicates you're driving backwards with forwards controls.
   double invertGain = 1.0;
 
-  int initialButtons;
+  int initialDriverButtons;
 
   /**
    * Creates a new HID_KBStick_Subsystem.
    */
   public HID_KBStick_Subsystem(double velExpo, double rotExpo) {
     driver = (KBSimStick) registerController(Id.Driver, new KBSimStick(Id.Driver.value));
-    initDriverButtons = getButtonsRaw(Id.Driver);
+    initialDriverButtons = getButtonsRaw(Id.Driver);
 
     velShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kThrottle));
     rotShaper = new ExpoShaper(rotExpo, () -> -driver.getAxis(Axis.kRot));
@@ -47,9 +47,9 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
     // Rotation on Left-X axis,  X-Y throttle on Right
     velXShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kX));     
     velXShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kY));
-    swRotShaper = new ExpoShaper(rotExpo, () -> -driver.getAxis(Axis.kRot));  //inverted rot
+    xyRotShaper = new ExpoShaper(rotExpo, () -> -driver.getAxis(Axis.kRot));  //inverted rot
 
-    initialButtons = getButtonsRaw(Id.Driver);
+    initialDriverButtons = getButtonsRaw(Id.Driver);
   }
 
   @Override
@@ -62,7 +62,7 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
      //XYRot
      velX = velXShaper.get();
      velY = velYShaper.get();
-     xyRot = swRotShaper.get();
+     xyRot = xyRotShaper.get();
 
     // tank hack
     velLeft = vel;
@@ -132,7 +132,7 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
 
   @Override
   public int getInitialButtons(Id id) {
-    if (id == Id.Driver) return initialButtons;
+    if (id == Id.Driver) return initialDriverButtons;
     return  0;
   }
 

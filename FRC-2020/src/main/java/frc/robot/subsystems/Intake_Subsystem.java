@@ -20,6 +20,7 @@ import frc.robot.subsystems.ifx.Logger;
 import frc.robot.util.misc.PIDFController;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake_Subsystem extends SubsystemBase implements Logger {
@@ -110,6 +111,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private boolean shooterIsOn;
 
   public Intake_Subsystem() {
+    SendableRegistry.setName(this,"Intake", "myShooter");
     upper_shooter = new FlyWheel(UPPER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);
     upper_shooter.setMotorTurnsPerFlywheelTurn(Gear);
     lower_shooter = new FlyWheel(LOWER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);

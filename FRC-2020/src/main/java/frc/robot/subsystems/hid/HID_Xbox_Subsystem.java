@@ -87,7 +87,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
     // XYRot or Swerve Drive
     // Rotation on Left-X axis,  X-Y throttle on Right
     velXShaper = new ExpoShaper(velExpo, () -> driver.getX(Hand.kRight));     
-    velXShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
+    velYShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
     swRotShaper = new ExpoShaper(rotExpo, () -> (- driver.getX(Hand.kLeft)));  //inverted rot
     
     // add some deadzone in normalized coordinates

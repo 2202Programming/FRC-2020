@@ -88,8 +88,6 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // put driver controls first so its periodic() is called first.
-
-   
     driverControls = new HID_Xbox_Subsystem(0.3, 0.9, 0.05); // velExpo,rotExpo, deadzone
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 14.0, 100.0); // ft/s, deg/sec
@@ -97,7 +95,7 @@ public class RobotContainer {
     limelight = new Limelight_Subsystem();
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
-    lidar = new Lidar_Subsystem(RobotBase.isReal()); 
+    lidar = new Lidar_Subsystem(); 
     
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();

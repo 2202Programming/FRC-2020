@@ -17,40 +17,64 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
 
   ExpoShaper velShaper;
   ExpoShaper rotShaper;
-
   double vel, z_rot;
+
+  //setup for Swerve XYRot controls
+  ExpoShaper velXShaper;
+  ExpoShaper velYShaper;
+  ExpoShaper xyRotShaper;
+  double velX, velY, xyRot;
 
   // invertGain is used to change the controls for driving backwards easily.
   // A negative value indicates you're driving backwards with forwards controls.
   double invertGain = 1.0;
+
+  int initDriverButtons;
 
   /**
    * Creates a new HID_KBStick_Subsystem.
    */
   public HID_KBStick_Subsystem(double velExpo, double rotExpo) {
     driver = (KBSimStick) registerController(Id.Driver, new KBSimStick(Id.Driver.value));
+    initDriverButtons = getButtonsRaw(Id.Driver);
 
+    //Arcade 
     velShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kY));
     rotShaper = new ExpoShaper(rotExpo, () -> (driver.getAxis(Axis.kRot) * -1.0));
+
+    //XY-Rotation user inputs
+    velXShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kX));
+    velYShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kY));
+    xyRotShaper = new ExpoShaper(rotExpo, () -> driver.getAxis(Axis.kX));
+
+    
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // Arcade 
     vel = velShaper.get() * invertGain;
     z_rot = rotShaper.get() * invertGain;
-
+    
+    // XY Rotation 
+    velX = velXShaper.get() * invertGain;
+    velY = velYShaper.get() * invertGain;
+    xyRot =xyRotShaper.get() * invertGain;
   }
 
-  // TODO: fix non-arcade drive functions
   @Override
   public double getVelocityX() {
-    return 0;
+    return velX;
   }
 
   @Override
   public double getVelocityY() {
-    return 0;
+    return velY;
+  }
+ 
+  public double getXyRot() {
+     return xyRot;
   }
 
   @Override
@@ -91,7 +115,7 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
 
   @Override
   public int getInitialButtons(Id id) {
-    // TODO Auto-generated method stub
+    if (id == Id.Driver) return initDriverButtons;
     return 0;
   }
 

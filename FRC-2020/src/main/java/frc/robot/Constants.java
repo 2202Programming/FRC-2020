@@ -13,6 +13,11 @@ package frc.robot;
  * purpose. All constants should be declared globally (i.e. public static). Do
  * not put anything functional in this class.
  *
+ * Conventions
+ * xxx_CANID   - CAN device, integer between 0..63, unique
+ * yyy_PCM     - Pnumatics channel ID
+ * zzz_PWM     - PWM port on RIO
+ * 
  * <p>
  * It is advised to statically import this class (or one of its inner classes)
  * wherever the constants are needed, to reduce verbosity.
@@ -23,19 +28,19 @@ public final class Constants {
     public static final double Tperiod = 0.02;   //framerate period 20ms, 50Hz
 
     //CAN ID for non-motor devices
-    public static final int PDP_CAN_ID = 0;    //this must be 0
-    public static final int PCM1_CAN_ID = 1;   //default ID for PCM
-    public static final int PCM2_CAN_ID = 2;   
+    public static final int PDP_CANID = 0;    //this must be 0
+    public static final int PCM1_CANID = 1;   //default ID for PCM
+    public static final int PCM2_CANID = 2;   
 
     //Lidar
-    public static final int FRONT_LEFT_LIDAR = 22;
-    public static final int FRONT_RIGHT_LIDAR = 21;
-    public static final double LIDAR_SAMPLE_TIME = 20; //in ms
-    public static final double COLOR_SAMPLE_TIME = 100; //in ms
-    public static final int LOG_REFRESH_RATE = 100; //in ms
+    public static final int FRONT_LEFT_LIDAR_CANID = 22;
+    public static final int FRONT_RIGHT_LIDAR_CANID = 21;
+    public static final double LIDAR_SAMPLE_mS = 20; //in ms
+    public static final double COLOR_SAMPLE_mS = 100; //in ms
+    public static final int LOG_REFRESH_RATE_mS = 100; //in ms
 
     //Intake
-    public static final int MAGAZINE_PCM_CAN_ID = PCM2_CAN_ID;
+    public static final int MAGAZINE_PCM_CAN_ID = PCM2_CANID;
     public static final int MAGAZINE_UP_PCM = 0;
     public static final int MAGAZINE_DOWN_PCM = 1;
     public static final int MAGAZINE_PWM = 9;
@@ -44,7 +49,7 @@ public final class Constants {
     public static final int UPPER_SHOOTER_TALON_CAN = 18;
     public static final int LOWER_SHOOTER_TALON_CAN = 19;
     
-    public static final int INTAKE_PCM_CAN_ID = PCM1_CAN_ID;
+    public static final int INTAKE_PCM_CAN_ID = PCM1_CANID;
     public static final int INTAKE_UP_SOLENOID_PCM = 4;    
     public static final int INTAKE_DOWN_SOLENOID_PCM = 5;
 
@@ -57,12 +62,12 @@ public final class Constants {
     public static final int BR_SPARKMAX_CANID = 35;
 
     //Gearshifter
-    public static final int GEARSHIFT_PCM_CAN_ID = PCM1_CAN_ID;
+    public static final int GEARSHIFT_PCM_CAN_ID = PCM1_CANID;
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
 
     //Climber
-    public static final int CLIMBER_PCM_CAN_ID = PCM2_CAN_ID;
+    public static final int CLIMBER_PCM_CAN_ID = PCM2_CANID;
     public static final int ARMSOLENOID_LOW_CANID = 0;
     public static final int ARMSOLENOID_HIGH_CANID = 1;
     public static final int WN_SPARKMAX_CANID = 16;       // Winch Motor

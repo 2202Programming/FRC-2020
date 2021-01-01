@@ -106,6 +106,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   public static class FlywheelRPM {
     public double upper;
     public double lower;
+
+    public FlywheelRPM() { this(0.0, 0.0); }
+    public FlywheelRPM(FlywheelRPM c) { this(c.lower, c.upper); }
     public FlywheelRPM(double lower, double upper) {
       this.upper = upper;
       this.lower= lower;
@@ -125,20 +128,19 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     public String toString() {
       return Double.toString(upper) + "/" + Double.toString(lower);
     }
-
   }
 
   // All RPM are in FW-RPM, not motor.
-  FlywheelRPM actual;
-  FlywheelRPM target;
-  FlywheelRPM error;
+  FlywheelRPM actual = new FlywheelRPM();
+  FlywheelRPM target = new FlywheelRPM();
+  FlywheelRPM error = new FlywheelRPM();
   
   //state variables
   private boolean intakeIsOn;
   private boolean shooterIsOn;
 
   public Intake_Subsystem() {
-    SendableRegistry.setName(this,"Intake", "myShooter");
+    SendableRegistry.setName(this,"Intake", "shooter");
     upper_shooter = new FlyWheel(UPPER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);
     upper_shooter.setMotorTurnsPerFlywheelTurn(Gear);
     lower_shooter = new FlyWheel(LOWER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);
@@ -319,12 +321,11 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
  * @param layout  - panel to put the data on
  */
   public void addDashboardWidgets(ShuffleboardLayout layout) {
-    layout.addNumber("/Shooter/U-MO", upper_shooter::getMotorOutputPercent ) ;
-    layout.addNumber("/Shooter/L-MO", lower_shooter::getMotorOutputPercent ) ;
-    layout.addNumber("/Shooter/U-RPM", () -> actual.upper);
-    layout.addNumber("/Shooter/L-RPM", ()-> actual.lower);
-    layout.addNumber("/Shooter/U-RPM-err", () -> (target.upper - actual.upper) );
-
+    layout.addNumber("MO/Upper", upper_shooter::getMotorOutputPercent ).withSize(2, 1) ;
+    layout.addNumber("MO/Lower", lower_shooter::getMotorOutputPercent ) ;
+    layout.addNumber("RPM/Upper", () -> actual.upper).withSize(2,1);
+    layout.addNumber("RPM/Lower", ()-> actual.lower);
+    layout.addNumber("RPM/Error", () -> error.upper );
   }
 
 

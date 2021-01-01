@@ -57,8 +57,9 @@ public class ShooterOn extends CommandBase {
      * @param d
      */
     public Data( Data d) {
-      LowGoal.copy(d.LowGoal);
-      HighGoal.copy(d.HighGoal);
+      // make deep copy of incoming data
+      LowGoal = new FlywheelRPM(d.LowGoal);
+      HighGoal = new FlywheelRPM(d.HighGoal);
       BackupSec = d.BackupSec;
       Tolerance = d.Tolerance;
     }

@@ -192,7 +192,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		leftController.controller.setClosedLoopRampRate(rateLimit);
 		rightController.controller.setClosedLoopRampRate(rateLimit);
 
-		SmartDashboard.putNumber("DT/motorRate", rateLimit);
+		SmartDashboard.putNumber("limits/rate", rateLimit);
 		return rateLimit;
 	}
 
@@ -211,7 +211,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			// smart current limit
 			c.setSmartCurrentLimit(smartCurrentLimit);
 		}
-		SmartDashboard.putNumber("motorI", smartCurrentLimit);
+		SmartDashboard.putNumber("limits/smart_I", smartCurrentLimit);
 		System.out.println("***** SmartCurrent*****" + smartCurrentLimit);
 		return smartCurrentLimit;
 	}
@@ -398,9 +398,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		 * SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
 		 * SmartDashboard.putNumber("Right Position", getRightPos());
 		 * SmartDashboard.putNumber("Left Position", getLeftPos());
-		 */
-		SmartDashboard.putString("DT Command", getDefaultCommand().toString());
-		SmartDashboard.putString("Current Gear", gearbox.getCurrentGear().toString());
+		 * SmartDashboard.putString("DT Command", getDefaultCommand().toString());
+		 * SmartDashboard.putString("Current Gear", gearbox.getCurrentGear().toString());
+		*/
 	}
 
 	/**
@@ -523,12 +523,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void addDashboardWidgets(ShuffleboardLayout layout) {
-		layout.addNumber("DT/leftVel", () -> velLeft);
-		layout.addNumber("DT/rightVel", () -> velRight);
-		layout.addBoolean("DT/highGear", () -> (getCurrentGear() == Gear.HIGH_GEAR));
+		layout.addNumber("DT/Vel/left", () -> velLeft).withSize(2, 2);
+		layout.addNumber("DT/Vel/right", () -> velRight);
 		layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
-		layout.addString("DT/command", () -> getDefaultCommand().toString());
-
+		
 	}
 
 }

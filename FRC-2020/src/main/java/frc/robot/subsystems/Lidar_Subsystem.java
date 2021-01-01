@@ -11,6 +11,7 @@ import com.playingwithfusion.TimeOfFlight;
 
 import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -62,7 +63,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
       front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, LIDAR.SAMPLE_mS);
       front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, LIDAR.SAMPLE_mS);
     }
-    
+  
     // use a lowpass filter to clean up high freq noise. Helpful if you use a PID with any D.
     left_iir = LinearFilter.singlePoleIIR(filterTC, Tperiod);
     right_iir = LinearFilter.singlePoleIIR(filterTC, Tperiod);
@@ -123,7 +124,13 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
       left_valid = front_left_lidar.isRangeValid();
       right_valid = front_right_lidar.isRangeValid();
     }
-
+    else {
+      // make something up
+      left_raw = (left_raw + 1) % 200;
+      right_raw = (right_raw + 1.03) % 200;
+      right_valid = (right_raw <100);
+      left_valid = (left_raw < 125);
+    }
     double temp = (valid()) ? 1.0 : 0.0;
     filteredValid = valid_fir.calculate(temp);
     left_lidar_range = left_iir.calculate(left_raw) - BUMPER_DISTANCE; 
@@ -132,9 +139,9 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   }
 
   public void addDashboardWidgets(ShuffleboardLayout layout) {
-		layout.addNumber("LIDAR/left",  () -> left_lidar_range);
-		layout.addNumber("LIDAR/right", () -> right_lidar_range);
-		layout.addBoolean("LIDAR/valid", this::isFilteredValid);
+    layout.addNumber("LDR/left",  () -> left_lidar_range).withSize(2,1);
+    layout.addNumber("LDR/right", () -> right_lidar_range);
+		layout.addBoolean("LDR/valid", this::isFilteredValid);
 	}
 
 }

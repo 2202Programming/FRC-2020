@@ -9,6 +9,7 @@ package frc.robot;
 
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.subsystems.Intake_Subsystem.FlywheelRPM;
+import frc.robot.util.misc.PIDFController;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -40,16 +41,20 @@ public final class Constants {
         public static final int PCM1 = 1; // default ID for PCM
         public static final int PCM2 = 2;
 
-        // Other CAN ID - Subsystem_location
-
+        // Lidar 
+        public static final int FRONT_RIGHT_LIDAR = 21;
+        public static final int FRONT_LEFT_LIDAR = 22;
+       
+        // Drivetrain
+        public static final int FL_SMAX = 30;
+        public static final int ML_SMAX = 31;
+        public static final int BL_SMAX = 32;
+        public static final int FR_SMAX = 33;
+        public static final int MR_SMAX = 34;
+        public static final int BR_SMAX = 35;
     }
 
-    // Lidar
-    public static final int FRONT_LEFT_LIDAR_CANID = 22;
-    public static final int FRONT_RIGHT_LIDAR_CANID = 21;
-    public static final double LIDAR_SAMPLE_mS = 20; // in ms
-    public static final double COLOR_SAMPLE_mS = 100; // in ms
-    public static final int LOG_REFRESH_RATE_mS = 100; // in ms
+    
 
     // Intake
     public static final int MAGAZINE_PCM_CAN_ID = CAN.PCM2;
@@ -65,13 +70,7 @@ public final class Constants {
     public static final int INTAKE_UP_SOLENOID_PCM = 4;
     public static final int INTAKE_DOWN_SOLENOID_PCM = 5;
 
-    // Drivetrain
-    public static final int FL_SPARKMAX_CANID = 30;
-    public static final int ML_SPARKMAX_CANID = 31;
-    public static final int BL_SPARKMAX_CANID = 32;
-    public static final int FR_SPARKMAX_CANID = 33;
-    public static final int MR_SPARKMAX_CANID = 34;
-    public static final int BR_SPARKMAX_CANID = 35;
+   
 
     // Gearshifter
     public static final int GEARSHIFT_PCM_CAN_ID = CAN.PCM1;
@@ -129,14 +128,58 @@ public final class Constants {
 
     public static final int FLOOR_SENSOR = 17; // Time of Flight sensor, measures distance from floor
 
+    public static final class RobotPhysical {
+        public static final double BUMPER_TO_LIDAR = 100; // mm 
+        public static final double LIDAR_TO_LIDAR = 348;  // mm 
+
+        //useful if we do modeling for tracking
+        public static final double Mass = 145;  // lbs with battery and code loaded
+
+        //chassis  
+        public static final double WheelDiameter = 7.5; // inches
+        public static final double WheelAxelDistance = 25.5; // inches
+        
+    }
+
     /**
      * Subsystem constants
+     * 
+     * Maybe be used directly by the subsystem or passed as args in construction 
+     * depending on the need.
+     * 
+     *    <subsys>.data  convention 
      */
     public static final class LIDAR {
+        public static final double SAMPLE_mS = 20; // in ms
+        //unused public static final double COLOR_SAMPLE_mS = 100; // in ms
+        //unused public static final int LOG_REFRESH_RATE_mS = 100; // in ms
+    }
 
+    public static final class DriverPrefs {
+        public static final double VelExpo = 0.3;        // non-dim [0.0 - 1.0]
+        public static final double RotationExpo = 0.9;   // non-dim [0.0 -1.0]
+        public static final double StickDeadzone = 0.05; // non-dim [0.0 - 1.0]
     }
 
     public static final class DriveTrain {
+        // motor constraints
+        public static final double motorMaxRPM= 5600; // motor limits
+        public static final double maxFPS = 14;          // max speed in feet/sec
+        public static final double maxRotDPS = 100;     // max rotation rate in deg/sec
+        
+        // PIDS are in the SparkMax, PIDFControler is used to hold the values
+        // for initializing the hardware. The PID object not run on RIO.
+        public static final PIDFController pidValues =
+             new PIDFController(0.00005, 0.0, 0.0, 0.00025); // P, I, D, FF
+
+        // shifter settings
+        public static final int shiftCount = 5;       // frames to wait on vel measurement
+        public static final double vShiftLow = 1.5;   // ft/sec shift to low
+        public static final double vShiftHigh = 6.8;  // ft/sec shift to high
+
+        // Other constraints
+        public static final int smartCurrentMax = 60; //amps in SparkMax
+        public static final int smartCurrentLimit = 35; //amps in SparkMax
 
     }
 

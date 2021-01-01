@@ -16,9 +16,18 @@ public class Dashboard {
   //public static final ShuffleboardTab limelightTab = Shuffleboard.getTab("Limelight");
 
   public static void configure(RobotContainer rc) {
-    var layout = systemsTab.getLayout("Shooter", BuiltInLayouts.kList).withSize(2,2).withPosition(1, 0);
+    var layout = systemsTab.getLayout("Shooter", BuiltInLayouts.kList).withSize(2,4).withPosition(0, 1);
     rc.intake.addDashboardWidgets(layout);
     layout.add(rc.intake); 
+
+    layout = systemsTab.getLayout("DriveTrain", BuiltInLayouts.kList).withSize(2,3).withPosition(0, 2);
+    rc.driveTrain.addDashboardWidgets(layout);
+    layout.add(rc.driveTrain);
+
+    layout = systemsTab.getLayout("LIDAR", BuiltInLayouts.kList).withSize(2,3).withPosition(0, 3);
+    rc.lidar.addDashboardWidgets(layout);
+    layout.add(rc.lidar);
+
   }
 
 }

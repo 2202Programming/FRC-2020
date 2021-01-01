@@ -16,7 +16,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
-import frc.robot.Constants.ShooterOnCmd;
+
 //import frc.robot.commands.intake.ShooterOnAuto;
 //import frc.robot.commands.intake.ToggleIntakeRaised;
 //import frc.robot.commands.auto.DriveOffLine;
@@ -49,6 +49,10 @@ import frc.robot.subsystems.hid.XboxAxis;
 import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
+//Constants file import sections
+import frc.robot.Constants.ShooterOnCmd;
+import frc.robot.Constants.DriverPrefs;
+import frc.robot.Constants.DriveTrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -83,10 +87,10 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // put driver controls first so its periodic() is called first.
-    driverControls = new HID_Xbox_Subsystem(0.3, 0.9, 0.05); // velExpo,rotExpo, deadzone
+    driverControls = new HID_Xbox_Subsystem(DriverPrefs.VelExpo, DriverPrefs.RotationExpo, DriverPrefs.StickDeadzone); 
     gearShifter = new GearShifter();
-    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 14.0, 100.0); // ft/s, deg/sec
-    intake = new Intake_Subsystem(); //shooter percent controlled vs. velocity controlled
+    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter); 
+    intake = new Intake_Subsystem(); 
     limelight = new Limelight_Subsystem();
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
@@ -104,8 +108,8 @@ public class RobotContainer {
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
 
-    velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, 14.0, 100.0); // fps, dps
-    velDriveCmd.setShiftProfile(5, 1.5, 6.8); // counts, ft/s, ft/s
+    velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, DriveTrain.maxFPS, DriveTrain.maxRotDPS); 
+    velDriveCmd.setShiftProfile(DriveTrain.shiftCount, DriveTrain.vShiftLow, DriveTrain.vShiftHigh); 
 
     driveTrain.setDefaultCommand(velDriveCmd);
 

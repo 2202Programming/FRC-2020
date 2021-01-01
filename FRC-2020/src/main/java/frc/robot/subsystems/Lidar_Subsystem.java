@@ -11,8 +11,8 @@ import com.playingwithfusion.TimeOfFlight;
 
 import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
 import frc.robot.subsystems.ifx.*;
@@ -23,8 +23,8 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
    */
   
   //Geometry contstants
-  private final double LIDAR_DIST = 348; //mm   TODO:What is this distance?
-  private final double BUMPER_DISTANCE = 100; //mm from bumber to sensor
+  private final double LIDAR_DIST = RobotPhysical.LIDAR_TO_LIDAR; //mm 
+  private final double BUMPER_DISTANCE = RobotPhysical.BUMPER_TO_LIDAR; //mm from bumber to sensor
 
   // CAN bus TLIDAR devices
   private TimeOfFlight front_left_lidar;
@@ -56,11 +56,11 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     SendableRegistry.setName(this, "LIDAR");
 
     if (isreal){
-      front_left_lidar = new TimeOfFlight(FRONT_LEFT_LIDAR_CANID);
-      front_right_lidar = new TimeOfFlight(FRONT_RIGHT_LIDAR_CANID);
+      front_left_lidar = new TimeOfFlight(CAN.FRONT_LEFT_LIDAR);
+      front_right_lidar = new TimeOfFlight(CAN.FRONT_RIGHT_LIDAR);
   
-      front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, LIDAR_SAMPLE_mS);
-      front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, LIDAR_SAMPLE_mS);
+      front_left_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, LIDAR.SAMPLE_mS);
+      front_right_lidar.setRangingMode(TimeOfFlight.RangingMode.Short, LIDAR.SAMPLE_mS);
     }
     
     // use a lowpass filter to clean up high freq noise. Helpful if you use a PID with any D.
@@ -85,28 +85,31 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     double dist2 = left_lidar_range;
     double dist1 = right_lidar_range;
     double difference = dist1 - dist2;
+    //DPL - should this asin(), not atan() small angles << 15 deg doesn't matter - 1/1/21
     angle = Math.toDegrees(Math.atan(difference/LIDAR_DIST));
     return angle;
   }
 
   public void log() {
+    /**  dashboard rework - dpl 1/1/2021
     SmartDashboard.putNumber("/LIDAR/left", left_lidar_range);
     SmartDashboard.putNumber("/LIDAR/right", right_lidar_range);
     SmartDashboard.putBoolean("/LIDAR/valid", valid());
     SmartDashboard.putBoolean("/LIDAR/l-valid", left_valid);
     SmartDashboard.putBoolean("/LIDAR/r-valid", right_valid);
     SmartDashboard.putNumber("/LIDAR/angle", angle);
+    */
   }
 
-  public boolean valid(){
+  public boolean valid() {
     return (left_valid && right_valid);
   }
 
-  public boolean isEitherValid(){
+  public boolean isEitherValid() {
     return (left_valid || right_valid);
   }
 
-  public boolean isFilteredValid(){
+  public boolean isFilteredValid() {
     return (filteredValid >= 0.6);
   }
 
@@ -127,5 +130,11 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     right_lidar_range = right_iir.calculate(right_raw) - BUMPER_DISTANCE;
     findAngle(); 
   }
+
+  public void addDashboardWidgets(ShuffleboardLayout layout) {
+		layout.addNumber("LIDAR/left",  () -> left_lidar_range);
+		layout.addNumber("LIDAR/right", () -> right_lidar_range);
+		layout.addBoolean("LIDAR/valid", this::isFilteredValid);
+	}
 
 }

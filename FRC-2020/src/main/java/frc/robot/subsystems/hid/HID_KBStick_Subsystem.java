@@ -14,40 +14,42 @@ import frc.robot.subsystems.ifx.DriverControls;
 public class HID_KBStick_Subsystem extends SubsystemBase implements DriverControls {
   KBSimStick driver;
   //only one stick for now, so no tank drive
-
   ExpoShaper velShaper;
   ExpoShaper rotShaper;
-  double vel, z_rot;
 
-  //setup for Swerve XYRot controls
-  ExpoShaper velXShaper;
-  ExpoShaper velYShaper;
-  ExpoShaper xyRotShaper;
-  double velX, velY, xyRot;
+   //XYRot / Swerve (field or robot relative)
+   ExpoShaper velXShaper;    // left/right  
+   ExpoShaper velYShaper;    // forward/backward 
+   ExpoShaper xyRotShaper;   // rotation for XYRot
+
+   //values updated each frame
+  double vel, z_rot;         //arcade
+  double velLeft, velRight;  //tank
+  double velX,velY, xyRot;   //XTRot
 
   // invertGain is used to change the controls for driving backwards easily.
   // A negative value indicates you're driving backwards with forwards controls.
   double invertGain = 1.0;
 
-  int initDriverButtons;
+  int initialDriverButtons;
 
   /**
    * Creates a new HID_KBStick_Subsystem.
    */
   public HID_KBStick_Subsystem(double velExpo, double rotExpo) {
     driver = (KBSimStick) registerController(Id.Driver, new KBSimStick(Id.Driver.value));
-    initDriverButtons = getButtonsRaw(Id.Driver);
+    initialDriverButtons = getButtonsRaw(Id.Driver);
 
-    //Arcade 
-    velShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kY));
-    rotShaper = new ExpoShaper(rotExpo, () -> (driver.getAxis(Axis.kRot) * -1.0));
+    velShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kThrottle));
+    rotShaper = new ExpoShaper(rotExpo, () -> -driver.getAxis(Axis.kRot));
 
-    //XY-Rotation user inputs
-    velXShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kX));
-    velYShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kY));
-    xyRotShaper = new ExpoShaper(rotExpo, () -> driver.getAxis(Axis.kX));
+    // XYRot or Swerve Drive
+    // Rotation on Left-X axis,  X-Y throttle on Right
+    velXShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kX));     
+    velXShaper = new ExpoShaper(velExpo, () -> driver.getAxis(Axis.kY));
+    xyRotShaper = new ExpoShaper(rotExpo, () -> -driver.getAxis(Axis.kRot));  //inverted rot
 
-    
+    initialDriverButtons = getButtonsRaw(Id.Driver);
   }
 
   @Override
@@ -57,12 +59,19 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
     vel = velShaper.get() * invertGain;
     z_rot = rotShaper.get() * invertGain;
     
-    // XY Rotation 
-    velX = velXShaper.get() * invertGain;
-    velY = velYShaper.get() * invertGain;
-    xyRot =xyRotShaper.get() * invertGain;
+     //XYRot
+     velX = velXShaper.get();
+     velY = velYShaper.get();
+     xyRot = xyRotShaper.get();
+
+    // tank hack
+    velLeft = vel;
+    velRight = velY;
   }
 
+  /**
+   * XYRotation controls
+   */
   @Override
   public double getVelocityX() {
     return velX;
@@ -77,6 +86,14 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
      return xyRot;
   }
 
+  @Override
+  public double getXYRotation() {
+    return xyRot;
+  }
+
+  /**
+   * Tank Controls - throttle = left, kY = right side (kind of a one stick hack for tank)
+   */
   @Override
   public double getVelocityLeft() {
     return vel;
@@ -115,8 +132,8 @@ public class HID_KBStick_Subsystem extends SubsystemBase implements DriverContro
 
   @Override
   public int getInitialButtons(Id id) {
-    if (id == Id.Driver) return initDriverButtons;
-    return 0;
+    if (id == Id.Driver) return initialDriverButtons;
+    return  0;
   }
 
 }

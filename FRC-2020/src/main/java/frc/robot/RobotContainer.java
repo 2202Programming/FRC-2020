@@ -7,20 +7,18 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
-import frc.robot.commands.test.TestKBSimMode;
 import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
+
 //import frc.robot.commands.intake.ShooterOnAuto;
-import frc.robot.commands.intake.ShooterOnPerc;
-import frc.robot.commands.intake.ToggleIntakeRaised;
+//import frc.robot.commands.intake.ToggleIntakeRaised;
 //import frc.robot.commands.auto.DriveOffLine;
 //import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.toggleLED;
@@ -47,10 +45,14 @@ import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
+import frc.robot.subsystems.hid.XboxAxis;
+import frc.robot.subsystems.hid.XboxButton;
+import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
-import frc.robot.subsystems.hid.XboxControllerButtonCode;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+//Constants file import sections
+import frc.robot.Constants.ShooterOnCmd;
+import frc.robot.Constants.DriverPrefs;
+import frc.robot.Constants.DriveTrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -79,36 +81,26 @@ public class RobotContainer {
   ArcadeDriveCmd arcadeDriveCmd;
   ArcadeVelDriveCmd velDriveCmd;
 
-  // Tests to run during test mode
-
-  TestKBSimMode t1;
-  final boolean PERCENT_CONTROLLED = false;
-
-  //taking input from smartdashboard (probably needs to be moved to shooter_on cmd)
-  private double rpmUpper_low = SmartDashboard.getNumber("rpm upper low goal", 1000);
-  private double rpmLower_low = SmartDashboard.getNumber("rpm lower low goal", 1000);
-  private double rpmUpper_high = SmartDashboard.getNumber("rpm upper high goal", 1900);
-  private double rpmLower_high = SmartDashboard.getNumber("rpm lower high goal", 1900);
+  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // put driver controls first so its periodic() is called first.
-
-    // cameraSubsystem = new CameraSubsystem();
-    driverControls = new HID_Xbox_Subsystem(0.3, 0.9, 0.05); // velExpo,rotExpo, deadzone
+    driverControls = new HID_Xbox_Subsystem(DriverPrefs.VelExpo, DriverPrefs.RotationExpo, DriverPrefs.StickDeadzone); 
     gearShifter = new GearShifter();
-    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 14.0, 100.0); // ft/s, deg/sec
-    intake = new Intake_Subsystem(PERCENT_CONTROLLED); //shooter percent controlled vs. velocity controlled
+    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter); 
+    intake = new Intake_Subsystem(); 
     limelight = new Limelight_Subsystem();
     limelight.disableLED();
+    logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
+    lidar = new Lidar_Subsystem(); 
     
-    logSubsystem = new Log_Subsystem(10); // log every 5 frames - 100mS
-    lidar = new Lidar_Subsystem(RobotBase.isReal()); 
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();
-
+    //cameraSubsystem = new CameraSubsystem();
+    
     // Add anything that has logging requirements
     logSubsystem.add(/*driveTrain, lidar,*/limelight, intake /*,driverControls, panel, detector*/);
 
@@ -116,106 +108,40 @@ public class RobotContainer {
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
 
-    velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, 14.0, 100.0); // fps, dps
-    velDriveCmd.setShiftProfile(5, 1.5, 6.8); // counts, ft/s, ft/s
+    velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, DriveTrain.maxFPS, DriveTrain.maxRotDPS); 
+    velDriveCmd.setShiftProfile(DriveTrain.shiftCount, DriveTrain.vShiftLow, DriveTrain.vShiftHigh); 
 
     driveTrain.setDefaultCommand(velDriveCmd);
 
     // Configure the button bindings
-    configureButtonBindings();
-    jasonsButtons();
+    configureButtonBindings(driverControls);
 
-    //makes an output file
-   /* try {
-      outputStream = new PrintWriter(new File("Robot_Log.txt"));
-    } catch(FileNotFoundException e){
-      e.printStackTrace();
-    }
-    */
+    //finally setup the dashboard programatically
+    Dashboard.configure(this);
   }
 
-  private void jasonsButtons() {
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.X.getCode()).whenPressed(new toggleLED(limelight));
-
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.B.getCode())
-        .whenPressed(new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
-
-  } 
-
-  private void configureButtonBindings() {
+  private void configureButtonBindings(DriverControls dc) {
     // Drivers buttons
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.LB.getCode())
-        .whenPressed(new GearToggleCmd(driveTrain));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.A.getCode())
-        .whenPressed(new InvertDriveControls(driverControls));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.RB.getCode())
-        .whenPressed(new SwitchDriveMode(driveTrain, velDriveCmd, arcadeDriveCmd));
-    driverControls.bindButton(Id.Driver, XboxControllerButtonCode.Y.getCode())
-        .whenPressed(new ToggleAutoShiftCmd(gearShifter));
-
-        // Assistant's buttons
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-        .whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.B.getCode())
-        .whenHeld(new ReverseIntake(intake, -0.5));
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.LB.getCode())
-       .whenPressed(new ToggleIntakeRaised(intake));
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.Y.getCode())
-      .whenPressed(new MagazineAdjust(intake, true, 0.4), true);
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.A.getCode())
-        .whileHeld(new MagazineAdjust(intake, false, 0.0));
-
-    // power based shooter (pick one, power or velocity)
-
-    if (PERCENT_CONTROLLED) {
-      driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode())
-    .whenHeld(new ShooterOnPerc(intake, 0.5, 1, -0.5, -1, 0.2)); // pwr_low, pwr_high, seconds mag backup 
-    }
-    else {
-    //velocity based shooter (pick one, power or velocity)
-      driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_RIGHT.getCode()) //flywheel RPM targets
-        .whenHeld(new ShooterOn(intake, rpmUpper_low, rpmUpper_high, rpmLower_low, rpmLower_high, 0.2)); // rpm_low, rpm_high, seconds mag backup
-    }
-
-    driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_LEFT.getCode())
-    .whenHeld(new ShooterOnPerc(intake, 0.5, 0.8, -0.5, -0.8, 0.2)); // pwr_low, pwr_high, seconds mag backup 
-
-//    driverControls.bindJoystick(Id.Assistant, XboxControllerButtonCode.TRIGGER_LEFT.getCode()) //auto RPM adjustment from limelight area based on calculated trendlines
-//    .whenHeld(new ShooterOnAuto(intake, 0.2, -220.0, 3000.0, -220.0, 3000.0, limelight));
-
-    driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.RB.getCode())
-        .whenPressed(new MagazineToggleCmd(intake));
-
-    // driverControls.bindButton(Id.Assistant, XboxControllerButtonCode.X.getCode())
-    // .whenPressed(new auto_creep_cmd(driveTrain, limelight, 0, 10, 10, 10));
-
-    /*Not using for now
-    //Control Panel Manual Controls
-    driverControls.bindButton(Id.SwitchBoard, XboxControllerButtonCode.LB.getCode())
-      .whenPressed(new SimpRotateControl(panel));
-    driverControls.bindButton(Id.SwitchBoard, 12)
-      .whenPressed(new SimpPositionControl(panel, detector));
-    driverControls.bindButton(Id.SwitchBoard, 5)
-      .whenPressed(() -> panel.extendArm()).whenReleased(() -> panel.retractArm());
-      */
+    dc.bind(Id.Driver, XboxButton.A).whenPressed(new InvertDriveControls(dc)); 
+    dc.bind(Id.Driver, XboxButton.B).whenPressed(new auto_cmd_group(dc, driveTrain, intake, limelight, lidar));
+    dc.bind(Id.Driver, XboxButton.X).whenPressed(new toggleLED(limelight));
+    dc.bind(Id.Driver, XboxButton.Y).whenPressed(new ToggleAutoShiftCmd(gearShifter));
+    dc.bind(Id.Driver, XboxButton.RB).whenPressed(new SwitchDriveMode(driveTrain, velDriveCmd, arcadeDriveCmd));
+    dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(driveTrain));
+   
+    // Assistant's buttons
+    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineAdjust(intake, false, 0.0)); 
+    dc.bind(Id.Assistant, XboxButton.B).whenHeld(new ReverseIntake(intake, -0.5));
+    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineAdjust(intake, true, 0.4), true);
+    dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
+    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineToggleCmd(intake));
     
-      /*
-    driverControls.bindButton(Id.SwitchBoard, 7)
-        .whenHeld(new SetClimbArmRotation(climber, 0.5));
-    driverControls.bindButton(Id.SwitchBoard, 8)
-        .whenHeld(new SetClimbArmRotation(climber, -0.5));
-    driverControls.bindButton(Id.SwitchBoard, 9)
-        .whenPressed(new SetClimbArmExtension(climber, true))
-        .whenReleased(new SetClimbArmExtension(climber, false));
-    driverControls.bindButton(Id.SwitchBoard, 10)
-        .whenHeld(new RunWinch(climber, 0.8));
-    driverControls.bindButton(Id.SwitchBoard, 11)
-        .whenHeld(new RunWinch(climber, -0.8));
+    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); // rpm_low, rpm_high, seconds mag backup
     
+    //auto RPM adjustment from limelight area based on calculated trendlines
+    /*
+      dc.bindJoystick(Id.Assistant, XboxAxis.TRIGGER_LEFT).whenHeld(new ShooterOnAuto(intake, 0.2, -220.0, 3000.0, -220.0, 3000.0, limelight));
     */
-    
-    //driverControls.bindDoubleButton(Id.SwitchBoard, 7, 11)
-    //  .whenPressed(new ClimbGroup(climber));
   }
 
   
@@ -235,12 +161,9 @@ public class RobotContainer {
    * in test mode.
    */
   public void initTest() {
-    t1 = new TestKBSimMode();
-
   }
 
   public void runTestPeriod() {
-    t1.periodic();
   }
 
   /**

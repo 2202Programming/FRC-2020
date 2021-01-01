@@ -16,8 +16,8 @@ public class ShooterOnWithDelay extends CommandBase {
   private double delay; //in milliseconds
   private double startTime;
 
-  public ShooterOnWithDelay(Intake_Subsystem m_intake, double delay) {
-    this.m_intake = m_intake;
+  public ShooterOnWithDelay(Intake_Subsystem intake, double delay) {
+    this.m_intake = intake;
     this.delay = delay;
 
     // Use addRequirements() here to declare subsystem dependencies.
@@ -37,7 +37,7 @@ public class ShooterOnWithDelay extends CommandBase {
     // We will want to backup the mag a little bit before shooter gets engaged
     // this will prevent balls getting stuck.
 
-    m_intake.shooterOn(shootPower,shootPower);
+    m_intake.shooterOnPercent(shootPower,shootPower);
   }
 
   // Called once the command ends or is interrupted.

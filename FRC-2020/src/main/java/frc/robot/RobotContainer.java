@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -17,6 +16,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
+
 //import frc.robot.commands.intake.ShooterOnAuto;
 //import frc.robot.commands.intake.ToggleIntakeRaised;
 //import frc.robot.commands.auto.DriveOffLine;
@@ -46,10 +46,13 @@ import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.hid.XboxAxis;
+import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
-import frc.robot.subsystems.hid.XboxButton;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//Constants file import sections
+import frc.robot.Constants.ShooterOnCmd;
+import frc.robot.Constants.DriverPrefs;
+import frc.robot.Constants.DriveTrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -78,20 +81,16 @@ public class RobotContainer {
   ArcadeDriveCmd arcadeDriveCmd;
   ArcadeVelDriveCmd velDriveCmd;
 
-  //taking input from smartdashboard (probably needs to be moved to shooter_on cmd)
-  private double rpmUpper_low = SmartDashboard.getNumber("rpm upper low goal", 1000);
-  private double rpmLower_low = SmartDashboard.getNumber("rpm lower low goal", 1000);
-  private double rpmUpper_high = SmartDashboard.getNumber("rpm upper high goal", 1900);
-  private double rpmLower_high = SmartDashboard.getNumber("rpm lower high goal", 1900);
+  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // put driver controls first so its periodic() is called first.
-    driverControls = new HID_Xbox_Subsystem(0.3, 0.9, 0.05); // velExpo,rotExpo, deadzone
+    driverControls = new HID_Xbox_Subsystem(DriverPrefs.VelExpo, DriverPrefs.RotationExpo, DriverPrefs.StickDeadzone); 
     gearShifter = new GearShifter();
-    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter, 14.0, 100.0); // ft/s, deg/sec
-    intake = new Intake_Subsystem(); //shooter percent controlled vs. velocity controlled
+    driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter); 
+    intake = new Intake_Subsystem(); 
     limelight = new Limelight_Subsystem();
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
@@ -109,13 +108,16 @@ public class RobotContainer {
     tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
     arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
 
-    velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, 14.0, 100.0); // fps, dps
-    velDriveCmd.setShiftProfile(5, 1.5, 6.8); // counts, ft/s, ft/s
+    velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, DriveTrain.maxFPS, DriveTrain.maxRotDPS); 
+    velDriveCmd.setShiftProfile(DriveTrain.shiftCount, DriveTrain.vShiftLow, DriveTrain.vShiftHigh); 
 
     driveTrain.setDefaultCommand(velDriveCmd);
 
     // Configure the button bindings
     configureButtonBindings(driverControls);
+
+    //finally setup the dashboard programatically
+    Dashboard.configure(this);
   }
 
   private void configureButtonBindings(DriverControls dc) {
@@ -134,7 +136,7 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
     dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineToggleCmd(intake));
     
-    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, rpmUpper_low, rpmUpper_high, rpmLower_low, rpmLower_high, 0.2)); // rpm_low, rpm_high, seconds mag backup
+    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); // rpm_low, rpm_high, seconds mag backup
     
     //auto RPM adjustment from limelight area based on calculated trendlines
     /*

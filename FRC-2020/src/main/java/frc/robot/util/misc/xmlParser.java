@@ -1,15 +1,23 @@
 package frc.robot.util.misc;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
 
-import frc.robot.RobotContainer;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandGroupBase;
+import frc.robot.RobotContainer;
 
 /**
  * xmlParser - read XML file and create a command group that can be run in auto.
@@ -68,15 +76,27 @@ public class xmlParser {
     public xmlParser() {
 
     }
+    /**
+     * Parse()
+     * 
+     * Looks in the deploy directory, any files should be relative to that directory
+     * 
+     * @param fileName    XML file to parse for command
+     * 
+     */
 
     public Command parse(String fileName) {
         Document doc;
-        // File commandFile = new File("Auto.xml"); //move to deploy once done
+
+        //anything we use will be in the deploy directory
+        File deployDir = Filesystem.getDeployDirectory();
+        String uri = deployDir + File.separator + fileName;
+        
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setIgnoringElementContentWhitespace(true);
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            doc = builder.parse(fileName);
+            doc = builder.parse(uri);
             doc.normalize();
         } catch (Exception e) {
             System.out.println("XML parsing error - " + e.toString());
@@ -105,7 +125,7 @@ public class xmlParser {
                     case CMD:
                         cmdArray = parseCommand(element);
                         cmd = buildCommand(cmdArray);
-                        decorate(cmd, element);
+                        cmd = decorate(cmd, element); //may get back wrapped cmd
                         if (cmd != null)
                             group.addCommands(cmd);
                         break;
@@ -200,11 +220,13 @@ public class xmlParser {
     }
 
 
-    void decorate(Command cmd, Element cmdElement) {
+    Command decorate(Command cmd, Element cmdElement) {
         if (cmdElement.hasAttribute(WITHTIMEOUT)) {
             double time = Double.parseDouble(cmdElement.getAttribute(WITHTIMEOUT));
-            cmd.withTimeout(time);
+            return cmd.withTimeout(time);
         }  
+        // no decorator found, just give cmd back for chanining
+        return cmd;
     }
 
     /**

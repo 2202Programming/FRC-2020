@@ -14,9 +14,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.dummy.DummyVelocityDrive;
@@ -27,21 +25,19 @@ import frc.robot.subsystems.ifx.VelocityDrive;
  */
 public class xmlParserTest {
 
-    static Map<String, Object> deviceMap = RobotContainer.deviceMap; 
-    VelocityDrive drive;
-    
-    @Mock
-    protected Timer m_timer;
+  static Map<String, Object> deviceMap = RobotContainer.deviceMap;
+  VelocityDrive drive;
 
-    @Before
-    public void setUp() {
-        drive = new DummyVelocityDrive();
-        deviceMap.put("driveTrain", drive);
-    }
-    @Test
-    public void testParser() {
+  @Before
+  public void setUp() {
+    drive = new DummyVelocityDrive();
+    deviceMap.put("driveTrain", drive);
+  }
 
-        String filename = "src/main/deploy/NoPotato.xml";
+  @Test
+  public void testParser() {
+        String filename = "NoPotato.xml";
+
         xmlParser myParser = new xmlParser();
         Command test = myParser.parse(filename);
         System.out.println("File parsed and returned: " + test.getName());

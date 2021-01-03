@@ -5,20 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "java",
-      "name": "CodeLens (Launch) - xmlParser",
-      "request": "launch",
-      "mainClass": "frc.robot.xmlParser",
-      "projectName": "FRC-2020"
-    },
-    {
-      "type": "java",
-      "name": "CodeLens (Launch) - Main",
-      "request": "launch",
-      "mainClass": "frc.robot.Main",
-      "projectName": "FRC-2020"
-    },
-    {
       "type": "wpilib",
       "name": "WPILib Desktop Debug",
       "request": "launch",

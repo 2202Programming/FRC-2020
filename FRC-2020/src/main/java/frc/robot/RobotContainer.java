@@ -60,7 +60,7 @@ import frc.robot.subsystems.hid.XboxControllerButtonCode;
  */
 public class RobotContainer {
   //tracks robot's devices for XML parsing
-  static Map<String, Object> deviceMap = new HashMap<String, Object>();  
+  static public Map<String, Object> deviceMap = new HashMap<String, Object>();  
   
   // The robot's subsystems and commands are defined here...
   // public final CameraSubsystem cameraSubsystem;

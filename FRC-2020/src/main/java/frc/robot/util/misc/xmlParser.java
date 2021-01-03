@@ -1,12 +1,13 @@
-package frc.robot;
+package frc.robot.util.misc;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 
+import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandGroupBase;
 
@@ -16,13 +17,9 @@ import edu.wpi.first.wpilibj2.command.CommandGroupBase;
  * the element level.
  * 
  * 
- * XML Syntax 
- * <Command name="fq-classname" /> <!-- No args --> 
- * <CommandGroup>
- *    <Command name="fq-classname"   withTimeout="3.3"> 
- *        <Arg type="fq-type" value="stringValue") />
- *        <Arg robotDevice="name"/> 
- *    </Command> ... 
+ * XML Syntax <Command name="fq-classname" /> <!-- No args --> <CommandGroup>
+ * <Command name="fq-classname" withTimeout="3.3"> <Arg type="fq-type"
+ * value="stringValue") /> <Arg robotDevice="name"/> </Command> ...
  * </CommandGroup>
  * 
  * Usage:
@@ -42,18 +39,13 @@ public class xmlParser {
     static final String PARA_GRP = "ParallelGrp";
     static final String RACE_GRP = "RaceGrp";
     // attribute key words
+    static final String WITHTIMEOUT = "withTimeout";
     static final String NAME = "name";
     static final String TYPE = "type";
     static final String VALUE = "value";
     static final String ROBOT_DEV = "robotDevice";
 
     CommandGroupBase m_cmd;
-
-    public static void main(String args[]) {
-        xmlParser myParser = new xmlParser();
-        Command test = myParser.parse("Auto.xml");
-        System.out.println("Auto.xml parsed and returned: " + test.getName());
-    }
 
     private static boolean isWhitespaceNode(Node n) {
         if (n.getNodeType() == Node.TEXT_NODE) {
@@ -90,47 +82,35 @@ public class xmlParser {
             System.out.println("XML parsing error - " + e.toString());
             return null;
         }
-        /**
-         * DPL - 12/15/20 not sure where this is going.
-         * 
-         * List<Node> commandGroups =
-         * removeWhitespaceNodes(doc.getElementsByTagName("CommandGroup")); Node
-         * selectedCommandGroup = commandGroups.get(0);
-         * 
-         * List<Node> commands =
-         * removeWhitespaceNodes(selectedCommandGroup.getChildNodes()); Node
-         * selectedCommand = commands.get(0);
-         * 
-         * NamedNodeMap attributes = selectedCommand.getAttributes();
-         * 
-         * for(int i = 0; i < attributes.getLength(); i++) {
-         * System.out.println(attributes.item(i)); }
-         */
+        
         // we got this far, so the DOM is valid, now construct our commands
-        m_cmd = CommandGroupBase.sequence(); // start with a sequence container
-        buildCommands(m_cmd, doc.getDocumentElement());
+        m_cmd = CommandGroupBase.sequence(); // start with a sequence containe
+        m_cmd.setName(fileName);
+        buildCommands(m_cmd, doc);
         return m_cmd;
     }
 
-    public void buildCommands(CommandGroupBase group, Element nodElement) {
+    public void buildCommands(CommandGroupBase group, Node nodElement) {
         Object[] cmdArray;
         CommandGroupBase newGroup;
         Command cmd;
-        
+
         NodeList nodes = nodElement.getChildNodes();
-        for (int i=0; i < nodes.getLength(); i++) {
+        for (int i = 0; i < nodes.getLength(); i++) {
 
             Node node = nodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE ) {
-                Element element = (Element)node;
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) node;
                 switch (node.getNodeName()) {
-                   case CMD:
+                    case CMD:
                         cmdArray = parseCommand(element);
                         cmd = buildCommand(cmdArray);
-                        group.addCommands(cmd);
+                        decorate(cmd, element);
+                        if (cmd != null)
+                            group.addCommands(cmd);
                         break;
 
-                   case SEQ_GRP:
+                    case SEQ_GRP:
                         newGroup = CommandGroupBase.sequence();
                         group.addCommands(newGroup);
                         buildCommands(newGroup, element);
@@ -141,8 +121,8 @@ public class xmlParser {
                         group.addCommands(newGroup);
                         buildCommands(newGroup, element);
                         break;
-                   
-                 default:
+
+                    default:
                         // ignore anything we don't know
                         break;
                 }
@@ -155,35 +135,76 @@ public class xmlParser {
     /**
      * buildCommand() - constructs a single command object via reflections
      * 
-     * @param cmdArray   array of fqcn + value objects
-     * @return  constructed Command object
+     * @param cmdArray array of fqcn + value objects
+     * @return constructed Command object
      */
 
     Command buildCommand(Object[] cmdArray) {
         Command retCmd = null;
-        String fqcn;
+        String fqcn= (String) cmdArray[0]; // 0th is the fqdn by convention
         Class<?> cls;
-        Class<?>[] parameterTypes = new Class<?>[cmdArray.length - 1];   // skip [0], fqcn
         Object[] args = new Object[cmdArray.length - 1];
-
-        //build parameters and args so we can find a CTor
-        for (int i=1; i< cmdArray.length; i++) {
-            parameterTypes[i-1] = cmdArray[i].getClass(); 
-            args[i-1] = cmdArray[i];
-        }
+        
+        System.arraycopy(cmdArray, 1, args, 0, cmdArray.length -1);
+        
         try {
-            fqcn = (String)cmdArray[0];    //0th is the fqdn by convention
             cls = Class.forName(fqcn);
-            Constructor<?> ctor =  cls.getDeclaredConstructor(parameterTypes);
-            
-            // cast our new object to a Command
-            retCmd = (Command)ctor.newInstance(args);
-        }
-        catch (Exception e) {
-            System.out.println("*** Command construction failed:"  + e.getMessage() + " *** \n" );
+             retCmd = (Command)checkInterfaces(cls.getDeclaredConstructors(), args);
+        } catch (Exception e) {
+            System.out.println("*** Command construction failed:" + e.getMessage() + " *** \n");
             e.printStackTrace(System.out);
         }
         return retCmd;
+    }
+
+    Object checkInterfaces(Constructor<?>[] ctors, Object[] args)
+            throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        Class<?>[] newTypes = new Class<?>[args.length];
+        Constructor<?> match = null;
+        // check each constructor for a match
+        for (Constructor<?> ctor : ctors) {
+            Class<?>[] cptypes = ctor.getParameterTypes();
+           
+            // now check all 
+            if (cptypes.length != args.length)  continue;
+
+            // check args for match with given parameters
+            for (int i = 0; i < args.length; i++) {
+                Class<?> cptype = cptypes[i];
+                Class<?> atype = (args[i] != null) ? args[i].getClass() : Object.class;
+
+                if (cptype.isInterface()) {
+                    for (Class<?> ifx : atype.getInterfaces()) {
+                        if (ifx == cptype) {
+                            atype = ifx;
+                        }
+                    }
+                }
+                // save the adjusted param in the newParam list
+                if (cptype == atype) {
+                    newTypes[i] = atype;  //
+                    match = ctor;
+                    continue;   // keep checking this constructor
+                } else {
+                    match = null;
+                    break; // couldn't make this constructor work
+                }
+            }
+            // if we still have a match, we can quit checking
+            if (match != null) break;
+        }
+        if (match != null) {
+            return match.newInstance(args);
+        }
+        return null;
+    }
+
+
+    void decorate(Command cmd, Element cmdElement) {
+        if (cmdElement.hasAttribute(WITHTIMEOUT)) {
+            double time = Double.parseDouble(cmdElement.getAttribute(WITHTIMEOUT));
+            cmd.withTimeout(time);
+        }  
     }
 
     /**
@@ -197,13 +218,13 @@ public class xmlParser {
      */
 
     /**
-      * getArgs - returns all the arguments needed to instantiate 
-      *         the command represented by this node in the xml doc.
-      *      Fully qualified command name (fqcn) is first Object in the array returned.
-      *
-      * @param cmdNode    a single command
-      * @return Object[]  fqcn + arguments 
-      */
+     * getArgs - returns all the arguments needed to instantiate the command
+     * represented by this node in the xml doc. Fully qualified command name (fqcn)
+     * is first Object in the array returned.
+     *
+     * @param cmdNode a single command
+     * @return Object[] fqcn + arguments
+     */
 
     Object[] parseCommand(Element cmdNode) {
         ArrayList<Object> args = new ArrayList<Object>();
@@ -211,24 +232,35 @@ public class xmlParser {
         String fqcn = cmdNode.getAttribute("name");
         args.add(fqcn);
 
-        //Child nodes will all be argument Elements or we ignore them
-        NodeList argNodes = cmdNode.getChildNodes();
-        //now parse the Arg Element and build array for reflection
-        for (int i=0; i < argNodes.getLength(); i++) {
-            Element arg = (Element)argNodes.item(i);
-            // Type will have type and value attributes
-            if (arg.hasAttribute(TYPE)) {
-                //<Arg  type="fq-type" value="stringValue") />
-                String type = arg.getAttribute(TYPE);
-                String value = arg.getAttribute(VALUE);
-                args.add(createObject(type, value));
-            }
+        // Child nodes will all be argument Elements or we ignore them
+        NodeList childNodes = cmdNode.getChildNodes();
+        // now parse the Arg Element and build array for reflection
+        for (int i = 0; i < childNodes.getLength(); i++) {
 
-            if (arg.hasAttribute(ROBOT_DEV)) {
-                // <Arg  robotDevice="name"/>
-                String deviceName = arg.getAttribute(ROBOT_DEV);
-                // add the requested robot device to the arg array
-                args.add(RobotContainer.getDeviceByName(deviceName));
+            Node child = childNodes.item(i);
+            if (child.getNodeType() == Node.ATTRIBUTE_NODE)  {
+                
+                break;
+            }
+            
+            if ((child.getNodeType() == Node.ELEMENT_NODE) &&
+                (child.getNodeName() == ARG)) {
+                Element c = (Element) child;
+                // Type will have type and value attributes
+                if (c.hasAttribute(TYPE)) {
+                    // <Arg type="fq-type" value="stringValue") />
+                    String type = c.getAttribute(TYPE);
+                    String value = c.getAttribute(VALUE);
+                    args.add(createObject(type, value));
+                }
+
+                if (c.hasAttribute(ROBOT_DEV)) {
+                    // <Arg robotDevice="name"/>
+                    String deviceName = c.getAttribute(ROBOT_DEV);
+                    // add the requested robot device to the arg array
+                    Object dev = RobotContainer.getDeviceByName(deviceName);
+                    args.add(dev);
+                }
             }
         }
         return args.toArray();

@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Color_Subsystem;
 import frc.robot.subsystems.Control_Panel;
 
-//TODO: NOT DONE
 /**
  * Positions the control panel to an indicated color.
  */
@@ -14,8 +13,9 @@ public class PositionControlPanelCommand extends CommandBase {
     private static final double RATE = 0.2;
     private static final int FULL_ROTATION = 360;
     private static final double STOP = 0;
-    private static final double WHEEL_CIRCUMFERENCE = 2.5*Math.PI;  //inches (TODO: fix wheel diameter)
     private static final int PANEL_DIAMETER = 32;  //inches
+    private static final double WHEEL_DIAMETER =  4.0; //inches
+    private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;  //inches 
     private static final double PANEL_CIRCUMFERENCE = Math.PI * PANEL_DIAMETER;
 
     

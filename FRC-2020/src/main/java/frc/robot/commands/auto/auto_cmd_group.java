@@ -16,6 +16,7 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterOnCmd;
 
 public class auto_cmd_group extends SequentialCommandGroup {
 
@@ -99,7 +100,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
                     new WaitCommand(0.7),
                     new MagazineToggleCmd(intake),
                     new WaitCommand(1.2),
-                    new ShooterOn(intake, 0.6, 1.0, 0.5).withTimeout(3),
+                    new ShooterOn(intake, ShooterOnCmd.data).withTimeout(3),
                     new MagazineToggleCmd(intake),
                     new ToggleIntakeRaised(intake)
             );
@@ -125,8 +126,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
                         new auto_drive_straight_cmd(drive, 1.5).withTimeout(2), // pressure on wall during dump
 
                         // Deploy balls
-                        new ShooterOn(intake, 0.65, 1, 0.4).withTimeout(2) // turn shooter on for 2 seconds 1200
-                                                                                // rpm
+                        new ShooterOn(intake).withTimeout(2) // turn shooter on for 2 seconds
                 ),
 
                 // Drive backwards at departure angle using lidar

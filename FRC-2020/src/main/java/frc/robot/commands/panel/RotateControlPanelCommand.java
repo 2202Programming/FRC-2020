@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Color_Subsystem;
 import frc.robot.subsystems.Control_Panel;
 
-//TODO: NOT DONE
 /**
  * Rotates the control panel an indicated number of times.
  */
@@ -46,8 +45,6 @@ public class RotateControlPanelCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        // TODO: Change
-        // Command.super.initialize();
         init_color = detector.getColor();
         curr_color = detector.getColor();
         panel.extendArm();
@@ -59,7 +56,6 @@ public class RotateControlPanelCommand extends CommandBase {
 
     @Override
     public void execute() {
-        // TODO Auto-generated method stub
         degreesRotated = findDegrees();
         ramp();
         if (!curr_color.equals(detector.getColor())) {

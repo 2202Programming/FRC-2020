@@ -7,70 +7,171 @@
 
 package frc.robot.commands.intake;
 
+import static frc.robot.Constants.ShooterOnCmd;
+import static frc.robot.Constants.DT;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Intake_Subsystem.FlywheelRPM;
 
 public class ShooterOn extends CommandBase {
+
   private double SLOW_MAG_REVERSE = -0.8; // motor power
   private double FAST_MAG_FORWARD =  1; // motor power
-  private Intake_Subsystem m_intake;
-  private final double m_rpmTarget_low;
-  private final double m_rpmTarget_high;
-  private final int m_backupCount;
-  private int m_count;
-  private double m_rpm;  // speed to use based on high/low mag position
+  
+  Intake_Subsystem intake;
+  private final int backupCount;
+  private int count;
 
-  public ShooterOn(Intake_Subsystem intake, double rpmTarget_low, double rpmTarget_high, double backupSec) {
-    m_intake = intake;
-    m_rpmTarget_low = rpmTarget_low;
-    m_rpmTarget_high = rpmTarget_high;
-    m_backupCount = (int) Math.floor(backupSec / Constants.DT);
+  // Speed to use speed to use based on high/low mag position, distance or other function
+  // set by call to calculateShooterSpeed().
+  FlywheelRPM rpmCmd = new FlywheelRPM(0, 0);
+  
+  // testing/reporting controls
+  double time;
 
+  // Shooter states (verbs) for state machine
+  enum Stage {
+    DoingNothing,           // entry state, before button is pushed
+    WaitingForSolution,     // calculating or moving for shot, see calcuateShooterSpeed()
+    BackingMagazine,        // fixed time given on constructor
+    WaitingForFlyWheel,     // holds until flywheel is at speed
+    Shooting,               // mag running, balls flying, watching fw speeds 
+  }
+  Stage stage;
+
+  /**
+   * Constant/control data needed for this command.
+   */
+  public static class Data {
+    public FlywheelRPM LowGoal;   
+    public FlywheelRPM HighGoal; 
+    public double Tolerance;   // % of target goal ~1% to 2%
+    public double BackupSec;   //seconds to backup
+
+    public Data() {
+      // do nothing
+    }
+    /**
+     * copy constructor
+     * @param d
+     */
+    public Data( Data d) {
+      // make deep copy of incoming data
+      LowGoal = new FlywheelRPM(d.LowGoal);
+      HighGoal = new FlywheelRPM(d.HighGoal);
+      BackupSec = d.BackupSec;
+      Tolerance = d.Tolerance;
+    }
+  }
+
+  // commanded target goals
+  Data goals;
+
+  public ShooterOn(Intake_Subsystem intake) {
+    // using dummy upper/lower target rpm.  If this construsctor is used, calculateShooterSpeed()
+    // will be overriden.  USe the Constant data.
+    this(intake, ShooterOnCmd.data);      //dummy args except intake and backup.
+  }
+
+  public ShooterOn(Intake_Subsystem intake,  ShooterOn.Data cmdData) {
+    this.intake = intake;
+    goals = new Data(cmdData);
+    backupCount = (int) Math.floor(goals.BackupSec / DT);
+    stage = Stage.DoingNothing;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.magazineOff();
-    m_intake.intakeOff();
-    m_count = 0;
-
-    // use the mag position to determine shooter speed.
-    m_rpm = calcShooterSpeed();
+    stage = Stage.DoingNothing;
+    intake.magazineOff();
+    intake.intakeOff();
+    count = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    
-    //check our speed
-    double shooterRPM =  m_intake.getShooterRPM();
+  
+    switch(stage){
+      case DoingNothing:
+        intake.magazineOn(SLOW_MAG_REVERSE);
+        stage = Stage.BackingMagazine;
+      break;
 
-    if (m_count++ < m_backupCount) {
-      // We will want to backup the mag a little bit before shooter gets engaged
-      // this will prevent balls getting stuck.
-      m_intake.magazineOn(SLOW_MAG_REVERSE);
-    } else if(shooterRPM <= m_rpm) {
-      // Runs while the shooters are getting up to their desired speed
-      // This will not work if the upper and lower shooters speeds are ever 
-      // changed separately
-      m_intake.shooterOn(m_rpm);
-    } else {
-      m_intake.magazineOn(FAST_MAG_FORWARD);
+      case BackingMagazine:    
+        //backup magazine for backup_count to get balls off flywheels
+        if (count >= backupCount) {
+          //done backing up, turn on flw wheels enter next stage
+          intake.magazineOff();
+          stage = Stage.WaitingForSolution;
+          
+          // TODO: consider starting the flywheels with an estimate while we wait
+          // for a computed solution.  In the fixed cases, this doesn't matter much. (one frame delay - 20ms)
+        }
+      break;
+
+      case WaitingForSolution:
+        if (!calculateShooterSpeed()) break;  // break means we don't have solution, keep waiting
+        
+        // we have our shoot target speeds, turn shooter on
+        intake.shooterOn(rpmCmd);
+        time = System.currentTimeMillis();    //time for spin up start
+        stage = Stage.WaitingForFlyWheel;
+      break;
+
+      case WaitingForFlyWheel: //stage 1, pause magazine while shooters get to RPM goal
+        if (intake.atGoalRPM(goals.Tolerance)) {
+          //Flywheel at speed, move to shooting
+          stage = Stage.Shooting;
+          intake.magazineOn(FAST_MAG_FORWARD);
+        }
+      break;
+
+      case Shooting: 
+        //magazine forward fast to shoot while at RPM goals              
+        if (!intake.atGoalRPM(goals.Tolerance)) { 
+          time = System.currentTimeMillis();
+          //back to WaitingForFlywheel
+          stage = Stage.WaitingForFlyWheel;
+          intake.magazineOff();
+       }
+      break;
     }
+    count++;   
   }
 
-  double calcShooterSpeed() {
-    return (m_intake.isMagazineUp()) ?  m_rpmTarget_high : m_rpmTarget_low;
+  /**
+   * calcuateShooterSpeed()
+   *   Sets internal target speeds for shooter. 
+   *   Override this to use ShooterOn command from different locations.
+   * 
+   *   sets m_rpmUpper and m_rpmLower for flywheel speeds.
+   * 
+   * @return true if solution is found and we can shoot
+   */
+  public boolean calculateShooterSpeed(){
+    if (intake.isMagazineUp()) {
+      // aiming high
+     rpmCmd.copy(goals.HighGoal);
+    }
+    else {
+      // aiming low
+      rpmCmd.copy(goals.LowGoal);
+    }
+    // nothing more to calculate or wait for, we have RPM solution
+    return true;  
   }
+ 
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.shooterOff();
-    m_intake.magazineOff();
-    m_intake.intakeOff();
+    stage = Stage.DoingNothing;
+    intake.shooterOff();
+    intake.magazineOff();
+    intake.intakeOff();
   }
 
 }

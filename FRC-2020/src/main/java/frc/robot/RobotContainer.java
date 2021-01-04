@@ -7,6 +7,10 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -62,6 +66,9 @@ import frc.robot.Constants.DriveTrain;
  * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  //tracks robot's devices for XML parsing
+  static public Map<String, Object> deviceMap = new HashMap<String, Object>();  
+  
   // The robot's subsystems and commands are defined here...
   // public final CameraSubsystem cameraSubsystem;
   public final HID_Xbox_Subsystem driverControls;
@@ -113,6 +120,12 @@ public class RobotContainer {
 
     driveTrain.setDefaultCommand(velDriveCmd);
 
+    //Add devices to map for XML parsing usage, names must be unique.
+    deviceMap.put("lidar", lidar);
+    deviceMap.put("driveTran", driveTrain);
+    deviceMap.put("intake", intake);
+    deviceMap.put("limelight", limelight);
+    
     // Configure the button bindings
     configureButtonBindings(driverControls);
 
@@ -144,6 +157,21 @@ public class RobotContainer {
     */
   }
 
+  /**
+   * getSubystemByName(String systemName)
+   * The XML command file may need access to the subsystem objects
+   * this is a clean way to get them.
+   * 
+   * @return Object 
+   */
+  public static  Object getDeviceByName(String name) {
+    if (!deviceMap.containsKey(name)) {
+      System.out.println("Device not found on Robot:" + name +
+          ".\nPlease check the floor for missing part. ");
+      return null;
+    }
+    return deviceMap.get(name);
+  }
   
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

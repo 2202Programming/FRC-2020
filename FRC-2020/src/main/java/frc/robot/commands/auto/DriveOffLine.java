@@ -8,15 +8,15 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.subsystems.ifx.VelocityDrive;
 
 public class DriveOffLine extends CommandBase {
-  private VelocityDifferentialDrive_Subsystem driveTrain;
+  private VelocityDrive driveTrain;
   private double power;
   /**
    * Creates a new DriveOffLine.
    */
-  public DriveOffLine(VelocityDifferentialDrive_Subsystem driveTrain, double power) {
+  public DriveOffLine(VelocityDrive driveTrain, Double power) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.driveTrain = driveTrain;
     this.power = power;
@@ -26,7 +26,7 @@ public class DriveOffLine extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    driveTrain.velocityArcadeDrive(power, 0);
+    driveTrain.  velocityArcadeDrive(power, 0);
 
   }
 
@@ -39,7 +39,7 @@ public class DriveOffLine extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    driveTrain.arcadeDrive(0, 0);
+    driveTrain.velocityArcadeDrive(0, 0);
   }
 
   // Returns true when the command should end.

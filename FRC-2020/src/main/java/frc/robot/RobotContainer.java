@@ -10,17 +10,12 @@ package frc.robot;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.commands.drive.shift.GearToggleCmd;
-import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
-import frc.robot.commands.intake.IntakeToggleCmd;
-import frc.robot.commands.intake.MagazineAdjust;
-import frc.robot.commands.intake.MagazineToggleCmd;
-import frc.robot.commands.intake.ReverseIntake;
-import frc.robot.commands.intake.ShooterOn;
-
+import frc.robot.Constants.DriveTrain;
+import frc.robot.Constants.DriverPrefs;
+//Constants file import sections
+import frc.robot.Constants.ShooterOnCmd;
 //import frc.robot.commands.intake.ShooterOnAuto;
 //import frc.robot.commands.intake.ToggleIntakeRaised;
 //import frc.robot.commands.auto.DriveOffLine;
@@ -36,6 +31,13 @@ import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.SwitchDriveMode;
 import frc.robot.commands.drive.TankDriveCmd;
+import frc.robot.commands.drive.shift.GearToggleCmd;
+import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
+import frc.robot.commands.intake.IntakeToggleCmd;
+import frc.robot.commands.intake.MagazineAdjust;
+import frc.robot.commands.intake.MagazineToggleCmd;
+import frc.robot.commands.intake.ReverseIntake;
+import frc.robot.commands.intake.ShooterOn;
 //import frc.robot.subsystems.CameraSubsystem;
 //import frc.robot.commands.panel.SimpPositionControl;
 //import frc.robot.commands.panel.SimpRotateControl;
@@ -53,10 +55,6 @@ import frc.robot.subsystems.hid.XboxAxis;
 import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
-//Constants file import sections
-import frc.robot.Constants.ShooterOnCmd;
-import frc.robot.Constants.DriverPrefs;
-import frc.robot.Constants.DriveTrain;
 
 /**
  * This class is where the bulk of the robot should be declared. Since

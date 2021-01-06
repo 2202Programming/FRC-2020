@@ -100,7 +100,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
                     new WaitCommand(0.7),
                     new MagazineToggleCmd(intake),
                     new WaitCommand(1.2),
-                    new ShooterOn(intake, ShooterOnCmd.data).withTimeout(3),
+                    new ShooterOn(intake, ShooterOnCmd.data).withTimeout(3), //need to add Data type to parser
                     new MagazineToggleCmd(intake),
                     new ToggleIntakeRaised(intake)
             );
@@ -110,7 +110,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
 
                 // Move forward using limelight to a certain limelight area(distance estimate)
                 new auto_creep_area_cmd(drive, limelight, lidar, angleTarget, 3, 60, limelightAreaTarget, true)
-                        .withTimeout(3),
+                        .withTimeout(3), //double variables with Java reflections?
 
                 // Drive open loop forward until lidar valid
                 new auto_drive_straight_until_lidar_cmd(drive, lidar, 2).withTimeout(3),
@@ -147,7 +147,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
 
             if (trenchMode) { // only move to pickup balls after first 3 are delivered if switch enables this
                               // behavior
-                addCommands(
+                addCommands( //should this be within non-HighMode only?
 
                         // turn only with limelight to face balls to pick up
                         new auto_creep_area_turn_cmd(drive, limelight, -24, 60),

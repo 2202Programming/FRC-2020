@@ -33,7 +33,7 @@
         "DYLD_LIBRARY_PATH": "${workspaceFolder}/build/tmp/jniExtractDir;${workspaceFolder}/build/tmp/expandedArchives",
         "HALSIM_EXTENSIONS": "${workspacefoleder}/build/tmp/expandedArchives/halsim_gui-2020.3.2-windowsx86-64debug.zip_edf14ad9212ab25cb303cb48741010d5/windows/x86-64/shared/halsim_guid.dll"
       }
-    },
+    }
   ],
   "java.test.defaultConfig": "WPIlibUnitTests"
 }

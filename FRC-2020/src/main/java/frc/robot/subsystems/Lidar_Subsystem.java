@@ -7,16 +7,19 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.Tperiod;
+
 import com.playingwithfusion.TimeOfFlight;
 
 import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.*;
-import frc.robot.subsystems.ifx.*;
+import frc.robot.Constants.CAN;
+import frc.robot.Constants.LIDAR;
+import frc.robot.Constants.RobotPhysical;
+import frc.robot.subsystems.ifx.Logger;
 
 public class Lidar_Subsystem extends SubsystemBase implements Logger {
   /**

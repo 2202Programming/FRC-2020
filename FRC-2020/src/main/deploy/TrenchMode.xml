@@ -1,0 +1,84 @@
+<SequenceGrp>
+    <Command name="frc.robot.commands.auto.auto_creep_area_cmd" withTimeout="3">
+        <Arg robotDevice="driveTrain" />
+        <Arg robotDevice="limelight" />
+        <Arg robotDevice="lidar" />
+        <Arg type="double" value="angleTarget" />
+        <Arg type="double" value="3" />
+        <Arg type="double" value="60" />
+        <Arg type="double" value="limelightAreaTarget" />
+        <Arg type="boolean" value="true" />
+    </Command>
+    <Command name="frc.robot.commands.auto.auto_drive_straight_until_lidar_cmd" withTimeout="3">
+        <Arg robotDevice="driveTrain" />
+        <Arg robotDevice="lidar" />
+        <Arg type="double" value="2" />
+    </Command>
+    <Command name="frc.robot.commands.auto.auto_drive_lidar">
+        <Arg robotDevice="driveTrain" />
+        <Arg robotDevice="lidar" />
+        <Arg type="double" value="300" />
+        <Arg type="double" value="1.25" />
+        <Arg type="boolean" value="true" />
+        <Arg type="double" value="lidarDepartureAngle[positionCode]" />
+    </Command>
+    <Command name="frc.robot.commands.auto.auto_drive_lidar" withTimeout="2">
+        <Arg robotDevice="driveTrain" />
+        <Arg robotDevice="lidar" />
+        <Arg type="double" value="120" />
+        <Arg type="double" value="3" />
+        <Arg type="boolean" value="true" />
+        <Arg type="double" value="0" />
+    </Command>
+    <ParallelGrp>
+        <Command name="frc.robot.commands.auto.auto_drive_straight_cmd" withTimeout="2">
+            <Arg robotDevice="driveTrain" />
+            <Arg type="double" value="1.5" />
+        </Command>
+        <Command name="frc.robot.commands.intake.ShooterOn" withTimeout="2">
+            <Arg robotDevice="intake" />
+        </Command>
+    </ParallelGrp>
+    <Command name="frc.robot.commands.auto.auto_drive_lidar">
+        <Arg robotDevice="driveTrain" />
+        <Arg robotDevice="lidar" />
+        <Arg type="double" value="800" />
+        <Arg type="double" value="3" />
+        <Arg type="boolean" value="false" />
+        <Arg type="double" value="1.5 * lidarDepartureAngle[positionCode]" />
+    </Command>
+    <Command name="frc.robot.commands.auto.auto_drive_straight_cmd" withTimeout="1">
+        <Arg robotDevice="driveTrain" />
+        <Arg type="double" value="-1" />
+    </Command>
+    <Command name="frc.robot.commands.auto.auto_creep_area_cmd">
+        <Arg robotDevice="driveTrain" />
+        <Arg robotDevice="limelight" />
+        <Arg robotDevice="lidar" />
+        <Arg type="double" value="limelightDepartureAngle[positionCode]" />
+        <Arg type="double" value="3" />
+        <Arg type="double" value="60" />
+        <Arg type="double" value="departureArea[positionCode]" />
+        <Arg type="boolean" value="false" />
+    </Command>
+    <Command name="frc.robot.commands.auto.auto_drive_straight_cmd" withTimeout=".8">
+        <Arg robotDevice="driveTrain" />
+        <Arg type="double" value="-2" />
+    </Command>
+    <Command name="frc.robot.commands.toggleLED">
+        <Arg robotDevice="limelight" />
+    </Command>
+    <Command name="frc.robot.commands.auto.auto_creep_area_turn_cmd">
+        <Arg robotDevice="driveTrain" />
+        <Arg robotDevice="limelight" />
+        <Arg type="double" value="-24" />
+        <Arg type="double" value="60" />
+    </Command>
+    <Command name="frc.robot.commands.auto.auto_ball_capture_cmd" withTimeout="4">
+        <Arg robotDevice="intake" />
+        <Arg robotDevice="driveTrain" />
+        <Arg type="double" value=".5" />
+        <Arg type="double" value=".7" />
+        <Arg type="double" value="-4" />
+    </Command>
+</SequenceGrp>

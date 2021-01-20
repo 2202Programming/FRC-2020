@@ -1,38 +1,34 @@
 package frc.robot.subsystems;
 
-import frc.robot.subsystems.GearShifter.Gear;
-import frc.robot.subsystems.ifx.*;
-import frc.robot.util.misc.MathUtil;
-import frc.robot.util.misc.PIDFController;
+import static frc.robot.Constants.RobotPhysical.WheelAxelDistance;
+import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 
 import com.revrobotics.CANEncoder;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANPIDController;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.SpeedController;
-
-import frc.robot.Constants.DriveTrain;
-import static frc.robot.Constants.RobotPhysical.*;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
-
-//TODO: Fix left/right gearing to use inverted motor control so positive is forward for both sides.
-// needs to be done at the motor level for trajectory control to work.
+import frc.robot.Constants.DriveTrain;
+import frc.robot.subsystems.GearShifter.Gear;
+import frc.robot.subsystems.ifx.DualDrive;
+import frc.robot.subsystems.ifx.Logger;
+import frc.robot.subsystems.ifx.Shifter;
+import frc.robot.subsystems.ifx.VelocityDrive;
+import frc.robot.util.misc.MathUtil;
+import frc.robot.util.misc.PIDFController;
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive, Shifter {
-	// RPM Limits
-	final double MAXRPM = DriveTrain.motorMaxRPM;
-	
+  
 	// Current Limits
-	private final int SMARTCURRENT_MAX = DriveTrain.smartCurrentMax;
 	private int smartCurrentLimit = DriveTrain.smartCurrentLimit; // amps
-	// private final double KSecondaryCurrent = 1.40; // set secondary current based
-	// on smart current
+	// private final double KSecondaryCurrent = 1.40; // set secondary current based on smart current
 
 	// Phyical units deadzone
 	private final double RPM_DZ = 2.0;
@@ -61,12 +57,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	// VelController can use either Velocity mode or dutycycle modes and is wrapper
 	// around CANSparkMax. These get setup after factory resets.
-	private VelController leftController; 
-	private VelController rightController;
+	VelController leftController; 
+	VelController rightController;
 	
 	// likely not needed because it is so low to get robot to move.
-	private final double FEEDFWD_MAX_VOLT = 0.0;   //0.15 was enough to move Alfred.
-	private double feedFwd = 0.0;
+	final double ARBIT_FEEDFWD_MAX_VOLT = 0.0;   //0.15 was enough to move Alfred.
+	private double arbFeedFwd = 0.0;
 
 	// Calculated based on desired low-gear max ft/s
 	private final double maxFPS_High;  // Assigned
@@ -75,19 +71,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	//private final double maxRPM_Low;   // max motor RPM low & high
 	private final double maxRPM_High;  // max motor RPM low & high
 
-	private final DifferentialDrive dDrive;
-	private GearShifter gearbox;
-	private Gear requestedGear; 
-	private boolean coastMode = false;
-
-	/**
-	 * Data needed for this sub-system set in the constants file. 
-	 */
-	
+	final DifferentialDrive dDrive;
+	GearShifter gearbox;
+	Gear requestedGear; 
+	boolean coastMode = false;
 	
 	//measurements, taken in periodic()
-	double velLeft=0.0;   //fps
-	double velRight=0.0;  //fps
+	double velLeft=0.0;   //fps, positive moves robot forward
+	double velRight=0.0;  //fps, positive moves robot forward
 	Gear currentGear;
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {
@@ -98,16 +89,17 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		maxFPS_High = DriveTrain.maxFPS;
 
 		// setup physical units - chassis * gearbox  (rev per minute)
-		K_low_fps_rpm = K_ft_per_rev * gearbox.K_low / 60;
+		K_low_fps_rpm = K_ft_per_rev * gearbox.K_low / 60;    //rpm/60 rps
 		K_high_fps_rpm = K_ft_per_rev * gearbox.K_high / 60;
-		// compute max RPM for motors
+    
+    // compute max RPM for motors for high and low gears
 		maxRPM_High = (maxFPS_High / K_high_fps_rpm); 
-		maxFPS_Low = (MAXRPM * K_low_fps_rpm);
+		maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
 
 		// check we can hit max requested speed in high gear
-		if (maxRPM_High > MAXRPM) {
+		if (maxRPM_High > DriveTrain.motorMaxRPM) {
 			System.out.println("Warning: targeted maxFPS not reachable. maxFPS= " + 
-				(MAXRPM*K_high_fps_rpm));
+				(DriveTrain.motorMaxRPM * K_high_fps_rpm));
 		}
 
 		// setup SparkMax controllers, sets left and right masters
@@ -118,7 +110,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		adjustCurrentLimit(0);
 
 		dDrive = new DifferentialDrive(leftController, rightController);
-		dDrive.setSafetyEnabled(false);
+		dDrive.setSafetyEnabled(DriveTrain.safetyEnabled);
 	}
 
 	/**
@@ -129,21 +121,22 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		resetControllers();
 
 		// velocity setup - using RPM speed controller, sets pid
-		this.leftController = new VelController(backLeft, DriveTrain.pidValues);
-		this.rightController = new VelController(backRight, DriveTrain.pidValues);
+    leftController = new VelController(backLeft, DriveTrain.pidValues);
+    leftController.setEncoderInverted(DriveTrain.leftEncoderInverted);
+		rightController = new VelController(backRight, DriveTrain.pidValues);
+    rightController.setEncoderInverted(DriveTrain.rightEncoderInverted);
 
 		// Have motors follow to use Differential Drive
-		middleRight.follow(backRight);
+		middleRight.follow(backRight);   // right side
 		frontRight.follow(backRight);
-		// Left side
-		middleLeft.follow(backLeft);
+		middleLeft.follow(backLeft);     // left side
 		frontLeft.follow(backLeft);
 
 		// zero adjust will set the default limits for accel and currents
 		adjustAccelerationLimit(0.0);
 		adjustCurrentLimit(0);
 
-		// burn the default value incase of brown-out
+		// burn the default value in case of brown-out
 		saveControllers();
 	}
 
@@ -158,21 +151,20 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 
 	/**
-	 * adjust the feedforward voltage sent to the motors.  This should
+	 * adjust the arbitrary feedforward voltage sent to the motors.  This should
 	 * be positive, but sign is flipped when going backward.
 	 * 
-	 * Tune to the value the motor/robot just starts to move.
+	 * Purpose is to tune to the value the motor/robot just starts to move.
 	 * 
 	 * @param deltaFF voltage to go up or down from current value
 	 * @return
 	 */
 	public double adjustFeedForward(final double deltaFF) {
-		feedFwd = MathUtil.limit((feedFwd + deltaFF), 0.0, FEEDFWD_MAX_VOLT);
+		arbFeedFwd = MathUtil.limit((arbFeedFwd + deltaFF), 0.0, ARBIT_FEEDFWD_MAX_VOLT);
 
-		SmartDashboard.putNumber("motorFF", feedFwd);
-		return feedFwd;
+		SmartDashboard.putNumber("DT/limits/arbFF", arbFeedFwd);
+		return arbFeedFwd;
 	}
-
 
 
 	/**
@@ -192,7 +184,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		leftController.controller.setClosedLoopRampRate(rateLimit);
 		rightController.controller.setClosedLoopRampRate(rateLimit);
 
-		SmartDashboard.putNumber("limits/rate", rateLimit);
+		SmartDashboard.putNumber("DT/limits/acelrate", rateLimit);
 		return rateLimit;
 	}
 
@@ -204,15 +196,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 * @return
 	 */
 	public int adjustCurrentLimit(final int deltaCurrent) {
-		smartCurrentLimit = MathUtil.limit(smartCurrentLimit + deltaCurrent, 0, SMARTCURRENT_MAX);
+		smartCurrentLimit = MathUtil.limit(smartCurrentLimit + deltaCurrent, 0, DriveTrain.smartCurrentMax);
 		// final double secondaryCurrent = smartCurrentLimit * KSecondaryCurrent;
 
 		for (final CANSparkMax c : controllers) {
 			// smart current limit
 			c.setSmartCurrentLimit(smartCurrentLimit);
 		}
-		SmartDashboard.putNumber("limits/smart_I", smartCurrentLimit);
-		System.out.println("***** SmartCurrent*****" + smartCurrentLimit);
+		SmartDashboard.putNumber("DT/limits/smart_I", smartCurrentLimit);
 		return smartCurrentLimit;
 	}
 
@@ -260,11 +251,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// add in the commanded speed each wheel
 		double vl_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ);
 		double vr_rpm = -applyDeadZone(rpm - vturn_rpm, RPM_DZ);
-
-		/* debugging
-		double v_test = getLeftVel(false);
-		double v_err = v_test - vl_rpm;
-		*/
 		
 		if (coastMode) {
 			// command doesn't need power, ok to coast, should use PWM and zero power
@@ -450,11 +436,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		 * @param rpm - revs per minute
 		 */
 		public void setReference(double rpm) {
-			double ffSign = (rpm >= 0) ? -1.0 : 1.0;
+			double arbff = (rpm >= 0) ? arbFeedFwd : - arbFeedFwd;
 
 			//rpm haz a deadzone so == 0.0 is a fair test.
-			if (rpm ==0.0) ffSign = 0.0;
-			pid.setReference(rpm, ControlType.kVelocity, pidSlot, ffSign*feedFwd); 
+			if (rpm ==0.0) arbff = 0.0;
+			pid.setReference(rpm, ControlType.kVelocity, pidSlot, arbff); 
 		}
 
 		@Override
@@ -470,6 +456,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			encoder.setPosition(position);
 		}
 
+    /**
+     * Controller direction can be inverted.  This is useful so both sides
+     * of the drivetrain get positive RPM to move forward.
+     * 
+     */
 		@Override
 		public void setInverted(final boolean isInverted) {
 			controller.setInverted(isInverted);
@@ -479,6 +470,20 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		public boolean getInverted() {
 			return controller.getInverted();
 		}
+
+    /**
+     *    setEncoderInverted(invert)
+     *    
+     * @param invert  true inverts the encoder sign
+     */
+    public void setEncoderInverted(boolean invert) {
+      encoder.setInverted(invert);
+    }
+
+    public boolean getEncoderInverted() {
+      return encoder.getInverted();
+    }
+
 
 		@Override
 		public void disable() {

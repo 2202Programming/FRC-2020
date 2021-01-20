@@ -172,14 +172,20 @@ public final class Constants {
         public static final PIDFController pidValues =
              new PIDFController(0.00005, 0.0, 0.0, 0.00025); // P, I, D, FF
 
+        // Encoder and other signs
+        public static final boolean leftEncoderInverted = false;
+        public static final boolean rightEncoderInverted = true;
+
         // shifter settings
         public static final int shiftCount = 5;       // frames to wait on vel measurement
         public static final double vShiftLow = 1.5;   // ft/sec shift to low
         public static final double vShiftHigh = 6.8;  // ft/sec shift to high
 
         // Other constraints
-        public static final int smartCurrentMax = 60; //amps in SparkMax
-        public static final int smartCurrentLimit = 35; //amps in SparkMax
+        public static final int smartCurrentMax = 60;  //amps in SparkMax, max setting
+        public static final int smartCurrentLimit = 35; //amps in SparkMax, inital setting
+
+        public static final boolean safetyEnabled = true; 
 
     }
 

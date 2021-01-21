@@ -6,8 +6,17 @@
 /*----------------------------------------------------------------------------*/
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import static frc.robot.Constants.INTAKE_DOWN_SOLENOID_PCM;
+import static frc.robot.Constants.INTAKE_PCM_CAN_ID;
+import static frc.robot.Constants.INTAKE_SPARK_PWM;
+import static frc.robot.Constants.INTAKE_UP_SOLENOID_PCM;
+import static frc.robot.Constants.LOWER_SHOOTER_TALON_CAN;
+import static frc.robot.Constants.MAGAZINE_DOWN_PCM;
+import static frc.robot.Constants.MAGAZINE_PCM_CAN_ID;
+import static frc.robot.Constants.MAGAZINE_PWM;
+import static frc.robot.Constants.MAGAZINE_UP_PCM;
+import static frc.robot.Constants.UPPER_SHOOTER_TALON_CAN;
+
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -15,13 +24,14 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import static frc.robot.Constants.*;
-import frc.robot.subsystems.ifx.Logger;
-import frc.robot.util.misc.PIDFController;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.ifx.Logger;
+import frc.robot.util.misc.PIDFController;
 
 public class Intake_Subsystem extends SubsystemBase implements Logger {
   /**
@@ -84,8 +94,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * 
    * Use same values as starting point for both upper and lower FW PIDF.                             
    */
-  PIDFController pidValues = new PIDFController(0.1, 0.00000, 6, 0.00934);   // kP kI kD kF 
-
+  //PIDFController pidValues = new PIDFController(0.1, 0.00000, 6, 0.00934);   // kP kI kD kF 
+  PIDFController pidValues = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
+  int Izone =1800;
   /**
    * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =
    * velocity setpoint is in units/100ms
@@ -369,6 +380,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
       config.slot0.kI = pid.getI();
       config.slot0.kD = pid.getD();
       config.slot0.kF = pid.getF();
+      config.slot0.integralZone = Izone;
 
       config.slot1 = config.slot0;
       motor.configAllSettings(config);

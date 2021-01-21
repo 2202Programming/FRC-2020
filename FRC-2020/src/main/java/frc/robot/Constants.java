@@ -209,9 +209,9 @@ public final class Constants {
         public static ShooterOn.Data data = new ShooterOn.Data();
         static {
             data.BackupSec = .1;    // seconds
-            data.Tolerance = .025;  //2.5%
-            data.HighGoal = new FlywheelRPM(1900, 1900);
-            data.LowGoal =  new FlywheelRPM(1000, 1000);
+            data.Tolerance = .005;  //2.5%
+            data.HighGoal = new FlywheelRPM(2200, 2200);
+            data.LowGoal =  new FlywheelRPM(1800, 1800);
         }
        
     }

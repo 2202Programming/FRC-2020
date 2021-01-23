@@ -38,6 +38,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
+import frc.robot.commands.intake.ToggleIntakeRaised;
 //import frc.robot.subsystems.CameraSubsystem;
 //import frc.robot.commands.panel.SimpPositionControl;
 //import frc.robot.commands.panel.SimpRotateControl;
@@ -146,7 +147,7 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineAdjust(intake, true, 0.4), true);
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
     dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineToggleCmd(intake));
-    
+    dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new ToggleIntakeRaised(intake));
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); // rpm_low, rpm_high, seconds mag backup
     
     //auto RPM adjustment from limelight area based on calculated trendlines

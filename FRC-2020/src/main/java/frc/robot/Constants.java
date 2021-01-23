@@ -211,7 +211,7 @@ public final class Constants {
             data.BackupSec = .1;    // seconds
             data.Tolerance = .005;  //2.5%
             data.HighGoal = new FlywheelRPM(2200, 2200);
-            data.LowGoal =  new FlywheelRPM(3000, 2000);
+            data.LowGoal =  new FlywheelRPM(2975, 2175);
         }
        
     }

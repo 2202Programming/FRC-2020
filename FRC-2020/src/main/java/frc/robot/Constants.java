@@ -210,9 +210,8 @@ public final class Constants {
         static {
             data.BackupSec = .1;    // seconds
             data.Tolerance = .005;  //0.5%
-            data.HighGoal = new FlywheelRPM(2200, 2200);
-            data.LowGoal =  new FlywheelRPM(2975, 2175);
-            data.AtGoalBeforeShoot = 3;
+            data.HighGoal = new FlywheelRPM(2202, 2202);
+            data.LowGoal =  new FlywheelRPM(2975, 2175); //2975, 2175 | 2500, 1700
         }
        
     }

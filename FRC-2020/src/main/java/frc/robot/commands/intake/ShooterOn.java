@@ -7,10 +7,10 @@
 
 package frc.robot.commands.intake;
 
-import static frc.robot.Constants.ShooterOnCmd;
 import static frc.robot.Constants.DT;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.FlywheelRPM;
 
@@ -39,6 +39,7 @@ public class ShooterOn extends CommandBase {
     Shooting,               // mag running, balls flying, watching fw speeds 
   }
   Stage stage;
+  int atGoalCount = 0;       // require flywheels to be at goal for a few frames
 
   /**
    * Constant/control data needed for this command.
@@ -47,7 +48,8 @@ public class ShooterOn extends CommandBase {
     public FlywheelRPM LowGoal;   
     public FlywheelRPM HighGoal; 
     public double Tolerance;   // % of target goal ~1% to 2%
-    public double BackupSec;   //seconds to backup
+    public double BackupSec;   // seconds to backup
+    public int    AtGoalBeforeShoot;      //
 
     public Data() {
       // do nothing
@@ -62,6 +64,7 @@ public class ShooterOn extends CommandBase {
       HighGoal = new FlywheelRPM(d.HighGoal);
       BackupSec = d.BackupSec;
       Tolerance = d.Tolerance;
+      AtGoalBeforeShoot = d.AtGoalBeforeShoot;
     }
   }
 
@@ -88,6 +91,7 @@ public class ShooterOn extends CommandBase {
     intake.magazineOff();
     intake.intakeOff();
     count = 0;
+    atGoalCount = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -122,7 +126,8 @@ public class ShooterOn extends CommandBase {
       break;
 
       case WaitingForFlyWheel: //stage 1, pause magazine while shooters get to RPM goal
-        if (intake.atGoalRPM(goals.Tolerance)) {
+        if (intake.atGoalRPM(goals.Tolerance) && 
+            (atGoalCount++ >= goals.AtGoalBeforeShoot)) {
           //Flywheel at speed, move to shooting
           stage = Stage.Shooting;
           intake.magazineOn(FAST_MAG_FORWARD);
@@ -133,6 +138,7 @@ public class ShooterOn extends CommandBase {
         //magazine forward fast to shoot while at RPM goals              
         if (!intake.atGoalRPM(goals.Tolerance)) { 
           time = System.currentTimeMillis();
+          atGoalCount = 0;
           //back to WaitingForFlywheel
           stage = Stage.WaitingForFlyWheel;
           intake.magazineOff();

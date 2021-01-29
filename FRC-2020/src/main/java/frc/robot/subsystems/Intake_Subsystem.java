@@ -94,9 +94,36 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * 
    * Use same values as starting point for both upper and lower FW PIDF.                             
    */
-  //PIDFController pidValues = new PIDFController(0.1, 0.00000, 6, 0.00934);   // kP kI kD kF 
-  PIDFController pidValues = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
-  int Izone =1800;
+
+  class FlyWheelConfig {
+    PIDFController pid;
+    int Izone;
+    double maxOpenLoopRPM; 
+    double gearRatio;              // account for gearbox reduction to flywheel
+    boolean sensorPhase;
+    boolean inverted;
+  };
+
+  FlyWheelConfig upperFWConfig = new FlyWheelConfig();
+  {
+    upperFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
+    upperFWConfig.Izone = 1800;
+    upperFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
+    upperFWConfig.gearRatio = 5.0;         // upper is 5:1 (motor:fw)
+    upperFWConfig.sensorPhase = false;
+    upperFWConfig.inverted = false;
+  }
+
+  FlyWheelConfig lowerFWConfig = new FlyWheelConfig();
+  {
+    lowerFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
+    lowerFWConfig.Izone = 1800;
+    lowerFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
+    lowerFWConfig.gearRatio = 3.0;         // lower fw gear 3:1  (motor:flywheel)
+    lowerFWConfig.sensorPhase = false;
+    lowerFWConfig.inverted = true; 
+  }
+  
   /**
    * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =
    * velocity setpoint is in units/100ms
@@ -104,9 +131,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * Gear ratio is 5:1 and sensor is before gearbox 12/12/20
    * (Motor turns 5x the flywheel)
    */
-
-  final double maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
-  final double Gear = 5.0;              // account for gearbox reduction to flywheel
   final double ShooterEncoder = 4096;   // counts per rev motor 
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
   final double kRPM2Counts = (ShooterEncoder) / RPM2CountsPer100ms;  // motor-units (no gearing)
@@ -152,11 +176,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   public Intake_Subsystem() {
     SendableRegistry.setName(this,"Intake", "shooter");
-    upper_shooter = new FlyWheel(UPPER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);
-    upper_shooter.setMotorTurnsPerFlywheelTurn(Gear);
-    lower_shooter = new FlyWheel(LOWER_SHOOTER_TALON_CAN, pidValues, false, maxOpenLoopRPM);
-    lower_shooter.setMotorTurnsPerFlywheelTurn(Gear);
-    lower_shooter.setInverted(); 
+    upper_shooter = new FlyWheel(UPPER_SHOOTER_TALON_CAN, upperFWConfig);
+    lower_shooter = new FlyWheel(LOWER_SHOOTER_TALON_CAN, lowerFWConfig);
 
     intakeIsOn = false;
     shooterIsOn = false;
@@ -174,9 +195,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
     error.upper = target.upper - actual.upper;
     error.lower = target.lower - actual.lower;
-
-    // This method will be called once per scheduler run
-    //lastError = upper_shooter.getLastError();
   }
 
   public void raiseIntake() {
@@ -336,7 +354,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     layout.addNumber("MO/Lower", lower_shooter::getMotorOutputPercent ) ;
     layout.addNumber("RPM/Upper", () -> actual.upper).withSize(2,1);
     layout.addNumber("RPM/Lower", ()-> actual.lower);
-    layout.addNumber("RPM/Error", () -> error.upper );
+    layout.addNumber("RPM/ErrorL", () -> error.lower );
   }
 
 
@@ -350,47 +368,49 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     final int kPIDLoopIdx = 0;
     final int kTimeoutMs = 30;
 
-    TalonSRXConfiguration config;
+    TalonSRXConfiguration srxconfig;
     WPI_TalonSRX motor;     //this could be a generic motor controller...
-    PIDFController pid;     // values used to send to hardware and tie to display, never calculate()
     
-    double maxRPM;          // measured at the flywheel (tach - RPM)
-    double gearRatio;       // motor turns per flywheel turn
-    double FWrpm2Counts;    // flywheel RPM given motor-unit counts (f(gear, meas-period))
-    double MUCounts2FWrpm;  // motor units (counts/100ms) to FW RPM (1/FWrpm2Counts)
+    final double maxRPM;          // measured at the flywheel (tach - RPM)
+    final double FWrpm2Counts;    // flywheel RPM given motor-unit counts (f(gear, meas-period))
+    final double MUCounts2FWrpm;  // motor units (counts/100ms) to FW RPM (1/FWrpm2Counts)
 
-    FlyWheel(int CAN_ID, PIDFController pidValues, boolean sensorPhase, double max_rpm) {
-      config = new TalonSRXConfiguration();
+    FlyWheel(int CAN_ID, FlyWheelConfig cfg) {
+      srxconfig = new TalonSRXConfiguration();
       motor = new WPI_TalonSRX(CAN_ID);
-      pid = new PIDFController(pidValues.getP(), pidValues.getI(), pidValues.getD(), pidValues.getF());
-      maxRPM = max_rpm;
+      motor.setInverted(cfg.inverted);
+      maxRPM = cfg.maxOpenLoopRPM;
 
-      ErrorCode lasterr = motorConfig(sensorPhase);
+      // flywheel constants RPM given motor-unit counts (f(gear, meas-period))
+      FWrpm2Counts = kRPM2Counts * cfg.gearRatio;  //motor counts are bigger, motor spins faster than FW    
+      MUCounts2FWrpm  = 1.0 / FWrpm2Counts;  // motor units (counts/100ms) to FW RPM 
+
+      ErrorCode lasterr = motorConfig(cfg);
       if (lasterr.value != 0 ) {
         System.out.println("Flywheel motor error:" + lasterr.value + "  CANID=" + CAN_ID);
       }
     }
 
-    ErrorCode motorConfig(boolean sensorPhase) {
+    ErrorCode motorConfig(FlyWheelConfig cfg) {
       /* Factory Default all hardware to prevent unexpected behaviour */
       motor.configFactoryDefault();
       
       // use the config to set all values at once
-      config.slot0.kP = pid.getP();
-      config.slot0.kI = pid.getI();
-      config.slot0.kD = pid.getD();
-      config.slot0.kF = pid.getF();
-      config.slot0.integralZone = Izone;
+      srxconfig.slot0.kP = cfg.pid.getP();
+      srxconfig.slot0.kI = cfg.pid.getI();
+      srxconfig.slot0.kD = cfg.pid.getD();
+      srxconfig.slot0.kF = cfg.pid.getF();
+      srxconfig.slot0.integralZone = cfg.Izone;
 
-      config.slot1 = config.slot0;
-      motor.configAllSettings(config);
+      srxconfig.slot1 = srxconfig.slot0;
+      motor.configAllSettings(srxconfig);
 
       /* Config sensor used for Primary PID [Velocity] */
       //motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, kPIDLoopIdx, kTimeoutMs);
       // dpl - 12/19/20  Relative encoding worked very well.  See plots in Slack.
       //
       motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kPIDLoopIdx, kTimeoutMs);
-      motor.setSensorPhase(sensorPhase);   // fix feedback direction
+      motor.setSensorPhase(cfg.sensorPhase);   // fix feedback direction
       motor.setNeutralMode(NeutralMode.Coast);
 
       /* Config the peak and nominal outputs */
@@ -399,19 +419,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
       motor.configPeakOutputForward(1, kTimeoutMs);
       motor.configPeakOutputReverse(-1, kTimeoutMs);
       return motor.getLastError();
-    }
-
-    /**
-     * sets the gear ratio between Flywheel and motor shaft
-     * @param gear
-     */
-    public void setMotorTurnsPerFlywheelTurn(double gear) {
-      gearRatio = gear;
-      // flywheel RPM given motor-unit counts (f(gear, meas-period))
-      FWrpm2Counts = kRPM2Counts * gearRatio;  //motor counts are bigger, motor spins faster than FW
-      
-      // motor units (counts/100ms) to FW RPM 
-      MUCounts2FWrpm  = 1.0 / FWrpm2Counts; 
     }
 
     /**
@@ -428,21 +435,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
     public void  setRPM(double fw_rpm) {
       double sp = fw_rpm * FWrpm2Counts;
-      pid.setSetpoint(sp);  // saving value for possible pid display
       motor.set(ControlMode.Velocity, sp);
     }
 
     public void setPercent(double pct) {
-      pid.setSetpoint(pct);  // saving value for possible pid display
       motor.set(ControlMode.PercentOutput, pct); 
     }
-
-    public void setInverted() {
-      motor.setInverted(true);
-    }
-
   } //FlyWheel
-
- 
 
 }

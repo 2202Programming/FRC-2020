@@ -10,12 +10,10 @@ import static frc.robot.Constants.INTAKE_DOWN_SOLENOID_PCM;
 import static frc.robot.Constants.INTAKE_PCM_CAN_ID;
 import static frc.robot.Constants.INTAKE_SPARK_PWM;
 import static frc.robot.Constants.INTAKE_UP_SOLENOID_PCM;
-import static frc.robot.Constants.LOWER_SHOOTER_TALON_CAN;
 import static frc.robot.Constants.MAGAZINE_DOWN_PCM;
 import static frc.robot.Constants.MAGAZINE_PCM_CAN_ID;
 import static frc.robot.Constants.MAGAZINE_PWM;
 import static frc.robot.Constants.MAGAZINE_UP_PCM;
-import static frc.robot.Constants.UPPER_SHOOTER_TALON_CAN;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -30,6 +28,12 @@ import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.Matrix;
+import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.Vector;
+import edu.wpi.first.wpiutil.math.numbers.N2;
+import frc.robot.Constants.CAN;
+import frc.robot.Constants.Shooter;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.util.misc.PIDFController;
 
@@ -41,13 +45,23 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * implements the WPI SpeedController, Sendable.
    * 
    * 
-   * Who When What
-   *  DPL 2/09/2020 removed publics, use WPI_TalonSRX, Gear gain Also removed some debug code.
-   *  DPL 12/12/2020  setup for Kevin' PID UX, Moved motor stuff to flywheel class
-   *                  invert flag for feedback, setInvert for motor polarity.
+   * Who When What DPL 2/09/2020 removed publics, use WPI_TalonSRX, Gear gain Also
+   * removed some debug code. DPL 12/12/2020 setup for Kevin' PID UX, Moved motor
+   * stuff to flywheel class invert flag for feedback, setInvert for motor
+   * polarity.
    * 
-   *  DPL 12/15/2020  tested in lab, sort of worked but oscilated. Found Ki was 10x what 
-   *                  we tested 12/12 in DifferentialShooter branch.  Changed, need to retest.
+   * DPL 12/15/2020 tested in lab, sort of worked but oscilated. Found Ki was 10x
+   * what we tested 12/12 in DifferentialShooter branch. Changed, need to retest.
+   *
+   * DPL 1/30/2021 Tuned for new wheel layout. Added Izone in small region to zero
+   * error Kd = at 80% of value that caused oscilation, want as large as possible
+   * to resist speed change when ball is being launched. Kff = based on open loop
+   * speed at max RPM
+   * 
+   * DPL 2/1/2021 moved constants to Constants.java split for different
+   * upper/lower flywheel diameter added velocty and rotation as main control
+   * inputs
+   * 
    */
 
   // Intake
@@ -95,34 +109,16 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * Use same values as starting point for both upper and lower FW PIDF.                             
    */
 
-  class FlyWheelConfig {
-    PIDFController pid;
-    int Izone;
-    double maxOpenLoopRPM; 
-    double gearRatio;              // account for gearbox reduction to flywheel
-    boolean sensorPhase;
-    boolean inverted;
+  public static class FlyWheelConfig {
+    public PIDFController pid;
+    public int Izone;
+    public double maxOpenLoopRPM; 
+    public double gearRatio;              // account for gearbox reduction to flywheel
+    public boolean sensorPhase;
+    public boolean inverted;
+    public double flywheelRadius;
   };
 
-  FlyWheelConfig upperFWConfig = new FlyWheelConfig();
-  {
-    upperFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
-    upperFWConfig.Izone = 1800;
-    upperFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
-    upperFWConfig.gearRatio = 5.0;         // upper is 5:1 (motor:fw)
-    upperFWConfig.sensorPhase = false;
-    upperFWConfig.inverted = false;
-  }
-
-  FlyWheelConfig lowerFWConfig = new FlyWheelConfig();
-  {
-    lowerFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
-    lowerFWConfig.Izone = 1800;
-    lowerFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
-    lowerFWConfig.gearRatio = 3.0;         // lower fw gear 3:1  (motor:flywheel)
-    lowerFWConfig.sensorPhase = false;
-    lowerFWConfig.inverted = true; 
-  }
   
   /**
    * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =
@@ -169,6 +165,11 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   FlywheelRPM actual = new FlywheelRPM();
   FlywheelRPM target = new FlywheelRPM();
   FlywheelRPM error = new FlywheelRPM();
+
+  //Transfrom from [ w, V] [W_lower, W_upper]
+  Matrix<N2,N2> VelToRPM = new Matrix<>(Nat.N2(), Nat.N2() );
+  Vector<N2> vel = new Vector<N2>(Nat.N2());
+  Vector<N2> rpm = new Vector<N2>(Nat.N2());
   
   //state variables
   private boolean intakeIsOn;
@@ -176,8 +177,15 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   public Intake_Subsystem() {
     SendableRegistry.setName(this,"Intake", "shooter");
-    upper_shooter = new FlyWheel(UPPER_SHOOTER_TALON_CAN, upperFWConfig);
-    lower_shooter = new FlyWheel(LOWER_SHOOTER_TALON_CAN, lowerFWConfig);
+    upper_shooter = new FlyWheel(CAN.SHOOTER_UPPER_TALON, Shooter.upperFWConfig);
+    lower_shooter = new FlyWheel(CAN.SHOOTER_LOWER_TALON, Shooter.lowerFWConfig);
+
+    // build out matrix to calculate FW RPM from Vel, omega for power cell
+    VelToRPM.set(0, 0, Shooter.PCEffectiveRadius / Shooter.lowerFWConfig.flywheelRadius);
+    VelToRPM.set(0, 1,  1.0 / Shooter.lowerFWConfig.flywheelRadius);
+    VelToRPM.set(1, 0, -Shooter.PCEffectiveRadius / Shooter.upperFWConfig.flywheelRadius);
+    VelToRPM.set(1, 1, 1.0 / Shooter.upperFWConfig.flywheelRadius);
+    VelToRPM.times(0.5);  // common factor 1/2
 
     intakeIsOn = false;
     shooterIsOn = false;
@@ -234,6 +242,25 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     magazine.set(0);
   }
 
+  /**
+   * Set the Shooter RPM goals from power cell velocity and rotation rate.  
+   * 
+   * Uses a transformation matrix
+   * 
+   *   [ VelToRPM<2,2>] * [w, vel ]^T =  [RPM_lower,  RPM_upper]^T
+   * 
+   *   @param pc_fps        Power Cell Vel = ft / sec
+   *   @param pc_omeg_rps   Power Cell w = rotations / sec 
+   *
+   * @return FlywheelRPM goal
+   */
+  public FlywheelRPM calculateGoals(double pc_fps, double pc_omega_rps) {
+    vel.set(0,0, pc_omega_rps);
+    vel.set(1,0, pc_fps);
+    var omega = VelToRPM.times(vel);
+    return new FlywheelRPM(omega.get(0,0), omega.get(1,0));
+  }
+  
   /**
    * Commands shooter flwwheels to target RPM
    * 

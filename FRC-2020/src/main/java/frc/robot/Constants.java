@@ -8,6 +8,7 @@
 package frc.robot;
 
 import frc.robot.commands.intake.ShooterOn;
+import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
 import frc.robot.subsystems.Intake_Subsystem.FlywheelRPM;
 import frc.robot.util.misc.PIDFController;
 
@@ -41,6 +42,10 @@ public final class Constants {
         public static final int PCM1 = 1; // default ID for PCM
         public static final int PCM2 = 2;
 
+        //Shooter
+        public static final int SHOOTER_UPPER_TALON = 18; 
+        public static final int SHOOTER_LOWER_TALON = 19;
+        
         // Lidar 
         public static final int FRONT_RIGHT_LIDAR = 21;
         public static final int FRONT_LEFT_LIDAR = 22;
@@ -63,9 +68,7 @@ public final class Constants {
     public static final int MAGAZINE_PWM = 9;
 
     public static final int INTAKE_SPARK_PWM = 0;
-    public static final int UPPER_SHOOTER_TALON_CAN = 18;
-    public static final int LOWER_SHOOTER_TALON_CAN = 19;
-
+  
     public static final int INTAKE_PCM_CAN_ID = CAN.PCM1;
     public static final int INTAKE_UP_SOLENOID_PCM = 4;
     public static final int INTAKE_DOWN_SOLENOID_PCM = 5;
@@ -82,7 +85,7 @@ public final class Constants {
     public static final int ARMSOLENOID_LOW_CANID = 0;
     public static final int ARMSOLENOID_HIGH_CANID = 1;
     public static final int WN_SPARKMAX_CANID = 16; // Winch Motor
-    public static final int CLIMB_ARM_TALON_CANID = 18; // rotate arm
+    public static final int CLIMB_ARM_TALON_CANID = 99; // rotate arm
 
     // Control Panel Manipulator
     public static final int PANEL_LIMIT_SWITCH_CH = 0;
@@ -190,6 +193,33 @@ public final class Constants {
     }
 
     public static final class Shooter {
+      // Power Cell info
+      public static final double PowerCellMass = 3.0/16.0;     //lbs
+      public static final double PCNominalRadius = 7.0/2.0;    //inches - power cell 
+      public static final double PCEffectiveRadius = 4.75/2.0; //inches - compressed radius
+      
+      // Flywheel info
+      public static final FlyWheelConfig upperFWConfig = new FlyWheelConfig();
+      {
+        upperFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
+        upperFWConfig.Izone = 1800;
+        upperFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
+        upperFWConfig.gearRatio = 5.0;         // upper is 5:1 (motor:fw)
+        upperFWConfig.sensorPhase = false;
+        upperFWConfig.inverted = false;
+        upperFWConfig.flywheelRadius = 2.0 / 12.0;  //feet
+      }
+    
+      public static final FlyWheelConfig lowerFWConfig = new FlyWheelConfig();
+      {
+        lowerFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
+        lowerFWConfig.Izone = 1800;
+        lowerFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
+        lowerFWConfig.gearRatio = 3.0;         // lower fw gear 3:1  (motor:flywheel)
+        lowerFWConfig.sensorPhase = false;
+        lowerFWConfig.inverted = true; 
+        lowerFWConfig.flywheelRadius = 1.25 / 12.0;   //feet
+      }
 
     }
 

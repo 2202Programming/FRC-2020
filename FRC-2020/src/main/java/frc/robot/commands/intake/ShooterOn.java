@@ -110,9 +110,6 @@ public class ShooterOn extends CommandBase {
           //done backing up, turn on flw wheels enter next stage
           intake.magazineOff();
           stage = Stage.WaitingForSolution;
-          
-          // TODO: consider starting the flywheels with an estimate while we wait
-          // for a computed solution.  In the fixed cases, this doesn't matter much. (one frame delay - 20ms)
         }
       break;
 

@@ -5,7 +5,9 @@ import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
+import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 
@@ -25,7 +27,13 @@ import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive, Shifter {
-  
+  // Sign conventions, apply to encoder and command inputs
+  // Brushless SparkMax cannot invert the encoders
+  final double Kleft = 1.0;
+  final double Kright = -1.0;
+  final boolean KInvertMotor = true;     // convention required in robot characterization 
+  final IdleMode KIdleMode = IdleMode.kCoast;
+
 	// Current Limits
 	private int smartCurrentLimit = DriveTrain.smartCurrentLimit; // amps
 	// private final double KSecondaryCurrent = 1.40; // set secondary current based on smart current
@@ -60,26 +68,31 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	VelController leftController; 
 	VelController rightController;
 	
-	// likely not needed because it is so low to get robot to move.
-	final double ARBIT_FEEDFWD_MAX_VOLT = 0.0;   //0.15 was enough to move Alfred.
+  //  Voltage to get robot to move.
+  // kS - taken from the Drive Characterization
+  //    - for reference, 0.15 was enough to move 2019 arm-bot chassis
+	final double ARBIT_FEEDFWD_MAX_VOLT = 0.123;    // taken 1/30/21
 	private double arbFeedFwd = 0.0;
 
 	// Calculated based on desired low-gear max ft/s
-	private final double maxFPS_High;  // Assigned
-	private final double maxFPS_Low;   // using HIGH gear RPM
+	private final double maxFPS_High;  // <input>
+	private final double maxFPS_Low;   // using HIGH gear max RPM
 	private final double maxDPS;       // max rotation in deg/sec around Z axis
 	//private final double maxRPM_Low;   // max motor RPM low & high
 	private final double maxRPM_High;  // max motor RPM low & high
 
+  // drivetrain & gear objects 
 	final DifferentialDrive dDrive;
 	GearShifter gearbox;
-	Gear requestedGear; 
-	boolean coastMode = false;
+	Gear requestedGear;                // where driver or external logic wants the gear
+	boolean coastMode = false;         // attempt to coast when Vcmd > Vrequest
 	
-	//measurements, taken in periodic()
+	//measurements, taken in periodic(), robot coordinates
 	double velLeft=0.0;   //fps, positive moves robot forward
-	double velRight=0.0;  //fps, positive moves robot forward
-	Gear currentGear;
+  double velRight=0.0;  //fps, positive moves robot forward
+  double posLeft=0.0;   //feet, positive is forward distance, since encoder reset
+  double posRight=0.0;  //feet, positive is forward distance, since encoder reset
+	Gear currentGear;     //high/low
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
@@ -117,14 +130,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 * hides some of the ugly setups like delays between programming.
 	 */
 	void configureControllers() {
-		// factory reset
 		resetControllers();
 
-		// velocity setup - using RPM speed controller, sets pid
+		// velocity setup - using RPM speed controller, sets pid in sparxMax
     leftController = new VelController(backLeft, DriveTrain.pidValues);
-//   leftController.setEncoderInverted(DriveTrain.leftEncoderInverted);
 		rightController = new VelController(backRight, DriveTrain.pidValues);
-//    rightController.setEncoderInverted(DriveTrain.rightEncoderInverted);
 
 		// Have motors follow to use Differential Drive
 		middleRight.follow(backRight);   // right side
@@ -145,7 +155,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public void periodic() {
 		// read required sensor and system values for the frame
 		velLeft = getLeftVel(false);
-		velRight = getRightVel(false);
+    velRight = getRightVel(false);
+    posLeft = getLeftPos();
+    posRight = getRightPos();
 		currentGear = gearbox.getCurrentGear(); 
 	}
 
@@ -184,7 +196,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		leftController.controller.setClosedLoopRampRate(rateLimit);
 		rightController.controller.setClosedLoopRampRate(rateLimit);
 
-		SmartDashboard.putNumber("DT/limits/acelrate", rateLimit);
+		SmartDashboard.putNumber("DT/limits/acelerate", rateLimit);
 		return rateLimit;
 	}
 
@@ -209,7 +221,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	private void resetControllers() {
 		for (final CANSparkMax c : controllers) {
-			c.restoreFactoryDefaults(true); // flash them too
+      c.restoreFactoryDefaults(false); 
+      //apply any of our controller requirements
+      c.setInverted(KInvertMotor);
+      c.setIdleMode(KIdleMode);
+      c.clearFaults();
 		}
 	}
 
@@ -249,8 +265,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		double vturn_rpm = (rps * WHEEL_AXLE_DIST) / k;
 
 		// add in the commanded speed each wheel
-		double vl_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ);
-		double vr_rpm = -applyDeadZone(rpm - vturn_rpm, RPM_DZ);
+		double vl_rpm = Kleft * applyDeadZone(rpm + vturn_rpm, RPM_DZ);
+		double vr_rpm = Kright * applyDeadZone(rpm - vturn_rpm, RPM_DZ);
 		
 		if (coastMode) {
 			// command doesn't need power, ok to coast, should use PWM and zero power
@@ -276,8 +292,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void tankDrive(final double leftSpeed, final double rightSpeed) {
-		shiftGears();
-		dDrive.tankDrive(leftSpeed, rightSpeed, false);
+    shiftGears(); 
+    // dDrive has invert built into it, don't change with this wrapper
+		dDrive.tankDrive(leftSpeed, rightSpeed, false); 
 	}
 
 	/**
@@ -296,20 +313,20 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	public double getLeftPos() {
 		// postion is in units of revs
-		double kft_rev = getFPSperRPM(getCurrentGear())*60.0;
-		double ft =  (-kft_rev) * leftController.getPosition();  
+		double kft_rev = Kleft*getFPSperRPM(getCurrentGear())*60.0;
+		double ft =  kft_rev * leftController.getPosition();  
 		return ft;
 	}
 
 	public double getRightPos() {
 		// postion is in units of revs
-		double kft_rev = getFPSperRPM(getCurrentGear())*60.0;
+		double kft_rev = Kright*getFPSperRPM(getCurrentGear())*60.0;
 		double ft = kft_rev * rightController.getPosition();
 		return ft;
 	}
 
 	public double getLeftVel(final boolean normalized) {
-		double vel =  -leftController.get();           
+		double vel =  Kleft * leftController.get();           
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
@@ -431,23 +448,33 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		}
 
 		/**
-		 * setReference - uses physical units (rpm)
+		 * setReference - uses physical units (rpm) for speed
+     *   - volts for arbitrary feed forward 
 		 * 
-		 * @param rpm - revs per minute
+		 * @param rpm - revs per minute for desired 
 		 */
 		public void setReference(double rpm) {
-			double arbff = (rpm >= 0) ? arbFeedFwd : - arbFeedFwd;
+      // arbff compensates for min voltage needed to make robot move
+      // +V moves forward, -V moves backwards
+			double arbffVolts = (rpm >= 0) ? arbFeedFwd : - arbFeedFwd;
 
 			//rpm haz a deadzone so == 0.0 is a fair test.
-			if (rpm ==0.0) arbff = 0.0;
-			pid.setReference(rpm, ControlType.kVelocity, pidSlot, arbff); 
+			if (rpm ==0.0) arbffVolts = 0.0;
+			pid.setReference(rpm, ControlType.kVelocity, pidSlot, arbffVolts, ArbFFUnits.kVoltage); 
 		}
 
+    /**
+     *  @return  motor RPM
+     */
 		@Override
 		public double get() {
 			return encoder.getVelocity();
 		}
 
+    /**
+     * 
+     * @return motor rotations
+     */
 		public double getPosition() {
 			return encoder.getPosition();
 		}

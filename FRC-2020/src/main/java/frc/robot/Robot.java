@@ -7,7 +7,14 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -75,6 +82,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    String trajectoryJSON = "paths/StraightDrive.wpilib.json";
+    Trajectory trajectory = new Trajectory();
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    } catch (IOException ex) {
+      DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+    }
+    
     Dashboard.getAutoChoice(); // TEST CODE only prints
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     

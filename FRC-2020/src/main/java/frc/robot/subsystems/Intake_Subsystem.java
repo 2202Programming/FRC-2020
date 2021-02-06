@@ -8,11 +8,9 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.INTAKE_DOWN_SOLENOID_PCM;
 import static frc.robot.Constants.INTAKE_PCM_CAN_ID;
-import static frc.robot.Constants.INTAKE_SPARK_PWM;
 import static frc.robot.Constants.INTAKE_UP_SOLENOID_PCM;
 import static frc.robot.Constants.MAGAZINE_DOWN_PCM;
 import static frc.robot.Constants.MAGAZINE_PCM_CAN_ID;
-import static frc.robot.Constants.MAGAZINE_PWM;
 import static frc.robot.Constants.MAGAZINE_UP_PCM;
 
 import com.ctre.phoenix.ErrorCode;
@@ -33,6 +31,7 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.Constants.CAN;
+import frc.robot.Constants.PWM;
 import frc.robot.Constants.Shooter;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.util.misc.PIDFController;
@@ -65,11 +64,11 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    */
 
   // Intake
-  Spark intake_spark = new Spark(INTAKE_SPARK_PWM);
+  Spark intake_spark = new Spark(PWM.INTAKE);
   DoubleSolenoid intakeSolenoid = new DoubleSolenoid(INTAKE_PCM_CAN_ID, INTAKE_UP_SOLENOID_PCM, INTAKE_DOWN_SOLENOID_PCM);
  
   // magazine
-  Spark magazine = new Spark(MAGAZINE_PWM);
+  Spark magazine = new Spark(PWM.MAGAZINE);
   DoubleSolenoid magSolenoid = new DoubleSolenoid(MAGAZINE_PCM_CAN_ID, MAGAZINE_UP_PCM, MAGAZINE_DOWN_PCM);
   
   // Flywheels 
@@ -123,18 +122,15 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   /**
    * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =
    * velocity setpoint is in units/100ms
-   * 
-   * Gear ratio is 5:1 and sensor is before gearbox 12/12/20
-   * (Motor turns 5x the flywheel)
    */
   final double ShooterEncoder = 4096;   // counts per rev motor 
   final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
   final double kRPM2Counts = (ShooterEncoder) / RPM2CountsPer100ms;  // motor-units (no gearing)
 
-/**
+  /**
    * RPMSet and Data are static classes to help configure the comma
    */
-  public static class FlywheelRPM {
+    public static class FlywheelRPM {
     public double upper;
     public double lower;
 
@@ -161,6 +157,27 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     }
   }
 
+  /**
+   * ShooterSettings - simple struture to group the shooters settings.
+   * 
+   *   Rotations/sec is used as input, remember to convert to RADIAN/SEC
+   *   to calculate speeds
+   */
+  public static class ShooterSettings 
+  {
+    public double vel;   // power cell ft/sec 
+    public double rps;   // power cell rotations/sec 
+    public double angle; // angle to set the shooter output
+
+    public ShooterSettings(double vel, double rps, double angle) {
+      this.vel = vel; 
+      this.rps = rps;
+      this.angle = angle;
+    }
+    public ShooterSettings(ShooterSettings s) {this(s.vel, s.rps, s.angle);}
+    public ShooterSettings() {this(0.0, 0.0, 0.0);}
+  }
+
   // All RPM are in FW-RPM, not motor.
   FlywheelRPM actual = new FlywheelRPM();
   FlywheelRPM target = new FlywheelRPM();
@@ -171,23 +188,20 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   Vector<N2> vel = new Vector<N2>(Nat.N2());
   
   //state variables
-  private boolean intakeIsOn;
-  private boolean shooterIsOn;
+  private boolean intakeIsOn = false;
+  private boolean shooterIsOn = false;
 
   public Intake_Subsystem() {
     SendableRegistry.setName(this,"Intake", "shooter");
     upper_shooter = new FlyWheel(CAN.SHOOTER_UPPER_TALON, Shooter.upperFWConfig);
     lower_shooter = new FlyWheel(CAN.SHOOTER_LOWER_TALON, Shooter.lowerFWConfig);
 
-    // build out matrix to calculate FW RPM from Vel, omega for power cell
+    // build out matrix to calculate FW RPM from [omega , Vel] for power cell
     VelToRPM.set(0, 0, Shooter.PCEffectiveRadius / Shooter.lowerFWConfig.flywheelRadius);
     VelToRPM.set(0, 1,  1.0 / Shooter.lowerFWConfig.flywheelRadius);
     VelToRPM.set(1, 0, -Shooter.PCEffectiveRadius / Shooter.upperFWConfig.flywheelRadius);
     VelToRPM.set(1, 1, 1.0 / Shooter.upperFWConfig.flywheelRadius);
     VelToRPM.times(0.5);  // common factor 1/2
-
-    intakeIsOn = false;
-    shooterIsOn = false;
 
     magazineDown(); // must start in down positon
     raiseIntake();  // must start in the up position
@@ -247,16 +261,20 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * Uses a transformation matrix
    * 
    *   [ VelToRPM<2,2>] * [w, vel ]^T =  [RPM_lower,  RPM_upper]^T
+   *   
+   *    @param ShooterSettings  
+   *       @param pc_omeg_rps   Power Cell w = rotations / sec 
+   *       @param pc_fps        Power Cell Vel = ft / sec
    * 
-   *   @param pc_fps        Power Cell Vel = ft / sec
-   *   @param pc_omeg_rps   Power Cell w = rotations / sec 
    *
    * @return FlywheelRPM goal
    */
-  public FlywheelRPM calculateGoals(double pc_fps, double pc_omega_rps) {
-    vel.set(0,0, pc_omega_rps);
-    vel.set(1,0, pc_fps);
-    var omega = VelToRPM.times(vel);
+  public FlywheelRPM calculateGoals(ShooterSettings s) {
+    final double radPerSec2revPerMin = 60 / (2.0*Math.PI);
+    // order of input vector must match VelToRPM matrix order
+    vel.set(0, 0, s.rps*2.0*Math.PI); //rad/s
+    vel.set(1, 0, s.vel);             //ft/s  
+    var omega = VelToRPM.times(vel).times(radPerSec2revPerMin);
     return new FlywheelRPM(omega.get(0,0), omega.get(1,0));
   }
 

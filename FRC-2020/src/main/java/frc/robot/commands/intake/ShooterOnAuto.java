@@ -42,8 +42,8 @@ public class ShooterOnAuto extends ShooterOn  {
   public boolean calculateShooterSpeed() {
      if (m_limelight.getTarget()){
           calculateRPMFromLimelight();
-          intake.shooterOn(rpmCmd); //Start shooter spin up to actual RPM goals
-          System.out.println("Got Limelight Area, Calc Upper RPM" + rpmCmd.toString() + "\n"); 
+          intake.shooterOn(rpmSetpoint); //Start shooter spin up to actual RPM goals
+          System.out.println("Got Limelight Area, Calc Upper RPM" + rpmSetpoint.toString() + "\n"); 
           return true;
      }
      // keep trying for target
@@ -52,7 +52,7 @@ public class ShooterOnAuto extends ShooterOn  {
 
   //find RPM goals from limelight area and slope/intercept of measured RPM data
   private void calculateRPMFromLimelight(){ 
-    rpmCmd.upper = upper_slope*m_limelight.getArea() + upper_yIntercept;
-    rpmCmd.lower = lower_slope*m_limelight.getArea() + lower_yIntercept;
+    rpmSetpoint.upper = upper_slope*m_limelight.getArea() + upper_yIntercept;
+    rpmSetpoint.lower = lower_slope*m_limelight.getArea() + lower_yIntercept;
   }
 }

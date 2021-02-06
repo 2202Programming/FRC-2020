@@ -9,7 +9,7 @@ package frc.robot;
 
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
-import frc.robot.subsystems.Intake_Subsystem.FlywheelRPM;
+import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.util.misc.PIDFController;
 
 /**
@@ -17,9 +17,6 @@ import frc.robot.util.misc.PIDFController;
  * numerical or boolean constants. This class should not be used for any other
  * purpose. All constants should be declared globally (i.e. public static). Do
  * not put anything functional in this class.
- *
- * Conventions xxx_CANID - CAN device, integer between 0..63, unique yyy_PCM -
- * Pnumatics channel ID zzz_PWM - PWM port on RIO
  * 
  * <p>
  * It is advised to statically import this class (or one of its inner classes)
@@ -59,15 +56,18 @@ public final class Constants {
         public static final int BR_SMAX = 35;
     }
 
-    
+    // PWM assignments on the Rio
+    public static final class PWM {
+      public static final int INTAKE = 0;
+      public static final int MAGAZINE = 9; 
+    }
 
     // Intake
     public static final int MAGAZINE_PCM_CAN_ID = CAN.PCM2;
     public static final int MAGAZINE_UP_PCM = 0;
     public static final int MAGAZINE_DOWN_PCM = 1;
-    public static final int MAGAZINE_PWM = 9;
-
-    public static final int INTAKE_SPARK_PWM = 0;
+    
+   
   
     public static final int INTAKE_PCM_CAN_ID = CAN.PCM1;
     public static final int INTAKE_UP_SOLENOID_PCM = 4;
@@ -194,13 +194,13 @@ public final class Constants {
 
     public static final class Shooter {
       // Power Cell info
-      public static final double PowerCellMass = 3.0/16.0;     //lbs
-      public static final double PCNominalRadius = 7.0/2.0;    //inches - power cell 
-      public static final double PCEffectiveRadius = 4.75/2.0; //inches - compressed radius
+      public static final double PowerCellMass = 3.0/16.0;           //lbs
+      public static final double PCNominalRadius = 7.0/2.0/12.0;     //feet - power cell 
+      public static final double PCEffectiveRadius = 4.75/2.0/12.0;  //feet - compressed radius
       
       // Flywheel info
-      public static final FlyWheelConfig upperFWConfig = new FlyWheelConfig();
-      {
+      public static FlyWheelConfig upperFWConfig = new FlyWheelConfig();
+      static {
         upperFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
         upperFWConfig.Izone = 1800;
         upperFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
@@ -210,8 +210,8 @@ public final class Constants {
         upperFWConfig.flywheelRadius = 2.0 / 12.0;  //feet
       }
     
-      public static final FlyWheelConfig lowerFWConfig = new FlyWheelConfig();
-      {
+      public static FlyWheelConfig lowerFWConfig = new FlyWheelConfig();
+      static {
         lowerFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
         lowerFWConfig.Izone = 1800;
         lowerFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
@@ -240,8 +240,8 @@ public final class Constants {
         static {
             data.BackupSec = .1;    // seconds
             data.Tolerance = .005;  //0.5%
-            data.HighGoal = new FlywheelRPM(2202, 2202);
-            data.LowGoal =  new FlywheelRPM(2975, 2175); //2975, 2175 | 2500, 1700
+            data.HighGoal = new ShooterSettings(35.0, 0.0, 41.0);  //vel, rps, angle
+            data.LowGoal =  new ShooterSettings(10.0, 0.0, 22.0);  //vel, rps, angle
         }
        
     }

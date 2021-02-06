@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.FlywheelRPM;
+import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 
 public class ShooterOn extends CommandBase {
 
@@ -25,8 +26,12 @@ public class ShooterOn extends CommandBase {
 
   // Speed to use speed to use based on high/low mag position, distance or other function
   // set by call to calculateShooterSpeed().
-  FlywheelRPM rpmCmd = new FlywheelRPM(0, 0);
+  FlywheelRPM rpmSetpoint = new FlywheelRPM(0, 0);
   
+  // Flywheel speed calculated from the vel/rps targets
+  FlywheelRPM lowFlywheelGoal;
+  FlywheelRPM highFlywheelGoal;
+
   // testing/reporting controls
   double time;
 
@@ -42,11 +47,11 @@ public class ShooterOn extends CommandBase {
   int atGoalCount = 0;       // require flywheels to be at goal for a few frames
 
   /**
-   * Constant/control data needed for this command.
+   * Constant/control data needed as input for this command.
    */
   public static class Data {
-    public FlywheelRPM LowGoal;   
-    public FlywheelRPM HighGoal; 
+    public ShooterSettings LowGoal;   
+    public ShooterSettings HighGoal; 
     public double Tolerance;   // % of target goal ~1% to 2%
     public double BackupSec;   // seconds to backup
     public int    AtGoalBeforeShoot;      //
@@ -60,8 +65,8 @@ public class ShooterOn extends CommandBase {
      */
     public Data( Data d) {
       // make deep copy of incoming data
-      LowGoal = new FlywheelRPM(d.LowGoal);
-      HighGoal = new FlywheelRPM(d.HighGoal);
+      LowGoal = new ShooterSettings(d.LowGoal);
+      HighGoal = new ShooterSettings(d.HighGoal);
       BackupSec = d.BackupSec;
       Tolerance = d.Tolerance;
       AtGoalBeforeShoot = d.AtGoalBeforeShoot;
@@ -74,14 +79,19 @@ public class ShooterOn extends CommandBase {
   public ShooterOn(Intake_Subsystem intake) {
     // using dummy upper/lower target rpm.  If this construsctor is used, calculateShooterSpeed()
     // will be overriden.  USe the Constant data.
-    this(intake, ShooterOnCmd.data);      //dummy args except intake and backup.
+    this(intake, ShooterOnCmd.data);      
   }
 
   public ShooterOn(Intake_Subsystem intake,  ShooterOn.Data cmdData) {
     this.intake = intake;
-    goals = new Data(cmdData);
+    goals = cmdData;
     backupCount = (int) Math.floor(goals.BackupSec / DT);
     stage = Stage.DoingNothing;
+
+    //convert powercell velocity to RPM for high and low positions
+    lowFlywheelGoal = intake.calculateGoals(cmdData.LowGoal);
+    highFlywheelGoal = intake.calculateGoals(cmdData.HighGoal);
+
   }
 
   // Called when the command is initially scheduled.
@@ -117,7 +127,7 @@ public class ShooterOn extends CommandBase {
         if (!calculateShooterSpeed()) break;  // break means we don't have solution, keep waiting
         
         // we have our shoot target speeds, turn shooter on
-        intake.shooterOn(rpmCmd);
+        intake.shooterOn(rpmSetpoint);
         time = System.currentTimeMillis();    //time for spin up start
         stage = Stage.WaitingForFlyWheel;
       break;
@@ -142,7 +152,7 @@ public class ShooterOn extends CommandBase {
        }
       break;
     }
-    count++;   
+    count++;
   }
 
   /**
@@ -150,18 +160,18 @@ public class ShooterOn extends CommandBase {
    *   Sets internal target speeds for shooter. 
    *   Override this to use ShooterOn command from different locations.
    * 
-   *   sets m_rpmUpper and m_rpmLower for flywheel speeds.
+   *   Side effect: rpmSetpoint is loaded 
    * 
    * @return true if solution is found and we can shoot
    */
   public boolean calculateShooterSpeed(){
     if (intake.isMagazineUp()) {
       // aiming high
-     rpmCmd.copy(goals.HighGoal);
+     rpmSetpoint.copy(highFlywheelGoal);
     }
     else {
       // aiming low
-      rpmCmd.copy(goals.LowGoal);
+      rpmSetpoint.copy(lowFlywheelGoal);
     }
     // nothing more to calculate or wait for, we have RPM solution
     return true;  

@@ -167,9 +167,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   FlywheelRPM error = new FlywheelRPM();
 
   //Transfrom from [ w, V] [W_lower, W_upper]
-  Matrix<N2,N2> VelToRPM = new Matrix<>(Nat.N2(), Nat.N2() );
+  final Matrix<N2,N2> VelToRPM = new Matrix<>(Nat.N2(), Nat.N2() );
   Vector<N2> vel = new Vector<N2>(Nat.N2());
-  Vector<N2> rpm = new Vector<N2>(Nat.N2());
   
   //state variables
   private boolean intakeIsOn;
@@ -260,7 +259,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     var omega = VelToRPM.times(vel);
     return new FlywheelRPM(omega.get(0,0), omega.get(1,0));
   }
-  
+
   /**
    * Commands shooter flwwheels to target RPM
    * 

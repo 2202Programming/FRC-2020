@@ -89,6 +89,8 @@ public class RobotContainer {
   ArcadeDriveCmd arcadeDriveCmd;
   ArcadeVelDriveCmd velDriveCmd;
 
+  AutoPaths autoPaths;
+
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -103,7 +105,8 @@ public class RobotContainer {
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
-    
+    autoPaths = new AutoPaths();
+
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();
@@ -144,7 +147,7 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(driveTrain));
 
     //auto path testing
-    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, "BounceSinglePath"));
+    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, autoPaths.BounceSinglePath));
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
     // Assistant's buttons

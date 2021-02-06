@@ -4,56 +4,37 @@
 
 package frc.robot.commands.auto;
 
-import java.io.IOException;
-import java.nio.file.Path;
-
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
-
 
 public class auto_drivePath_cmd extends CommandBase {
 
   private final VelocityDifferentialDrive_Subsystem m_robotDrive;
-  private Trajectory trajectory;
-  private String pathname;
+  private Trajectory autoPath;
 
-  public auto_drivePath_cmd(VelocityDifferentialDrive_Subsystem drive, String path) {
+  public auto_drivePath_cmd(VelocityDifferentialDrive_Subsystem drive, Trajectory path) {
     // Use addRequirements() here to declare subsystem dependencies.
 
     m_robotDrive = drive;
-    pathname = path;
+    autoPath = path;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drive);
     
-    //load path
-    String trajectoryJSON = "paths/" + pathname + ".wpilib.json";
-    trajectory = new Trajectory();
-      try {
-        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-        trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-      } catch (IOException ex) {
-        DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-      }
-
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(trajectory.getInitialPose());
+    m_robotDrive.resetOdometry(autoPath.getInitialPose());
   }
   
   // Called every time the scheduler runs while the command is scheduled.
@@ -66,7 +47,7 @@ public class auto_drivePath_cmd extends CommandBase {
   public Command getPathCommand() {
 
     RamseteCommand ramseteCommand = new RamseteCommand(
-        trajectory,
+        autoPath,
         m_robotDrive::getPose,
         new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
         new SimpleMotorFeedforward(Constants.ksVolts,

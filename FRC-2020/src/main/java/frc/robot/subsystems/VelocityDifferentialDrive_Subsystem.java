@@ -25,6 +25,12 @@ import frc.robot.subsystems.ifx.Shifter;
 import frc.robot.subsystems.ifx.VelocityDrive;
 import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.SPI;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive, Shifter {
   // Sign conventions, apply to encoder and command inputs
@@ -33,6 +39,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
   final double Kright = -1.0;
   final boolean KInvertMotor = true;     // convention required in robot characterization 
   final IdleMode KIdleMode = IdleMode.kCoast;
+  final double Kgyro = -1.0;         // ccw is positive, just like geometry class
 
 	// Current Limits
 	private int smartCurrentLimit = DriveTrain.smartCurrentLimit; // amps
@@ -93,6 +100,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
   double posLeft=0.0;   //feet, positive is forward distance, since encoder reset
   double posRight=0.0;  //feet, positive is forward distance, since encoder reset
 	Gear currentGear;     //high/low
+	double m_theta;    //heading   
+
+  // Odometry class for tracking robot pose
+  private final DifferentialDriveOdometry m_odometry;
+
+ // The gyro sensor
+ private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
@@ -124,6 +138,25 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 		dDrive = new DifferentialDrive(leftController, rightController);
 		dDrive.setSafetyEnabled(DriveTrain.safetyEnabled);
+
+		// this should cause a 1-2 second delay
+		m_gyro.calibrate();
+		while (m_gyro.isCalibrating()) { //wait to zero yaw if calibration is still running
+		try {
+			Thread.sleep(250);
+			System.out.println("calibrating gyro");
+		} catch (InterruptedException e) {
+
+		}
+		}
+		System.out.println("Pre-Zero yaw:" + m_gyro.getYaw());
+
+		m_gyro.reset(); //should zero yaw but not working.
+		m_gyro.zeroYaw(); //should zero yaw but not working.
+
+		System.out.println("Post-Zero yaw:" + m_gyro.getYaw());
+
+		m_odometry = new DifferentialDriveOdometry(readGyro());
 	}
 
 	/**
@@ -155,10 +188,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public void periodic() {
 		// read required sensor and system values for the frame
 		velLeft = getLeftVel(false);
-    velRight = getRightVel(false);
-    posLeft = getLeftPos();
-    posRight = getRightPos();
+		velRight = getRightVel(false);
+		posLeft = getLeftPos();
+		posRight = getRightPos();
 		currentGear = gearbox.getCurrentGear(); 
+		m_theta = Kgyro*m_gyro.getYaw();
+
+		// Update the odometry in the periodic block, physical units
+		m_odometry.update(readGyro(), posLeft, posRight);
 	}
 
 
@@ -560,5 +597,59 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
 		
 	}
+
+	  /**
+   * Controls the left and right sides of the drive directly with voltages.
+   *
+   * @param leftVolts  the commanded left output
+   * @param rightVolts the commanded right output
+   */
+  public void tankDriveVolts(double leftVolts, double rightVolts) {
+    backLeft.setVoltage(Kleft* leftVolts);
+    backRight.setVoltage(Kright * rightVolts);
+    dDrive.feed();
+  }
+
+    /**
+   * Returns the current wheel speeds of the robot.
+   *
+   * @return The current wheel speeds.
+   */
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(velLeft, velRight);
+  }
+
+  /**
+   * Returns the currently-estimated pose of the robot.
+   *
+   * @return The pose.
+   */
+  public Pose2d getPose() {
+    return m_odometry.getPoseMeters();
+  }
+
+  //Need to use getYaw to get -180 to 180 as expected.
+  Rotation2d readGyro() {
+    return Rotation2d.fromDegrees(m_theta); 
+  }
+
+
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
+  public void resetOdometry(Pose2d pose) {
+    resetEncoders();
+    m_odometry.resetPosition(pose, m_gyro.getRotation2d());  // has a -1 in the interface for they gyro
+  }
+
+  /**
+   * Resets the drive encoders to currently read a position of 0.
+   */
+  public void resetEncoders() {
+    leftController.setPosition(0);
+    rightController.setPosition(0);
+  }
 
 }

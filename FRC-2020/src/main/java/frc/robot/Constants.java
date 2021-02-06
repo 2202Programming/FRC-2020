@@ -11,6 +11,7 @@ import frc.robot.commands.intake.ShooterOn;
 import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
 import frc.robot.subsystems.Intake_Subsystem.FlywheelRPM;
 import frc.robot.util.misc.PIDFController;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -60,6 +61,29 @@ public final class Constants {
     }
 
     
+    // These characterization values MUST be determined either experimentally or theoretically
+    // for *your* robot's drive.
+    // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
+    // values for your robot.
+    // DPL we are using Feet not Meters, robot was profiled with feet so numbers are unadjusted
+    
+    public static final double ksVolts = 0.123; //updated2
+    public static final double kvVoltSecondsPerMeter = 1.48; //updated2
+    public static final double kaVoltSecondsSquaredPerMeter = 0.15; //updated2
+
+    public static final double kPDriveVel = 2.44; //updated
+    public static final double kTrackwidthMeters = 2.08333;   // from char=1.4348; //updated2
+
+    public static final DifferentialDriveKinematics kDriveKinematics =
+        new DifferentialDriveKinematics(kTrackwidthMeters);
+
+    public static final double kMaxSpeedMetersPerSecond = 2;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+
+    // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
+
 
     // Intake
     public static final int MAGAZINE_PCM_CAN_ID = CAN.PCM2;

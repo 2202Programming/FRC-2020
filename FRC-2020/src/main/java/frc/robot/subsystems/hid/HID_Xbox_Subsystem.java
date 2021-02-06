@@ -8,8 +8,8 @@
 package frc.robot.subsystems.hid;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.Logger;
@@ -27,6 +27,18 @@ import frc.robot.subsystems.ifx.Logger;
  * Shouldn't need to make this subsystem a requirement for any command, just
  * reference it. This class is intended to run in the periodic(). It should be
  * run first by being first on the list.
+ * 
+ * XBox stick signs:
+ *   Y stick forward is -1.0, backward is 1.0.
+ *   X stick left is -1.0, right is 1.0.
+ *  
+ * Conventions used robot body axis:
+ *    Arcade
+ *      Y stick forward creates positive velocity, robot moves forward.
+ *      X stick left create positive angular velocity, robots rotates counter-clockwise.
+ * 
+ *    Tank
+ *      Y stick forward will be positive creates positive velocity for that side.
  * 
  */
 public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls, Logger {
@@ -76,20 +88,20 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
     switchBoard = (XboxController) registerController(Id.SwitchBoard, new XboxController(Id.SwitchBoard.value));
 
     // Driver inputs for acade style in normalized units,
-    // left Y-stick throttle right X-stick turn rate
-    velShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft));
-    rotShaper = new ExpoShaper(rotExpo, () -> (driver.getX(Hand.kRight) * -1.0));
+    // left Y-stick throttle (forward negative) right X-stick turn rate
+    velShaper = new ExpoShaper(velExpo, () -> -driver.getY(Hand.kLeft));
+    rotShaper = new ExpoShaper(rotExpo, () -> -driver.getX(Hand.kRight));
 
-    // Tank drive Left/Right Y-axis used
-    velLeftShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft));
-    velRightShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
+    // Tank drive Left/Right Y-axis used, forward stick is negative 
+    velLeftShaper = new ExpoShaper(velExpo,  () -> -driver.getY(Hand.kLeft));
+    velRightShaper = new ExpoShaper(velExpo, () -> -driver.getY(Hand.kRight));
 
     // XYRot or Swerve Drive
     // Rotation on Left-X axis,  X-Y throttle on Right
-    velXShaper = new ExpoShaper(velExpo, () -> driver.getX(Hand.kRight));     
-    velYShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
-    swRotShaper = new ExpoShaper(rotExpo, () -> (- driver.getX(Hand.kLeft)));  //inverted rot
-    
+    velXShaper = new ExpoShaper(velExpo,  () -> -driver.getX(Hand.kRight));   
+    velYShaper = new ExpoShaper(velExpo,  () -> -driver.getY(Hand.kRight));
+    swRotShaper = new ExpoShaper(rotExpo, () -> -driver.getX(Hand.kLeft));  
+
     // add some deadzone in normalized coordinates
     rotShaper.setDeadzone(deadzone);
     velShaper.setDeadzone(deadzone);

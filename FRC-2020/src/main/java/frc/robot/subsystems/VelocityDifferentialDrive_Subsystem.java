@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.RobotPhysical.WheelAxelDistance;
 import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
@@ -11,33 +12,36 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DriveTrain;
+import frc.robot.Constants.RobotPhysical;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.DualDrive;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.subsystems.ifx.Shifter;
 import frc.robot.subsystems.ifx.VelocityDrive;
+import frc.robot.subsystems.ifx.VoltageDrive;
 import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.SPI;
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
-public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive, Shifter {
+public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive, 
+                VoltageDrive, Shifter {
   // Sign conventions, apply to encoder and command inputs
   // Brushless SparkMax cannot invert the encoders
   final double Kleft = 1.0;
   final double Kright = -1.0;
-  final boolean KInvertMotor = true;     // convention required in robot characterization 
+  final boolean KInvertMotor = true; // convention required in robot characterization 
   final IdleMode KIdleMode = IdleMode.kCoast;
   final double Kgyro = -1.0;         // ccw is positive, just like geometry class
 
@@ -53,7 +57,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private double rateLimit = 0.9; // seconds to max speed/power
 
 	// Chasis details
-	private final double WHEEL_AXLE_DIST = WheelAxelDistance / 12.0; // feet
 	private final double K_ft_per_rev = Math.PI * WheelDiameter / 12.0; // feet/rev
 	private final double K_low_fps_rpm; // Low gear ft/s / rpm of motor shaft
 	private final double K_high_fps_rpm; // High gear ft/s /rpm of motor shaft
@@ -95,12 +98,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	boolean coastMode = false;         // attempt to coast when Vcmd > Vrequest
 	
 	//measurements, taken in periodic(), robot coordinates
-	double velLeft=0.0;   //fps, positive moves robot forward
-  double velRight=0.0;  //fps, positive moves robot forward
-  double posLeft=0.0;   //feet, positive is forward distance, since encoder reset
-  double posRight=0.0;  //feet, positive is forward distance, since encoder reset
-	Gear currentGear;     //high/low
-	double m_theta;    //heading   
+	double m_velLeft  = 0.0;  //fps, positive moves robot forward
+  double m_velRight = 0.0;  //fps, positive moves robot forward
+  double m_posLeft  = 0.0;  //feet, positive is forward distance, since encoder reset
+  double m_posRight = 0.0;  //feet, positive is forward distance, since encoder reset
+	Gear m_currentGear;       //high/low
+	double m_theta;           //heading   
 
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
@@ -140,16 +143,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		dDrive.setSafetyEnabled(DriveTrain.safetyEnabled);
 
 		// this should cause a 1-2 second delay
-		m_gyro.calibrate();
-		while (m_gyro.isCalibrating()) { //wait to zero yaw if calibration is still running
-		try {
-			Thread.sleep(250);
-			System.out.println("calibrating gyro");
-		} catch (InterruptedException e) {
-
-		}
-		}
-		System.out.println("Pre-Zero yaw:" + m_gyro.getYaw());
+    m_gyro.calibrate();
+    while (m_gyro.isCalibrating()) { // wait to zero yaw if calibration is still running
+      try {
+        Thread.sleep(250);
+        System.out.println("calibrating gyro");
+      } catch (InterruptedException e) {  /*do nothing */  }
+    }
+    System.out.println("Pre-Zero yaw:" + m_gyro.getYaw());
 
 		m_gyro.reset(); //should zero yaw but not working.
 		m_gyro.zeroYaw(); //should zero yaw but not working.
@@ -187,15 +188,15 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	@Override
 	public void periodic() {
 		// read required sensor and system values for the frame
-		velLeft = getLeftVel(false);
-		velRight = getRightVel(false);
-		posLeft = getLeftPos();
-		posRight = getRightPos();
-		currentGear = gearbox.getCurrentGear(); 
+		m_velLeft = getLeftVel(false);
+		m_velRight = getRightVel(false);
+		m_posLeft = getLeftPos();
+		m_posRight = getRightPos();
+		m_currentGear = gearbox.getCurrentGear(); 
 		m_theta = Kgyro*m_gyro.getYaw();
 
 		// Update the odometry in the periodic block, physical units
-		m_odometry.update(readGyro(), posLeft, posRight);
+		m_odometry.update(readGyro(), m_posLeft, m_posRight);
 	}
 
 
@@ -276,17 +277,17 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	// rotationRate deg/sec
 	public void velocityArcadeDrive(final double velFps, final double rotDps) {
 		// used to handle shifting request
-		boolean shifting = (currentGear != requestedGear);
+		boolean shifting = (m_currentGear != requestedGear);
 		//shifting 
 		if (shifting) {
 			// do math on new gear to match RPM of new Vel Cmd
-			currentGear = requestedGear;   
+			m_currentGear = requestedGear;   
 		}
 
 		// Spark Max uses RPM for velocity closed loop mode
 		// so we need to convert ft/s to RPM command which is dependent
 		// on the gear ratio.
-		double k = getFPSperRPM(currentGear);
+		double k = getFPSperRPM(m_currentGear);
 		double maxSpeed = maxFPS_High;   //getMaxSpeed(currentGear);
 		
 		// limit vel to max for the gear ratio
@@ -299,7 +300,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// Convert to rad/s split between each wheel
 		double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
 		rps *= (Math.PI / 180.0);
-		double vturn_rpm = (rps * WHEEL_AXLE_DIST) / k;
+		double vturn_rpm = (rps * WheelAxelDistance) / k;
 
 		// add in the commanded speed each wheel
 		double vl_rpm = Kleft * applyDeadZone(rpm + vturn_rpm, RPM_DZ);
@@ -592,8 +593,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void addDashboardWidgets(ShuffleboardLayout layout) {
-		layout.addNumber("DT/Vel/left", () -> velLeft).withSize(2, 2);
-		layout.addNumber("DT/Vel/right", () -> velRight);
+		layout.addNumber("DT/Vel/left", () -> m_velLeft).withSize(2, 2);
+		layout.addNumber("DT/Vel/right", () -> m_velRight);
 		layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
 		
 	}
@@ -610,13 +611,24 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
     dDrive.feed();
   }
 
+  /**
+   * Returns a kinematics helper based on chassis geometry
+   *  and using length units robot profiled in.  feet (or meters)
+   * 
+   * @return DifferentialDriveKinematics  
+   */
+  @Override
+  public DifferentialDriveKinematics getDriveKinematics() {
+    return new DifferentialDriveKinematics(RobotPhysical.WheelAxelDistance);
+  }
+
     /**
    * Returns the current wheel speeds of the robot.
    *
    * @return The current wheel speeds.
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(velLeft, velRight);
+    return new DifferentialDriveWheelSpeeds(m_velLeft, m_velRight);
   }
 
   /**
@@ -652,4 +664,5 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
     rightController.setPosition(0);
   }
 
+  
 }

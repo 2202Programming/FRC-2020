@@ -10,13 +10,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 /**
  * Any arcade drive should support these methods.
  */
-public interface ArcadeDrive extends Subsystem {
+public interface ArcadeDrive extends Odometry, Subsystem {
     public void arcadeDrive(double xSpeed, double zRot);
-    public double getLeftVel(boolean normalized);
-    public double getRightVel(boolean normalized);
     
-    // Position should be in physical units
-    public double getLeftPos();
-    public double getRightPos();
-    public void resetPosition();
 }

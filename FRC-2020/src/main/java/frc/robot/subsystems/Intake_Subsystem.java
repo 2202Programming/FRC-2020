@@ -82,30 +82,14 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * 
    *  Calculate Kf to get us close to desired speed and pid will fine tune it.
    * 
-   *     MU max out = +/- 1023   - given by CTRE docs
-   *     60% motor pct gave  2000 RPM   - measured in the lab 12/12/2020
-   *     2000 fw-rpm * Kf  = (0.60)*1023    60% output gave 2000FW-RPM in testing
-   * 
-   *     Kf = 6138/2000 = 0.3069 [MU/FW_RPM]
-  *
    *     [FW-RPM] = flywheel rpm
    *     [MU-100] = motor units per 100mS which is the controller's vel uint, [MU] for short
    *     2000 RPM * 34.133 [MU-100ms]/[FW-RPM]  = 68267 MU/FW-RPM
    * 
    *     New Flywheels - need new KF. Compromise between 1000 and 2000 Open-loop
    *     Kf = .00934 as measured/calculated 12/19/2020  DPL/Alek O.
-   * 
-   *     Initial Err = 68267 MU
-   *     Max Kp contribution = 15% (1023)[MO] = 153 MO
-   *      Kp*Error = 153 [MO]
-   *      Kp = 153/68267 = 0.002248  [MO / MUerr]  (very safe)
-   * 
-   *      Kp = 0.1 worked well and still has lots of margin.
-   *      KD = 6 damped out with out adding ringing or lag
-   *      Ki = 0   not needed for velocity loop
-   * 
-   * 
-   * Use same values as starting point for both upper and lower FW PIDF.                             
+   *                       
+   *   2/6/21  Kff now calcualted from max FW RPM 
    */
 
   public static class FlyWheelConfig {
@@ -319,6 +303,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   /**
    * getShooterAvgRPM()  - average of upper and lower wheels
+   * 
+   * Warning, not really meaningful if flywheels have different diameters.
+   * 
    * @return
    */
   public double getShooterAvgRPM() {    
@@ -400,14 +387,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
  */
   public class FlyWheel {
     //Talon Slot stuff, we just use slot 0
-    final int kSlotIdx = 0;
     final int kPIDLoopIdx = 0;
     final int kTimeoutMs = 30;
 
     TalonSRXConfiguration srxconfig;
     WPI_TalonSRX motor;     //this could be a generic motor controller...
     
-    final double maxRPM;          // measured at the flywheel (tach - RPM)
     final double FWrpm2Counts;    // flywheel RPM given motor-unit counts (f(gear, meas-period))
     final double MUCounts2FWrpm;  // motor units (counts/100ms) to FW RPM (1/FWrpm2Counts)
 
@@ -415,13 +400,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
       srxconfig = new TalonSRXConfiguration();
       motor = new WPI_TalonSRX(CAN_ID);
       motor.setInverted(cfg.inverted);
-      maxRPM = cfg.maxOpenLoopRPM;
-
+    
       // flywheel constants RPM given motor-unit counts (f(gear, meas-period))
       FWrpm2Counts = Shooter.kRPM2Counts * cfg.gearRatio;  //motor counts are bigger, motor spins faster than FW    
       MUCounts2FWrpm  = 1.0 / FWrpm2Counts;  // motor units (counts/100ms) to FW RPM 
 
-      // use max rpm and max motor out
+      // use max rpm and max motor out to calculate kff
       double kff = Shooter.kMaxMO / (cfg.maxOpenLoopRPM * FWrpm2Counts);
       cfg.pid.setF(kff);
 
@@ -446,9 +430,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
       motor.configAllSettings(srxconfig);
 
       /* Config sensor used for Primary PID [Velocity] */
-      //motor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, kPIDLoopIdx, kTimeoutMs);
-      // dpl - 12/19/20  Relative encoding worked very well.  See plots in Slack.
-      //
       motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kPIDLoopIdx, kTimeoutMs);
       motor.setSensorPhase(cfg.sensorPhase);   // fix feedback direction
       motor.setNeutralMode(NeutralMode.Coast);

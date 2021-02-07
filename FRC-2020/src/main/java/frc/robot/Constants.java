@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
@@ -63,42 +62,13 @@ public final class Constants {
       public static final int MAGAZINE = 9; 
     }
     
-    // These characterization values MUST be determined either experimentally or theoretically
-    // for *your* robot's drive.
-    // The Robot Characterization Toolsuite provides a convenient tool for obtaining these
-    // values for your robot.
-    // DPL we are using Feet not Meters, robot was profiled with feet so numbers are unadjusted
-    
-    public static final double ksVolts = 0.123; //updated2
-    public static final double kvVoltSecondsPerMeter = 1.48; //updated2
-    public static final double kaVoltSecondsSquaredPerMeter = 0.15; //updated2
-
-    public static final double kPDriveVel = 2.44; //updated
-    public static final double kTrackwidthMeters = 2.08333;   // from char=1.4348; //updated2
-
-    public static final DifferentialDriveKinematics kDriveKinematics =
-        new DifferentialDriveKinematics(kTrackwidthMeters);
-
-    public static final double kMaxSpeedMetersPerSecond = 2;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
-
-    // Reasonable baseline values for a RAMSETE follower in units of meters and seconds
-    public static final double kRamseteB = 2;
-    public static final double kRamseteZeta = 0.7;
-
-
     // Intake
     public static final int MAGAZINE_PCM_CAN_ID = CAN.PCM2;
     public static final int MAGAZINE_UP_PCM = 0;
     public static final int MAGAZINE_DOWN_PCM = 1;
-    
-   
-  
     public static final int INTAKE_PCM_CAN_ID = CAN.PCM1;
     public static final int INTAKE_UP_SOLENOID_PCM = 4;
     public static final int INTAKE_DOWN_SOLENOID_PCM = 5;
-
-   
 
     // Gearshifter
     public static final int GEARSHIFT_PCM_CAN_ID = CAN.PCM1;
@@ -165,7 +135,7 @@ public final class Constants {
 
         //chassis  
         public static final double WheelDiameter = 7.5; // inches
-        public static final double WheelAxelDistance = 25.5; // inches
+        public static final double WheelAxelDistance = 25.5/12.0; // feet
         
     }
 
@@ -185,24 +155,21 @@ public final class Constants {
 
     public static final class DriverPrefs {
         public static final double VelExpo = 0.3;        // non-dim [0.0 - 1.0]
-        public static final double RotationExpo = 0.9;   // non-dim [0.0 -1.0]
+        public static final double RotationExpo = 0.9;   // non-dim [0.0 - 1.0]
         public static final double StickDeadzone = 0.05; // non-dim [0.0 - 1.0]
     }
 
     public static final class DriveTrain {
         // motor constraints
-        public static final double motorMaxRPM= 5600; // motor limits
+        public static final double motorMaxRPM= 5600;    // motor limits
         public static final double maxFPS = 14;          // max speed in feet/sec
-        public static final double maxRotDPS = 100;     // max rotation rate in deg/sec
+        public static final double maxRotDPS = 100;      // max rotation rate in deg/sec
         
         // PIDS are in the SparkMax, PIDFControler is used to hold the values
         // for initializing the hardware. The PID object not run on RIO.
         public static final PIDFController pidValues =
              new PIDFController(0.00005, 0.0, 0.0, 0.00025); // P, I, D, FF
 
-        // Encoder and other signs
-        public static final boolean leftEncoderInverted = false;
-        public static final boolean rightEncoderInverted = true;
 
         // shifter settings
         public static final int shiftCount = 5;       // frames to wait on vel measurement
@@ -279,5 +246,26 @@ public final class Constants {
        
     }
 
+    public static final class RamseteProfile {
+      // These characterization values MUST be determined either experimentally or
+      // theoretically for *your* robot's drive.
+      // The Robot Characterization Toolsuite provides a convenient tool for obtaining
+      // these values for your robot.
+
+      public static final double ksVolts = 0.123; 
+      public static final double kvVoltSecondsPerFoot= 1.48; 
+      public static final double kaVoltSecondsSquaredPerFoot = 0.15; 
+
+      public static final double kPDriveVel = 2.44; 
+
+      // Change these to go faster/slower for commands using ramsete and VoltageDrive
+      //unused??  public static final double kMaxSpeedFeetPerSecond = 2;
+      //unused??  public static final double kMaxAccelerationFeetPerSecondSquared = 1;
+
+      // Reasonable baseline values for a RAMSETE follower in units of meters and
+      // seconds - DPL not sure about how to convert to feet.
+      public static final double kRamseteB = 2;
+      public static final double kRamseteZeta = 0.7;
+    }
 
 }

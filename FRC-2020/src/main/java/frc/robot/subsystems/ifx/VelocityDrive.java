@@ -9,26 +9,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 /**
  *  All you should need for working with physical units and the drive train.
  */
-public interface VelocityDrive extends Subsystem {
-
-    /**
-     * Gets velocity from the drive train in physical or normalized units.
-     * This should represent the drive trains best estimate of current speed.
-     * Units is ft/s or normalized.
-     *  
-     * @param normalized  when true, returns vel in range of -1.0 to 1.0
-     * @return
-     */
-    public double getLeftVel(boolean normalized);
-    public double getRightVel(boolean normalized);
-    public double getAvgVelocity(boolean normalized);
-    
-    // Position should be in physical units 
-    public double getLeftPos();
-    public double getRightPos();
-
-    // resets the position counters on the drive train encoder
-    public void resetPosition();
+public interface VelocityDrive extends Odometry, Subsystem {
 
     // allow some coasting if wanted
     public void setCoastMode(boolean coast);
@@ -36,10 +17,10 @@ public interface VelocityDrive extends Subsystem {
     /**
      * Commands to the drive train should be in physical units.
      * 
-     * @param feetPerSecond
+     * @param lengthPerSecond
      * @param degreePerSecond
      */
-    public void velocityArcadeDrive(double feetPerSecond, double degreePerSecond);
+    public void velocityArcadeDrive(double lengthPerSecond, double degreePerSecond);
 
 
     /** Some drive systems may have shifting, Expose the shifter if there is one. Null returned if none. */

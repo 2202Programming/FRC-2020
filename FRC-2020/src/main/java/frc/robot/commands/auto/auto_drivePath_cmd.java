@@ -7,19 +7,29 @@ package frc.robot.commands.auto;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import frc.robot.Constants;
-import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.Constants.RamseteProfile;
+import frc.robot.subsystems.ifx.VoltageDrive;
+
+/**
+ * 
+ * It seems like there should be a more direct way to create the command 
+ * and schedule it.  This command is really an instant that creates the pathing
+ * and then schedules it.  Why the indirection???
+ * 
+ * TODO:figure this out.
+ */
 
 public class auto_drivePath_cmd extends CommandBase {
 
-  private final VelocityDifferentialDrive_Subsystem m_robotDrive;
+  private final VoltageDrive m_robotDrive;
   private Trajectory autoPath;
 
-  public auto_drivePath_cmd(VelocityDifferentialDrive_Subsystem drive, Trajectory path) {
+  public auto_drivePath_cmd(VoltageDrive drive, Trajectory path) {
     // Use addRequirements() here to declare subsystem dependencies.
 
     m_robotDrive = drive;
@@ -46,17 +56,19 @@ public class auto_drivePath_cmd extends CommandBase {
 
   public Command getPathCommand() {
 
+    DifferentialDriveKinematics kinematics = m_robotDrive.getDriveKinematics();
+
     RamseteCommand ramseteCommand = new RamseteCommand(
         autoPath,
         m_robotDrive::getPose,
-        new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
-        new SimpleMotorFeedforward(Constants.ksVolts,
-                                  Constants.kvVoltSecondsPerMeter,
-                                  Constants.kaVoltSecondsSquaredPerMeter),
-        Constants.kDriveKinematics,
+        new RamseteController(RamseteProfile.kRamseteB, RamseteProfile.kRamseteZeta),
+        new SimpleMotorFeedforward(RamseteProfile.ksVolts,
+                                  RamseteProfile.kvVoltSecondsPerFoot,
+                                  RamseteProfile.kaVoltSecondsSquaredPerFoot),
+        kinematics,
         m_robotDrive::getWheelSpeeds,
-        new PIDController(Constants.kPDriveVel, 0, 0),
-        new PIDController(Constants.kPDriveVel, 0, 0),
+        new PIDController(RamseteProfile.kPDriveVel, 0, 0),
+        new PIDController(RamseteProfile.kPDriveVel, 0, 0),
         // RamseteCommand passes volts to the callback
         m_robotDrive::tankDriveVolts,
         m_robotDrive

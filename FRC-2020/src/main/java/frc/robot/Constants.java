@@ -7,11 +7,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.util.misc.PIDFController;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -219,31 +219,39 @@ public final class Constants {
 
     public static final class Shooter {
       // Power Cell info
-      public static final double PowerCellMass = 3.0/16.0;           //lbs
-      public static final double PCNominalRadius = 7.0/2.0/12.0;     //feet - power cell 
-      public static final double PCEffectiveRadius = 4.75/2.0/12.0;  //feet - compressed radius
-      
+      public static final double PowerCellMass = 3.0 / 16.0; // lbs
+      public static final double PCNominalRadius = 7.0 / 2.0 / 12.0; // feet - power cell
+      public static final double PCEffectiveRadius = 4.75 / 2.0 / 12.0; // feet - compressed radius
+
+      /**
+       * Convert Target RPM to [motor-units/100ms] 4096 Units/Rev * Target RPM * 600 =
+       * velocity setpoint is in units/100ms
+       */
+      public static final double kRPM2Counts = 4096.0/600.0; // MU-100 (no gearing)
+      public static final double kMaxMO = 1023;  // max Motor output
+
       // Flywheel info
+      // Flywheel maxOpenLoopRPM and gear ratio are used to calculate kFF in shooter
       public static FlyWheelConfig upperFWConfig = new FlyWheelConfig();
       static {
-        upperFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
-        upperFWConfig.Izone = 1800;
-        upperFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
-        upperFWConfig.gearRatio = 5.0;         // upper is 5:1 (motor:fw)
+        upperFWConfig.maxOpenLoopRPM = 3074;  // estimated from 2000 RPM test
+        upperFWConfig.gearRatio = 5.0;        // upper is 5:1 (motor:fw)
         upperFWConfig.sensorPhase = false;
         upperFWConfig.inverted = false;
-        upperFWConfig.flywheelRadius = 2.0 / 12.0;  //feet
+        upperFWConfig.flywheelRadius = 2.0 / 12.0; // feet
+        upperFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0); // kP kI kD kFF
+        upperFWConfig.Izone = 1800;
       }
-    
+
       public static FlyWheelConfig lowerFWConfig = new FlyWheelConfig();
       static {
-        lowerFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0.00975);   // kP kI kD kF 
-        lowerFWConfig.Izone = 1800;
-        lowerFWConfig.maxOpenLoopRPM = 3330;   // estimated from 2000 RPM test
+        lowerFWConfig.maxOpenLoopRPM = 5100;
         lowerFWConfig.gearRatio = 3.0;         // lower fw gear 3:1  (motor:flywheel)
         lowerFWConfig.sensorPhase = false;
         lowerFWConfig.inverted = true; 
-        lowerFWConfig.flywheelRadius = 1.25 / 12.0;   //feet
+        lowerFWConfig.flywheelRadius = 1.25 / 12.0;   //feet 
+        lowerFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0);   // kP kI kD kF 
+        lowerFWConfig.Izone = 1800;
       }
 
     }

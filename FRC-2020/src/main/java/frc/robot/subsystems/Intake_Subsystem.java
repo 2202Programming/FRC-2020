@@ -112,20 +112,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     public PIDFController pid;
     public int Izone;
     public double maxOpenLoopRPM; 
-    public double gearRatio;              // account for gearbox reduction to flywheel
+    public double gearRatio;           // account for gearbox reduction to flywheel
     public boolean sensorPhase;
     public boolean inverted;
     public double flywheelRadius;
+    public double FWrpe2MU;            // FlywheelRPM to Motor-Units  (includes gearing)
   };
-
-  
-  /**
-   * Convert Target RPM to units / 100ms. 4096 Units/Rev * Target RPM * 600 =
-   * velocity setpoint is in units/100ms
-   */
-  final double ShooterEncoder = 4096;   // counts per rev motor 
-  final double RPM2CountsPer100ms = 600.0; // Vel uses 100mS as counter sample period
-  final double kRPM2Counts = (ShooterEncoder) / RPM2CountsPer100ms;  // motor-units (no gearing)
 
   /**
    * RPMSet and Data are static classes to help configure the comma
@@ -426,8 +418,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
       maxRPM = cfg.maxOpenLoopRPM;
 
       // flywheel constants RPM given motor-unit counts (f(gear, meas-period))
-      FWrpm2Counts = kRPM2Counts * cfg.gearRatio;  //motor counts are bigger, motor spins faster than FW    
+      FWrpm2Counts = Shooter.kRPM2Counts * cfg.gearRatio;  //motor counts are bigger, motor spins faster than FW    
       MUCounts2FWrpm  = 1.0 / FWrpm2Counts;  // motor units (counts/100ms) to FW RPM 
+
+      // use max rpm and max motor out
+      double kff = Shooter.kMaxMO / (cfg.maxOpenLoopRPM * FWrpm2Counts);
+      cfg.pid.setF(kff);
 
       ErrorCode lasterr = motorConfig(cfg);
       if (lasterr.value != 0 ) {

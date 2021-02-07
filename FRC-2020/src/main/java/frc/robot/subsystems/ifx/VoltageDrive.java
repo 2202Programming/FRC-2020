@@ -4,11 +4,8 @@
 
 package frc.robot.subsystems.ifx;
 
-
-import edu.wpi.first.wpilibj2.command.Subsystem;
-
 /** Simple voltage driven robot */
-public interface VoltageDrive extends Odometry, Subsystem{
+public interface VoltageDrive extends Odometry {
 
   public void tankDriveVolts(double leftVolts, double rightVolts);  
 }

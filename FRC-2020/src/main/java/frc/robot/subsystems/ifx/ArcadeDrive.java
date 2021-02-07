@@ -6,11 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot.subsystems.ifx;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+
 /**
  * Any arcade drive should support these methods.
  */
-public interface ArcadeDrive extends Odometry, Subsystem {
+public interface ArcadeDrive extends Odometry {
     public void arcadeDrive(double xSpeed, double zRot);
     
 }

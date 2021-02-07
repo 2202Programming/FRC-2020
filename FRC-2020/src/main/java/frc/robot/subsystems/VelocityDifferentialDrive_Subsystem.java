@@ -4,7 +4,6 @@ import static frc.robot.Constants.RobotPhysical.WheelAxelDistance;
 import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
@@ -13,7 +12,6 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -25,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DriveTrain;
-import frc.robot.Constants.RobotPhysical;
+import frc.robot.Constants.RamseteProfile;
 import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.DualDrive;
 import frc.robot.subsystems.ifx.Logger;
@@ -44,6 +42,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
   final boolean KInvertMotor = true; // convention required in robot characterization 
   final IdleMode KIdleMode = IdleMode.kCoast;
   final double Kgyro = -1.0;         // ccw is positive, just like geometry class
+  
+  // we only use this one PID slot for the drive lead controllers
+  final int KpidSlot = 0;
 
 	// Current Limits
 	private int smartCurrentLimit = DriveTrain.smartCurrentLimit; // amps
@@ -53,8 +54,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	private final double RPM_DZ = 2.0;
 
 	// Acceleration limits
-	private final double RATE_MAX_SECONDS = 2;
-	private double rateLimit = 0.9; // seconds to max speed/power
+	private double slewRateLimit = DriveTrain.slewRateLimit;   // seconds to max speed/power
 
 	// Chasis details
 	private final double K_ft_per_rev = Math.PI * WheelDiameter / 12.0; // feet/rev
@@ -75,14 +75,16 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	// VelController can use either Velocity mode or dutycycle modes and is wrapper
 	// around CANSparkMax. These get setup after factory resets.
-	VelController leftController; 
-	VelController rightController;
+	final CANSparkMax leftController = backLeft; 
+  final CANSparkMax rightController = backRight;
+  final CANPIDController leftPID = leftController.getPIDController();
+	final CANPIDController rightPID = leftController.getPIDController();
 	
   //  Voltage to get robot to move.
   // kS - taken from the Drive Characterization
   //    - for reference, 0.15 was enough to move 2019 arm-bot chassis
-	final double ARBIT_FEEDFWD_MAX_VOLT = 0.123;    // taken 1/30/21
-	private double arbFeedFwd = 0.0;
+  private final double ARBIT_FEEDFWD_MAX_VOLT = 1.5;     //volts max allowed
+	private double arbFeedFwd = RamseteProfile.ksVolts;    //current value
 
 	// Calculated based on desired low-gear max ft/s
 	private final double maxFPS_High;  // <input>
@@ -108,8 +110,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
 
- // The gyro sensor
- private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
+  // The gyro sensor
+  private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
 
 	public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
@@ -142,7 +144,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		dDrive = new DifferentialDrive(leftController, rightController);
 		dDrive.setSafetyEnabled(DriveTrain.safetyEnabled);
 
-		// this should cause a 1-2 second delay
+		// this may cause a 1-2 second delay - robot can't move during period
     m_gyro.calibrate();
     while (m_gyro.isCalibrating()) { // wait to zero yaw if calibration is still running
       try {
@@ -151,30 +153,29 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
       } catch (InterruptedException e) {  /*do nothing */  }
     }
     System.out.println("Pre-Zero yaw:" + m_gyro.getYaw());
-
 		m_gyro.reset(); //should zero yaw but not working.
-		m_gyro.zeroYaw(); //should zero yaw but not working.
-
 		System.out.println("Post-Zero yaw:" + m_gyro.getYaw());
 
+    // clear our starting position.
+    resetPosition();
 		m_odometry = new DifferentialDriveOdometry(readGyro());
 	}
 
 	/**
-	 * hides some of the ugly setups like delays between programming.
+	 * hides some of the ugly setup for our collection of controllers
 	 */
 	void configureControllers() {
 		resetControllers();
 
-		// velocity setup - using RPM speed controller, sets pid in sparxMax
-    leftController = new VelController(backLeft, DriveTrain.pidValues);
-		rightController = new VelController(backRight, DriveTrain.pidValues);
-
-		// Have motors follow to use Differential Drive
-		middleRight.follow(backRight);   // right side
-		frontRight.follow(backRight);
-		middleLeft.follow(backLeft);     // left side
-		frontLeft.follow(backLeft);
+		// Have motors follow the main left/right controller
+		middleRight.follow(rightController);
+		frontRight.follow(rightController);
+		middleLeft.follow(leftController); 
+    frontLeft.follow(leftController);
+    
+    // configure lead controller's pid
+    configurePID(leftPID, DriveTrain.pidValues);
+    configurePID(rightPID, DriveTrain.pidValues);
 
 		// zero adjust will set the default limits for accel and currents
 		adjustAccelerationLimit(0.0);
@@ -225,17 +226,17 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 * @return
 	 */
 	public double adjustAccelerationLimit(final double deltaRate) {
-		rateLimit = MathUtil.limit((rateLimit + deltaRate), 0.0, RATE_MAX_SECONDS);
+		slewRateLimit = MathUtil.limit((slewRateLimit + deltaRate), 0.0, DriveTrain.slewRateMax);
 		// Just set the ramp limit on the masters
-		leftController.controller.setOpenLoopRampRate(rateLimit);
-		rightController.controller.setOpenLoopRampRate(rateLimit);
+		leftController.setOpenLoopRampRate(slewRateLimit);
+		rightController.setOpenLoopRampRate(slewRateLimit);
 
 		// Use same rate limit on closed loop too
-		leftController.controller.setClosedLoopRampRate(rateLimit);
-		rightController.controller.setClosedLoopRampRate(rateLimit);
+		leftController.setClosedLoopRampRate(slewRateLimit);
+		rightController.setClosedLoopRampRate(slewRateLimit);
 
-		SmartDashboard.putNumber("DT/limits/acelerate", rateLimit);
-		return rateLimit;
+		SmartDashboard.putNumber("DT/limits/slewRate", slewRateLimit);
+		return slewRateLimit;
 	}
 
 	/**
@@ -314,8 +315,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		}
 		else {
 			// command the velocity to the wheels
-			leftController.setReference(vl_rpm);
-			rightController.setReference(vr_rpm);
+			setReference(vl_rpm, leftPID);
+			setReference(vr_rpm, rightPID);
 		}
 
 		dDrive.feed();
@@ -352,14 +353,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public double getLeftPos() {
 		// postion is in units of revs
 		double kft_rev = Kleft*getFPSperRPM(getCurrentGear())*60.0;
-		double ft =  kft_rev * leftController.getPosition();  
+		double ft =  kft_rev * leftController.getEncoder().  getPosition();  
 		return ft;
 	}
 
 	public double getRightPos() {
 		// postion is in units of revs
 		double kft_rev = Kright*getFPSperRPM(getCurrentGear())*60.0;
-		double ft = kft_rev * rightController.getPosition();
+		double ft = kft_rev * rightController.getEncoder().getPosition();
 		return ft;
 	}
 
@@ -371,22 +372,22 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getRightVel(final boolean normalized) {
-		double vel = rightController.get();
+		double vel = Kright * rightController.get();
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
 	}
 
 	public double getAvgVelocity(final boolean normalized) {
-		double vel = 0.5*(rightController.get() - leftController.get()); 
+		double vel = 0.5*(Kright * rightController.get() + Kleft * leftController.get());
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
 	}
 
 	public void resetPosition() {
-		rightController.setPosition(0);
-		leftController.setPosition(0);
+		rightController.getEncoder().setPosition(0);
+		leftController.getEncoder().setPosition(0);
 	}
 
 
@@ -444,46 +445,16 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		*/
 	}
 
-	/**
-	 * VelController puts all the Rev elements into a single class
-	 * so it can support SpeedController.  Most of it is just wrapper stuff
-	 * but to use the RPM velocity mode, call setReference().
-	 * 
-	 * Postion will return revs
-	 * 
-	 */
-	class VelController implements SpeedController {
-		final CANSparkMax controller;
-		final CANPIDController pid;
-		final CANEncoder encoder;
-	
-		private final double kMaxOutput = 1;
-		private final double kMinOutput = -1;
-		private final int pidSlot = 0;
-
-		public VelController(final CANSparkMax ctrl, PIDFController pidf) {
-			controller = ctrl;
-			encoder = controller.getEncoder();
-			pid = controller.getPIDController();
-
-			// set PID coefficients
-			pid.setP(pidf.getP(), pidSlot);
-			pid.setI(pidf.getI(), pidSlot);
-			pid.setD(pidf.getD(), pidSlot);
-			pid.setIZone(0.0, pidSlot);
-			pid.setFF(pidf.getF(), pidSlot);
-			pid.setOutputRange(kMinOutput, kMaxOutput);
+		void configurePID(CANPIDController hwpid, PIDFController pidf) {
+      // set PID coefficients
+			hwpid.setP(pidf.getP(), KpidSlot);
+			hwpid.setI(pidf.getI(), KpidSlot);
+			hwpid.setD(pidf.getD(), KpidSlot);
+			hwpid.setIZone(0.0, KpidSlot);
+			hwpid.setFF(pidf.getF(), KpidSlot);
+			// dpl removed TODO:do we need?    hwpid.setOutputRange(kMinOutput, kMaxOutput);
 		}
 
-		@Override
-		public void pidWrite(final double output) {
-			set(output);
-		}
-
-		@Override
-		public void set(final double speed) {
-			controller.set(speed);
-		}
 
 		/**
 		 * setReference - uses physical units (rpm) for speed
@@ -491,76 +462,17 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		 * 
 		 * @param rpm - revs per minute for desired 
 		 */
-		public void setReference(double rpm) {
+		public void setReference(double rpm, CANPIDController pid) {
       // arbff compensates for min voltage needed to make robot move
       // +V moves forward, -V moves backwards
 			double arbffVolts = (rpm >= 0) ? arbFeedFwd : - arbFeedFwd;
 
 			//rpm haz a deadzone so == 0.0 is a fair test.
 			if (rpm ==0.0) arbffVolts = 0.0;
-			pid.setReference(rpm, ControlType.kVelocity, pidSlot, arbffVolts, ArbFFUnits.kVoltage); 
+			pid.setReference(rpm, ControlType.kVelocity, KpidSlot, arbffVolts, ArbFFUnits.kVoltage); 
 		}
-
-    /**
-     *  @return  motor RPM
-     */
-		@Override
-		public double get() {
-			return encoder.getVelocity();
-		}
-
-    /**
-     * 
-     * @return motor rotations
-     */
-		public double getPosition() {
-			return encoder.getPosition();
-		}
-
-		public void setPosition(final double position) {
-			encoder.setPosition(position);
-		}
-
-    /**
-     * Controller direction can be inverted.  This is useful so both sides
-     * of the drivetrain get positive RPM to move forward.
-     * 
-     */
-		@Override
-		public void setInverted(final boolean isInverted) {
-			controller.setInverted(isInverted);
-		}
-
-		@Override
-		public boolean getInverted() {
-			return controller.getInverted();
-		}
-
-    /**
-     *    setEncoderInverted(invert)
-     *    
-     * @param invert  true inverts the encoder sign
-     */
-    public void setEncoderInverted(boolean invert) {
-      encoder.setInverted(invert);
-    }
-
-    public boolean getEncoderInverted() {
-      return encoder.getInverted();
-    }
-
-
-		@Override
-		public void disable() {
-			set(0.0);
-		}
-
-		@Override
-		public void stopMotor() {
-			set(0.0);
-		}
-	}
-
+    
+    
 	/**
 	 *  Implement Shifter interface by deferring to the gearbox being used.
 	 */
@@ -619,7 +531,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
    */
   @Override
   public DifferentialDriveKinematics getDriveKinematics() {
-    return new DifferentialDriveKinematics(RobotPhysical.WheelAxelDistance);
+    return new DifferentialDriveKinematics(WheelAxelDistance);
   }
 
     /**
@@ -652,17 +564,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
-    resetEncoders();
+    resetPosition();
     m_odometry.resetPosition(pose, m_gyro.getRotation2d());  // has a -1 in the interface for they gyro
   }
 
-  /**
-   * Resets the drive encoders to currently read a position of 0.
-   */
-  public void resetEncoders() {
-    leftController.setPosition(0);
-    rightController.setPosition(0);
-  }
-
-  
 }

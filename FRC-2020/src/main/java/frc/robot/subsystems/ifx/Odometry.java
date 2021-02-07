@@ -6,13 +6,14 @@ package frc.robot.subsystems.ifx;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /** 
  * Common interfaces for the robot to tell us where it is and
  * how far it has gone.
  * 
  **/
-public interface Odometry {
+public interface Odometry extends Subsystem {
 
   //Ramsete requires these
   public Pose2d getPose();

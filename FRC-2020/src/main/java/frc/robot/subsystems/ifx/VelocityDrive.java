@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 package frc.robot.subsystems.ifx;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+
 /**
- *  All you should need for working with physical units and the drive train.
+ * All you should need for working with physical units and the drive train.
  */
-public interface VelocityDrive extends Odometry, Subsystem {
+public interface VelocityDrive extends Odometry {
 
     // allow some coasting if wanted
     public void setCoastMode(boolean coast);

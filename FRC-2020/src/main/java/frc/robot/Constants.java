@@ -180,8 +180,11 @@ public final class Constants {
         public static final int smartCurrentMax = 60;  //amps in SparkMax, max setting
         public static final int smartCurrentLimit = 35; //amps in SparkMax, inital setting
 
-        public static final boolean safetyEnabled = true; 
+        // Acceleration limits
+        public static final double slewRateMax = 2;      //sec limits adjusting slewrate 
+        public static final double slewRateLimit = 0.9;  //sec to max power <default>
 
+        public static final boolean safetyEnabled = true; 
     }
 
     public static final class Shooter {

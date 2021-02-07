@@ -14,37 +14,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveTrain;
 import frc.robot.Constants.DriverPrefs;
-//Constants file import sections
 import frc.robot.Constants.ShooterOnCmd;
-//import frc.robot.commands.intake.ShooterOnAuto;
-//import frc.robot.commands.intake.ToggleIntakeRaised;
-//import frc.robot.commands.auto.DriveOffLine;
-//import frc.robot.commands.auto.auto_creep_cmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
-//import frc.robot.commands.climb.ClimbGroup;
-//import frc.robot.commands.climb.RunWinch;
-//import frc.robot.commands.climb.SetClimbArmExtension;
-//import frc.robot.commands.climb.SetClimbArmRotation;
-import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
-import frc.robot.commands.drive.SwitchDriveMode;
-import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
+import frc.robot.commands.generic.CallFunctionCmd;
 import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.MagazineToggleCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
-//import frc.robot.subsystems.CameraSubsystem;
-//import frc.robot.commands.panel.SimpPositionControl;
-//import frc.robot.commands.panel.SimpRotateControl;
-//import frc.robot.subsystems.ClimberSubsystem;
-//import frc.robot.subsystems.Color_Subsystem;
-//import frc.robot.subsystems.Control_Panel;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -77,14 +60,8 @@ public class RobotContainer {
   public final Limelight_Subsystem limelight;
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
-  //public static PrintWriter outputStream;
-
-  //public final Control_Panel panel;
-  //public final Color_Subsystem detector;
-  //private final ClimberSubsystem climber;
-
-  TankDriveCmd tankDriveCmd;
-  ArcadeDriveCmd arcadeDriveCmd;
+  
+  // Default commands
   ArcadeVelDriveCmd velDriveCmd;
 
   
@@ -110,13 +87,9 @@ public class RobotContainer {
     // Add anything that has logging requirements
     logSubsystem.add(/*driveTrain, lidar,*/limelight, intake /*,driverControls, panel, detector*/);
 
-    // Create default commads for driver preference
-    tankDriveCmd = new TankDriveCmd(driverControls, driveTrain);
-    arcadeDriveCmd = new ArcadeDriveCmd(driverControls, driveTrain);
-
+    // Create default commads for driver preference  
     velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, DriveTrain.maxFPS, DriveTrain.maxRotDPS); 
     velDriveCmd.setShiftProfile(DriveTrain.shiftCount, DriveTrain.vShiftLow, DriveTrain.vShiftHigh); 
-
     driveTrain.setDefaultCommand(velDriveCmd);
 
     //Add devices to map for XML parsing usage, names must be unique.
@@ -138,7 +111,7 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.B).whenPressed(new auto_cmd_group(dc, driveTrain, intake, limelight, lidar));
     dc.bind(Id.Driver, XboxButton.X).whenPressed(new toggleLED(limelight));
     dc.bind(Id.Driver, XboxButton.Y).whenPressed(new ToggleAutoShiftCmd(gearShifter));
-    dc.bind(Id.Driver, XboxButton.RB).whenPressed(new SwitchDriveMode(driveTrain, velDriveCmd, arcadeDriveCmd));
+    dc.bind(Id.Driver, XboxButton.RB).whenPressed(new CallFunctionCmd(() -> {return -1;} ));  //placeholder, do nothing
     dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(driveTrain));
    
     // Assistant's buttons
@@ -148,12 +121,7 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
     dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineToggleCmd(intake));
     dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new ToggleIntakeRaised(intake));
-    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); // rpm_low, rpm_high, seconds mag backup
-    
-    //auto RPM adjustment from limelight area based on calculated trendlines
-    /*
-      dc.bindJoystick(Id.Assistant, XboxAxis.TRIGGER_LEFT).whenHeld(new ShooterOnAuto(intake, 0.2, -220.0, 3000.0, -220.0, 3000.0, limelight));
-    */
+    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
   }
 
   /**

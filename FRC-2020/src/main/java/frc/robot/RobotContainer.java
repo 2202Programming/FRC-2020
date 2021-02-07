@@ -17,8 +17,17 @@ import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
+import frc.robot.commands.auto.auto_drivePath_cmd;
+//import frc.robot.commands.climb.ClimbGroup;
+//import frc.robot.commands.climb.RunWinch;
+//import frc.robot.commands.climb.SetClimbArmExtension;
+//import frc.robot.commands.climb.SetClimbArmRotation;
+import frc.robot.commands.drive.ArcadeDriveCmd;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
+import frc.robot.commands.drive.ResetPosition;
+import frc.robot.commands.drive.SwitchDriveMode;
+import frc.robot.commands.drive.TankDriveCmd;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
 import frc.robot.commands.generic.CallFunctionCmd;
@@ -64,6 +73,8 @@ public class RobotContainer {
   // Default commands
   ArcadeVelDriveCmd velDriveCmd;
 
+  AutoPaths autoPaths;
+
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -78,7 +89,8 @@ public class RobotContainer {
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
-    
+    autoPaths = new AutoPaths();
+
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();
@@ -113,7 +125,11 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.Y).whenPressed(new ToggleAutoShiftCmd(gearShifter));
     dc.bind(Id.Driver, XboxButton.RB).whenPressed(new CallFunctionCmd(() -> {return -1;} ));  //placeholder, do nothing
     dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(driveTrain));
-   
+
+    //auto path testing
+    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, autoPaths.BounceSinglePath));
+    dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
+
     // Assistant's buttons
     dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineAdjust(intake, false, 0.0)); 
     dc.bind(Id.Assistant, XboxButton.B).whenHeld(new ReverseIntake(intake, -0.5));

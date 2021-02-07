@@ -137,10 +137,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// setup SparkMax controllers, sets left and right masters
 		configureControllers();
 
-		// zero adjust will set the default limits
-		adjustAccelerationLimit(0.0);
-		adjustCurrentLimit(0);
-
+    // create a dDrive to support other modes besides velocity command
 		dDrive = new DifferentialDrive(leftController, rightController);
 		dDrive.setSafetyEnabled(DriveTrain.safetyEnabled);
 
@@ -180,7 +177,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// zero adjust will set the default limits for accel and currents
 		adjustAccelerationLimit(0.0);
 		adjustCurrentLimit(0);
-
+    
 		// burn the default value in case of brown-out
 		saveControllers();
 	}

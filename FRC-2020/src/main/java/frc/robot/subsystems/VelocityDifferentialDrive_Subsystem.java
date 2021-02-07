@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.RobotPhysical.WheelAxelDistance;
 import static frc.robot.Constants.RobotPhysical.WheelDiameter;
+import static frc.robot.Constants.RobotPhysical.WheelWearLeft;
+import static frc.robot.Constants.RobotPhysical.WheelWearRight;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANPIDController;
@@ -309,18 +311,53 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 			// with the controller setup to coast mode by default.
 			leftController.set(0.0);
 			rightController.set(0.0);
-		}
-		else {
-			// command the velocity to the wheels
-			setReference(vl_rpm, leftPID);
-			setReference(vr_rpm, rightPID);
-		}
-
-		dDrive.feed();
-		
-		//shifts the gears if needed
-		shiftGears();
+    }
+    // issue all commands to the hardware
+    output( vl_rpm, vr_rpm, coastMode);
 	}
+
+  /**
+   *  velocityTankDrive - takes wheel speeds in fps and scales
+   *    to RPM and ouputs those speeds. 
+   * 
+   *  Uses current gearing, but does not attempt to shift as this is most likely
+   *  used by trajectory control.
+   * 
+   * @param velLeft      [length/s]    positive moves forward
+   * @param velRight     [length/s]    positive movee forward
+   */
+  public void velocityTankDrive(double velLeft, double velRight) {
+    // Spark Max uses RPM for velocity closed loop mode
+		// so we need to convert ft/s to RPM command which is dependent
+		// on the gear ratio.
+    double k = 1.0 / getFPSperRPM(m_currentGear);   // k = [RPM/fps]
+    
+    //scale and apply sign corrections
+    double l_rpm = k*velLeft*Kleft;
+    double r_rpm = k*velRight*Kright;
+
+    output(l_rpm, r_rpm, false);
+  }
+
+
+  /**
+   * Issues all the output changes to the motor controller and gear shifter
+   * when in a velocity command mode.
+   * 
+   * @param l_rpm
+   * @param r_rpm
+   * @param coastMode
+   */
+  private void output(double l_rpm, double r_rpm, boolean coastMode) {
+    if (!coastMode) {
+      	// command the velocity to the wheels, correct for wheelwear
+			setReference(l_rpm/WheelWearLeft, leftPID);
+			setReference(r_rpm/WheelWearRight, rightPID);
+    }
+    dDrive.feed();
+    shiftGears();
+  }
+
 
 	public void arcadeDrive(final double xSpeed, final double zRotation) {
 		shiftGears();
@@ -350,33 +387,33 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public double getLeftPos() {
 		// postion is in units of revs
 		double kft_rev = Kleft*getFPSperRPM(getCurrentGear())*60.0;
-		double ft =  kft_rev * leftController.getEncoder().  getPosition();  
-		return ft;
+		double ft =  kft_rev * leftController.getEncoder().getPosition();  
+		return ft*WheelWearLeft;  // account for calibration, we didn't go as far as we think
 	}
 
 	public double getRightPos() {
 		// postion is in units of revs
 		double kft_rev = Kright*getFPSperRPM(getCurrentGear())*60.0;
 		double ft = kft_rev * rightController.getEncoder().getPosition();
-		return ft;
+		return ft*WheelWearRight;
 	}
 
 	public double getLeftVel(final boolean normalized) {
 		double vel =  Kleft * leftController.get();           
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
-		return vel;
+		return vel*WheelWearLeft;
 	}
 
 	public double getRightVel(final boolean normalized) {
 		double vel = Kright * rightController.get();
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
-		return vel;
+		return vel*WheelWearRight;
 	}
 
 	public double getAvgVelocity(final boolean normalized) {
-		double vel = 0.5*(Kright * rightController.get() + Kleft * leftController.get());
+		double vel = 0.5*(Kright * rightController.get()*WheelWearRight + Kleft * leftController.get())*WheelWearLeft;
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;

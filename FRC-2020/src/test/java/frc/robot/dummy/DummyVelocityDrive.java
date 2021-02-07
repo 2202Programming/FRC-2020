@@ -83,4 +83,8 @@ public class DummyVelocityDrive implements VelocityDrive {
     return null;
   }
 
+  @Override
+  public void velocityTankDrive(double leftvel, double rightvel) {
+  }
+
 }

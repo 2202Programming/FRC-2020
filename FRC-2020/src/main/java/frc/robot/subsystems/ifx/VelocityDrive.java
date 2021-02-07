@@ -17,11 +17,11 @@ public interface VelocityDrive extends Odometry {
     /**
      * Commands to the drive train should be in physical units.
      * 
-     * @param lengthPerSecond
-     * @param degreePerSecond
+     * @param velocity          [length/s]    feet or meters, be consistent
+     * @param degreePerSecond   [degrees/s]   degrees is expected
      */
-    public void velocityArcadeDrive(double lengthPerSecond, double degreePerSecond);
-
+    public void velocityArcadeDrive(double velocity, double degreePerSecond);
+    public void velocityTankDrive(double leftvel, double rightvel);
 
     /** Some drive systems may have shifting, Expose the shifter if there is one. Null returned if none. */
     public Shifter getShifter();

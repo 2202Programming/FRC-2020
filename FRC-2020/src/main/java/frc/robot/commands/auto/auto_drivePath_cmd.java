@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import frc.robot.AutoPaths;
 import frc.robot.Constants.RamseteProfile;
 import frc.robot.subsystems.ifx.VoltageDrive;
 
@@ -27,13 +28,14 @@ import frc.robot.subsystems.ifx.VoltageDrive;
 public class auto_drivePath_cmd extends CommandBase {
 
   private final VoltageDrive m_robotDrive;
-  private Trajectory autoPath;
+  private AutoPaths autoPath;
+  Trajectory path;
 
-  public auto_drivePath_cmd(VoltageDrive drive, Trajectory path) {
+  public auto_drivePath_cmd(VoltageDrive drive, AutoPaths paths) {
     // Use addRequirements() here to declare subsystem dependencies.
 
     m_robotDrive = drive;
-    autoPath = path;
+    autoPath = paths;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drive);
@@ -43,8 +45,10 @@ public class auto_drivePath_cmd extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    //grab the trajectory determined by the AutoPath
+    path = autoPath.get();
     // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(autoPath.getInitialPose());
+    m_robotDrive.resetOdometry(path.getInitialPose());
   }
   
   // Called every time the scheduler runs while the command is scheduled.
@@ -59,7 +63,7 @@ public class auto_drivePath_cmd extends CommandBase {
     DifferentialDriveKinematics kinematics = m_robotDrive.getDriveKinematics();
 
     RamseteCommand ramseteCommand = new RamseteCommand(
-        autoPath,
+        path,
         m_robotDrive::getPose,
         new RamseteController(RamseteProfile.kRamseteB, RamseteProfile.kRamseteZeta),
         new SimpleMotorFeedforward(RamseteProfile.ksVolts,

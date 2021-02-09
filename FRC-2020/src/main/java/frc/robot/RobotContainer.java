@@ -108,6 +108,7 @@ public class RobotContainer {
 
     //finally setup the dashboard programatically
     Dashboard.configure(this);
+    Dashboard.preRoundTab.getLayout("Match").add(autoPaths.getChooser());
   }
 
   private void configureButtonBindings(DriverControls dc) {
@@ -120,7 +121,7 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(driveTrain));
 
     //auto path testing
-    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, autoPaths.BounceSinglePath));
+    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, autoPaths));
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
     // Assistant's buttons

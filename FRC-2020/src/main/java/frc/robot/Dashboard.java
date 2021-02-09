@@ -29,7 +29,7 @@ public class Dashboard {
     stringChooser.addOption("No Potato", "you chose very very well" );
 
     ShuffleboardLayout layout;
-    layout = preRoundTab.getLayout("PreRound Test", BuiltInLayouts.kGrid).withSize(3,3);
+    layout = preRoundTab.getLayout("Match", BuiltInLayouts.kGrid).withSize(3,3);
     layout.add(stringChooser).withPosition(1, 0).withSize(2,1);
 
     layout = systemsTab.getLayout("Shooter", BuiltInLayouts.kList).withSize(2,3).withPosition(0, 0);

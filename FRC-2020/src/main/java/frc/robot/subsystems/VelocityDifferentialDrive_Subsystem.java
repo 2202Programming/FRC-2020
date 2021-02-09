@@ -303,7 +303,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 		// compute each wheel, pos rpm moves forward, pos turn is CCW
 		double vl_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ);  //turn left, +CCW, slows left wheel
-    double vr_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ); //turn left, +CCW, speeds right wheel
+    double vr_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ);  //turn left, +CCW, speeds right wheel
     
     // issue all commands to the hardware
     output( vl_rpm, vr_rpm, coastMode);

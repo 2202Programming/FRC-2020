@@ -132,7 +132,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
     // only read/shape the stick mode.
     
     //Arcade
-    z_rot = rotShaper.get();
+    z_rot = -rotShaper.get();
     vel = velShaper.get() * invertGain;
 
     // tank

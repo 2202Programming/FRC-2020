@@ -80,7 +80,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	final CANSparkMax leftController = backLeft; 
   final CANSparkMax rightController = backRight;
   final CANPIDController leftPID = leftController.getPIDController();
-	final CANPIDController rightPID = leftController.getPIDController();
+	final CANPIDController rightPID = rightController.getPIDController();
 	
   //  Voltage to get robot to move.
   // kS - taken from the Drive Characterization

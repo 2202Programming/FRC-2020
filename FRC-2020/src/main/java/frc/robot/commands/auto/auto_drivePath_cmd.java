@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.AutoPaths;
 import frc.robot.Constants.RamseteProfile;
@@ -45,12 +46,14 @@ public class auto_drivePath_cmd extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //grab the trajectory determined by the AutoPath
+    // grab the trajectory determined by the AutoPath
     path = autoPath.get();
-    // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(path.getInitialPose());
+    if (path != null) {
+      // Reset odometry to the starting pose of the trajectory.
+      m_robotDrive.resetOdometry(path.getInitialPose());
+    }
   }
-  
+
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
@@ -59,6 +62,9 @@ public class auto_drivePath_cmd extends CommandBase {
   }
 
   public Command getPathCommand() {
+    if (path == null) {
+      return new InstantCommand();  // no path selected
+    }
 
     DifferentialDriveKinematics kinematics = m_robotDrive.getDriveKinematics();
 

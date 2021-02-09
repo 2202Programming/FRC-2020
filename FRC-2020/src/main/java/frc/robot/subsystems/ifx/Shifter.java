@@ -7,18 +7,23 @@
 
 package frc.robot.subsystems.ifx;
 
-import frc.robot.subsystems.GearShifter.Gear;
-
 /**
- * Minimal controls for shifting the gear train.
+ * Minimal controls for a two shifting the gear train.
  */
 public interface Shifter {
+  public enum Gear {LOW, HIGH};
+
+    // what a shifter can do
     public void shiftDown();
     public void shiftUp();
     public Gear getCurrentGear();
 
-    // Added autoshift control 
+    // Support autoshift controls
     public boolean isAutoShiftEnabled();   //return true if enabled
     public boolean enableAutoShift();      //return true if autoshift was set
-    public boolean disableAutoShift();     //always false
+    public boolean disableAutoShift();     //returns false
+
+    // Tell us about the gear ratios, no state change
+    public double getGearRatio(Gear g);    // gear ratio for given gear 
+    public double getGearRatio();          // current gear ratio 
 }

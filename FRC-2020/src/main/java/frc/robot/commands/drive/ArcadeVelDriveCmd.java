@@ -8,10 +8,9 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-//import static frc.robot.Constants.*;
-import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.Shifter;
+import frc.robot.subsystems.ifx.Shifter.Gear;
 import frc.robot.subsystems.ifx.VelocityDrive;
 
 public class ArcadeVelDriveCmd extends CommandBase {
@@ -81,7 +80,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
 
     // count time we want to shift high, if we hit it request it from the shifter
     if ((vel > shiftUpSpeed) && // (velCmd >= vel) &&
-        (shifter.getCurrentGear() == Gear.LOW_GEAR)) {
+        (shifter.getCurrentGear() == Gear.LOW)) {
       if (++timeWantingUp >= minTimeInZone) {
         shifter.shiftUp();
         resetTimeInZone();
@@ -90,7 +89,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
 
     // same thing on the low side
     if ((vel < shiftDownSpeed) && // (velCmd <= vel) &&
-        (shifter.getCurrentGear() == Gear.HIGH_GEAR)) {
+        (shifter.getCurrentGear() == Gear.HIGH)) {
       if (timeWantingDown++ >= minTimeInZone) {
         shifter.shiftDown();
         resetTimeInZone();

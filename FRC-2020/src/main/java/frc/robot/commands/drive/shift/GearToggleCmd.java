@@ -1,8 +1,8 @@
 package frc.robot.commands.drive.shift;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.Shifter;
+import frc.robot.subsystems.ifx.Shifter.Gear;
 
 public class GearToggleCmd extends InstantCommand {
   /**
@@ -22,7 +22,7 @@ public class GearToggleCmd extends InstantCommand {
   @Override
   public void initialize() {
    
-    if (m_shifter.getCurrentGear() == Gear.LOW_GEAR) {
+    if (m_shifter.getCurrentGear() == Gear.LOW) {
       m_shifter.shiftUp();
     } else {
       m_shifter.shiftDown();

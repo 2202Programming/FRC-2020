@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DriveTrain;
 import frc.robot.Constants.RamseteProfile;
-import frc.robot.subsystems.GearShifter.Gear;
 import frc.robot.subsystems.ifx.DualDrive;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.subsystems.ifx.Shifter;
@@ -97,7 +96,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
   // drivetrain & gear objects 
 	final DifferentialDrive dDrive;
-	GearShifter gearbox;
+	Shifter gearbox;
 	Gear requestedGear;                // where driver or external logic wants the gear
 	boolean coastMode = false;         // attempt to coast when Vcmd > Vrequest
 	
@@ -115,7 +114,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
   // The gyro sensor
   private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
 
-	public VelocityDifferentialDrive_Subsystem(final GearShifter gear) {
+	public VelocityDifferentialDrive_Subsystem(final Shifter gear) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
 		gearbox = gear;
 		maxDPS = DriveTrain.maxRotDPS;
@@ -123,8 +122,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		maxFPS_High = DriveTrain.maxFPS;
 
 		// setup physical units - chassis * gearbox  (rev per minute)
-		K_low_fps_rpm = K_ft_per_rev * gearbox.K_low / 60;    //rpm/60 rps
-		K_high_fps_rpm = K_ft_per_rev * gearbox.K_high / 60;
+		K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60;    //rpm/60 rps
+		K_high_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.HIGH) / 60;
     
     // compute max RPM for motors for high and low gears
 		maxRPM_High = (maxFPS_High / K_high_fps_rpm); 
@@ -287,12 +286,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// Spark Max uses RPM for velocity closed loop mode
 		// so we need to convert ft/s to RPM command which is dependent
 		// on the gear ratio.
-		double k = getFPSperRPM(m_currentGear);
+		double k = 1.0 / getFPSperRPM(m_currentGear);   //k [rpm/fps]
 		double maxSpeed = maxFPS_High;   //getMaxSpeed(currentGear);
 		
 		// limit vel to max for the gear ratio
 		double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
-		double rpm = vcmd / k;
+		double rpm = vcmd * k;
 
 		/**
 		 * Rotation controls
@@ -300,18 +299,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// Convert to rad/s split between each wheel
 		double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
 		rps *= (Math.PI / 180.0);
-		double vturn_rpm = (rps * WheelAxelDistance) / k;
+		double vturn_rpm = (rps * WheelAxelDistance) * k;
 
-		// add in the commanded speed each wheel
-		double vl_rpm = Kleft * applyDeadZone(rpm + vturn_rpm, RPM_DZ);
-		double vr_rpm = Kright * applyDeadZone(rpm - vturn_rpm, RPM_DZ);
-		
-		if (coastMode) {
-			// command doesn't need power, ok to coast, should use PWM and zero power
-			// with the controller setup to coast mode by default.
-			leftController.set(0.0);
-			rightController.set(0.0);
-    }
+		// compute each wheel, pos rpm moves forward, pos turn is CCW
+		double vl_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ);  //turn left, +CCW, slows left wheel
+    double vr_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ); //turn left, +CCW, speeds right wheel
+    
     // issue all commands to the hardware
     output( vl_rpm, vr_rpm, coastMode);
 	}
@@ -332,30 +325,34 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// on the gear ratio.
     double k = 1.0 / getFPSperRPM(m_currentGear);   // k = [RPM/fps]
     
-    //scale and apply sign corrections
-    double l_rpm = k*velLeft*Kleft;
-    double r_rpm = k*velRight*Kright;
-
-    output(l_rpm, r_rpm, false);
+    //scale to rpm and ouput to contollers, no coast mode
+    output(k*velLeft, k*velRight, false);
   }
-
 
   /**
    * Issues all the output changes to the motor controller and gear shifter
    * when in a velocity command mode.
    * 
-   * @param l_rpm
-   * @param r_rpm
-   * @param coastMode
+   * @param l_rpm   positive left side moves forward
+   * @param r_rpm   positive right side moves forward
+   * @param coastMode  zero output, no breaks, let it roll
    */
   private void output(double l_rpm, double r_rpm, boolean coastMode) {
-    if (!coastMode) {
-      	// command the velocity to the wheels, correct for wheelwear
-			setReference(l_rpm/WheelWearLeft, leftPID);
-			setReference(r_rpm/WheelWearRight, rightPID);
+    if (coastMode) {
+			// command doesn't need power, ok to coast, should use PWM and zero power
+			// with the controller setup to coast mode by default.
+			leftController.set(0.0);
+			rightController.set(0.0);
     }
+    else {
+      // command the velocity to the wheels, correct for wheelwear
+      // also correct for any left/right motor conventions
+			setReference(l_rpm/WheelWearLeft*Kleft, leftPID);
+			setReference(r_rpm/WheelWearRight*Kright, rightPID);
+    }
+   
+    shiftGears(); 
     dDrive.feed();
-    shiftGears();
   }
 
 
@@ -376,11 +373,11 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 * @return max speed in ft/s
 	 */
 	public double getMaxSpeed( Gear gear) {
-		return (gear == Gear.HIGH_GEAR) ? maxFPS_High : maxFPS_Low;
+		return (gear == Gear.HIGH) ? maxFPS_High : maxFPS_Low;
 	}
 
 	private double getFPSperRPM(Gear gear) {
-		return (gear == Gear.HIGH_GEAR) ?  K_high_fps_rpm : K_low_fps_rpm;
+		return (gear == Gear.HIGH) ?  K_high_fps_rpm : K_low_fps_rpm;
 	}
 
 
@@ -413,7 +410,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public double getAvgVelocity(final boolean normalized) {
-		double vel = 0.5*(Kright * rightController.get()*WheelWearRight + Kleft * leftController.get())*WheelWearLeft;
+    double vel = 0.5*(Kright * rightController.get() * WheelWearRight 
+                     + Kleft * leftController.get() * WheelWearLeft);
 		double fps = vel * getFPSperRPM(getCurrentGear());
 		vel = (normalized) ? (fps / maxFPS_High) : fps;
 		return vel;
@@ -433,7 +431,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		if (requestedGear == gearbox.getCurrentGear()) return;
 		
 		// shift based on requested
-		if (requestedGear == Gear.LOW_GEAR) {
+		if (requestedGear == Gear.LOW) {
 			gearbox.shiftDown();
 		} 
 		else {
@@ -457,56 +455,55 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	 * Shifter controls encapsulation
 	 */
 	public void shiftUp() {
-		requestedGear = Gear.HIGH_GEAR;
+		requestedGear = Gear.HIGH;
 	}
 
 	public void shiftDown() {
-		requestedGear = Gear.LOW_GEAR;
+		requestedGear = Gear.LOW;
 	}
 
 	public Gear getCurrentGear() {
 		return gearbox.getCurrentGear();
 	}
 
-	public void log() {
-		/**
-		 * SmartDashboard.putNumber("Right Velocity", getRightVel(false));
-		 * SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
-		 * SmartDashboard.putNumber("Right Position", getRightPos());
-		 * SmartDashboard.putNumber("Left Position", getLeftPos());
-		 * SmartDashboard.putString("DT Command", getDefaultCommand().toString());
-		 * SmartDashboard.putString("Current Gear", gearbox.getCurrentGear().toString());
-		*/
-	}
+    public void log() {
+      /**
+       * SmartDashboard.putNumber("Right Velocity", getRightVel(false));
+       * SmartDashboard.putNumber("Left Velocity", getLeftVel(false));
+       * SmartDashboard.putNumber("Right Position", getRightPos());
+       * SmartDashboard.putNumber("Left Position", getLeftPos());
+       * SmartDashboard.putString("DT Command", getDefaultCommand().toString());
+       * SmartDashboard.putString("Current Gear",
+       * gearbox.getCurrentGear().toString());
+       */
+    }
 
-		void configurePID(CANPIDController hwpid, PIDFController pidf) {
+    void configurePID(CANPIDController hwpid, PIDFController pidf) {
       // set PID coefficients
-			hwpid.setP(pidf.getP(), KpidSlot);
-			hwpid.setI(pidf.getI(), KpidSlot);
-			hwpid.setD(pidf.getD(), KpidSlot);
-			hwpid.setIZone(0.0, KpidSlot);
-			hwpid.setFF(pidf.getF(), KpidSlot);
-			// dpl removed TODO:do we need?    hwpid.setOutputRange(kMinOutput, kMaxOutput);
-		}
+      hwpid.setP(pidf.getP(), KpidSlot);
+      hwpid.setI(pidf.getI(), KpidSlot);
+      hwpid.setD(pidf.getD(), KpidSlot);
+      hwpid.setIZone(0.0, KpidSlot);
+      hwpid.setFF(pidf.getF(), KpidSlot);
+    }
 
-
-		/**
-		 * setReference - uses physical units (rpm) for speed
-     *   - volts for arbitrary feed forward 
-		 * 
-		 * @param rpm - revs per minute for desired 
-		 */
-		public void setReference(double rpm, CANPIDController pid) {
+    /**
+     * setReference - uses physical units (rpm) for speed - volts for arbitrary feed
+     * forward
+     * 
+     * @param rpm - revs per minute for desired
+     */
+    public void setReference(double rpm, CANPIDController pid) {
       // arbff compensates for min voltage needed to make robot move
       // +V moves forward, -V moves backwards
-			double arbffVolts = (rpm >= 0) ? arbFeedFwd : - arbFeedFwd;
+      double arbffVolts = (rpm >= 0) ? arbFeedFwd : -arbFeedFwd;
 
-			//rpm haz a deadzone so == 0.0 is a fair test.
-			if (rpm ==0.0) arbffVolts = 0.0;
-			pid.setReference(rpm, ControlType.kVelocity, KpidSlot, arbffVolts, ArbFFUnits.kVoltage); 
-		}
-    
-    
+      // rpm haz a deadzone so == 0.0 is a fair test.
+      if (rpm == 0.0)
+        arbffVolts = 0.0;
+      pid.setReference(rpm, ControlType.kVelocity, KpidSlot, arbffVolts, ArbFFUnits.kVoltage);
+    }
+  
 	/**
 	 *  Implement Shifter interface by deferring to the gearbox being used.
 	 */
@@ -600,6 +597,16 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
   public void resetOdometry(Pose2d pose) {
     resetPosition();
     m_odometry.resetPosition(pose, m_gyro.getRotation2d());  // has a -1 in the interface for they gyro
+  }
+
+  @Override
+  public double getGearRatio(Gear g) {
+    return gearbox.getGearRatio(g);
+  }
+
+  @Override
+  public double getGearRatio() {
+    return gearbox.getGearRatio();
   }
 
 }

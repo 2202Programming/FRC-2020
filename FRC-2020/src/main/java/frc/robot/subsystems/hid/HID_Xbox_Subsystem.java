@@ -87,20 +87,25 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
     assistant = (XboxController) registerController(Id.Assistant, new XboxController(Id.Assistant.value));
     switchBoard = (XboxController) registerController(Id.SwitchBoard, new XboxController(Id.SwitchBoard.value));
 
+    /**
+     * All Joysticks are read and shaped without sign conventions.
+     * Sign convention added on periodic based on the type of driver control
+     * being used.
+     */
     // Driver inputs for acade style in normalized units,
     // left Y-stick throttle (forward negative) right X-stick turn rate
-    velShaper = new ExpoShaper(velExpo, () -> -driver.getY(Hand.kLeft));
-    rotShaper = new ExpoShaper(rotExpo, () -> -driver.getX(Hand.kRight));
+    velShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft));
+    rotShaper = new ExpoShaper(rotExpo, () -> driver.getX(Hand.kRight)); 
 
     // Tank drive Left/Right Y-axis used, forward stick is negative 
-    velLeftShaper = new ExpoShaper(velExpo,  () -> -driver.getY(Hand.kLeft));
-    velRightShaper = new ExpoShaper(velExpo, () -> -driver.getY(Hand.kRight));
+    velLeftShaper = new ExpoShaper(velExpo,  () -> driver.getY(Hand.kLeft));
+    velRightShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
 
     // XYRot or Swerve Drive
     // Rotation on Left-X axis,  X-Y throttle on Right
-    velXShaper = new ExpoShaper(velExpo,  () -> -driver.getX(Hand.kRight));   
-    velYShaper = new ExpoShaper(velExpo,  () -> -driver.getY(Hand.kRight));
-    swRotShaper = new ExpoShaper(rotExpo, () -> -driver.getX(Hand.kLeft));  
+    velXShaper = new ExpoShaper(velExpo,  () -> driver.getX(Hand.kRight));   
+    velYShaper = new ExpoShaper(velExpo,  () -> driver.getY(Hand.kRight));
+    swRotShaper = new ExpoShaper(rotExpo, () -> driver.getX(Hand.kLeft));  
 
     // add some deadzone in normalized coordinates
     rotShaper.setDeadzone(deadzone);
@@ -132,24 +137,23 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
     // only read/shape the stick mode.
     
     //Arcade
-    z_rot = -rotShaper.get();
-    vel = velShaper.get() * invertGain;
+    z_rot = -rotShaper.get() * invertGain; //positive turns robot CCW
+    vel = -velShaper.get() * invertGain;   //positive moves robot forward
 
     // tank
     if (isControlInverted()) {
-      velLeft = velRightShaper.get() * invertGain;
-      velRight = velLeftShaper.get() * invertGain;
+      velLeft = velRightShaper.get();     //cross left/right
+      velRight = velLeftShaper.get();     //and remove inversion
     } else {
-      
-      velLeft = velLeftShaper.get() * invertGain;
-      velRight = velRightShaper.get() * invertGain;
+      velLeft = -velLeftShaper.get();     //invert so forward stick is positive
+      velRight = -velRightShaper.get();   //invert so forward stick is positive
     }
     limitTankRotation();
 
-    //XYRot
-    velX = velXShaper.get();
-    velY = velYShaper.get();
-    xyRot = swRotShaper.get();
+    //XYRot - field axis, pos X away from driver station, pos y to left side of field
+    velY = -velXShaper.get();    //invert, so right stick moves robot, right, lowering Y 
+    velX = -velYShaper.get();    //invert, so forward stick is positive, increase X
+    xyRot = -swRotShaper.get();  //invert, so positive is CCW 
   }
   
   public void setLimitRotation(boolean enableLimit) {

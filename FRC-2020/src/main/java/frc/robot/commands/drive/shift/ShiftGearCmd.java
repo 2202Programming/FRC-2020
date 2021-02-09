@@ -1,24 +1,23 @@
 package frc.robot.commands.drive.shift;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.GearShifter;
-import frc.robot.subsystems.GearShifter.Gear;
+import frc.robot.subsystems.ifx.Shifter;
+import frc.robot.subsystems.ifx.Shifter.Gear;
 
 /**
  * ShiftGearCmd - requests a shift to the given gear.
  */
 public class ShiftGearCmd extends InstantCommand {
     private Gear g;
-    private GearShifter shifter;
+    private Shifter shifter;
 
-    public ShiftGearCmd(GearShifter shifter, Gear g) {
+    public ShiftGearCmd(Shifter shifter, Gear g) {
         this.shifter = shifter;
         this.g = g;
-        addRequirements(shifter);
     }
     @Override
     public void initialize() {
-        if (g == Gear.HIGH_GEAR) {
+        if (g == Gear.HIGH) {
             shifter.shiftUp();
         } else {
             shifter.shiftDown();

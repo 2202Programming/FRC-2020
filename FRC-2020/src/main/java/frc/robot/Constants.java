@@ -248,7 +248,7 @@ public final class Constants {
             data.BackupSec = .1;    // seconds
             data.Tolerance = .005;  //0.5%
             data.HighGoal = new ShooterSettings(35.0, 0.0, 41.0);  //vel, rps, angle
-            data.LowGoal =  new ShooterSettings(10.0, 0.0, 22.0);  //vel, rps, angle
+            data.LowGoal =  new ShooterSettings(39.0, 6.0, 22.0);  //vel, rps, angle
         }
        
     }

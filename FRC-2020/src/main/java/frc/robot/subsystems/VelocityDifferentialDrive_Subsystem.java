@@ -540,6 +540,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
     layout.addNumber("DT/Vel/right", () -> m_velRight);
     layout.addNumber("DT/pos/left", () -> m_posLeft);
     layout.addNumber("DT/pos/right", () -> m_posRight);
+    layout.addNumber("DT/pos/theta", () -> m_theta);
 		layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
 		
 	}

@@ -138,8 +138,8 @@ public final class Constants {
         public static final double WheelAxelDistance = 25.5/12.0; // feet
 
         //wheel wear compensation - adjust when distance is off by small amount
-        public static final double WheelWearLeft = 0.975;   //[percent] of nominal
-        public static final double WheelWearRight = 0.975;  //[percent] of nominal
+        public static final double WheelWearLeft = 1.0;   //[percent] of nominal
+        public static final double WheelWearRight = 1.0;  //[percent] of nominal
         
     }
 

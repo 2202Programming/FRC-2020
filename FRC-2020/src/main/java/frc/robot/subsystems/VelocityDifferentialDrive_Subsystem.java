@@ -537,7 +537,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 
 	public void addDashboardWidgets(ShuffleboardLayout layout) {
 		layout.addNumber("DT/Vel/left", () -> m_velLeft).withSize(2, 2);
-		layout.addNumber("DT/Vel/right", () -> m_velRight);
+    layout.addNumber("DT/Vel/right", () -> m_velRight);
+    layout.addNumber("DT/pos/left", () -> m_posLeft);
+    layout.addNumber("DT/pos/right", () -> m_posRight);
 		layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
 		
 	}

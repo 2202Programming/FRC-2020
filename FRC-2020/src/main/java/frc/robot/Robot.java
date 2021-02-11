@@ -75,8 +75,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    
-    Dashboard.getAutoChoice(); // TEST CODE only prints
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     
     // schedule the autonomous command (example)
@@ -101,6 +99,9 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    // Set the driveTrain default command
+    Command drivecmd = RobotContainer.getInstance().dashboard.getDriverPreferences().getCommandChooser().getSelected();
+    RobotContainer.getInstance().driveTrain.setDefaultCommand(drivecmd);
   }
 
   /**
@@ -132,7 +133,5 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     m_robotContainer.runTestPeriod();
     CommandScheduler.getInstance().run();
-
-
   }
 }

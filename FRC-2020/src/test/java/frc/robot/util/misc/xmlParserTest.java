@@ -25,7 +25,7 @@ import frc.robot.subsystems.ifx.VelocityDrive;
  */
 public class xmlParserTest {
 
-  static Map<String, Object> deviceMap = RobotContainer.deviceMap;
+  static Map<String, Object> deviceMap = RobotContainer.getDeviceMap();
   VelocityDrive drive;
 
   @Before

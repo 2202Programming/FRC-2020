@@ -8,17 +8,19 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.Shifter;
 import frc.robot.subsystems.ifx.Shifter.Gear;
 import frc.robot.subsystems.ifx.VelocityDrive;
+import frc.robot.ux.DriverPreferences;
 
 public class ArcadeVelDriveCmd extends CommandBase {
   DriverControls dc;
   VelocityDrive drive;
   Shifter shifter;
 
-  // max speeds allowed
+  // max speeds allowed - initialized from DriverPreferences
   double vMax; // fps
   double rotMax; // deg per sec
 
@@ -48,12 +50,9 @@ public class ArcadeVelDriveCmd extends CommandBase {
    * @param velMaxFps  - max FPS scales normalized stick value
    * @param rotMaxDps  - rotation max, scales normalized stick value
    */
-  public ArcadeVelDriveCmd(DriverControls dc, VelocityDrive driveTrain, Shifter shifter, double velMaxFps,
-      double rotMaxDps) {
+  public ArcadeVelDriveCmd(DriverControls dc, VelocityDrive driveTrain, Shifter shifter) {
     this.dc = dc;
     this.drive = driveTrain;
-    this.vMax = velMaxFps;
-    this.rotMax = rotMaxDps;
     this.shifter = shifter;
 
     addRequirements(driveTrain);
@@ -62,6 +61,10 @@ public class ArcadeVelDriveCmd extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    // get DriverPreferences off Dashboard
+    DriverPreferences dp = RobotContainer.getInstance().dashboard.getDriverPreferences();
+    vMax = dp.getMaxSpeed();
+    rotMax = dp.getMaxRotation()();
     drive.resetPosition();
     shifter.shiftDown();
     resetTimeInZone();

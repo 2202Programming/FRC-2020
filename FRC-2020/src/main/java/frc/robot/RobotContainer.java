@@ -12,13 +12,11 @@ import java.util.Map;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.DriveTrain;
 import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.auto_drivePath_cmd;
-import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -41,6 +39,7 @@ import frc.robot.subsystems.hid.XboxAxis;
 import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
+import frc.robot.ux.Dashboard;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -50,9 +49,11 @@ import frc.robot.subsystems.ifx.DriverControls.Id;
  * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  static RobotContainer instance;
+
   //tracks robot's devices for XML parsing
-  static public Map<String, Object> deviceMap = new HashMap<String, Object>();  
-  
+  static Map<String, Object> deviceMap = new HashMap<String, Object>(); 
+
   // The robot's subsystems and commands are defined here...
   // public final CameraSubsystem cameraSubsystem;
   public final HID_Xbox_Subsystem driverControls;
@@ -62,17 +63,13 @@ public class RobotContainer {
   public final Limelight_Subsystem limelight;
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
-  
-  // Default commands
-  ArcadeVelDriveCmd velDriveCmd;
-
-  AutoPaths autoPaths;
-
+  public final Dashboard dashboard;
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    RobotContainer.instance = this;
     // put driver controls first so its periodic() is called first.
     driverControls = new HID_Xbox_Subsystem(DriverPrefs.VelExpo, DriverPrefs.RotationExpo, DriverPrefs.StickDeadzone); 
     gearShifter = new GearShifter();
@@ -82,8 +79,7 @@ public class RobotContainer {
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
-    autoPaths = new AutoPaths();
-
+    
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();
@@ -91,24 +87,18 @@ public class RobotContainer {
     
     // Add anything that has logging requirements
     logSubsystem.add(/*driveTrain, lidar,*/limelight, intake /*,driverControls, panel, detector*/);
-
-    // Create default commads for driver preference  
-    velDriveCmd = new ArcadeVelDriveCmd(driverControls, driveTrain, driveTrain, DriveTrain.maxFPS, DriveTrain.maxRotDPS); 
-    velDriveCmd.setShiftProfile(DriveTrain.shiftCount, DriveTrain.vShiftLow, DriveTrain.vShiftHigh); 
-    driveTrain.setDefaultCommand(velDriveCmd);
-
+    
     //Add devices to map for XML parsing usage, names must be unique.
     deviceMap.put("lidar", lidar);
-    deviceMap.put("driveTran", driveTrain);
+    deviceMap.put("driveTrain", driveTrain);
     deviceMap.put("intake", intake);
     deviceMap.put("limelight", limelight);
-    
+
+    //setup the dashboard programatically, creates any choosers, screens
+    dashboard = new Dashboard(this);
+
     // Configure the button bindings
     configureButtonBindings(driverControls);
-
-    //finally setup the dashboard programatically
-    Dashboard.configure(this);
-    Dashboard.preRoundTab.getLayout("Match").add(autoPaths.getChooser());
   }
 
   private void configureButtonBindings(DriverControls dc) {
@@ -121,7 +111,7 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(driveTrain));
 
     //auto path testing
-    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, autoPaths));
+    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getPath()));
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
     // Assistant's buttons
@@ -141,7 +131,7 @@ public class RobotContainer {
    * 
    * @return Object 
    */
-  public static  Object getDeviceByName(String name) {
+  public static Object getDeviceByName(String name) {
     if (!deviceMap.containsKey(name)) {
       System.out.println("Device not found on Robot:" + name +
           ".\nPlease check the floor for missing part. ");
@@ -150,6 +140,11 @@ public class RobotContainer {
     return deviceMap.get(name);
   }
   
+  public static Map<String, Object> getDeviceMap() {return deviceMap;}
+
+  //static accessor to get the robot container, or device map 
+  public static RobotContainer getInstance() {return instance; }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

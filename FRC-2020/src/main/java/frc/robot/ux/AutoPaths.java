@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.ux;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
@@ -25,13 +27,12 @@ public class AutoPaths {
   final String PathsDir = Filesystem.getDeployDirectory() + File.separator + "paths";
   
   // what we find
-  // if we want to pre-read use a map to hold paths
-  //Map<String, Trajectory> trajectories = new HashMap<String, Trajectory>();
   SendableChooser<Trajectory> pathChooser = new SendableChooser<>();
 
-  public AutoPaths() {
+  public AutoPaths(ShuffleboardTab tab) {
 
-    pathChooser.addOption("do nothing", null);
+    // create a default trajectory that does nothing 
+    pathChooser.setDefaultOption("do nothing", null);
 
     try {
       // fills chooser from directory
@@ -40,6 +41,9 @@ public class AutoPaths {
       e.printStackTrace();
       //OK to continune, it was some IO error, just eat it.
     }
+
+    // put the chooser on the tab we were given
+    tab.getLayout("AutoPath", BuiltInLayouts.kList).withSize(2, 2).add(pathChooser);
   }
 
   public SendableChooser<Trajectory> getChooser() { return pathChooser;}
@@ -50,8 +54,7 @@ public class AutoPaths {
    * 
    * @return Trajectory selected 
    */
-  public Trajectory get() { return  pathChooser.getSelected();
-   }
+  //public Trajectory get() { return  pathChooser.getSelected();   }
 
   void readPaths() throws IOException {
     Stream<Path> paths = Files.walk(Paths.get(PathsDir));

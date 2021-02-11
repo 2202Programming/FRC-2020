@@ -8,12 +8,12 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import frc.robot.AutoPaths;
 import frc.robot.Constants.RamseteProfile;
 import frc.robot.subsystems.ifx.VoltageDrive;
 
@@ -29,25 +29,23 @@ import frc.robot.subsystems.ifx.VoltageDrive;
 public class auto_drivePath_cmd extends CommandBase {
 
   private final VoltageDrive m_robotDrive;
-  private AutoPaths autoPath;
+  SendableChooser<Trajectory> chooser;
   Trajectory path;
 
-  public auto_drivePath_cmd(VoltageDrive drive, AutoPaths paths) {
+  public auto_drivePath_cmd(VoltageDrive drive, SendableChooser<Trajectory> chooser) {
     // Use addRequirements() here to declare subsystem dependencies.
-
     m_robotDrive = drive;
-    autoPath = paths;
+    this.chooser = chooser;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drive);
-    
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     // grab the trajectory determined by the AutoPath
-    path = autoPath.get();
+    path = chooser.getSelected();
     if (path != null) {
       // Reset odometry to the starting pose of the trajectory.
       m_robotDrive.resetOdometry(path.getInitialPose());

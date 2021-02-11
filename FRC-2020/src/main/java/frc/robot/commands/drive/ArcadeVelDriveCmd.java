@@ -64,7 +64,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
     // get DriverPreferences off Dashboard
     DriverPreferences dp = RobotContainer.getInstance().dashboard.getDriverPreferences();
     vMax = dp.getMaxSpeed();
-    rotMax = dp.getMaxRotation()();
+    rotMax = dp.getMaxRotation();
     drive.resetPosition();
     shifter.shiftDown();
     resetTimeInZone();

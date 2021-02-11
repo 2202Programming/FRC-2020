@@ -281,7 +281,7 @@ public class xmlParser {
           // <Arg robotDevice="name"/>
           String deviceName = c.getAttribute(ROBOT_DEV);
           // add the requested robot device to the arg array
-          Object dev = RobotContainer.getInstance().getDeviceByName(deviceName);
+          Object dev = RobotContainer.getDeviceByName(deviceName);
           args.add(dev);
         }
       }

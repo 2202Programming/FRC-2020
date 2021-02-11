@@ -4,8 +4,11 @@
 
 package frc.robot.ux;
 
+import java.util.Map;
+
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -43,8 +46,14 @@ public class DriverPreferences {
     tab.getLayout("DriveCmd", BuiltInLayouts.kList).withSize(2, 2).add(driveChoices);
 
     ShuffleboardLayout  layout = tab.getLayout("RobotSpeeds", BuiltInLayouts.kList).withSize(2, 2);
-    maxSpeedNTE = layout.addPersistent("DriverPref/speed", DriveTrain.maxFPS).getEntry();
-		maxRotationNTE = layout.addPersistent("DriverPref/rotation", DriveTrain.maxRotDPS).getEntry();
+    maxSpeedNTE = layout.addPersistent("DriverPref/speed", DriveTrain.maxFPS)
+    .withWidget(BuiltInWidgets.kNumberSlider)
+    .withProperties(Map.of("Min", 1, "Max", 20,"Block increment", 1 ))
+    .getEntry();
+    
+    maxRotationNTE = layout.addPersistent("DriverPref/rotation", DriveTrain.maxRotDPS)
+    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("Min", 30, "Max", 200))
+    .getEntry();
 		
 	}
 

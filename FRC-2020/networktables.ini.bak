@@ -1,2 +1,3 @@
 [NetworkTables Storage 3.0]
-double "/Shuffleboard/DriversChoice/RobotSpeeds/DriverPref/speed"=14
+double "/Shuffleboard/DriversChoice/RobotSpeeds/DriverPref/rotation"=14.4847
+double "/Shuffleboard/DriversChoice/RobotSpeeds/DriverPref/speed"=66

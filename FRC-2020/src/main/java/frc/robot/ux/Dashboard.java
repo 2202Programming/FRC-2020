@@ -35,7 +35,7 @@ public class Dashboard {
 
   public Dashboard(RobotContainer rc) {
     ShuffleboardLayout layout;
-    layout = matchTab.getLayout("Paths", BuiltInLayouts.kGrid).withSize(3,3);
+    ///layout = matchTab.getLayout("Paths", BuiltInLayouts.kGrid).withSize(3,3);
  
     layout = systemsTab.getLayout("Shooter", BuiltInLayouts.kList).withSize(2,3).withPosition(0, 0);
     rc.intake.addDashboardWidgets(layout);

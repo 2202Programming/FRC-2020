@@ -176,7 +176,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
     configurePID(rightPID, DriveTrain.pidValues);
 
 		// zero adjust will set the default limits for accel and currents
-		adjustAccelerationLimit(0.0);
+    adjustAccelerationLimit(0.0);
+    adjustFeedForward(0.0);
 		adjustCurrentLimit(0);
     
 		// burn the default value in case of brown-out
@@ -211,7 +212,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public double adjustFeedForward(final double deltaFF) {
 		arbFeedFwd = MathUtil.limit((arbFeedFwd + deltaFF), 0.0, ARBIT_FEEDFWD_MAX_VOLT);
 
-		SmartDashboard.putNumber("DT/limits/arbFF", arbFeedFwd);
+		SmartDashboard.putNumber("/DT/limits/arbFF", arbFeedFwd);
 		return arbFeedFwd;
 	}
 
@@ -233,7 +234,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		leftController.setClosedLoopRampRate(slewRateLimit);
 		rightController.setClosedLoopRampRate(slewRateLimit);
 
-		SmartDashboard.putNumber("DT/limits/slewRate", slewRateLimit);
+		SmartDashboard.putNumber("/DT/limits/slewRate", slewRateLimit);
 		return slewRateLimit;
 	}
 
@@ -536,12 +537,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	}
 
 	public void addDashboardWidgets(ShuffleboardLayout layout) {
-		layout.addNumber("DT/Vel/left", () -> m_velLeft).withSize(2, 2);
-    layout.addNumber("DT/Vel/right", () -> m_velRight);
-    layout.addNumber("DT/pos/left", () -> m_posLeft);
-    layout.addNumber("DT/pos/right", () -> m_posRight);
-    layout.addNumber("DT/pos/theta", () -> m_theta);
-		layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
+		layout.addNumber("/DT/Vel/left", () -> m_velLeft).withSize(2, 2);
+    layout.addNumber("/DT/Vel/right", () -> m_velRight);
+    layout.addNumber("/DT/pos/left", () -> m_posLeft);
+    layout.addNumber("/DT/pos/right", () -> m_posRight);
+    layout.addNumber("/DT/pos/theta", () -> m_theta);
+		layout.addString("/DT/gear", () -> gearbox.getCurrentGear().toString());
 		
 	}
 

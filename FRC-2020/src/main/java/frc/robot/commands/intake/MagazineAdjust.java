@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Magazine_Subsystem;
 
 public class MagazineAdjust extends CommandBase {
-  private Magazine_Subsystem mag;
+  private Magazine_Subsystem magazine;
   private double strength = 0.8;
   private int pulseCounts = -1;
   private int counts; // count down timer
@@ -22,7 +22,7 @@ public class MagazineAdjust extends CommandBase {
    */
   public MagazineAdjust(Magazine_Subsystem mag, boolean forward, double pulseTime) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.intake = intake;
+    magazine = mag;
 
     //set the direction
     strength *= (forward) ? 1.0 : -1.0;
@@ -33,7 +33,7 @@ public class MagazineAdjust extends CommandBase {
   @Override
   public void initialize() { 
     counts = pulseCounts;
-    intake.magazineOn(strength);
+    magazine.beltOn(strength);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,7 +45,7 @@ public class MagazineAdjust extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.magazineOff();
+    magazine.beltOff();
   }
 
   // Returns true when the command should end.

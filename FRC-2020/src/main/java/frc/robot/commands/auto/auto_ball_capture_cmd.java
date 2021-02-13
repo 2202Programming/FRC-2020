@@ -38,7 +38,7 @@ public class auto_ball_capture_cmd extends CommandBase {
   public void initialize() {
     intake.lowerIntake();
     intake.intakeOn(intake_strength);
-    intake.magazineOn(magazine_strength);
+    intake.getMagazine().beltOn(magazine_strength);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -51,7 +51,7 @@ public class auto_ball_capture_cmd extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     intake.intakeOff();
-    intake.magazineOff();
+    intake.getMagazine().beltOff();
     drive.velocityArcadeDrive(0, 0);
   }
 

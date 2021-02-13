@@ -8,23 +8,24 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Magazine_Subsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class MagazineToggleCmd extends InstantCommand {
-  Intake_Subsystem intake;
+  Magazine_Subsystem magazine;
 
-  public MagazineToggleCmd(Intake_Subsystem intake) {
-    this.intake = intake;
+  public MagazineToggleCmd(Magazine_Subsystem mag) {
+    magazine = mag;
+    addRequirements(magazine);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    boolean isDown = !intake.isMagazineUp();
-    if (isDown)  intake.magazineUp();
-    else intake.magazineDown();
+    boolean isDown = !magazine.isUp();
+    if (isDown)  magazine.raise();
+    else magazine.lower();
   }
 }

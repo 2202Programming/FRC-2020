@@ -14,13 +14,17 @@ import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.FlywheelRPM;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
+import frc.robot.subsystems.Magazine_Subsystem;
 
 public class ShooterOn extends CommandBase {
+  private double HIGH_ANGLE = 40;
 
   private double SLOW_MAG_REVERSE = -0.8; // motor power
   private double FAST_MAG_FORWARD =  1; // motor power
   
   Intake_Subsystem intake;
+  Magazine_Subsystem magazine;
+
   private final int backupCount;
   private int count;
 
@@ -82,8 +86,9 @@ public class ShooterOn extends CommandBase {
     this(intake, ShooterOnCmd.data);      
   }
 
-  public ShooterOn(Intake_Subsystem intake,  ShooterOn.Data cmdData) {
+  public ShooterOn(Intake_Subsystem intake, ShooterOn.Data cmdData) {
     this.intake = intake;
+    magazine = intake.getMagazine();
     goals = cmdData;
     backupCount = (int) Math.floor(goals.BackupSec / DT);
     stage = Stage.DoingNothing;
@@ -92,13 +97,14 @@ public class ShooterOn extends CommandBase {
     lowFlywheelGoal = intake.calculateGoals(cmdData.LowGoal);
     highFlywheelGoal = intake.calculateGoals(cmdData.HighGoal);
 
+    addRequirements(magazine);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     stage = Stage.DoingNothing;
-    intake.magazineOff();
+    magazine.beltOff();
     intake.intakeOff();
     count = 0;
     atGoalCount = 0;
@@ -110,7 +116,7 @@ public class ShooterOn extends CommandBase {
   
     switch(stage){
       case DoingNothing:
-        intake.magazineOn(SLOW_MAG_REVERSE);
+        magazine.beltOn(SLOW_MAG_REVERSE);
         stage = Stage.BackingMagazine;
       break;
 
@@ -118,7 +124,7 @@ public class ShooterOn extends CommandBase {
         //backup magazine for backup_count to get balls off flywheels
         if (count >= backupCount) {
           //done backing up, turn on flw wheels enter next stage
-          intake.magazineOff();
+          magazine.beltOff();
           stage = Stage.WaitingForSolution;
         }
       break;
@@ -137,7 +143,7 @@ public class ShooterOn extends CommandBase {
             (atGoalCount++ >= goals.AtGoalBeforeShoot)) {
           //Flywheel at speed, move to shooting
           stage = Stage.Shooting;
-          intake.magazineOn(FAST_MAG_FORWARD);
+          magazine.beltOn(FAST_MAG_FORWARD);
         }
       break;
 
@@ -148,7 +154,7 @@ public class ShooterOn extends CommandBase {
           atGoalCount = 0;
           //back to WaitingForFlywheel
           stage = Stage.WaitingForFlyWheel;
-          intake.magazineOff();
+          magazine.beltOff();
        }
       break;
     }
@@ -165,9 +171,9 @@ public class ShooterOn extends CommandBase {
    * @return true if solution is found and we can shoot
    */
   public boolean calculateShooterSpeed(){
-    if (intake.isMagazineUp()) {
+    if (magazine.getAngle() > HIGH_ANGLE) {
       // aiming high
-     rpmSetpoint.copy(highFlywheelGoal);
+      rpmSetpoint.copy(highFlywheelGoal);
     }
     else {
       // aiming low
@@ -183,7 +189,7 @@ public class ShooterOn extends CommandBase {
   public void end(boolean interrupted) {
     stage = Stage.DoingNothing;
     intake.shooterOff();
-    intake.magazineOff();
+    magazine.beltOff();
     intake.intakeOff();
   }
 

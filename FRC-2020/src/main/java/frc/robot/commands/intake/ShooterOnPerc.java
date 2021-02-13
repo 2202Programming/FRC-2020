@@ -10,11 +10,13 @@ package frc.robot.commands.intake;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Magazine_Subsystem;
 
 public class ShooterOnPerc extends CommandBase {
   private double SLOW_MAG_REVERSE = -0.8; // motor power
   private double FAST_MAG_FORWARD =  1; // motor power
   private Intake_Subsystem m_intake;
+  private Magazine_Subsystem m_magazine;
   private final double m_upperRpmTarget_low;
   private final double m_upperRpmTarget_high;
   private final double m_lowerRpmTarget_low;
@@ -28,6 +30,7 @@ public class ShooterOnPerc extends CommandBase {
 
   public ShooterOnPerc(Intake_Subsystem intake, double upperRpmTarget_low, double upperRpmTarget_high, double lowerRpmTarget_low, double lowerRpmTarget_high, double backupSec) {
     m_intake = intake;
+    m_magazine = intake.getMagazine();
     m_upperRpmTarget_low = upperRpmTarget_low;
     m_upperRpmTarget_high = upperRpmTarget_high;
     m_lowerRpmTarget_low = lowerRpmTarget_low;
@@ -38,7 +41,7 @@ public class ShooterOnPerc extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.magazineOff();
+    m_magazine.beltOff();
     m_intake.intakeOff();
     m_count = 0;
 
@@ -57,22 +60,22 @@ public class ShooterOnPerc extends CommandBase {
         if(m_count++ > m_backupCount){
           stage = 1;
         }
-        m_intake.magazineOn(SLOW_MAG_REVERSE);
+        m_magazine.beltOn(SLOW_MAG_REVERSE);
       break;
 
       case 1: //stage 1, pause magazine while shooters get to RPM goal
         m_intake.shooterOnPercent(m_rpmUpper, m_rpmLower);
-        m_intake.magazineOn(FAST_MAG_FORWARD);
+        m_magazine.beltOn(FAST_MAG_FORWARD);
       break;
     }
   }
 
   double calcShooterSpeedUpper() {
-    return (m_intake.isMagazineUp()) ?  m_upperRpmTarget_high : m_upperRpmTarget_low;
+    return (m_magazine.isUp()) ?  m_upperRpmTarget_high : m_upperRpmTarget_low;
   }
 
   double calcShooterSpeedLower() {
-    return (m_intake.isMagazineUp()) ?  m_lowerRpmTarget_high : m_lowerRpmTarget_low;
+    return (m_magazine.isUp()) ?  m_lowerRpmTarget_high : m_lowerRpmTarget_low;
   }
 
   // Called once the command ends or is interrupted.
@@ -80,7 +83,7 @@ public class ShooterOnPerc extends CommandBase {
   public void end(boolean interrupted) {
     stage = 0;
     m_intake.shooterOff();
-    m_intake.magazineOff();
+    m_magazine.beltOff();
     m_intake.intakeOff();
   }
 

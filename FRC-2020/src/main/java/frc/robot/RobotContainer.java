@@ -116,11 +116,11 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
     // Assistant's buttons
-    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineAdjust(intake, false, 0.0)); 
+    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineAdjust(intake.getMagazine(), false, 0.0)); 
     dc.bind(Id.Assistant, XboxButton.B).whenHeld(new ReverseIntake(intake, -0.5));
-    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineAdjust(intake, true, 0.4), true);
+    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineAdjust(intake.getMagazine(), true, 0.4), true);
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
-    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineToggleCmd(intake));
+    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineToggleCmd(intake.getMagazine()));
     dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new ToggleIntakeRaised(intake));
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
   }

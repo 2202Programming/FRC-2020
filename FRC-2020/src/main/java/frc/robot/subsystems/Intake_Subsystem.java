@@ -178,8 +178,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     VelToRPM.set(1, 1, 1.0 / Shooter.upperFWConfig.flywheelRadius);
     VelToRPM.times(0.5);  // common factor 1/2
 
-    magazineDown(); // must start in down positon
-    raiseIntake();  // must start in the up position
+    magazine.lower(); // must start in down positon
+    raiseIntake();    // must start in the up position
   }
 
   @Override
@@ -196,7 +196,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   public void raiseIntake() {
     // can't have magazine up with intake up, force it down.
     // Magazine goes down faster, so should be ok...
-    if (isMagazineUp()) { magazineDown();}
+    if (magazine.isUp()) { 
+      magazine.lower();
+    }
     intakeSolenoid.set(DoubleSolenoid.Value.kForward);
   }
 
@@ -222,6 +224,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     intake_spark.set(0);
   }
 
+  public Magazine_Subsystem getMagazine() {
+    return this.magazine;
+  }
 
   /**
    * Set the Shooter RPM goals from power cell velocity and rotation rate.  

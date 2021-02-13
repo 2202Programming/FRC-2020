@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
+import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.toggleLED;
 //import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineToggleCmd;
@@ -15,8 +17,6 @@ import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
-import frc.robot.Constants;
-import frc.robot.Constants.ShooterOnCmd;
 
 public class auto_cmd_group extends SequentialCommandGroup {
 
@@ -98,10 +98,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
                     new DriveOffLine(drive, 0.8).withTimeout(2.7),
                     new ToggleIntakeRaised(intake),
                     new WaitCommand(0.7),
-                    new MagazineToggleCmd(intake),
+                    new MagazineToggleCmd(intake.getMagazine()),
                     new WaitCommand(1.2),
                     new ShooterOn(intake, ShooterOnCmd.data).withTimeout(3), //need to add Data type to parser
-                    new MagazineToggleCmd(intake),
+                    new MagazineToggleCmd(intake.getMagazine()),
                     new ToggleIntakeRaised(intake)
             );
         }

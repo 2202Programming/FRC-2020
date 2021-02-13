@@ -6,25 +6,21 @@
 </head>
 <body>
   <frc-dashboard>
-    <nt-string key="/robotName" value="Dozer"></nt-string>
+    <nt-string key="/team" value="2202"></nt-string>
     <!-- <nt-number key="Shuffleboard/Sys/DriveTrain/DT/pos/left"></nt-number>
     <nt-number key="Shuffleboard/Sys/DriveTrain/DT/pos/right"></nt-number> -->
     <div class="card" style="width: 750px; text-align: left; padding: 20px; margin: 10px;">
       <h1>
-        My robot's name is <frc-label source-key="/robotName"></frc-label>
+        Team <frc-label source-key="/team"></frc-label>
       </h1>
       <p>Position left: <frc-label source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/left"></frc-label></p>
       <p>Position right: <frc-label source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/right"></frc-label></p>
       <!-- Code for "With attributes" example -->
-<frc-number-bar value=".5"></frc-number-bar>
-
-<frc-number-bar value="2" min="-10" max="20" center="5" precision="3" num-tick-marks="3" unit="s"></frc-number-bar>
-
-<frc-number-bar value=".7" min="0" max="1" center="0" hide-text></frc-number-bar>
+    <frc-number-bar value=".5"></frc-number-bar>
       
-      <frc-differential-drivebase
+      <!-- <frc-differential-drivebase
         source-key="/LiveWindow/Ungrouped/DifferentialDrive[1]"
-      ></frc-differential-drivebase>
+      ></frc-differential-drivebase> -->
     </div>
   </frc-dashboard>
   <script src="./frc-web-components.js"></script>

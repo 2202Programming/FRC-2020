@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<head>
+  <title>FRC 2202 Robot Website</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+  <frc-dashboard>
+    <nt-string key="/team" value="2202"></nt-string>
+    <!-- <nt-number key="Shuffleboard/Sys/DriveTrain/DT/pos/left"></nt-number>
+    <nt-number key="Shuffleboard/Sys/DriveTrain/DT/pos/right"></nt-number> -->
+    <div class="card" style="width: 750px; text-align: left; padding: 20px; margin: 10px;">
+      <h1>
+        Team <frc-label source-key="/team"></frc-label>
+      </h1>
+      <p>Position left: <frc-label source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/left"></frc-label></p>
+      <p>Position right: <frc-label source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/right"></frc-label></p>
+      <p>Limelight TL: <frc-label source-key="/limelight/tl"></frc-label></p>
+      <!-- Code for "With attributes" example -->
+    <frc-number-bar value=".5"></frc-number-bar>
+      
+      <!-- <frc-differential-drivebase
+        source-key="/LiveWindow/Ungrouped/DifferentialDrive[1]"
+      ></frc-differential-drivebase> -->
+    </div>
+  </frc-dashboard>
+  <script src="./frc-web-components.js"></script>
+  <script src="/networktables/networktables.js"></script>
+</body>
+</html>

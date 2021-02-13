@@ -51,7 +51,6 @@ public class Magazine_Subsystem extends SubsystemBase {
   final CANSparkMax angleMotor = new CANSparkMax(CAN.MAG_SMAX, MotorType.kBrushless);
   final CANPIDController anglePID = angleMotor.getPIDController();
   final DigitalInput lightGate = new DigitalInput(DigitalIO.MAGAZINE_GATE);
-  DigitalInput lightGatePwr = new DigitalInput(DigitalIO.MAGAZINE_GATE_PWR);
   AnalogInput anglePot = new AnalogInput(AnalogIn.MAGAZINE_ANGLE);
 
   // Intake and Mag must talk, keep a reference
@@ -74,7 +73,6 @@ public class Magazine_Subsystem extends SubsystemBase {
     SendableRegistry.setSubsystem(this, "Magazine");
     SendableRegistry.setName(anglePot, this.getName(), "Mag Angle");
     SendableRegistry.setName(lightGate, this.getName(), "Mag LightGate");
-    SendableRegistry.setName(lightGatePwr, this.getName(), "Mag LightGatePwr");
     SendableRegistry.setName(beltMotor, this.getName(), "Mag Belt");
     SendableRegistry.setName(beltMotor, this.getName(), "Mag Belt");
 
@@ -127,6 +125,11 @@ public class Magazine_Subsystem extends SubsystemBase {
     return (getAngle() > MAG_UP_ANGLE) ? true : false;
   }
 
+  /**
+   * Lightgate as a 2K pull down resister on it. Signal goes high when 
+   * the light is broken.
+   * @return  true when blocked by power cell.
+   */
   public boolean isGateBlocked() {
       return lightGate.get();
   }

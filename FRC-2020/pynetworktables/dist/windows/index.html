@@ -11,21 +11,36 @@
       <h1>
         Team <frc-label source-key="/team"></frc-label>
       </h1>
+      <frc-basic-fms-info class="align-left" source-key="/FMSInfo"></frc-basic-fms-info>
+    </div>
+    <div class="card" style="width: 750px; text-align: left; padding: 20px; margin: 10px;">
       <p>Position left: <frc-label source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/left"></frc-label></p>
       <p>Position right: <frc-label source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/right"></frc-label></p>
       <p>Limelight TL: <frc-label source-key="/limelight/tl"></frc-label></p>
-      <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/SendableChooser[1]/active"></frc-label></p>
-      <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/SendableChooser[0]/active"></frc-label></p>
-
+      <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/DriverMode/active"></frc-label></p>
+      <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/PathChooser/active"></frc-label></p>
+    </div>
+    <div class="card" style="width: 750px; text-align: left; padding: 20px; margin: 10px;">
       <!-- drivebase and gyro -->
       <frc-differential-drivebase source-key="/LiveWindow/Ungrouped/DifferentialDrive[1]"></frc-differential-drivebase>
       <frc-gyro source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/theta" precision="2"></frc-gyro>
       
       <br>
+    </div>
+    <div class="card" style="width: 750px; text-align: left; padding: 20px; margin: 10px;">
       <!-- pdb -->
       <frc-pdp source-key="/panel">
             </frc-pdp>
           </div>
+    </div>
+    <div class="card" style="width: 750px; text-align: left; padding: 20px; margin: 10px;">
+      <h4>Choose Path</h4>
+      <frc-radio-group source-key="/Shuffleboard/Match/AutoPath/PathChooser/selected">
+        <frc-radio-button value="Do nothing">Do nothing</frc-radio-button>
+        <frc-radio-button value="BounceSinglePath">BounceSinglePath</frc-radio-button>
+        <frc-radio-button value="3">[Something else]</frc-radio-button>
+      </frc-radio-group>
+    </div>
   </frc-dashboard>
   <script src="./frc-web-components.js"></script>
   <script src="/networktables/networktables.js"></script>

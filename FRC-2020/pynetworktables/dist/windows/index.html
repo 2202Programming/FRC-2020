@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<head>
+  <title>FRC 2202 Robot Website</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+  <nav class="navbar navbar-expand-sm bg-light">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Form</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Search</a>
+      </li>
+    </ul>
+  </nav>
+  <frc-dashboard>
+    <div class="card" style="width: 750px; text-align: left; padding: 20px; margin: 10px;">
+      <nt-string key="/robotName" value="Dozer"></nt-string>
+      <nt-number key="/angle" value="135"></nt-number>
+      <h1>
+        My robot's name is <frc-label source-key="/robotName"></frc-label>
+      </h1>
+      <p>Random paragraph</p>
+      <frc-differential-drivebase
+        source-key="/LiveWindow/Ungrouped/DifferentialDrive[1]"
+      ></frc-differential-drivebase>
+      <frc-gyro source-key="/angle" precision="2"></frc-gyro>
+    </div>
+  </frc-dashboard>
+  <script src="./frc-web-components.js"></script>
+</body>
+</html>

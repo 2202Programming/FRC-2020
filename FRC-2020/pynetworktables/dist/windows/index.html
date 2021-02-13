@@ -17,8 +17,8 @@
       <p>Position left: <frc-label source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/left"></frc-label></p>
       <p>Position right: <frc-label source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/right"></frc-label></p>
       <p>Limelight TL: <frc-label source-key="/limelight/tl"></frc-label></p>
-      <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/SendableChooser[1]/active"></frc-label></p>
-      <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/SendableChooser[0]/active"></frc-label></p>
+      <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/DriverMode/active"></frc-label></p>
+      <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/PathChooser/active"></frc-label></p>
     </div>
     <div class="card" style="width: 750px; text-align: left; padding: 20px; margin: 10px;">
       <!-- drivebase and gyro -->
@@ -35,9 +35,9 @@
     </div>
     <div class="card" style="width: 750px; text-align: left; padding: 20px; margin: 10px;">
       <h4>Choose Path</h4>
-      <frc-radio-group source-key="/Shuffleboard/Match/AutoPath/DrivePath/options">
-        <frc-radio-button value="1">Do nothing</frc-radio-button>
-        <frc-radio-button value="2">BounceSinglePath</frc-radio-button>
+      <frc-radio-group source-key="/Shuffleboard/Match/AutoPath/PathChooser/selected">
+        <frc-radio-button value="Do nothing">Do nothing</frc-radio-button>
+        <frc-radio-button value="BounceSinglePath">BounceSinglePath</frc-radio-button>
         <frc-radio-button value="3">[Something else]</frc-radio-button>
       </frc-radio-group>
     </div>

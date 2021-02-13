@@ -109,7 +109,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
   double m_posLeft  = 0.0;  //feet, positive is forward distance, since encoder reset
   double m_posRight = 0.0;  //feet, positive is forward distance, since encoder reset
 	Gear m_currentGear;       //high/low
-	double m_theta;           //heading   
+  double m_theta;           //heading   
+  double m_voltleft;        //save voltages that we send to motor
+  double m_voltright;
 
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
@@ -569,6 +571,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
     layout.addNumber("DT/POSE/X", () -> getPose().getX() );
     layout.addNumber("DT/POSE/Y", () -> getPose().getY() );
     layout.addNumber("DT/POSE/The", () -> getPose().getRotation().getDegrees() );  
+    layout.addNumber("DT/POSE/VoltLeft", () -> m_voltleft);
+	  layout.addNumber("DT/POSE/VoltRight", () -> m_voltright);
 	}
 
 	  /**
@@ -578,8 +582,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
    * @param rightVolts the commanded right output
    */
   public void tankDriveVolts(double leftVolts, double rightVolts) {
-    backLeft.setVoltage(Kleft* leftVolts);
-    backRight.setVoltage(Kright * rightVolts);
+    m_voltleft = Kleft* leftVolts;
+    m_voltright = Kright * rightVolts;
+    backLeft.setVoltage(m_voltleft);
+    backRight.setVoltage(m_voltright);
     dDrive.feed();
   }
 

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveTrain;
 import frc.robot.RobotContainer;
@@ -40,7 +41,9 @@ public class DriverPreferences {
     arcadeDriveCmd = new ArcadeVelDriveCmd(rc.driverControls, rc.driveTrain, rc.driveTrain);
     arcadeDriveCmd.setShiftProfile(DriveTrain.shiftCount, DriveTrain.vShiftLow, DriveTrain.vShiftHigh);
     tankDriveCmd = new TankVelDriveCmd(rc.driverControls, rc.driveTrain);
+    
     // add to chooser
+    SendableRegistry.setName(driveChoices, "DriverMode");
     driveChoices.setDefaultOption("Arcade", arcadeDriveCmd);
     driveChoices.addOption("Tank", tankDriveCmd);
 

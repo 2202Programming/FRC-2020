@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 
@@ -32,6 +33,7 @@ public class AutoPaths {
   public AutoPaths(ShuffleboardTab tab) {
 
     // create a default trajectory that does nothing 
+    SendableRegistry.setName(pathChooser, "PathChooser");
     pathChooser.setDefaultOption("do nothing", null);
 
     try {

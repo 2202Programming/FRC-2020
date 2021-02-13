@@ -74,7 +74,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     SendableRegistry.setSubsystem(this, "Magazine");
     SendableRegistry.setName(anglePot, this.getName(), "Mag Angle");
     SendableRegistry.setName(lightGate, this.getName(), "Mag LightGate");
-    SendableRegistry.setName(lightGatePwr, this.getName(), "Mag LightGate");
+    SendableRegistry.setName(lightGatePwr, this.getName(), "Mag LightGatePwr");
     SendableRegistry.setName(beltMotor, this.getName(), "Mag Belt");
     SendableRegistry.setName(beltMotor, this.getName(), "Mag Belt");
 

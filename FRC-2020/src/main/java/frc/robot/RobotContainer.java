@@ -66,6 +66,7 @@ public class RobotContainer {
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
   public final Dashboard dashboard;
+  public final PowerDistributionPanel pdp;
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -81,7 +82,7 @@ public class RobotContainer {
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
-    PowerDistributionPanel examplePDP = new PowerDistributionPanel(0);
+    pdp = new PowerDistributionPanel(0);
     
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();

@@ -4,11 +4,23 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.ifx.Logger;
 
-public class Pdp_subsystem extends SubsystemBase {
+public class Pdp_subsystem extends SubsystemBase implements Logger {
   /** Creates a new Pdp_subsystem. */
-  public Pdp_subsystem() {}
+
+  private final PowerDistributionPanel pdp;
+  private double[] channelCurrent;
+
+
+  public Pdp_subsystem() {
+
+    pdp = new PowerDistributionPanel(0);
+  
+  }
 
   @Override
   public void periodic() {
@@ -16,6 +28,12 @@ public class Pdp_subsystem extends SubsystemBase {
   }
 
   public void log(){
+    for (int i = 0; i<16; i++){
+      channelCurrent[i] = pdp.getCurrent(i);
+      SmartDashboard.putNumber("/PDP/CurrentChannel"+i, channelCurrent[i]);
+    }
+    SmartDashboard.putNumber("/PDP/TotalCurrent", pdp.getTotalCurrent());
+    SmartDashboard.putNumber("/PDP/Voltage", pdp.getVoltage());
     
   }
 }

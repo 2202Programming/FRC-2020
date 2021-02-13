@@ -10,7 +10,6 @@ package frc.robot;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriverPrefs;
@@ -34,6 +33,7 @@ import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
+import frc.robot.subsystems.Pdp_subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.hid.XboxAxis;
@@ -66,7 +66,8 @@ public class RobotContainer {
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
   public final Dashboard dashboard;
-  public final PowerDistributionPanel pdp;
+  public final Pdp_subsystem pdp;
+  
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -82,7 +83,8 @@ public class RobotContainer {
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
-    pdp = new PowerDistributionPanel(0);
+    pdp = new Pdp_subsystem();
+    
     
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
@@ -90,7 +92,7 @@ public class RobotContainer {
     //cameraSubsystem = new CameraSubsystem();
     
     // Add anything that has logging requirements
-    logSubsystem.add(/*driveTrain, lidar,*/limelight, intake /*,driverControls, panel, detector*/);
+    logSubsystem.add(/*driveTrain, lidar,*/limelight, intake, pdp /*,driverControls, panel, detector*/);
     
     //Add devices to map for XML parsing usage, names must be unique.
     deviceMap.put("lidar", lidar);

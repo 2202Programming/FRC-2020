@@ -17,11 +17,15 @@
       <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/SendableChooser[1]/active"></frc-label></p>
       <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/SendableChooser[0]/active"></frc-label></p>
 
-
+      <!-- drivebase and gyro -->
       <frc-differential-drivebase source-key="/LiveWindow/Ungrouped/DifferentialDrive[1]"></frc-differential-drivebase>
       <frc-gyro source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/theta" precision="2"></frc-gyro>
       
-    </div>
+      <br>
+      <!-- pdb -->
+      <frc-pdp source-key="/panel">
+            </frc-pdp>
+          </div>
   </frc-dashboard>
   <script src="./frc-web-components.js"></script>
   <script src="/networktables/networktables.js"></script>

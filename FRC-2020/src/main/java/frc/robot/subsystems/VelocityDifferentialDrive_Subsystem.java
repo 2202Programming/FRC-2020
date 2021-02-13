@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.RobotPhysical.WheelAxelDistance;
+import static frc.robot.Constants.RobotPhysical.WheelAxleDistance;
 import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 import static frc.robot.Constants.RobotPhysical.WheelWearLeft;
 import static frc.robot.Constants.RobotPhysical.WheelWearRight;
@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DriveTrain;
 import frc.robot.Constants.RamseteProfile;
+import frc.robot.Constants.RobotPhysical;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.ifx.DashboardUpdate;
 import frc.robot.subsystems.ifx.DualDrive;
@@ -321,7 +322,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// Convert to rad/s split between each wheel
 		double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
 		rps *= (Math.PI / 180.0);
-		double vturn_rpm = (rps * WheelAxelDistance) * k;
+		double vturn_rpm = (rps * WheelAxleDistance) * k;
 
 		// compute each wheel, pos rpm moves forward, pos turn is CCW
 		double vl_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ);  //turn left, +CCW, slows left wheel
@@ -564,7 +565,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
     layout.addNumber("DT/pos/right", () -> m_posRight);
     layout.addNumber("DT/pos/theta", () -> m_theta);
     layout.addNumber("DT/HeadingDot", () -> getTurnRate());
-		layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
+    layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
+    layout.addNumber("DT/POSE/X", () -> getPose().getX() );
+    layout.addNumber("DT/POSE/Y", () -> getPose().getY() );
+    layout.addNumber("DT/POSE/The", () -> getPose().getRotation().getDegrees() );  
 	}
 
 	  /**
@@ -587,7 +591,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
    */
   @Override
   public DifferentialDriveKinematics getDriveKinematics() {
-    return new DifferentialDriveKinematics(WheelAxelDistance);
+    return new DifferentialDriveKinematics(RobotPhysical.WheelAxleDistance);
   }
 
     /**

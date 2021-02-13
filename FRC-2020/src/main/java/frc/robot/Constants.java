@@ -148,7 +148,7 @@ public final class Constants {
 
         //chassis  
         public static final double WheelDiameter = 6.0; // inches, nominal
-        public static final double WheelAxelDistance = 25.5/12.0; // feet
+        public static final double WheelAxleDistance = 25.5/12.0; // feet
 
         //wheel wear compensation - adjust when distance is off by small amount
         public static final double WheelWearLeft = 1.0;   //[percent] of nominal

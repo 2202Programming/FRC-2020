@@ -54,6 +54,8 @@ public final class Constants {
         public static final int FR_SMAX = 33;
         public static final int MR_SMAX = 34;
         public static final int BR_SMAX = 35;
+
+        public static final int MAG_SMAX = 55;
     }
 
     // PWM assignments on the Rio
@@ -62,6 +64,17 @@ public final class Constants {
       public static final int MAGAZINE = 9; 
     }
     
+    // Digital IO on the RIO
+    public static final class DigitalIO {
+      public static final int MAGAZINE_GATE = 2;  
+      public static final int MAGAZINE_GATE_PWR = 4;  
+    }
+
+    // Analog IO on the RIO
+    public static final class AnalogIn {
+      public static final int MAGAZINE_ANGLE = 0;
+    }
+
     // Intake
     public static final int MAGAZINE_PCM_CAN_ID = CAN.PCM2;
     public static final int MAGAZINE_UP_PCM = 0;

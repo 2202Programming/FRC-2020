@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 
+import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -26,6 +27,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DriveTrain;
 import frc.robot.Constants.RamseteProfile;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.ifx.DashboardUpdate;
 import frc.robot.subsystems.ifx.DualDrive;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.subsystems.ifx.Shifter;
@@ -35,7 +38,7 @@ import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implements Logger, DualDrive, VelocityDrive, 
-                VoltageDrive, Shifter {
+                VoltageDrive, Shifter, DashboardUpdate {
   // Sign conventions, apply to encoder and command inputs
   // Brushless SparkMax cannot invert the encoders
   final double Kleft = 1.0;
@@ -87,13 +90,12 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
   private final double ARBIT_FEEDFWD_MAX_VOLT = 1.5;     //volts max allowed
 	private double arbFeedFwd = RamseteProfile.ksVolts;    //current value
 
-	// Calculated based on desired low-gear max ft/s
-	private final double maxFPS_High;  // <input>
-	private final double maxFPS_Low;   // using HIGH gear max RPM
-	private final double maxDPS;       // max rotation in deg/sec around Z axis
-	//private final double maxRPM_Low;   // max motor RPM low & high
-	private final double maxRPM_High;  // max motor RPM low & high
-
+	// Calculated based on desired low-gear max ft/s 
+	double maxFPS_High;  // <input>
+	double maxFPS_Low;   // using HIGH gear max RPM
+  double maxRPM_High;  // max motor RPM low & high
+  double maxDPS;       // max rotation in deg/sec around Z axis
+  
   // drivetrain & gear objects 
 	final DifferentialDrive dDrive;
 	Shifter gearbox;
@@ -117,23 +119,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 	public VelocityDifferentialDrive_Subsystem(final Shifter gear) {
 		// save scaling factors, they are required to use SparkMax in Vel mode
 		gearbox = gear;
-		maxDPS = DriveTrain.maxRotDPS;
 		requestedGear = gearbox.getCurrentGear();
-		maxFPS_High = DriveTrain.maxFPS;
-
+		
 		// setup physical units - chassis * gearbox  (rev per minute)
 		K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60;    //rpm/60 rps
 		K_high_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.HIGH) / 60;
     
-    // compute max RPM for motors for high and low gears
-		maxRPM_High = (maxFPS_High / K_high_fps_rpm); 
-		maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
-
-		// check we can hit max requested speed in high gear
-		if (maxRPM_High > DriveTrain.motorMaxRPM) {
-			System.out.println("Warning: targeted maxFPS not reachable. maxFPS= " + 
-				(DriveTrain.motorMaxRPM * K_high_fps_rpm));
-		}
+    calcSpeedSettings();
 
 		// setup SparkMax controllers, sets left and right masters
 		configureControllers();
@@ -158,6 +150,35 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
     resetPosition();
 		m_odometry = new DifferentialDriveOdometry(readGyro());
 	}
+
+    void calcSpeedSettings() {
+      // compute max RPM for motors for high and low gears
+      var dp = RobotContainer.getInstance().getDriverPreferences();
+      maxDPS = (dp == null) ? DriveTrain.maxRotDPS : dp.getMaxRotation();
+      maxFPS_High = (dp == null) ? DriveTrain.maxFPS : dp.getMaxSpeed();
+      maxRPM_High = (maxFPS_High / K_high_fps_rpm);
+      maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
+
+      // don't allow Motor RPM to let low speed be faster than high speed
+      // which could happen with a slow user choice.
+      maxFPS_Low = (maxFPS_Low > maxFPS_High) ? maxFPS_High : maxFPS_Low;
+
+      // check we can hit max requested speed in high gear
+      if (maxRPM_High > DriveTrain.motorMaxRPM) {
+        System.out.println("Warning: maxFPS not reachable. maxFPS= " + (DriveTrain.motorMaxRPM * K_high_fps_rpm));
+      }
+      if (maxFPS_Low >= maxFPS_High) {
+        System.out.println("Warning: maxFPS low/high overlap" + maxFPS_Low + ">=" +maxRPM_High);
+      }
+    }
+
+    // Process any Dashboard events
+    public void processDashboard(EntryNotification event) {
+      // don't worry about which event, grab them all
+      calcSpeedSettings();
+    }
+
+
 
 	/**
 	 * hides some of the ugly setup for our collection of controllers
@@ -288,7 +309,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase implement
 		// so we need to convert ft/s to RPM command which is dependent
 		// on the gear ratio.
 		double k = 1.0 / getFPSperRPM(m_currentGear);   //k [rpm/fps]
-		double maxSpeed = maxFPS_High;   //getMaxSpeed(currentGear);
+		double maxSpeed = getMaxSpeed(m_currentGear);
 		
 		// limit vel to max for the gear ratio
 		double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);

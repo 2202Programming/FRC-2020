@@ -6,6 +6,7 @@ package frc.robot.ux;
 
 import java.util.Map;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -29,7 +30,8 @@ public class DriverPreferences {
   // Robot Limits
   NetworkTableEntry maxSpeedNTE; // [ft/s]
   NetworkTableEntry maxRotationNTE; // [deg/s]
-  //NetworkTableEntry sideAccelNTE; // [ft/s^2] - limit turn rate at speed <not implemented>
+  // NetworkTableEntry sideAccelNTE; // [ft/s^2] - limit turn rate at speed <not
+  // implemented>
 
   DriverPreferences(ShuffleboardTab tab) {
     RobotContainer rc = RobotContainer.getInstance();
@@ -38,22 +40,33 @@ public class DriverPreferences {
     arcadeDriveCmd = new ArcadeVelDriveCmd(rc.driverControls, rc.driveTrain, rc.driveTrain);
     arcadeDriveCmd.setShiftProfile(DriveTrain.shiftCount, DriveTrain.vShiftLow, DriveTrain.vShiftHigh);
     tankDriveCmd = new TankVelDriveCmd(rc.driverControls, rc.driveTrain);
-
+    // add to chooser
     driveChoices.setDefaultOption("Arcade", arcadeDriveCmd);
     driveChoices.addOption("Tank", tankDriveCmd);
 
     // put the chooser on the tab we were given
-    tab.getLayout("DriveCmd", BuiltInLayouts.kList).withSize(2, 2).add(driveChoices);
+    tab.getLayout("DriveCmd", BuiltInLayouts.kList).withSize(3, 2)
+        .withProperties(Map.of()).add(driveChoices);
 
-    ShuffleboardLayout  layout = tab.getLayout("RobotSpeeds", BuiltInLayouts.kList).withSize(2, 2);
-    maxSpeedNTE = layout.addPersistent("DriverPref/speed", DriveTrain.maxFPS)
-    .withWidget(BuiltInWidgets.kNumberSlider)
-    .withProperties(Map.of("Min", 1, "Max", 20,"Block increment", 1 ))
-    .getEntry();
-    
-    maxRotationNTE = layout.addPersistent("DriverPref/rotation", DriveTrain.maxRotDPS)
-    .withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("Min", 30, "Max", 200))
-    .getEntry();
+    ShuffleboardLayout layout = tab.getLayout("Robot Speeds", BuiltInLayouts.kList).withSize(2, 2);
+    maxSpeedNTE = layout.addPersistent("feet-per-sec", DriveTrain.maxFPS)
+      .withWidget(BuiltInWidgets.kNumberSlider)
+      .withProperties(Map.of("Min", 0.0, "Max", 20.0, "Block Increment", 5.0))
+      .getEntry();
+  
+    maxSpeedNTE.addListener(event -> 
+      {rc.driveTrain.processDashboard(event); },
+      EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+    maxRotationNTE = layout.addPersistent("deg-per-sec", DriveTrain.maxRotDPS)
+      .withWidget(BuiltInWidgets.kNumberSlider)
+      .withProperties(Map.of("Min", 30.0, "Max", 180.0, "Block Increment", 15 ))
+      .getEntry();
+
+    maxRotationNTE.addListener(event -> 
+      {rc.driveTrain.processDashboard(event); },
+      EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
 		
 	}
 

@@ -40,6 +40,7 @@ import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.ux.Dashboard;
+import frc.robot.ux.DriverPreferences;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -177,4 +178,12 @@ public class RobotContainer {
     };
 
   }
+
+  public DriverPreferences getDriverPreferences() { 
+    if (dashboard != null) {
+      return dashboard.getDriverPreferences();
+    }
+    return null;
+  }
+
 }

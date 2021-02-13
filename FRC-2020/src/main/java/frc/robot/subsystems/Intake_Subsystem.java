@@ -9,9 +9,6 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.INTAKE_DOWN_SOLENOID_PCM;
 import static frc.robot.Constants.INTAKE_PCM_CAN_ID;
 import static frc.robot.Constants.INTAKE_UP_SOLENOID_PCM;
-import static frc.robot.Constants.MAGAZINE_DOWN_PCM;
-import static frc.robot.Constants.MAGAZINE_PCM_CAN_ID;
-import static frc.robot.Constants.MAGAZINE_UP_PCM;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -67,10 +64,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   Spark intake_spark = new Spark(PWM.INTAKE);
   DoubleSolenoid intakeSolenoid = new DoubleSolenoid(INTAKE_PCM_CAN_ID, INTAKE_UP_SOLENOID_PCM, INTAKE_DOWN_SOLENOID_PCM);
  
-  // magazine
-  Spark magazine = new Spark(PWM.MAGAZINE);
-  DoubleSolenoid magSolenoid = new DoubleSolenoid(MAGAZINE_PCM_CAN_ID, MAGAZINE_UP_PCM, MAGAZINE_DOWN_PCM);
-  
+  // Magazine is used for a few controls 
+  Magazine_Subsystem magazine;
+
   // Flywheels 
   FlyWheel  upper_shooter; 
   FlyWheel  lower_shooter; 
@@ -168,6 +164,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private boolean shooterIsOn = false;
 
   public Intake_Subsystem() {
+    // Construct the magazine 
+    magazine = new Magazine_Subsystem(this);
+
     SendableRegistry.setName(this,"Intake", "shooter");
     upper_shooter = new FlyWheel(CAN.SHOOTER_UPPER_TALON, Shooter.upperFWConfig);
     lower_shooter = new FlyWheel(CAN.SHOOTER_LOWER_TALON, Shooter.lowerFWConfig);
@@ -223,13 +222,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     intake_spark.set(0);
   }
 
-  public void magazineOn(double motorStrength) {
-    magazine.set(motorStrength);
-  }
-
-  public void magazineOff() {
-    magazine.set(0);
-  }
 
   /**
    * Set the Shooter RPM goals from power cell velocity and rotation rate.  
@@ -286,20 +278,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     lower_shooter.setPercent(0.0);
   }
 
-  public void magazineUp() {
-    // intake will come down much faster than magazine will go up
-    // so no delay here should be OK... famous last words.
-    if  (isIntakeUp()) { lowerIntake();}
-    magSolenoid.set(Value.kForward);
-  }
-
-  public void magazineDown() {
-    magSolenoid.set(Value.kReverse);
-  }
-
-  public boolean isMagazineUp() {
-    return (magSolenoid.get() == Value.kForward);
-  }
+  
 
   /**
    * getShooterAvgRPM()  - average of upper and lower wheels

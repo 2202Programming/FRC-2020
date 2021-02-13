@@ -7,19 +7,20 @@
 
 package frc.robot.commands.intake;
 
+import static frc.robot.Constants.DT;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake_Subsystem;
-import static frc.robot.Constants.*;
+import frc.robot.subsystems.Magazine_Subsystem;
 
 public class MagazineAdjust extends CommandBase {
-  private Intake_Subsystem intake;
+  private Magazine_Subsystem mag;
   private double strength = 0.8;
   private int pulseCounts = -1;
   private int counts; // count down timer
   /**
    * Creates a new MagazineAdjust.
    */
-  public MagazineAdjust(Intake_Subsystem intake, boolean forward, double pulseTime) {
+  public MagazineAdjust(Magazine_Subsystem mag, boolean forward, double pulseTime) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.intake = intake;
 

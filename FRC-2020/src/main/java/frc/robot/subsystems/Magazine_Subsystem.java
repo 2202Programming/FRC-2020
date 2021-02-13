@@ -27,10 +27,19 @@ public class Magazine_Subsystem extends SubsystemBase {
   private final IdleMode kIdlemode = IdleMode.kBrake;
   private final int kpidSlot =0;
 
+  //
+  final int MAG_FULL_COUNT = 3;
+
   //the FFHoldVolts might be useful to balance the shocks
   private double kArbFFHoldVolts = 0.0;
 
   // constants
+  final double kCountsPerRev =  4096.0;
+  final double kAngleGearRatio = 48.0;  //motor turns to pully turns
+  final double kPullyDiameter = 2.0;    //inches
+  final double kLengthPerMotorCount = kPullyDiameter / (kAngleGearRatio*kCountsPerRev);
+  final double kLengthPerPotCount   = 1.0;
+  
   final double kPotCounts2Deg = .123456;  //TODO: fix all these
   final double kMotorCounts2Deg =.012345;
   final double MAG_MIN_ANGLE = 22.0;
@@ -54,6 +63,8 @@ public class Magazine_Subsystem extends SubsystemBase {
   // measurements update in periodic()
   double m_angle = 0.0;
   double m_angleMotor = 0.0;
+  int m_pcCount = 0;
+
 
   /** Creates a new Magazine_subsystem. */
   public Magazine_Subsystem(Intake_Subsystem intake) {
@@ -120,6 +131,12 @@ public class Magazine_Subsystem extends SubsystemBase {
       return lightGate.get();
   }
 
+  public void addPC() {m_pcCount++;}
+  public void removePC() {
+    if (m_pcCount>0) m_pcCount--;
+  }
+  public int  getPC() {return m_pcCount;}
+  public boolean isMagFull() { return (m_pcCount >= MAG_FULL_COUNT);}
   
   public double getAngle() {
     return m_angle;   //not sure if we want pot or motor angle

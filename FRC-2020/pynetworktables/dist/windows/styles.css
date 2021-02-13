@@ -23,3 +23,7 @@ h1, h2, h3, h4, h5, p, a, label, input, img, iframe{
     text-align: center;
     display: block;
   }
+
+  .align-left {
+    text-align: left;
+  }

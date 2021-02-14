@@ -8,12 +8,10 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.Shifter;
 import frc.robot.subsystems.ifx.Shifter.Gear;
 import frc.robot.subsystems.ifx.VelocityDrive;
-import frc.robot.ux.DriverPreferences;
 
 public class ArcadeVelDriveCmd extends CommandBase {
   DriverControls dc;
@@ -61,12 +59,6 @@ public class ArcadeVelDriveCmd extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    // get DriverPreferences off Dashboard
-    DriverPreferences dp = RobotContainer.getInstance().dashboard.getDriverPreferences();
-    vMax = dp.getMaxSpeed();
-    rotMax = dp.getMaxRotation();
-    //drive.resetPosition();
-    shifter.shiftDown();
     resetTimeInZone();
   }
 
@@ -128,11 +120,15 @@ public class ArcadeVelDriveCmd extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    //max speed/rotation can change via 
+    vMax = drive.getMaxVelocity();
+    rotMax = drive.getMaxRotation();
+    velAvg = drive.getAvgVelocity(false);   // ft/s
+
     // read controls in normalize units +/- 1.0, scale to physical units
     velCmd = dc.getVelocity() * vMax;
     rotCmd = dc.getRotation() * rotMax;
-    velAvg = drive.getAvgVelocity(false);   // ft/s
-
+   
     // implement auto-shift if it is enabled
     if (shifter.isAutoShiftEnabled()) { 
       // handles all the shift up/down requests based on time in the zone.

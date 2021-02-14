@@ -26,4 +26,9 @@ public interface VelocityDrive extends Odometry {
     /** Some drive systems may have shifting, Expose the shifter if there is one. Null returned if none. */
     public Shifter getShifter();
 
+    // expose the drive train's max speed and rate because UX may update it
+    // recommend reading these at init() or each frame
+    public double getMaxVelocity();  //ft/s
+    public double getMaxRotation();  //deg/s ccw positive
+
 }

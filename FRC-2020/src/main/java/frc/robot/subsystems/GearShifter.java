@@ -11,10 +11,10 @@ import frc.robot.subsystems.ifx.Shifter;
 
 public class GearShifter extends SubsystemBase implements Shifter {
     // define the gear ratios for high and low gear
-    private final double K_shaft = 1.0/18.75; //motor revs to wheel revs
+    public final static double K_shaft = 1.0/18.75; //motor revs to wheel revs
     //shifter stage with 
-    public final double K_low = 1.0 * K_shaft;     //motor rev to wheel revs
-    public final double K_high = 2.65 * K_shaft;   //motor rev to wheel revs 
+    public final static double K_low = 1.0 * K_shaft;     //motor rev to wheel revs
+    public final static double K_high = 2.65 * K_shaft;   //motor rev to wheel revs 
     private boolean autoShiftEnabled = false;
     
     enum Solnoid {

@@ -87,4 +87,14 @@ public class DummyVelocityDrive implements VelocityDrive {
   public void velocityTankDrive(double leftvel, double rightvel) {
   }
 
+  @Override
+  public double getMaxVelocity() {
+    return 0;
+  }
+
+  @Override
+  public double getMaxRotation() {
+    return 0;
+  }
+
 }

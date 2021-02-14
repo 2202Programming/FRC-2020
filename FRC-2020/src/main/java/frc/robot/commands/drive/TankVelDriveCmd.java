@@ -41,6 +41,9 @@ public class TankVelDriveCmd extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    vMax = drive.getMaxVelocity();
+    rotMax = drive.getMaxRotation();
+
     // read controls in normalize units +/- 1.0, scale to physical units
     vl = dc.getVelocityLeft() * vMax;
     vr = dc.getVelocityRight() * vMax;

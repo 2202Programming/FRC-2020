@@ -44,7 +44,7 @@ public class Magazine_Subsystem extends SubsystemBase {
   final double kMotorCounts2Deg =.012345;
   final double MAG_MIN_ANGLE = 22.0;
   final double MAG_UP_ANGLE = 29.0;      //Above this, mag is up and may interfere with intake
-  final double MAG_MAX_ANGLE = 51.0;
+  final double MAG_MAX_ANGLE = 55.0;
 
   // magazine IO
   final Spark beltMotor = new Spark(PWM.MAGAZINE);
@@ -126,8 +126,11 @@ public class Magazine_Subsystem extends SubsystemBase {
   }
 
   /**
-   * Lightgate as a 2K pull down resister on it. Signal goes high when 
+   * Lightgate has a 2K pull down resister on it. Signal goes high when 
    * the light is broken.
+   * 
+   * https://cdn.automationdirect.com/static/specs/pe18mmthroughbeamfb.pdf
+   * 
    * @return  true when blocked by power cell.
    */
   public boolean isGateBlocked() {

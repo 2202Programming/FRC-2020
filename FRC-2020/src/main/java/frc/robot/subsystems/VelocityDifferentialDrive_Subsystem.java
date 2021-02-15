@@ -587,8 +587,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     layout.addNumber("DT/POSE/Y", () -> getPose().getY());
     layout.addNumber("DT/POSE/The", () -> getPose().getRotation().getDegrees());
     layout.addNumber("DT/POSE/VoltLeft", () -> m_voltleft);
-    layout.addNumber("DT/POSE/VoltRight", () -> m_voltright);
-  }
+	  layout.addNumber("DT/POSE/VoltRight", () -> m_voltright);
+    layout.addBoolean("DT/Motor/RightInverted?", () -> frontRight.getInverted());
+    layout.addBoolean("DT/Motor/LeftInverted?", () -> frontLeft.getInverted());
+	}
 
   /**
    * Controls the left and right sides of the drive directly with voltages.

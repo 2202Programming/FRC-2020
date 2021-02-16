@@ -11,7 +11,7 @@ public class MagazineCaptureCmd extends CommandBase {
 
   // constants
   double kMotorStrength = 0.8;
-  double kFrameCount = 5;     // number of frames to run after LG opens, 20ms /frame
+  double kFrameCount = 25;     // number of frames to run after LG opens, 20ms /frame
 
   Magazine_Subsystem mag;
   double frameCount;
@@ -58,10 +58,10 @@ public class MagazineCaptureCmd extends CommandBase {
         break;
 
       case CountFrames:
-        if (++frameCount <= kFrameCount) {
+        if (++frameCount > kFrameCount) {
           state = (mag.isMagFull()) ? State.MagFull : State.WaitingForPC;
         }
-
+        break;
       case MagFull:
         System.out.println("Mag full");
         // if it empties we can intake more

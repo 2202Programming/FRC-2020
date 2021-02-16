@@ -77,8 +77,8 @@ public final class Constants {
 
     // Intake
     public static final int MAGAZINE_PCM_CAN_ID = CAN.PCM2;
-    public static final int MAGAZINE_UP_PCM = 0;
-    public static final int MAGAZINE_DOWN_PCM = 1;
+    public static final int MAGAZINE_LOCK_PCM = 0;
+    public static final int MAGAZINE_UNLOCK_PCM = 1;
     public static final int INTAKE_PCM_CAN_ID = CAN.PCM1;
     public static final int INTAKE_UP_SOLENOID_PCM = 4;
     public static final int INTAKE_DOWN_SOLENOID_PCM = 5;

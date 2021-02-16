@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.MAGAZINE_LOCK_PCM;
+import static frc.robot.Constants.MAGAZINE_PCM_CAN_ID;
+import static frc.robot.Constants.MAGAZINE_UNLOCK_PCM;
+
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
@@ -14,6 +18,8 @@ import com.revrobotics.ControlType;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -78,6 +84,8 @@ public class Magazine_Subsystem extends SubsystemBase {
     final CANEncoder angleEncoder = angleMotor.getEncoder();
     final CANPIDController anglePID = angleMotor.getPIDController();
     final AnalogInput anglePot = new AnalogInput(AnalogIn.MAGAZINE_ANGLE);
+    final DoubleSolenoid magSolenoid = new DoubleSolenoid(MAGAZINE_PCM_CAN_ID, MAGAZINE_LOCK_PCM, MAGAZINE_UNLOCK_PCM);
+  
 
     // measurements
     double m_pot_length;
@@ -127,7 +135,22 @@ public class Magazine_Subsystem extends SubsystemBase {
       m_lengthSetpoint = Math.sqrt(b2 + c2 - bc * Math.cos(Math.toRadians(deg)));
       anglePID.setReference(m_lengthSetpoint, ControlType.kPosition, kpidSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
     }
-  }
+
+    /**
+     * controls for the lock on the 
+     */
+    public void lock() {
+      magSolenoid.set(Value.kForward);
+    }
+  
+    public void unlock() {
+      magSolenoid.set(Value.kReverse);
+    }
+  
+    public boolean isLocked() {
+      return (magSolenoid.get() == Value.kForward);
+    }
+  } // MagazinePosition
 
   /**
    * 

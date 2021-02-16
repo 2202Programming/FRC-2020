@@ -11,12 +11,14 @@ public class MagazineCaptureCmd extends CommandBase {
 
   // constants
   double kMotorStrength = 0.8;
+  double kFrameCount = 5;     // number of frames to run after LG opens, 20ms /frame
 
   Magazine_Subsystem mag;
+  double frameCount;
 
   // states of our command
   enum State {
-    WaitingForPC, MovingPC, MagFull
+    WaitingForPC, MovingPC, CountFrames, MagFull
   };
 
   State state = State.WaitingForPC;
@@ -31,6 +33,7 @@ public class MagazineCaptureCmd extends CommandBase {
   @Override
   public void initialize() {
     state = State.WaitingForPC;
+    frameCount = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -49,9 +52,15 @@ public class MagazineCaptureCmd extends CommandBase {
         if (!mag.isGateBlocked()) {
           mag.beltOff();
           mag.addPC();
-          state = (mag.isMagFull()) ? State.MagFull : State.WaitingForPC;
+          state = State.CountFrames;  
+          frameCount = 0;
         }
         break;
+
+      case CountFrames:
+        if (++frameCount <= kFrameCount) {
+          state = (mag.isMagFull()) ? State.MagFull : State.WaitingForPC;
+        }
 
       case MagFull:
         System.out.println("Mag full");

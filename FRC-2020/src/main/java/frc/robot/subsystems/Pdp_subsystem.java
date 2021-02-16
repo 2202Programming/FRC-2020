@@ -31,8 +31,8 @@ public class Pdp_subsystem extends SubsystemBase implements Logger {
       channelCurrent[i] = pdp.getCurrent(i);
       SmartDashboard.putNumber("PDP/CurrentChannel"+i, channelCurrent[i]);
     }
-    SmartDashboard.putNumber("PDP/TotalCurrent", pdp.getTotalCurrent());
-    SmartDashboard.putNumber("PDP/Voltage", pdp.getVoltage());
+    //SmartDashboard.putNumber("PDP/TotalCurrent", pdp.getTotalCurrent());
+   // SmartDashboard.putNumber("PDP/Voltage", pdp.getVoltage());
     
   }
 }

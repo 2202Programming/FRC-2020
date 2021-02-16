@@ -38,7 +38,7 @@ public class DriverPreferences {
     RobotContainer rc = RobotContainer.getInstance();
 
     // Create default commands for driver preference selection
-    arcadeDriveCmd = new ArcadeVelDriveCmd(rc.driverControls, rc.driveTrain, rc.driveTrain);
+    arcadeDriveCmd = new ArcadeVelDriveCmd(rc.driverControls, rc.driveTrain, rc.gearShifter);
     arcadeDriveCmd.setShiftProfile(DriveTrain.shiftCount, DriveTrain.vShiftLow, DriveTrain.vShiftHigh);
     tankDriveCmd = new TankVelDriveCmd(rc.driverControls, rc.driveTrain);
     

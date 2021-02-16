@@ -8,7 +8,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.toggleLED;
 //import frc.robot.commands.intake.IntakeToggleCmd;
-import frc.robot.commands.intake.MagazineToggleCmd;
+import frc.robot.commands.intake.MagazineRaiseLowerCmd;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.subsystems.Intake_Subsystem;
@@ -98,10 +98,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
                     new DriveOffLine(drive, 0.8).withTimeout(2.7),
                     new ToggleIntakeRaised(intake),
                     new WaitCommand(0.7),
-                    new MagazineToggleCmd(intake.getMagazine()),
+                    new MagazineRaiseLowerCmd(intake.getMagazine()),
                     new WaitCommand(1.2),
                     new ShooterOn(intake, ShooterOnCmd.data).withTimeout(3), //need to add Data type to parser
-                    new MagazineToggleCmd(intake.getMagazine()),
+                    new MagazineRaiseLowerCmd(intake.getMagazine()),
                     new ToggleIntakeRaised(intake)
             );
         }

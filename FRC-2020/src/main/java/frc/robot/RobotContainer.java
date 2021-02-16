@@ -16,7 +16,7 @@ import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
-import frc.robot.commands.auto.auto_drivePath_cmd;
+import frc.robot.commands.auto.followTrajectory_cmd;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -24,7 +24,8 @@ import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
 import frc.robot.commands.generic.CallFunctionCmd;
 import frc.robot.commands.intake.IntakeToggleCmd;
 import frc.robot.commands.intake.MagazineAdjust;
-import frc.robot.commands.intake.MagazineToggleCmd;
+import frc.robot.commands.intake.MagazineCaptureCmd;
+import frc.robot.commands.intake.MagazineRaiseLowerCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
@@ -90,6 +91,10 @@ public class RobotContainer {
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();
     //cameraSubsystem = new CameraSubsystem();
+
+    // default commands
+    var mag = intake.getMagazine();
+    mag.setDefaultCommand(new MagazineCaptureCmd(mag));   //uses lightgate to load power cells
     
     // Add anything that has logging requirements
     logSubsystem.add(/*driveTrain, lidar,*/limelight, intake, pdp /*,driverControls, panel, detector*/);
@@ -108,24 +113,27 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings(DriverControls dc) {
+    var mag = intake.getMagazine();
+
     // Drivers buttons
     dc.bind(Id.Driver, XboxButton.A).whenPressed(new InvertDriveControls(dc)); 
     dc.bind(Id.Driver, XboxButton.B).whenPressed(new auto_cmd_group(dc, driveTrain, intake, limelight, lidar));
     dc.bind(Id.Driver, XboxButton.X).whenPressed(new toggleLED(limelight));
     dc.bind(Id.Driver, XboxButton.Y).whenPressed(new ToggleAutoShiftCmd(gearShifter));
     dc.bind(Id.Driver, XboxButton.RB).whenPressed(new CallFunctionCmd(() -> {return -1;} ));  //placeholder, do nothing
-    dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(driveTrain));
+    dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(gearShifter));
 
     //auto path testing
-    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getPath()));
+    //dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getPath()));
+    dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory_cmd(driveTrain, dashboard.getPath()));
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
     // Assistant's buttons
-    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineAdjust(intake.getMagazine(), false, 0.0)); 
+    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineAdjust(mag, false, 0.0), true); 
     dc.bind(Id.Assistant, XboxButton.B).whenHeld(new ReverseIntake(intake, -0.5));
-    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineAdjust(intake.getMagazine(), true, 0.4), true);
+    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineAdjust(mag, true, 0.4), true);
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
-    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineToggleCmd(intake.getMagazine()));
+    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineRaiseLowerCmd(mag));
     dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new ToggleIntakeRaised(intake));
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
   }

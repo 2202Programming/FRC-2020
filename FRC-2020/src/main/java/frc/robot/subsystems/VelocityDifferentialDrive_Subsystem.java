@@ -1,16 +1,17 @@
 package frc.robot.subsystems;
 
+import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
 import static frc.robot.Constants.RobotPhysical.WheelAxleDistance;
 import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 import static frc.robot.Constants.RobotPhysical.WheelWearLeft;
 import static frc.robot.Constants.RobotPhysical.WheelWearRight;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 
 import edu.wpi.first.networktables.EntryNotification;
@@ -44,13 +45,14 @@ import frc.robot.subsystems.ifx.DashboardUpdate;
 import frc.robot.subsystems.ifx.DualDrive;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.subsystems.ifx.Shifter;
+import frc.robot.subsystems.ifx.Shifter.Gear;
 import frc.robot.subsystems.ifx.VelocityDrive;
 import frc.robot.subsystems.ifx.VoltageDrive;
 import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
-    implements Logger, DualDrive, VelocityDrive, VoltageDrive, Shifter, DashboardUpdate {
+    implements Logger, DualDrive, VelocityDrive, VoltageDrive, DashboardUpdate {
   // Sign conventions, apply to encoder and command inputs
   // Brushless SparkMax cannot invert the encoders
   final double Kleft = 1.0;
@@ -79,21 +81,23 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   private final double K_high_fps_rpm; // High gear ft/s /rpm of motor shaft
 
   // CANSpark Max will be used 3 per side, 2 folowing the leader
-  private final CANSparkMaxLowLevel.MotorType MT = CANSparkMaxLowLevel.MotorType.kBrushless;
-  private final CANSparkMax frontRight = new CANSparkMax(CAN.FR_SMAX, MT);
-  private final CANSparkMax frontLeft = new CANSparkMax(CAN.FL_SMAX, MT);
-  private final CANSparkMax backRight = new CANSparkMax(CAN.BR_SMAX, MT);
-  private final CANSparkMax backLeft = new CANSparkMax(CAN.BL_SMAX, MT);
-  private final CANSparkMax middleRight = new CANSparkMax(CAN.MR_SMAX, MT);
-  private final CANSparkMax middleLeft = new CANSparkMax(CAN.ML_SMAX, MT);
+  private final CANSparkMax frontRight = new CANSparkMax(CAN.FR_SMAX, kBrushless);
+  private final CANSparkMax frontLeft = new CANSparkMax(CAN.FL_SMAX, kBrushless);
+  private final CANSparkMax backRight = new CANSparkMax(CAN.BR_SMAX, kBrushless);
+  private final CANSparkMax backLeft = new CANSparkMax(CAN.BL_SMAX, kBrushless);
+  private final CANSparkMax middleRight = new CANSparkMax(CAN.MR_SMAX, kBrushless);
+  private final CANSparkMax middleLeft = new CANSparkMax(CAN.ML_SMAX, kBrushless);
 
-  private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft, middleRight,
-      middleLeft };
+  private final CANSparkMax[] controllers = new CANSparkMax[] {
+     frontRight, frontLeft, 
+     backRight,  backLeft, 
+     middleRight, middleLeft };
 
-  // VelController can use either Velocity mode or dutycycle modes and is wrapper
-  // around CANSparkMax. These get setup after factory resets.
+  // split left/right sides controller/encoder/pid
   final CANSparkMax leftController = backLeft;
   final CANSparkMax rightController = backRight;
+  final CANEncoder leftEncoder = leftController.getEncoder();
+  final CANEncoder rightEncoder = rightController.getEncoder();
   final CANPIDController leftPID = leftController.getPIDController();
   final CANPIDController rightPID = rightController.getPIDController();
 
@@ -103,7 +107,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   private final double ARBIT_FEEDFWD_MAX_VOLT = 1.5; // volts max allowed
   private double arbFeedFwd = RamseteProfile.ksVolts; // current value
 
-  // Calculated based on desired low-gear max ft/s
+  // Calculated based on desired low-gear max ft/s - UX may update 
   double maxFPS_High; // <input>
   double maxFPS_Low; // using HIGH gear max RPM
   double maxRPM_High; // max motor RPM low & high
@@ -148,6 +152,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60; // rpm/60 rps
     K_high_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.HIGH) / 60;
 
+    //Speed setting may be updated via UX, but set defaults
     calcSpeedSettings();
 
     // setup SparkMax controllers, sets left and right masters
@@ -234,13 +239,27 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
 
   @Override
   public void periodic() {
-    // read required sensor and system values for the frame
-    m_velLeft = getLeftVel(false);
-    m_velRight = getRightVel(false);
-    m_posLeft = getLeftPos();
-    m_posRight = getRightPos();
     m_currentGear = gearbox.getCurrentGear();
     m_theta = Kgyro * m_gyro.getYaw();
+    double kGR = gearbox.getGearRatio();
+    
+    /**
+     * Encoder.getPostion() is in units of revs of motor shaft K_ft_per_rev -
+     * pi*wheeldiam - distance per rev of wheel shaft
+     * 
+     * Wheelwear accounts for calibration, expect 0.9 < wear <= 1.0
+     * K_ft_per_rev*WheelWear = actual distance traveled per wheel rev
+     * 
+     **/
+    m_posLeft = K_ft_per_rev * WheelWearLeft * Kleft * kGR * leftEncoder.getPosition();
+    m_posRight = K_ft_per_rev * WheelWearRight * Kright * kGR * rightEncoder.getPosition();
+
+    /**
+     * encoder.getVelocity() - motor turn in RPM ; rps = rpm/60
+     *
+     **/
+    m_velLeft = (K_ft_per_rev * WheelWearLeft * kGR / 60.0) * leftEncoder.getVelocity();
+    m_velRight = (K_ft_per_rev * WheelWearRight * kGR / 60.0) * rightEncoder.getVelocity();
 
     // Update the odometry in the periodic block, physical units
     m_odometry.update(readGyro(), m_posLeft, m_posRight);
@@ -332,20 +351,22 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     // Spark Max uses RPM for velocity closed loop mode
     // so we need to convert ft/s to RPM command which is dependent
     // on the gear ratio.
-    double k = 1.0 / getFPSperRPM(m_currentGear); // k [rpm/fps]
+    
+    // [s/min] / [ft /wheel-rev] / [motor-rev / wheel-rev] = [motor-rpm / ft/s]
+    double k = (60.0 / K_ft_per_rev) /gearbox.getGearRatio();  
     double maxSpeed = getMaxSpeed(m_currentGear);
 
     // limit vel to max for the gear ratio
     double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
-    double rpm = vcmd * k;
+    double rpm = k * vcmd;  // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
 
     /**
      * Rotation controls
      */
     // Convert to rad/s split between each wheel
     double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
-    rps *= (Math.PI / 180.0);
-    double vturn_rpm = (rps * WheelAxleDistance) * k;
+    //     [mo-rpm/ ft/s]  [rad/deg] [ft] [deg/s] =  [mo-rpm/ ft/s] * [ft/s] = mo-rpm
+    double vturn_rpm = k * (Math.PI / 180.0)*(0.5*WheelAxleDistance) * rps;
 
     // compute each wheel, pos rpm moves forward, pos turn is CCW
     double vl_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ); // turn left, +CCW, slows left wheel
@@ -369,10 +390,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     // Spark Max uses RPM for velocity closed loop mode
     // so we need to convert ft/s to RPM command which is dependent
     // on the gear ratio.
-    double k = 1.0 / getFPSperRPM(m_currentGear); // k = [RPM/fps]
-
+    // [s/min] / [ft/wheel-rev] / [wheel-rev / motor-rev] = [mo-rev / min] / [ft/s] = [mo-rpm / ft/s]
+    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();   
+    
+    // [mo-rpm / ft/s] * [ft/s]  = [rpm-mo]
+    double rpm_l = kGR * velLeft;  
+    double rpm_r = kGR * velRight; 
     // scale to rpm and ouput to contollers, no coast mode
-    output(k * velLeft, k * velRight, false);
+    output(rpm_l, rpm_r, false);
   }
 
   /**
@@ -385,15 +410,15 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
    */
   private void output(double l_rpm, double r_rpm, boolean coastMode) {
     if (coastMode) {
-      // command doesn't need power, ok to coast, should use PWM and zero power
+      // command doesn't need power, ok to coast, use PWM to zero power
       // with the controller setup to coast mode by default.
       leftController.set(0.0);
       rightController.set(0.0);
     } else {
       // command the velocity to the wheels, correct for wheelwear
       // also correct for any left/right motor conventions
-      setReference(l_rpm / WheelWearLeft * Kleft, leftPID);
-      setReference(r_rpm / WheelWearRight * Kright, rightPID);
+      setReference(l_rpm * (Kleft / WheelWearLeft), leftPID);
+      setReference(r_rpm * (Kright / WheelWearRight), rightPID);
     }
 
     shiftGears();
@@ -420,43 +445,25 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     return (gear == Gear.HIGH) ? maxFPS_High : maxFPS_Low;
   }
 
-  private double getFPSperRPM(Gear gear) {
-    return (gear == Gear.HIGH) ? K_high_fps_rpm : K_low_fps_rpm;
-  }
-
   public double getLeftPos() {
-    // postion is in units of revs
-    double kft_rev = Kleft * getFPSperRPM(getCurrentGear()) * 60.0;
-    double ft = kft_rev * leftController.getEncoder().getPosition();
-    return ft * WheelWearLeft; // account for calibration, we didn't go as far as we think
+    return m_posLeft;
   }
 
   public double getRightPos() {
-    // postion is in units of revs
-    double kft_rev = Kright * getFPSperRPM(getCurrentGear()) * 60.0;
-    double ft = kft_rev * rightController.getEncoder().getPosition();
-    return ft * WheelWearRight;
+    return m_posRight;
   }
 
   public double getLeftVel(final boolean normalized) {
-    double vel = Kleft * leftController.get();
-    double fps = vel * getFPSperRPM(getCurrentGear());
-    vel = (normalized) ? (fps / maxFPS_High) : fps;
-    return vel * WheelWearLeft;
+    return (normalized) ? (m_velLeft/ maxFPS_High) : m_velLeft;
   }
 
   public double getRightVel(final boolean normalized) {
-    double vel = Kright * rightController.get();
-    double fps = vel * getFPSperRPM(getCurrentGear());
-    vel = (normalized) ? (fps / maxFPS_High) : fps;
-    return vel * WheelWearRight;
+    return (normalized) ? (m_velRight / maxFPS_High) : m_velRight;
   }
 
   public double getAvgVelocity(final boolean normalized) {
-    double vel = 0.5 * (Kright * rightController.get() * WheelWearRight + Kleft * leftController.get() * WheelWearLeft);
-    double fps = vel * getFPSperRPM(getCurrentGear());
-    vel = (normalized) ? (fps / maxFPS_High) : fps;
-    return vel;
+    double vel = 0.5*(m_velLeft + m_velRight);
+    return (normalized) ? (vel/maxFPS_High) : vel;
   }
 
   public void resetPosition() {
@@ -489,7 +496,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
 
   /** Shifter is implemented by this class */
   public Shifter getShifter() {
-    return this;
+    return this.gearbox;
   }
 
   /**
@@ -543,24 +550,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     if (rpm == 0.0)
       arbffVolts = 0.0;
     pid.setReference(rpm, ControlType.kVelocity, KpidSlot, arbffVolts, ArbFFUnits.kVoltage);
-  }
-
-  /**
-   * Implement Shifter interface by deferring to the gearbox being used.
-   */
-  @Override
-  public boolean isAutoShiftEnabled() {
-    return gearbox.isAutoShiftEnabled();
-  }
-
-  @Override
-  public boolean enableAutoShift() {
-    return gearbox.enableAutoShift();
-  }
-
-  @Override
-  public boolean disableAutoShift() {
-    return gearbox.disableAutoShift();
   }
 
   /**
@@ -656,16 +645,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   public double getTurnRate() {
     double heading = Kgyro * m_gyro.getRate();
     return heading;
-  }
-
-  @Override
-  public double getGearRatio(Gear g) {
-    return gearbox.getGearRatio(g);
-  }
-
-  @Override
-  public double getGearRatio() {
-    return gearbox.getGearRatio();
   }
 
   void setupSimulation() {

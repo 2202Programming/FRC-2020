@@ -13,10 +13,10 @@ import frc.robot.subsystems.Magazine_Subsystem;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
-public class MagazineToggleCmd extends InstantCommand {
+public class MagazineRaiseLowerCmd extends InstantCommand {
   Magazine_Subsystem magazine;
 
-  public MagazineToggleCmd(Magazine_Subsystem mag) {
+  public MagazineRaiseLowerCmd(Magazine_Subsystem mag) {
     magazine = mag;
     addRequirements(magazine);
   }

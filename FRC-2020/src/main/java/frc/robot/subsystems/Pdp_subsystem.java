@@ -7,19 +7,18 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.CAN;
 import frc.robot.subsystems.ifx.Logger;
 
 public class Pdp_subsystem extends SubsystemBase implements Logger {
   /** Creates a new Pdp_subsystem. */
-
+  private static final int kChannels = 16;
   private final PowerDistributionPanel pdp;
-  private double[] channelCurrent;
+  private double[] channelCurrent = new double[kChannels];
 
 
   public Pdp_subsystem() {
-
-    pdp = new PowerDistributionPanel(0);
-  
+    pdp = new PowerDistributionPanel(CAN.PDP);
   }
 
   @Override
@@ -28,12 +27,12 @@ public class Pdp_subsystem extends SubsystemBase implements Logger {
   }
 
   public void log(){
-    for (int i = 0; i<16; i++){
+    for (int i = 0; i < kChannels; i++){
       channelCurrent[i] = pdp.getCurrent(i);
-      SmartDashboard.putNumber("/PDP/CurrentChannel"+i, channelCurrent[i]);
+      SmartDashboard.putNumber("PDP/CurrentChannel"+i, channelCurrent[i]);
     }
-    SmartDashboard.putNumber("/PDP/TotalCurrent", pdp.getTotalCurrent());
-    SmartDashboard.putNumber("/PDP/Voltage", pdp.getVoltage());
+    SmartDashboard.putNumber("PDP/TotalCurrent", pdp.getTotalCurrent());
+    SmartDashboard.putNumber("PDP/Voltage", pdp.getVoltage());
     
   }
 }

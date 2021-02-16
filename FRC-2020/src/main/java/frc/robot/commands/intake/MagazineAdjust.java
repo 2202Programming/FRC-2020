@@ -21,12 +21,12 @@ public class MagazineAdjust extends CommandBase {
    * Creates a new MagazineAdjust.
    */
   public MagazineAdjust(Magazine_Subsystem mag, boolean forward, double pulseTime) {
-    // Use addRequirements() here to declare subsystem dependencies.
     magazine = mag;
 
     //set the direction
     strength *= (forward) ? 1.0 : -1.0;
     pulseCounts = (pulseTime > 0.0) ? (int) ((pulseTime / DT) + 1) : -1;
+    addRequirements(mag);
   }
 
   // Called when the command is initially scheduled.

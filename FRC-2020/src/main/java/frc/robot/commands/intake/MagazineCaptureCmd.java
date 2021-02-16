@@ -54,6 +54,11 @@ public class MagazineCaptureCmd extends CommandBase {
         break;
 
       case MagFull:
+        System.out.println("Mag full");
+        // if it empties we can intake more
+        if (!mag.isMagFull()) {
+          state = State.WaitingForPC;
+        }
       default:
     }
   }
@@ -61,11 +66,15 @@ public class MagazineCaptureCmd extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    if (interrupted) {
+      //we got stopped, assume full
+      state = State.MagFull;
+    }
   }
 
-  // Returns true when the command should end.
+  // This is a default command, it shouldn't end but could get pre-empted
   @Override
   public boolean isFinished() {
-    return (state == State.MagFull);
+    return false;
   }
 }

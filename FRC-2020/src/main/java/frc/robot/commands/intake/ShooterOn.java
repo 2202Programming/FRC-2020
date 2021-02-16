@@ -144,6 +144,7 @@ public class ShooterOn extends CommandBase {
           //Flywheel at speed, move to shooting
           stage = Stage.Shooting;
           magazine.beltOn(FAST_MAG_FORWARD);
+          magazine.removePC();   // we will shoot 1
         }
       break;
 

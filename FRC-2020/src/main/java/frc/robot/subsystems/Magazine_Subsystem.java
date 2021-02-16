@@ -236,6 +236,9 @@ public class Magazine_Subsystem extends SubsystemBase {
     return m_pcCount;
   }
 
+  public void setPC(int c) {
+    m_pcCount = (c >= 0  && c <= MAG_FULL_COUNT) ? c : 0;
+  }
   public boolean isMagFull() {
     return (m_pcCount >= MAG_FULL_COUNT);
   }

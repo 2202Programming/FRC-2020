@@ -50,7 +50,7 @@ public class MagazineCaptureCmd extends CommandBase {
         break;
       case MovingPC:
         if (!mag.isGateBlocked()) {
-          mag.beltOff();
+         
           mag.addPC();
           state = State.CountFrames;  
           frameCount = 0;
@@ -58,7 +58,8 @@ public class MagazineCaptureCmd extends CommandBase {
         break;
 
       case CountFrames:
-        if (++frameCount > kFrameCount) {
+        if (++frameCount > kFrameCount) { 
+          mag.beltOff();
           state = (mag.isMagFull()) ? State.MagFull : State.WaitingForPC;
         }
         break;

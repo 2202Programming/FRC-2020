@@ -192,6 +192,7 @@ public class ShooterOn extends CommandBase {
     intake.shooterOff();
     magazine.beltOff();
     intake.intakeOff();
+    magazine.setPC(0);
   }
 
 }

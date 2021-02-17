@@ -11,7 +11,7 @@ public class MagazineCaptureCmd extends CommandBase {
 
   // constants
   double kMotorStrength = 0.8;
-  double kFrameCount = 5;     // number of frames to run after LG opens, 20ms /frame
+  double kFrameCount = 8;     // number of frames to run after LG opens, 20ms /frame
 
   Magazine_Subsystem mag;
   double frameCount;

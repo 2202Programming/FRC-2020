@@ -90,7 +90,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   public static class FlyWheelConfig {
     public PIDFController pid;
-    public int Izone;
     public double maxOpenLoopRPM; 
     public double gearRatio;           // account for gearbox reduction to flywheel
     public boolean sensorPhase;
@@ -404,11 +403,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
       motor.configFactoryDefault();
       
       // use the config to set all values at once
-      srxconfig.slot0.kP = cfg.pid.getP();
-      srxconfig.slot0.kI = cfg.pid.getI();
-      srxconfig.slot0.kD = cfg.pid.getD();
-      srxconfig.slot0.kF = cfg.pid.getF();
-      srxconfig.slot0.integralZone = cfg.Izone;
+      cfg.pid.copyTo(srxconfig.slot0);
 
       srxconfig.slot1 = srxconfig.slot0;
       motor.configAllSettings(srxconfig);

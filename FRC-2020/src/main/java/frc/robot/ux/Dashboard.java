@@ -39,6 +39,7 @@ public class Dashboard {
  
     layout = systemsTab.getLayout("Shooter", BuiltInLayouts.kList).withSize(2,3).withPosition(0, 0);
     rc.intake.addDashboardWidgets(layout);
+    rc.intake.getMagazine().getMagPositioner().addDashboardWidgets(layout);
     layout.add(rc.intake); 
 
     layout = systemsTab.getLayout("DriveTrain", BuiltInLayouts.kList).withSize(2,3).withPosition(2, 0);

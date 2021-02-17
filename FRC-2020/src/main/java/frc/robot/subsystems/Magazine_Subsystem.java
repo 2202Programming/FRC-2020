@@ -4,10 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.MAGAZINE_LOCK_PCM;
-import static frc.robot.Constants.MAGAZINE_PCM_CAN_ID;
-import static frc.robot.Constants.MAGAZINE_UNLOCK_PCM;
-
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
@@ -21,101 +17,163 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AnalogIn;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;
+import frc.robot.Constants.PCM2;
 import frc.robot.Constants.PWM;
 import frc.robot.util.misc.MathUtil;
+import frc.robot.util.misc.PIDFController;
 
 public class Magazine_Subsystem extends SubsystemBase {
   // Physical limits
-  static final double MAG_MIN_ANGLE = 22.0;
-  static final double MAG_UP_ANGLE = 29.0; // Above this, mag is up and may interfere with intake
-  static final double MAG_MAX_ANGLE = 55.0;
-  // arm lengths for linear pot anchor points
-  static final double MAG_UPPER_LEN = 16.25;
-  static final double MAG_LOWER_LEN = 11.5; // inch
+  static final double MIN_ANGLE = 22.0;
+  static final double UP_ANGLE = 29.0; // Above this, mag is up and may interfere with intake
+  static final double MAX_ANGLE = 55.0;
 
   /**
-   * MagazinePosition_Subsystem
+   * See this doc for calcs and numbers
+   * 
+   * https://docs.google.com/spreadsheets/d/1-3pbHYxEgDEzljsYpuX3GjYhh8UF8N46/edit#gid=171427340
+   * 
+   */
+  static final double MAG_ANGLE_OFFSET = 28.07; //degrees - rotation due to frame
+
+  // arm lengths for linear pot anchor points
+  static final double POT_UPPER_LEN = 18.283; // inch
+  static final double POT_LOWER_LEN = 18.18;  // inch
+  static final double POT_OFFSET_E = 15.67;   //degres - off set from pot angle base
+
+  // Strap / motor lengths - includes pully
+  static final double STRAP_UPPER_LEN = 23.183;  // inch
+  static final double STRAP_LOWER_LEN = 20.22;   // inch
+  static final double STRAP_OFFSET_E = 19.99;    //degres - off set from pot angle base
+
+  //law of cosine constants for motor strap calcs
+  static final double m_b2 = STRAP_LOWER_LEN * STRAP_LOWER_LEN;
+  static final double m_c2 = STRAP_UPPER_LEN * STRAP_UPPER_LEN;
+  static final double m_bc2 = 2.0*STRAP_UPPER_LEN * STRAP_LOWER_LEN;
+  static final double m_b2c2_2bc = (m_b2 + m_c2) / (m_bc2);
+  final double STRAP_LENGTH_min = Math.sqrt(m_b2 + m_c2 - m_bc2 * Math.cos(Math.toRadians(MIN_ANGLE)));
+
+  /**
+   * MagazinePositioner_Subsystem
    * 
    * Setup so it can run its own commands.
    * 
    */
-  public class MagazinePosition extends SubsystemBase {
+  public class MagazinePositioner extends SubsystemBase {
     // sparkmax config
     private final boolean kInverted = false;
     private final IdleMode kIdlemode = IdleMode.kBrake;
     private final int kpidSlot = 0;
 
+    //pid values for motor P, I, D, F
+    PIDFController pidvalues = new PIDFController(0.1, 1e-5, 1.0, 0.0);
+    {pidvalues.setIzone(0.0); }
+  
     // the FFHoldVolts might be useful to balance the shocks
     private double kArbFFHoldVolts = 0.0;
 
+
     // motor constants & linear pot
-    static final double kCountsPerRev = 4096.0;
-    static final double kAngleGearRatio = 48.0; // motor turns to pully turns
-    static final double kPullyDiameter = 2.0; // inches
-    static final double kMotorInchPerCount = kPullyDiameter / (kAngleGearRatio * kCountsPerRev);
+    static final double kGearRatio = 48.0; // motor turns to pully turns
+    static final double kPullyDiameter = 1.4;   // inches (1in without belting)
+    static final double kInchPerMotorRev = Math.PI*kPullyDiameter / kGearRatio;
+    static final double kRevPerInch = 1.0 / kInchPerMotorRev;
+    static final double kMinVelZeroTol = .01;  //inches/sec
+    static final double kMaxRPM = 30;
 
     // Pot Volts measured at top & bottom position
-    static final double Vat22 = 0.650; // volts at 22 degrees (min angle)
-    static final double Vat55 = 3.707; // volts at 55 degrees (max angle)
+    static final double VatMin = 0.650; // volts at 22 degrees (min angle)
+    static final double VatMax = 3.707; // volts at 55 degrees (max angle)
+    static final double PotLengthMin = 3.15; // inch compare with Law of Cosine
+    static final double PotLengthMax = 13.44; // inch
+
+    static final double kToleranceDeg = 0.1;
 
     /**
-     * Pot reading reprents length which is not linar because we have the sensor
-     * mounted at different radi on the mag.
-     * 
-     * b^2 + c^2 - l^2 cos( 55 - 22) = -------------------- bc
+     * Pot reading reprents length which is not linar because we have the sensor 
+     * mounted at different radi on the mag.  (it is very close now.)
      * 
      * Need to use law of cosines to determine L at angles
      */
-    static final double b2 = MAG_LOWER_LEN * MAG_LOWER_LEN;
-    static final double c2 = MAG_UPPER_LEN * MAG_UPPER_LEN;
-    static final double bc = MAG_UPPER_LEN * MAG_LOWER_LEN;
-    static final double b2c2_bc = (b2 + c2) / bc;
-    final double POT_LENGTH_min = Math.sqrt(b2 + c2 - bc * Math.cos(Math.toRadians(22)));
-    final double POT_LENGTH_max = Math.sqrt(b2 + c2 - bc * Math.cos(Math.toRadians(55)));
-    final double kLengthPerVolt = (POT_LENGTH_max - POT_LENGTH_min) / (Vat55 - Vat22);
+    static final double b2 = POT_LOWER_LEN * POT_LOWER_LEN;
+    static final double c2 = POT_UPPER_LEN * POT_UPPER_LEN;
+    static final double bc_2 = 2.0*POT_UPPER_LEN * POT_LOWER_LEN;
+    static final double b2c2_bc = (b2 + c2) / (bc_2);
+    final double POT_LENGTH_min = Math.sqrt(b2 + c2 - bc_2 * Math.cos(Math.toRadians(MIN_ANGLE)));
+    final double POT_LENGTH_max = Math.sqrt(b2 + c2 - bc_2 * Math.cos(Math.toRadians(MAX_ANGLE)));
+    final double kInchPerVolt = (POT_LENGTH_max - POT_LENGTH_min) / (VatMax - VatMin);
+    final double kDegPerVolt = ((MAX_ANGLE - MIN_ANGLE)/(VatMax - VatMin));
 
     // postion control devices
     final CANSparkMax angleMotor = new CANSparkMax(CAN.MAG_SMAX, MotorType.kBrushless);
     final CANEncoder angleEncoder = angleMotor.getEncoder();
     final CANPIDController anglePID = angleMotor.getPIDController();
     final AnalogInput anglePot = new AnalogInput(AnalogIn.MAGAZINE_ANGLE);
-    final DoubleSolenoid magSolenoid = new DoubleSolenoid(MAGAZINE_PCM_CAN_ID, MAGAZINE_LOCK_PCM, MAGAZINE_UNLOCK_PCM);
+    final DoubleSolenoid magSolenoid = new DoubleSolenoid(CAN.PCM2, PCM2.MAG_LOCK, PCM2.MAG_UNLOCK);
   
-
     // measurements
     double m_pot_length;
-    double m_angle = 0.0;
+    double m_anglePot = 0.0;
+    double m_angle_LOC = 0.0;     //exact calc to compare with estimated
     double m_angleMotor = 0.0;
+    double m_strapSpeed = 0.0;  //inches/s
+    double m_angle;  //actual angle in robot coordinates
 
     // command values, used in periodic()
-    double m_lengthSetpoint; // inches
+    double m_lengthSetpoint; // inches  <calculated from angleSetpoint>
+    double m_angleSetpoint;  // degrees <input>
 
-    MagazinePosition() {
+    MagazinePositioner() {
       SendableRegistry.setName(anglePot, this.getName(), "Mag Angle");
+      
       // configure sparkmax motor
       angleMotor.restoreFactoryDefaults(false);
       angleMotor.setInverted(kInverted);
       angleMotor.setIdleMode(kIdlemode);
+     
+      //copy the sw pidvalues to the hardware
+      pidvalues.copyTo(anglePID, kpidSlot);
       angleMotor.burnFlash();
 
+      // read
     }
+
+    public void addDashboardWidgets(ShuffleboardLayout layout) {
+      layout.addNumber("MAGPos/angle", () -> m_angle).withSize(2, 5);
+      layout.addNumber("MAGPos/Strap_Speed", () -> m_strapSpeed);
+      layout.addNumber("MAGPos/pot_len", () -> m_pot_length);
+      layout.addNumber("MAGPos/angle_mo", () -> m_angleMotor);
+    }
+
 
     @Override
     public void periodic() {
-      // read angle via pot and motor encoder
-      m_pot_length = anglePot.getValue() * kLengthPerVolt;
+      // read pot to get length
+      m_pot_length = POT_LENGTH_min + anglePot.getValue() * kInchPerVolt;
       double l2 = m_pot_length * m_pot_length;
-      m_angle = Math.toRadians(Math.acos(b2c2_bc - l2 / bc));
+      m_angle_LOC = Math.toRadians(Math.acos(b2c2_bc - l2 / bc_2));
+
+      //linear estimate should be good enought based on spreadsheet 
+      m_anglePot = kDegPerVolt * anglePot.getValue();
 
       // nw calc the angle based on the motor lenght
-      double motor_l = angleEncoder.getPosition() * kMotorInchPerCount;
+      double motor_l = STRAP_LENGTH_min + angleEncoder.getPosition() * kInchPerMotorRev;
       l2 = motor_l * motor_l;
-      m_angleMotor = Math.toRadians(Math.acos(b2c2_bc - l2 / bc));
+      m_angleMotor = Math.toRadians(Math.acos(m_b2c2_2bc - l2 /m_bc2));
+
+      // use pot to give angle in robot frame
+      m_angle = m_anglePot + (MAG_ANGLE_OFFSET - POT_OFFSET_E);
+
+      //measure strap speed
+      m_strapSpeed = angleEncoder.getVelocity()*(kInchPerMotorRev/60.0);
+
+      safety();
     }
 
     double getPotAngle() {
@@ -126,14 +184,59 @@ public class Magazine_Subsystem extends SubsystemBase {
       return m_angleMotor;
     }
 
-    double getAngle() {
+    /**
+     * gets Magazine angle in robot coordinates
+     * @return
+     */
+    public double get() {
       return m_angle;
     }
 
-    public void setAngle(double degrees) {
-      double deg = MathUtil.limit(degrees, MAG_MIN_ANGLE, MAG_MAX_ANGLE);
-      m_lengthSetpoint = Math.sqrt(b2 + c2 - bc * Math.cos(Math.toRadians(deg)));
-      anglePID.setReference(m_lengthSetpoint, ControlType.kPosition, kpidSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+    public void setAngle(double magDeg) {
+      magDeg = MathUtil.limit(magDeg, MIN_ANGLE, MAX_ANGLE);
+      double strap_deg = magDeg - (MAG_ANGLE_OFFSET - STRAP_OFFSET_E);
+      m_lengthSetpoint = Math.sqrt(m_b2 + m_c2 - m_bc2 * Math.cos(Math.toRadians(strap_deg)));
+      double setpoint = (m_lengthSetpoint - STRAP_LENGTH_min)*kRevPerInch;
+      
+      // unlock the gear, it gets re-locked when at setpoint
+      unlock();
+      anglePID.setReference(setpoint, ControlType.kPosition, kpidSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+    }
+
+    /**
+     * use velocity control to wind motor
+     * @param speed  RPM of takeup pully
+     */
+    public void wind(double pully_rpm) {
+      pully_rpm = MathUtil.limit(pully_rpm, 0.0, kMaxRPM);
+      double motor_speed = kGearRatio*pully_rpm;
+      unlock();
+      anglePID.setReference(motor_speed, ControlType.kVelocity, kpidSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+      
+    }
+
+    public void stop() {
+      angleMotor.stopMotor();
+      m_angleSetpoint = m_angle;  //force no error between current angle and setpoint
+      lock();
+    }
+
+    public boolean isAtBottom() {
+      return (m_angle <= MIN_ANGLE)  ?  true : false;
+    }
+    
+    public boolean isAtTop() {
+      return (m_angle >= MAX_ANGLE)  ?  true : false;
+    }
+    
+    public boolean isAtSetpoint() {
+      return (Math.abs(m_angle - m_angleSetpoint) < kToleranceDeg)  ? true : false;     
+    }
+
+    //checks to make sure we don't do stupid
+    void safety() {
+      //not sure what stupid is yet
+      //maybe a current check for being against the stop?
     }
 
     /**
@@ -150,8 +253,12 @@ public class Magazine_Subsystem extends SubsystemBase {
     public boolean isLocked() {
       return (magSolenoid.get() == Value.kForward);
     }
-  } // MagazinePosition
 
+    public boolean isMoving() {
+      return (Math.abs(m_strapSpeed) > kMinVelZeroTol) ? true : false;
+    }
+
+  } // MagazinePositioner
   /**
    * 
    */
@@ -164,7 +271,7 @@ public class Magazine_Subsystem extends SubsystemBase {
 
   // Intake and Mag must talk, keep a reference
   Intake_Subsystem intake;
-  MagazinePosition magPostion;
+  MagazinePositioner positioner;
 
   // measurements update in periodic()
   int m_pcCount = 0;
@@ -172,7 +279,7 @@ public class Magazine_Subsystem extends SubsystemBase {
   /** Creates a new Magazine_subsystem. */
   public Magazine_Subsystem(Intake_Subsystem intake) {
     this.intake = intake;
-    this.magPostion = new MagazinePosition();
+    this.positioner = new MagazinePositioner();
 
     // fill out dashboard stuff
     SendableRegistry.setSubsystem(this, "Magazine");
@@ -200,15 +307,16 @@ public class Magazine_Subsystem extends SubsystemBase {
       intake.lowerIntake();
     }
     // start moving the mag to the desired angle
-    magPostion.setAngle(MAG_MAX_ANGLE);
+    positioner.setAngle(MAX_ANGLE);
   }
 
   public void lower() {
-    magPostion.setAngle(MAG_MIN_ANGLE);
+    positioner.setAngle(MIN_ANGLE);
   }
 
+  //TODO: remove this function
   public boolean isUp() {
-    return (magPostion.getAngle() > MAG_UP_ANGLE) ? true : false;
+    return (positioner.get() > UP_ANGLE) ? true : false;
   }
 
   /**
@@ -244,7 +352,13 @@ public class Magazine_Subsystem extends SubsystemBase {
   }
 
   public double getAngle() {
-    return magPostion.getAngle();
+    return positioner.get();
   }
+
+  public MagazinePositioner getMagPositioner() {
+    return positioner;
+  }
+
+
 
 }

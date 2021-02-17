@@ -75,10 +75,13 @@ public final class Constants {
       public static final int MAGAZINE_ANGLE = 0;
     }
 
+    //Pnumatics control 2 -
+    public static final class PCM2 {
+      public static final int MAG_LOCK = 0;
+      public static final int MAG_UNLOCK = 1;
+    }
+
     // Intake
-    public static final int MAGAZINE_PCM_CAN_ID = CAN.PCM2;
-    public static final int MAGAZINE_LOCK_PCM = 0;
-    public static final int MAGAZINE_UNLOCK_PCM = 1;
     public static final int INTAKE_PCM_CAN_ID = CAN.PCM1;
     public static final int INTAKE_UP_SOLENOID_PCM = 4;
     public static final int INTAKE_DOWN_SOLENOID_PCM = 5;
@@ -88,12 +91,6 @@ public final class Constants {
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
 
-    // Climber
-    public static final int CLIMBER_PCM_CAN_ID = CAN.PCM2;
-    public static final int ARMSOLENOID_LOW_CANID = 0;
-    public static final int ARMSOLENOID_HIGH_CANID = 1;
-    public static final int WN_SPARKMAX_CANID = 16; // Winch Motor
-    public static final int CLIMB_ARM_TALON_CANID = 99; // rotate arm
 
     // Control Panel Manipulator
     public static final int PANEL_LIMIT_SWITCH_CH = 0;
@@ -227,7 +224,7 @@ public final class Constants {
         upperFWConfig.inverted = false;
         upperFWConfig.flywheelRadius = 2.0 / 12.0; // feet
         upperFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0); // kP kI kD kFF
-        upperFWConfig.Izone = 1800;
+        upperFWConfig.pid.setIzone(1800);
       }
 
       public static FlyWheelConfig lowerFWConfig = new FlyWheelConfig();
@@ -238,7 +235,7 @@ public final class Constants {
         lowerFWConfig.inverted = true; 
         lowerFWConfig.flywheelRadius = 1.25 / 12.0;   //feet 
         lowerFWConfig.pid = new PIDFController(0.08, 0.00015, 4.0, 0);   // kP kI kD kF 
-        lowerFWConfig.Izone = 1800;
+        lowerFWConfig.pid.setIzone(1800);
       }
 
     }

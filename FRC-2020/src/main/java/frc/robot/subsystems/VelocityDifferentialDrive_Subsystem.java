@@ -49,7 +49,6 @@ import frc.robot.subsystems.ifx.Shifter.Gear;
 import frc.robot.subsystems.ifx.VelocityDrive;
 import frc.robot.subsystems.ifx.VoltageDrive;
 import frc.robot.util.misc.MathUtil;
-import frc.robot.util.misc.PIDFController;
 
 public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     implements Logger, DualDrive, VelocityDrive, VoltageDrive, DashboardUpdate {
@@ -225,8 +224,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     frontLeft.follow(leftController);
 
     // configure lead controller's pid
-    configurePID(leftPID, DriveTrain.pidValues);
-    configurePID(rightPID, DriveTrain.pidValues);
+    DriveTrain.pidValues.copyTo(leftPID, KpidSlot);
+    DriveTrain.pidValues.copyTo(rightPID, KpidSlot);
 
     // zero adjust will set the default limits for accel and currents
     adjustAccelerationLimit(0.0);
@@ -524,15 +523,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
      * SmartDashboard.putString("Current Gear",
      * gearbox.getCurrentGear().toString());
      */
-  }
-
-  void configurePID(CANPIDController hwpid, PIDFController pidf) {
-    // set PID coefficients
-    hwpid.setP(pidf.getP(), KpidSlot);
-    hwpid.setI(pidf.getI(), KpidSlot);
-    hwpid.setD(pidf.getD(), KpidSlot);
-    hwpid.setIZone(0.0, KpidSlot);
-    hwpid.setFF(pidf.getF(), KpidSlot);
   }
 
   /**

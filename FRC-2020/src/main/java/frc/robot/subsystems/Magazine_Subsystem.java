@@ -88,8 +88,8 @@ public class Magazine_Subsystem extends SubsystemBase {
     final int kVelSlot = 1;
 
     //pid values for motor P, I, D, F
-    PIDFController posPIDvalues = new PIDFController(0.1, 0.0, 0.0, 0.0);
-    PIDFController velPIDvalues = new PIDFController(0.1, 0.0, 0.0, 0.0);
+    PIDFController posPIDvalues = new PIDFController(0.1, 0.0, 1.0, 0.0);
+    PIDFController velPIDvalues = new PIDFController(5e-5, 0.0, 0.0, 0.000015);
     {
        posPIDvalues.setIzone(0.0); 
        velPIDvalues.setIzone(0.0);

@@ -43,12 +43,12 @@ public class Magazine_Subsystem extends SubsystemBase {
   static final double MAG_ANGLE_OFFSET = 28.07; //degrees - rotation due to frame
 
   // arm lengths for linear pot anchor points
-  static final double POT_UPPER_LEN = 18.283; // inch
+  static final double POT_UPPER_LEN = 18.783; // inch
   static final double POT_LOWER_LEN = 18.18;  // inch
   static final double POT_OFFSET_E = 15.67;   //degres - off set from pot angle base
 
   // Strap / motor lengths - includes pully
-  static final double STRAP_UPPER_LEN = 23.183;  // inch
+  static final double STRAP_UPPER_LEN = 22.183;  // inch
   static final double STRAP_LOWER_LEN = 20.22;   // inch
   static final double STRAP_OFFSET_E = 19.99;    //degres - off set from pot angle base
 
@@ -57,7 +57,8 @@ public class Magazine_Subsystem extends SubsystemBase {
   static final double m_c2 = STRAP_UPPER_LEN * STRAP_UPPER_LEN;
   static final double m_bc2 = 2.0*STRAP_UPPER_LEN * STRAP_LOWER_LEN;
   static final double m_b2c2_2bc = (m_b2 + m_c2) / (m_bc2);
-  final double STRAP_LENGTH_min = Math.sqrt(m_b2 + m_c2 - m_bc2 * Math.cos(Math.toRadians(MIN_ANGLE)));
+  static final double STRAP_LENGTH_min = Math.sqrt(m_b2 + m_c2 - m_bc2 * 
+      Math.cos(Math.toRadians(MIN_ANGLE - (MAG_ANGLE_OFFSET - STRAP_OFFSET_E) )));
 
   /**
    * MagazinePositioner_Subsystem
@@ -68,11 +69,11 @@ public class Magazine_Subsystem extends SubsystemBase {
   public class MagazinePositioner extends SubsystemBase {
     // sparkmax config
     private final boolean kInverted = false;
-    private final IdleMode kIdlemode = IdleMode.kBrake;
+    private final IdleMode kIdlemode = IdleMode.kCoast;
     private final int kpidSlot = 0;
 
     //pid values for motor P, I, D, F
-    PIDFController pidvalues = new PIDFController(0.1, 1e-5, 1.0, 0.0);
+    PIDFController pidvalues = new PIDFController(0.1, 0.0, 0.0, 0.0);
     {pidvalues.setIzone(0.0); }
   
     // the FFHoldVolts might be useful to balance the shocks
@@ -105,10 +106,10 @@ public class Magazine_Subsystem extends SubsystemBase {
     static final double c2 = POT_UPPER_LEN * POT_UPPER_LEN;
     static final double bc_2 = 2.0*POT_UPPER_LEN * POT_LOWER_LEN;
     static final double b2c2_bc = (b2 + c2) / (bc_2);
-    final double POT_LENGTH_min = Math.sqrt(b2 + c2 - bc_2 * Math.cos(Math.toRadians(MIN_ANGLE)));
-    final double POT_LENGTH_max = Math.sqrt(b2 + c2 - bc_2 * Math.cos(Math.toRadians(MAX_ANGLE)));
+    final double POT_LENGTH_min = Math.sqrt(b2 + c2 - bc_2 * Math.cos(Math.toRadians(MIN_ANGLE - (MAG_ANGLE_OFFSET - POT_OFFSET_E) )));
+    final double POT_LENGTH_max = Math.sqrt(b2 + c2 - bc_2 * Math.cos(Math.toRadians(MAX_ANGLE - (MAG_ANGLE_OFFSET - POT_OFFSET_E))));
     final double kInchPerVolt = (POT_LENGTH_max - POT_LENGTH_min) / (VatMax - VatMin);
-    final double kDegPerVolt = ((MAX_ANGLE - MIN_ANGLE)/(VatMax - VatMin));
+    final double kDegPerVolt = ((42.6 - 9.6 /*MAX_ANGLE - MIN_ANGLE*/)/(VatMax - VatMin));
 
     // postion control devices
     final CANSparkMax angleMotor = new CANSparkMax(CAN.MAG_SMAX, MotorType.kBrushless);
@@ -140,8 +141,10 @@ public class Magazine_Subsystem extends SubsystemBase {
       //copy the sw pidvalues to the hardware
       pidvalues.copyTo(anglePID, kpidSlot);
       angleMotor.burnFlash();
-
-      stop();
+      angleEncoder.setPosition(0.0);
+     
+      stop();  //this locks
+      unlock();
     }
 
     public void addDashboardWidgets(ShuffleboardLayout layout) {
@@ -155,12 +158,13 @@ public class Magazine_Subsystem extends SubsystemBase {
     @Override
     public void periodic() {
       // read pot to get length
-      m_pot_length = POT_LENGTH_min + anglePot.getValue() * kInchPerVolt;
+      double apv =anglePot.getAverageVoltage();
+      m_pot_length = POT_LENGTH_min + apv * kInchPerVolt;
       double l2 = m_pot_length * m_pot_length;
       m_angle_LOC = Math.toRadians(Math.acos(b2c2_bc - l2 / bc_2));
 
       //linear estimate should be good enought based on spreadsheet 
-      m_anglePot = kDegPerVolt * anglePot.getValue();
+      m_anglePot = kDegPerVolt * apv;
 
       // nw calc the angle based on the motor lenght
       double motor_l = STRAP_LENGTH_min + angleEncoder.getPosition() * kInchPerMotorRev;
@@ -208,7 +212,7 @@ public class Magazine_Subsystem extends SubsystemBase {
      * @param speed  RPM of takeup pully
      */
     public void wind(double pully_rpm) {
-      pully_rpm = MathUtil.limit(pully_rpm, 0.0, kMaxRPM);
+      pully_rpm = MathUtil.limit(pully_rpm,-kMaxRPM, kMaxRPM);
       double motor_speed = kGearRatio*pully_rpm;
       unlock();
       anglePID.setReference(motor_speed, ControlType.kVelocity, kpidSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);

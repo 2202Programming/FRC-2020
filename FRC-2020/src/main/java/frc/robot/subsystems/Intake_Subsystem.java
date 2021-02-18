@@ -177,8 +177,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     VelToRPM.set(1, 1, 1.0 / Shooter.upperFWConfig.flywheelRadius);
     VelToRPM.times(0.5);  // common factor 1/2
 
-    magazine.lower(); // must start in down positon
-    raiseIntake();    // must start in the up position
+    //TODO: fix magazine.lower(); // must start in down positon
+   ///dpl shop debug raiseIntake();    // must start in the up position
+   lowerIntake(); //dpl shop debug
   }
 
   @Override

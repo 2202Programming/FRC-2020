@@ -27,6 +27,7 @@ import frc.robot.commands.intake.MagazineAdjust;
 import frc.robot.commands.intake.MagazineCaptureCmd;
 import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
+import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.commands.test.subsystem.MagazineManualWind_test;
 import frc.robot.commands.test.subsystem.MagazineToggleLock_test;
 import frc.robot.subsystems.GearShifter;
@@ -134,12 +135,13 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineAdjust(mag, true, 0.4), true);
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
     //dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineRaiseLowerCmd(mag));
-    //dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new ToggleIntakeRaised(intake));
+    dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new ToggleIntakeRaised(intake));
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
 
     //testing
+    dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 5.0));
+    dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -5.0));
     dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineToggleLock_test(intake));
-    dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new MagazineManualWind_test(intake, 5.0));
   }
 
   /**

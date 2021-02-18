@@ -22,7 +22,6 @@ public class MagazineToggleLock_test extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (magPositioner.isLocked()) magPositioner.unlock();
-    else magPositioner.lock();
+    magPositioner.unlock();
   }
 }

@@ -141,7 +141,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       pidvalues.copyTo(anglePID, kpidSlot);
       angleMotor.burnFlash();
 
-      // read
+      stop();
     }
 
     public void addDashboardWidgets(ShuffleboardLayout layout) {

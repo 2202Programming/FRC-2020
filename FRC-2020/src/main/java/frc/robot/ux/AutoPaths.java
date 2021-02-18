@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -29,6 +31,7 @@ public class AutoPaths {
   
   // what we find
   SendableChooser<Trajectory> pathChooser = new SendableChooser<>();
+  Map<String, Trajectory> m_map = new LinkedHashMap<>();
 
   public AutoPaths(ShuffleboardTab tab) {
 
@@ -69,8 +72,9 @@ public class AutoPaths {
     String key = fn.toString().split("\\.")[0]; 
     Trajectory traj = loadTrajectory(fn.toString());
     pathChooser.addOption(key, traj);
-
-
+    
+    // keep a map so we can access any path we need
+    m_map.put(key, traj);
   }
 
   Trajectory loadTrajectory(String filename) {
@@ -82,4 +86,9 @@ public class AutoPaths {
     }
     return null;
   }
+
+  public Trajectory get(String trajName) {
+    return m_map.get(trajName);
+  }
+
 }

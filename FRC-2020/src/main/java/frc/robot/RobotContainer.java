@@ -10,6 +10,7 @@ package frc.robot;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriverPrefs;
@@ -126,7 +127,7 @@ public class RobotContainer {
 
     //auto path testing
     //dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getPath()));
-    dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getPath()));
+    dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
     // Assistant's buttons
@@ -203,6 +204,17 @@ public class RobotContainer {
       return dashboard.getDriverPreferences();
     }
     return null;
+    }
+    /**
+     * getTrajectory
+     * 
+     * Any trajectory file in the paths folder is loaded at powerup to save time.
+     * This method will re
+     * 
+     * @param trajName
+     * @return loaded trajectory object
+     */
+  public Trajectory getTrajectory(String trajName) { 
+    return dashboard.getTrajectory(trajName); 
   }
-
 }

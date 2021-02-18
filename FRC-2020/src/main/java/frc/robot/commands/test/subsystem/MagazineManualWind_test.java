@@ -28,21 +28,25 @@ public class MagazineManualWind_test extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
-
+    // work done on init...
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    magPositioner.stop(false); // leave unlocked for testing
+
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (magPositioner.isAtBottom() || magPositioner.isAtTop()) {
+   /* Let this command run while a button is held
+   if (magPositioner.isAtBottom() || magPositioner.isAtTop()) {
       magPositioner.stop();
       return true;
     }
+    */
     return false;
   }
 }

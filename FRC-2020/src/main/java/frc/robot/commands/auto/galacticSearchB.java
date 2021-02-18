@@ -20,7 +20,7 @@ public class galacticSearchB extends SequentialCommandGroup {
     try {
       Path startPath = Filesystem.getDeployDirectory().toPath().resolve(start);
       Trajectory startTraj = TrajectoryUtil.fromPathweaverJson(startPath);
-      CommandBase cmd = new followPath(drive, startTraj);
+      CommandBase cmd = new followTrajectory(drive, startTraj);
       addCommands(cmd);
       while (!cmd.isFinished()) {}
     } catch (IOException ex) {
@@ -36,7 +36,7 @@ public class galacticSearchB extends SequentialCommandGroup {
     try {
       Path choosenPath = Filesystem.getDeployDirectory().toPath().resolve(choosen);
       Trajectory choosenTraj = TrajectoryUtil.fromPathweaverJson(choosenPath);
-      new followPath(drive, choosenTraj);
+      new followTrajectory(drive, choosenTraj);
     } catch (IOException ex) {
       DriverStation.reportError("Unable to open trajectory: " + choosen, ex.getStackTrace());
     }

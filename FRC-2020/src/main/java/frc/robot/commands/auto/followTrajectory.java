@@ -2,13 +2,15 @@ package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.subsystems.ifx.VelocityDrive;
 
-public class followPath extends CommandBase {
+public class followTrajectory extends CommandBase {
   final VelocityDrive drive;
+  SendableChooser<Trajectory> chooser = null;
 
   //
   Trajectory trajectory;
@@ -21,9 +23,18 @@ public class followPath extends CommandBase {
   double zeta = 0.7;
 
   /** Creates a new followTrajectory. */
-  public followPath(VelocityDrive drive, Trajectory trajectory) {
+  public followTrajectory(VelocityDrive drive, Trajectory trajectory) {
     this.drive = drive;
     this.trajectory = trajectory;
+
+    kinematics = this.drive.getDriveKinematics();
+    addRequirements(drive);
+  }
+
+  /** Creates a new followTrajectory. */
+  public followTrajectory(VelocityDrive drive, SendableChooser<Trajectory> chooser) {
+    this.drive = drive;
+    this.chooser = chooser;
 
     kinematics = this.drive.getDriveKinematics();
     addRequirements(drive);
@@ -32,6 +43,10 @@ public class followPath extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    // pull a trajectory from the chooser if possible
+    if ((trajectory == null) && (chooser != null)) {
+      trajectory = chooser.getSelected();
+    }
     if (trajectory != null) {
       // Reset odometry to the starting pose of the trajectory.
       drive.resetOdometry(trajectory.getInitialPose());

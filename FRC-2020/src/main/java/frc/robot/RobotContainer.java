@@ -13,6 +13,7 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.toggleLED;
@@ -30,7 +31,6 @@ import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
 import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.commands.test.subsystem.MagazineManualWind_test;
-import frc.robot.commands.test.subsystem.MagazineToggleLock_test;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -142,7 +142,11 @@ public class RobotContainer {
     //testing
     dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 5.0));
     dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -5.0));
-    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineToggleLock_test(intake));
+    var magPos = intake.getMagazine().getMagPositioner();
+    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new InstantCommand( magPos::unlock)
+        .andThen( () ->  magPos.setAngle(30.0)) )
+        .whenReleased( () -> magPos.stop(false));
+        
   }
 
   /**

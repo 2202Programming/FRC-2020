@@ -82,13 +82,18 @@ public class Magazine_Subsystem extends SubsystemBase {
    */
   public class MagazinePositioner extends SubsystemBase {
     // sparkmax config
-    private final boolean kInverted = false;
-    private final IdleMode kIdlemode = IdleMode.kCoast;
-    private final int kpidSlot = 0;
+    final boolean kInverted = false;
+    final IdleMode kIdlemode = IdleMode.kCoast;
+    final int kPosSlot = 0;
+    final int kVelSlot = 1;
 
     //pid values for motor P, I, D, F
-    PIDFController pidvalues = new PIDFController(0.1, 0.0, 0.0, 0.0);
-    {pidvalues.setIzone(0.0); }
+    PIDFController posPIDvalues = new PIDFController(0.1, 0.0, 0.0, 0.0);
+    PIDFController velPIDvalues = new PIDFController(0.1, 0.0, 0.0, 0.0);
+    {
+       posPIDvalues.setIzone(0.0); 
+       velPIDvalues.setIzone(0.0);
+    }
   
     // the FFHoldVolts might be useful to balance the shocks
     private double kArbFFHoldVolts = 0.0;
@@ -140,7 +145,8 @@ public class Magazine_Subsystem extends SubsystemBase {
       angleMotor.setIdleMode(kIdlemode);
      
       //copy the sw pidvalues to the hardware
-      pidvalues.copyTo(anglePID, kpidSlot);
+      posPIDvalues.copyTo(anglePID, kPosSlot);
+      velPIDvalues.copyTo(anglePID, kVelSlot);
       angleMotor.burnFlash();
       angleEncoder.setPosition(0.0);
 
@@ -212,14 +218,20 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
 
     public void setAngle(double magDeg) {
+      //limit range and save our current setpoint
       magDeg = MathUtil.limit(magDeg, MIN_ANGLE, MAX_ANGLE);
-      double strap_deg = magDeg - (MAG_ANGLE_OFFSET - STRAP_OFFSET_E);
-     // m_lengthSetpoint = Math.sqrt(m_b2 + m_c2 - m_bc2 * Math.cos(Math.toRadians(strap_deg)));
-      double setpoint = (m_lengthSetpoint - STRAP_LENGTH_MIN)*kRevPerInch;
+      m_angleSetpoint = magDeg;
+
+      //figure out desired motor strap length
+      double strap_deg = magDeg - STRAP_OFFSET_ANGLE;
+      m_lengthSetpoint = lawOfCosineLength(STRAP_LOWER_LEN, STRAP_UPPER_LEN, strap_deg);
+
+      //calculate motor postion in revs from our calibration positon
+      double setpoint = (m_lengthSetpoint - m_strap_zero)*kRevPerInch;
       
       // unlock the gear, it gets re-locked when at setpoint
       unlock();
-      anglePID.setReference(setpoint, ControlType.kPosition, kpidSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+      anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
     }
 
     /**
@@ -230,8 +242,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       pully_rpm = MathUtil.limit(pully_rpm,-kMaxRPM, kMaxRPM);
       double motor_speed = kGearRatio*pully_rpm;
       unlock();
-      anglePID.setReference(motor_speed, ControlType.kVelocity, kpidSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
-      
+      anglePID.setReference(motor_speed, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage); 
     }
 
     /**

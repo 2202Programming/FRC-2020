@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANEncoder;
+import com.revrobotics.CANError;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
@@ -83,15 +84,15 @@ public class Magazine_Subsystem extends SubsystemBase {
   public class MagazinePositioner extends SubsystemBase {
     // sparkmax config
     final boolean kInverted = false;
-    final IdleMode kIdlemode = IdleMode.kCoast;
+    final IdleMode kIdlemode = IdleMode.kBrake;
     final int kPosSlot = 0;
     final int kVelSlot = 1;
 
     //pid values for motor P, I, D, F
-    PIDFController posPIDvalues = new PIDFController(0.1, 0.0, 1.0, 0.0);
-    PIDFController velPIDvalues = new PIDFController(5e-5, 0.0, 0.0, 0.000015);
+    PIDFController posPIDvalues = new PIDFController(0.1, 0.001, 0.1, 0.0);
+    PIDFController velPIDvalues = new PIDFController(0.00002, 1e-7, 0.0, 0.0021);
     {
-       posPIDvalues.setIzone(0.0); 
+       posPIDvalues.setIzone(5.0); 
        velPIDvalues.setIzone(0.0);
     }
   
@@ -108,7 +109,7 @@ public class Magazine_Subsystem extends SubsystemBase {
 
     // Pot Volts measured at top & bottom position
     static final double VatMin = 0.650; // volts at 22 degrees (min mag angle)
-    static final double VatMax = 3.707; // volts at 55 degrees (max mag angle)
+    static final double VatMax = 3.7438; // volts at 55 degrees (max mag angle)
 
     static final double kToleranceDeg = 0.1;
 
@@ -129,6 +130,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     double m_anglePot = 0.0;     // mag angle using cosine and pot lenght
     double m_angleMotor = 0.0;   // mag angle using cosin and motor position
     double m_strapSpeed = 0.0;   // inches/s
+    double m_encPos =0.0;
     
     double m_strap_zero=0.0;   // for motor lenght calc
 
@@ -162,6 +164,9 @@ public class Magazine_Subsystem extends SubsystemBase {
       layout.addNumber("MAGPos/Strap_Speed", () -> m_strapSpeed);
       layout.addNumber("MAGPos/pot_len", () -> m_pot_length);
       layout.addNumber("MAGPos/angle_mo", () -> m_angleMotor);
+      layout.addNumber("MAGPos/encoder", () -> m_encPos);
+      
+
     }
 
 
@@ -178,7 +183,8 @@ public class Magazine_Subsystem extends SubsystemBase {
       m_angle = (apv - VatMin) * kDegPerVolt + MIN_ANGLE;
       
       // nw calc the angle based on the motor length
-      double motor_l = m_strap_zero + angleEncoder.getPosition() * kInchPerMotorRev;
+      m_encPos =  angleEncoder.getPosition();
+      double motor_l = m_strap_zero + m_encPos* kInchPerMotorRev;
       m_angleMotor = lawOfCosineAngle(STRAP_LOWER_LEN, STRAP_UPPER_LEN, motor_l) + STRAP_OFFSET_ANGLE;
     
      //measure strap speed
@@ -187,7 +193,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       safety();
     }
 
-    void calibrate() {
+    public void calibrate() {
       // use POT angle to calculate strap length
       double potang = lawOfCosineAngle(POT_LOWER_LEN, POT_UPPER_LEN, m_pot_length);
       double strapang = potang + (POT_OFFSET_ANGLE - STRAP_OFFSET_ANGLE);  //
@@ -231,7 +237,8 @@ public class Magazine_Subsystem extends SubsystemBase {
       
       // unlock the gear, it gets re-locked when at setpoint
       unlock();
-      anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+      CANError err = anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot);//, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+      if (err != CANError.kOk) System.out.println("SMARTMAX CAN ERROR in MAG POSITION"+ err);
     }
 
     /**
@@ -277,6 +284,13 @@ public class Magazine_Subsystem extends SubsystemBase {
     void safety() {
       //not sure what stupid is yet
       //maybe a current check for being against the stop?
+
+      // if we get outside the range, recalibrate against the pot.  
+      if ((m_angleMotor > MAX_ANGLE +0.50)  || (m_angleMotor < MIN_ANGLE - 0.5)) {
+        calibrate();
+      }
+        
+
     }
 
     /**

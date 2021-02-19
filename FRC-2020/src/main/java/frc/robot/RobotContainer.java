@@ -140,12 +140,14 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
 
     //testing
-    dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 5.0));
-    dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -5.0));
+    dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 15.0));
+    dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -15.0));
     var magPos = intake.getMagazine().getMagPositioner();
     dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new InstantCommand( magPos::unlock)
         .andThen( () ->  magPos.setAngle(30.0)) )
         .whenReleased( () -> magPos.stop(false));
+
+    dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand(magPos::calibrate));
         
   }
 

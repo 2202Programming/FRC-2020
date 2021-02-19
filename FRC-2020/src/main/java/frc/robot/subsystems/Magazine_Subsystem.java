@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.DT;
+
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANError;
 import com.revrobotics.CANPIDController;
@@ -34,6 +36,9 @@ public class Magazine_Subsystem extends SubsystemBase {
   static final double MIN_ANGLE = 22.0;
   static final double UP_ANGLE = 29.0; // Above this, mag is up and may interfere with intake
   static final double MAX_ANGLE = 55.0;
+
+  static final double MAX_SOFT_STOP = 50;
+  static final double MIN_SOFT_STOP = 25;
 
   /**
    * See this doc for calcs and numbers
@@ -78,17 +83,18 @@ public class Magazine_Subsystem extends SubsystemBase {
   /**
    * MagazinePositioner_Subsystem
    * 
-   * Setup so it can run its own commands.
+   * By exposing the positioner as a subsystem it can be
+   * be given it's own commands.
    * 
    */
   public class MagazinePositioner extends SubsystemBase {
     // sparkmax config
     final boolean kInverted = false;
-    final IdleMode kIdlemode = IdleMode.kBrake;
     final int kPosSlot = 0;
     final int kVelSlot = 1;
 
-    //pid values for motor P, I, D, F
+    // we use velocity and positon modes, so two sets of PIDF values
+    //pid values for motor P, I, D, F 
     PIDFController posPIDvalues = new PIDFController(0.1, 0.001, 0.1, 0.0);
     PIDFController velPIDvalues = new PIDFController(0.00002, 1e-7, 0.0, 0.0021);
     {
@@ -111,7 +117,11 @@ public class Magazine_Subsystem extends SubsystemBase {
     static final double VatMin = 0.650; // volts at 22 degrees (min mag angle)
     static final double VatMax = 3.7438; // volts at 55 degrees (max mag angle)
 
-    static final double kToleranceDeg = 0.1;
+    static final double kToleranceDeg = 0.2;
+    
+    // track encoder postion min/max - debugging
+    double  min_encoder_pos;
+    double  max_encoder_pos;
 
     // scale factors for yo-yo pot
     final double kInchPerVolt = (POT_LENGTH_MAX - POT_LENGTH_MIN) / (VatMax - VatMin);
@@ -122,18 +132,20 @@ public class Magazine_Subsystem extends SubsystemBase {
     final CANEncoder angleEncoder = angleMotor.getEncoder();
     final CANPIDController anglePID = angleMotor.getPIDController();
     final AnalogInput anglePot = new AnalogInput(AnalogIn.MAGAZINE_ANGLE);
-    final DoubleSolenoid magSolenoid = new DoubleSolenoid(CAN.PCM2, PCM2.MAG_LOCK, PCM2.MAG_UNLOCK);
+    final DoubleSolenoid solenoid = new DoubleSolenoid(CAN.PCM2, PCM2.MAG_LOCK, PCM2.MAG_UNLOCK);
   
     // measurements
-    double m_angle;              // mag angle robot frame (22 - 55)
-    double m_pot_length;         // used to check measurements 
-    double m_anglePot = 0.0;     // mag angle using cosine and pot lenght
-    double m_angleMotor = 0.0;   // mag angle using cosin and motor position
-    double m_strapSpeed = 0.0;   // inches/s
-    double m_encPos =0.0;
+    double m_angle_linear = 0.0;    // mag angle linear estimate from pot
+    double m_length_pot = 0.0;      // used to check measurements
+    double m_length_pot_prev = 0.0; // used to measure speed
+    double m_speed_pot = 0.0;       // dl/dt based on pot <unfiltered>
+    double m_length_motor = 0.0;    // used to check measurements 
+    double m_angle_pot = 0.0;       // mag angle using cosine and pot length
+    double m_angle_motor = 0.0;     // mag angle using cosin and motor position
+    double m_strap_speed = 0.0;     // inches/s
+    double m_enc_pos = 0.0;         // raw 
+    double m_strap_zero = 0.0;      // zero point for calibration
     
-    double m_strap_zero=0.0;   // for motor lenght calc
-
     // setpoint values, used in periodic()
     double m_lengthSetpoint; // inches  <calculated from angleSetpoint>
     double m_angleSetpoint;  // degrees <input>
@@ -144,7 +156,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       // configure sparkmax motor
       angleMotor.restoreFactoryDefaults(false);
       angleMotor.setInverted(kInverted);
-      angleMotor.setIdleMode(kIdlemode);
+      angleMotor.setIdleMode(IdleMode.kBrake);
      
       //copy the sw pidvalues to the hardware
       posPIDvalues.copyTo(anglePID, kPosSlot);
@@ -154,65 +166,74 @@ public class Magazine_Subsystem extends SubsystemBase {
 
       //call periodic to read our values and calibrate
       periodic();
-      calibrate();  // set motor encoder to zero and star
-     
-      stop(false);  // don't lock us
+      calibrate();      // set motor encoder to zero and star
+      zeroPower(true);  // relase any holding, lock gear so mag stays in place
     }
 
     public void addDashboardWidgets(ShuffleboardLayout layout) {
-      layout.addNumber("MAGPos/angle", () -> m_angle).withSize(2, 5);
-      layout.addNumber("MAGPos/Strap_Speed", () -> m_strapSpeed);
-      layout.addNumber("MAGPos/pot_len", () -> m_pot_length);
-      layout.addNumber("MAGPos/angle_mo", () -> m_angleMotor);
-      layout.addNumber("MAGPos/encoder", () -> m_encPos);
-      
-
+      layout.addNumber("MAGPos/angle_lin", () -> m_angle_linear).withSize(2, 5);
+      layout.addNumber("MAGPos/angle_pot", () -> m_angle_pot); 
+      layout.addNumber("MAGPos/angle_mot", () -> m_angle_motor); 
+      layout.addNumber("MAGPos/len_pot",   () -> m_length_pot);
+      layout.addNumber("MAGPos/len_strap", () -> m_length_motor );
+      layout.addNumber("MAGPos/encoder",   () -> m_enc_pos);
     }
 
 
     @Override
     public void periodic() {
-      // read pot to get length
-      double apv =anglePot.getAverageVoltage();
-      m_pot_length =  (apv - VatMin) * kInchPerVolt + POT_LENGTH_MIN;
+      m_length_pot_prev = m_length_pot;
 
-      // do it the hard way for testing, robot coords
-      m_anglePot = lawOfCosineAngle(POT_LOWER_LEN, POT_UPPER_LEN, m_pot_length) + POT_OFFSET_ANGLE;
+      // read pot to get length of pot, then calculate the angle based on potentiometer 
+      double apv =anglePot.getAverageVoltage();
+      m_length_pot =  (apv - VatMin) * kInchPerVolt + POT_LENGTH_MIN;
+      m_angle_pot = lawOfCosineAngle(POT_LOWER_LEN, POT_UPPER_LEN, m_length_pot) + POT_OFFSET_ANGLE;
       
       // use linear estimate should be good enough based on spreadsheet 
-      m_angle = (apv - VatMin) * kDegPerVolt + MIN_ANGLE;
+      m_angle_linear = (apv - VatMin) * kDegPerVolt + MIN_ANGLE;
       
       // nw calc the angle based on the motor length
-      m_encPos =  angleEncoder.getPosition();
-      double motor_l = m_strap_zero + m_encPos* kInchPerMotorRev;
-      m_angleMotor = lawOfCosineAngle(STRAP_LOWER_LEN, STRAP_UPPER_LEN, motor_l) + STRAP_OFFSET_ANGLE;
+      m_enc_pos =  angleEncoder.getPosition();
+      m_length_motor = m_strap_zero + m_enc_pos* kInchPerMotorRev;
+      m_angle_motor = lawOfCosineAngle(STRAP_LOWER_LEN, STRAP_UPPER_LEN, m_length_motor) + STRAP_OFFSET_ANGLE;
     
-     //measure strap speed
-      m_strapSpeed = angleEncoder.getVelocity()*(kInchPerMotorRev/60.0);
+      //measure strap speed
+      m_strap_speed = angleEncoder.getVelocity()*(kInchPerMotorRev/60.0);
 
+      // estimate pot speed inch/s
+      m_speed_pot = (m_length_pot_prev - m_length_pot) / DT;
       safety();
     }
 
+    /**
+     * calibrate() - uses the pot_length and sets the motor_stap zero position
+     *  to the current point.  The strap must not have slack for this to work as 
+     *  expected. If the motor angle estimate and the pot angle estimate differ
+     *  by too much, this function should get called again.
+     *   
+     *  If that is happening, the geometry measurements are off somewhere.
+     * 
+     * State variable used:
+     *    m_pot_lenght     <input>
+     *    m_strap_zero     <output>
+     *    m_angleSetpoint  <output>
+     * 
+     */
     public void calibrate() {
       // use POT angle to calculate strap length
-      double potang = lawOfCosineAngle(POT_LOWER_LEN, POT_UPPER_LEN, m_pot_length);
+      double potang = lawOfCosineAngle(POT_LOWER_LEN, POT_UPPER_LEN, m_length_pot);
       double strapang = potang + (POT_OFFSET_ANGLE - STRAP_OFFSET_ANGLE);  //
       
       // calculate the strap length and use it as the zero point on the motor encoder
       m_strap_zero = lawOfCosineLength(STRAP_LOWER_LEN, STRAP_UPPER_LEN, strapang);
       angleEncoder.setPosition(0.0); 
 
+      // calculate min/bax postion rotations - motor units
+      min_encoder_pos = (STRAP_LENGTH_MIN - m_strap_zero) * kRevPerInch;
+      max_encoder_pos = (STRAP_LENGTH_MAX - m_strap_zero) * kRevPerInch;
+
       // force angle setpoint to current position
       m_angleSetpoint = potang + POT_OFFSET_ANGLE;
-    }
-
-
-    double getPotAngle() {
-      return m_angle;
-    }
-
-    double getMotorAngle() {
-      return m_angleMotor;
     }
 
     /**
@@ -220,25 +241,26 @@ public class Magazine_Subsystem extends SubsystemBase {
      * @return
      */
     public double get() {
-      return m_angle;
+      return m_angle_motor;
     }
 
     public void setAngle(double magDeg) {
       //limit range and save our current setpoint
-      magDeg = MathUtil.limit(magDeg, MIN_ANGLE, MAX_ANGLE);
-      m_angleSetpoint = magDeg;
+      m_angleSetpoint = MathUtil.limit(magDeg, MIN_ANGLE, MAX_ANGLE);
 
       //figure out desired motor strap length
-      double strap_deg = magDeg - STRAP_OFFSET_ANGLE;
+      double strap_deg = m_angleSetpoint - STRAP_OFFSET_ANGLE;
       m_lengthSetpoint = lawOfCosineLength(STRAP_LOWER_LEN, STRAP_UPPER_LEN, strap_deg);
 
       //calculate motor postion in revs from our calibration positon
       double setpoint = (m_lengthSetpoint - m_strap_zero)*kRevPerInch;
       
-      // unlock the gear, it gets re-locked when at setpoint
+      // unlock the gear before moving, tell angleMotor to go to position
       unlock();
-      CANError err = anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot);//, kArbFFHoldVolts, ArbFFUnits.kVoltage);
-      if (err != CANError.kOk) System.out.println("SMARTMAX CAN ERROR in MAG POSITION"+ err);
+      CANError err = anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot);
+      if (err != CANError.kOk) {
+        System.out.println("SMARTMAX CAN ERROR in MAG POSITION"+ err);
+      }
     }
 
     /**
@@ -246,38 +268,50 @@ public class Magazine_Subsystem extends SubsystemBase {
      * @param speed  RPM of takeup pully
      */
     public void wind(double pully_rpm) {
-      pully_rpm = MathUtil.limit(pully_rpm,-kMaxRPM, kMaxRPM);
+      if (isAtBottom() || isAtTop()) {
+        pully_rpm = 0.0;
+      }
+
+      pully_rpm = MathUtil.limit(pully_rpm, -kMaxRPM, kMaxRPM);
       double motor_speed = kGearRatio*pully_rpm;
       unlock();
       anglePID.setReference(motor_speed, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage); 
     }
 
     /**
-     * Stop() will lock the motor after stoping it.
+     * zeroPower()  - sets motor speed to 0.0
+     *  stops using position or velocity mode control 
+     *  puts motor in idle mode
+     *  optionally lock the holding gear
+     * 
+     *  This will let the struts push the magazine up if lock is false
      */
-    public void stop() { stop(true);}
+    public void zeroPower(boolean lock) {
+      angleMotor.set(0.0);
+      if (lock) lock();
+    }
 
     /**
-     * Stop()
+     * stopAndHold()  - use position control to hold the motor
      * @param lock  true, engage lock
      *              false - leave it open
      */
-    public void stop(boolean lock) {
-      angleMotor.stopMotor();
-      m_angleSetpoint = m_angle;  //force no error between current angle and setpoint
+    public void stopAndHold(boolean lock) {
+      // angleMotor.stopMotor(); //zero's motor current, idle mode hold only
+      setAngle(get());       // sets postion, keeps motor in position control, uses current position
       if (lock) lock();
     }
 
     public boolean isAtBottom() {
-      return (m_angle <= MIN_ANGLE)  ?  true : false;
+      return (get() <= MIN_SOFT_STOP)  ?  true : false;
     }
     
     public boolean isAtTop() {
-      return (m_angle >= MAX_ANGLE)  ?  true : false;
+      return (get() >= MAX_SOFT_STOP)  ?  true : false;
     }
     
     public boolean isAtSetpoint() {
-      return (Math.abs(m_angle - m_angleSetpoint) < kToleranceDeg)  ? true : false;     
+      return (Math.abs(m_angle_motor - m_angleSetpoint) < kToleranceDeg)  ? true : false;     
     }
 
     //checks to make sure we don't do stupid
@@ -286,30 +320,30 @@ public class Magazine_Subsystem extends SubsystemBase {
       //maybe a current check for being against the stop?
 
       // if we get outside the range, recalibrate against the pot.  
-      if ((m_angleMotor > MAX_ANGLE +0.50)  || (m_angleMotor < MIN_ANGLE - 0.5)) {
+      if (Math.abs(m_angle_motor - m_angle_pot) > 1.0) {
+        System.out.println("Mag Angle Calibration Event ang_mot=" + m_angle_motor + " ang_pot=" + m_angle_pot );
         calibrate();
-      }
-        
-
+      }  
     }
+  
 
     /**
      * controls for the lock on the 
      */
     public void lock() {
-      magSolenoid.set(Value.kForward);
+      solenoid.set(Value.kForward);
     }
   
     public void unlock() {
-      magSolenoid.set(Value.kReverse);
+      solenoid.set(Value.kReverse);
     }
   
     public boolean isLocked() {
-      return (magSolenoid.get() == Value.kForward);
+      return (solenoid.get() == Value.kForward);
     }
 
     public boolean isMoving() {
-      return (Math.abs(m_strapSpeed) > kMinVelZeroTol) ? true : false;
+      return (Math.abs(m_strap_speed) > kMinVelZeroTol) ? true : false;
     }
 
   } // MagazinePositioner

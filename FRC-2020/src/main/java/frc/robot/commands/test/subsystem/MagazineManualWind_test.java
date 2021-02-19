@@ -34,7 +34,7 @@ public class MagazineManualWind_test extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    magPositioner.stop(false); // leave unlocked for testing
+    magPositioner.stopAndHold(false); // leave unlocked for testing
 
   }
 

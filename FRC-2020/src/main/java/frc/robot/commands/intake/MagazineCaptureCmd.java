@@ -5,16 +5,22 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Magazine_Subsystem;
 
+/**
+ * MagCaptureCmd - used as default command to drive belt while capturing 
+ *     power cells.  Will count the cells and stop intake if we hit max.
+ */
 public class MagazineCaptureCmd extends CommandBase {
 
-  // constants
-  double kMotorStrength = 0.8;
-  double kFrameCount = 8;     // number of frames to run after LG opens, 20ms /frame
+  // constants tuned to move power cells smoothly and clear light gate
+  final double kMotorStrength = 0.8;
+  final int kFrameCount = 8;     // number of frames to run after LG opens, 20ms /frame
 
+  Intake_Subsystem intake;
   Magazine_Subsystem mag;
-  double frameCount;
+  int frameCount;
 
   // states of our command
   enum State {
@@ -24,16 +30,20 @@ public class MagazineCaptureCmd extends CommandBase {
   State state = State.WaitingForPC;
 
   /** Creates a new MagazineCaptureCmd. */
-  public MagazineCaptureCmd(Magazine_Subsystem mag) {
-    this.mag = mag;
+  public MagazineCaptureCmd(Intake_Subsystem intake) {
+    this.mag = intake.getMagazine();
+    this.intake = intake;
     addRequirements(mag);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    state = State.WaitingForPC;
+     state = State.WaitingForPC;
     frameCount = 0;
+    if (mag.isMagFull()) {
+      state = State.MagFull;
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -42,15 +52,14 @@ public class MagazineCaptureCmd extends CommandBase {
 
     switch (state) {
       case WaitingForPC:
-
         if (mag.isGateBlocked()) {
           mag.beltOn(kMotorStrength);
           state = State.MovingPC;
         }
         break;
+
       case MovingPC:
         if (!mag.isGateBlocked()) {
-         
           mag.addPC();
           state = State.CountFrames;  
           frameCount = 0;
@@ -64,7 +73,9 @@ public class MagazineCaptureCmd extends CommandBase {
         }
         break;
       case MagFull:
-        System.out.println("Mag full");
+        // make sure we don't pick up more than we should
+        intake.intakeOff();
+
         // if it empties we can intake more
         if (!mag.isMagFull()) {
           state = State.WaitingForPC;
@@ -77,8 +88,7 @@ public class MagazineCaptureCmd extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     if (interrupted) {
-      //we got stopped, assume full
-      state = State.MagFull;
+      
     }
   }
 

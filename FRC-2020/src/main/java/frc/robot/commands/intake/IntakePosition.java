@@ -10,24 +10,37 @@ package frc.robot.commands.intake;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Intake_Subsystem;
 
-public class ToggleIntakeRaised extends InstantCommand {
+public class IntakePosition extends InstantCommand {
+  public enum Direction {
+    Up, Down, Toggle
+  }
 
   private Intake_Subsystem m_intake;
-  public ToggleIntakeRaised(Intake_Subsystem m_intake) {
-    addRequirements(m_intake);
+  Direction direction;
+
+  public IntakePosition(Intake_Subsystem m_intake, IntakePosition.Direction direction) {
     this.m_intake = m_intake;
+    this.direction = direction;
+    addRequirements(m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    boolean intakeUp = m_intake.isIntakeUp();
-    if (intakeUp) {
-      m_intake.lowerIntake();
-      //off is intentional on lowering according to Kyle.
-    } else {
-      m_intake.raiseIntake();
-      m_intake.intakeOff();
+    Direction cmd = direction;
+    if (direction == Direction.Toggle) {
+        cmd = m_intake.isIntakeUp() ? Direction.Down : Direction.Up;
+    }
+    switch (cmd) {
+      case Up:
+        m_intake.raiseIntake();
+        m_intake.intakeOff();
+      break;
+      
+      case Down:
+        m_intake.lowerIntake();
+        break;
+      default:
     }
   }
 }

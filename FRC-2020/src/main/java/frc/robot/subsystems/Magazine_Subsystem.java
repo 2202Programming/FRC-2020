@@ -34,11 +34,10 @@ import frc.robot.util.misc.PIDFController;
 public class Magazine_Subsystem extends SubsystemBase {
   // Physical limits
   static final double MIN_ANGLE = 22.0;
-  static final double UP_ANGLE = 29.0; // Above this, mag is up and may interfere with intake
   static final double MAX_ANGLE = 55.0;
 
-  static final double MAX_SOFT_STOP = 50;
-  static final double MIN_SOFT_STOP = 25;
+  static final double MAX_SOFT_STOP = 50.0;
+  static final double MIN_SOFT_STOP = 25.0;
 
   /**
    * See this doc for calcs and numbers
@@ -110,7 +109,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     static final double kPullyDiameter = 1.4;   // inches (1in without belting)
     static final double kInchPerMotorRev = Math.PI*kPullyDiameter / kGearRatio;
     static final double kRevPerInch = 1.0 / kInchPerMotorRev;
-    static final double kMinVelZeroTol = .01;   //inches/sec
+    static final double kMinVelZeroTol = 0.05;   //inches/sec
     static final double kMaxRPM = 30;
 
     // Pot Volts measured at top & bottom position
@@ -145,6 +144,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     double m_strap_speed = 0.0;     // inches/s
     double m_enc_pos = 0.0;         // raw 
     double m_strap_zero = 0.0;      // zero point for calibration
+    boolean m_loose_strap = false;  // based on pot and motor speeds
     
     // setpoint values, used in periodic()
     double m_lengthSetpoint; // inches  <calculated from angleSetpoint>
@@ -202,6 +202,7 @@ public class Magazine_Subsystem extends SubsystemBase {
 
       // estimate pot speed inch/s
       m_speed_pot = (m_length_pot_prev - m_length_pot) / DT;
+      isMoving();
       safety();
     }
 
@@ -311,7 +312,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
     
     public boolean isAtSetpoint() {
-      return (Math.abs(m_angle_motor - m_angleSetpoint) < kToleranceDeg)  ? true : false;     
+      return (Math.abs(get() - m_angleSetpoint) < kToleranceDeg)  ? true : false;     
     }
 
     //checks to make sure we don't do stupid
@@ -320,7 +321,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       //maybe a current check for being against the stop?
 
       // if we get outside the range, recalibrate against the pot.  
-      if (Math.abs(m_angle_motor - m_angle_pot) > 1.0) {
+      if (Math.abs(m_angle_motor - m_angle_pot) > 2.0) {
         System.out.println("Mag Angle Calibration Event ang_mot=" + m_angle_motor + " ang_pot=" + m_angle_pot );
         calibrate();
       }  
@@ -343,10 +344,17 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
 
     public boolean isMoving() {
-      return (Math.abs(m_strap_speed) > kMinVelZeroTol) ? true : false;
+      // possible motor is moving and mag isn't 
+      boolean mag_moving = Math.abs(m_speed_pot) > kMinVelZeroTol;
+      boolean motor_moving = Math.abs(m_strap_speed) > kMinVelZeroTol;
+      m_loose_strap = (mag_moving != motor_moving);
+
+      return (mag_moving || motor_moving);
     }
 
   } // MagazinePositioner
+
+
   /**
    * 
    */
@@ -376,9 +384,7 @@ public class Magazine_Subsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-
-  }
+  public void periodic() { }
 
   public void beltOn(double motorStrength) {
     beltMotor.set(motorStrength);
@@ -395,16 +401,11 @@ public class Magazine_Subsystem extends SubsystemBase {
       intake.lowerIntake();
     }
     // start moving the mag to the desired angle
-    positioner.setAngle(MAX_ANGLE);
+    positioner.setAngle(MAX_SOFT_STOP);
   }
 
   public void lower() {
-    positioner.setAngle(MIN_ANGLE);
-  }
-
-  //TODO: remove this function
-  public boolean isUp() {
-    return (positioner.get() > UP_ANGLE) ? true : false;
+    positioner.setAngle(MIN_SOFT_STOP);
   }
 
   /**

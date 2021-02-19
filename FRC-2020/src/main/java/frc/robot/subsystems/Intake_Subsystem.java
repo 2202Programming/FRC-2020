@@ -28,6 +28,7 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.Constants.CAN;
+import frc.robot.Constants.Intake;
 import frc.robot.Constants.PWM;
 import frc.robot.Constants.Shooter;
 import frc.robot.subsystems.ifx.Logger;
@@ -59,6 +60,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * inputs
    * 
    */
+
+  
 
   // Intake
   Spark intake_spark = new Spark(PWM.INTAKE);
@@ -196,7 +199,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   public void raiseIntake() {
     // can't have magazine up with intake up, force it down.
     // Magazine goes down faster, so should be ok...
-    if (magazine.isUp()) { 
+    if (magazine.positioner.get() > Intake.MAG_UP_ANGLE) { 
       magazine.lower();
     }
     intakeSolenoid.set(DoubleSolenoid.Value.kForward);

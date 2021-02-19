@@ -7,10 +7,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.toggleLED;
-//import frc.robot.commands.intake.IntakeToggleCmd;
-import frc.robot.commands.intake.MagazineRaiseLowerCmd;
+import frc.robot.commands.intake.IntakePosition;
+import frc.robot.commands.intake.IntakePosition.Direction;
+import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.ShooterOn;
-import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
@@ -96,13 +96,13 @@ public class auto_cmd_group extends SequentialCommandGroup {
             addCommands(
                     //TODO: Replace with lidar or limelight to get exact shooting distance
                     new DriveOffLine(drive, 0.8).withTimeout(2.7),
-                    new ToggleIntakeRaised(intake),
+                    new IntakePosition(intake, Direction.Down),
                     new WaitCommand(0.7),
-                    new MagazineRaiseLowerCmd(intake.getMagazine()),
+                    new MagazineAngle(intake, 40.0).withTimeout(2.0),
                     new WaitCommand(1.2),
                     new ShooterOn(intake, ShooterOnCmd.data).withTimeout(3), //need to add Data type to parser
-                    new MagazineRaiseLowerCmd(intake.getMagazine()),
-                    new ToggleIntakeRaised(intake)
+                    new MagazineAngle(intake, 25.0).withTimeout(2.0),
+                    new IntakePosition(intake, Direction.Up)
             );
         }
         else {

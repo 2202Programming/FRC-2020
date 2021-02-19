@@ -241,7 +241,8 @@ public final class Constants {
     }
 
     public static final class Intake {
-
+      //angle MAGAZINE must be below to raise intake
+      public static final double MAG_UP_ANGLE = 28.0; // degrees
     }
 
     public static final class Climber {

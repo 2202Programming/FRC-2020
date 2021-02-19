@@ -12,18 +12,23 @@ import static frc.robot.Constants.DT;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Magazine_Subsystem;
 
-public class MagazineAdjust extends CommandBase {
+public class MagazineBeltAdjust extends CommandBase {
   private Magazine_Subsystem magazine;
   private double strength = 0.8;
   private int pulseCounts = -1;
   private int counts; // count down timer
+  private boolean backwards;
+  boolean prev_gateBlocked;
+  boolean gateBlocked;
+
   /**
    * Creates a new MagazineAdjust.
    */
-  public MagazineAdjust(Magazine_Subsystem mag, boolean forward, double pulseTime) {
+  public MagazineBeltAdjust(Magazine_Subsystem mag, boolean forward, double pulseTime) {
     magazine = mag;
 
     //set the direction
+    backwards = !forward;
     strength *= (forward) ? 1.0 : -1.0;
     pulseCounts = (pulseTime > 0.0) ? (int) ((pulseTime / DT) + 1) : -1;
     addRequirements(mag);
@@ -34,12 +39,23 @@ public class MagazineAdjust extends CommandBase {
   public void initialize() { 
     counts = pulseCounts;
     magazine.beltOn(strength);
+    prev_gateBlocked = magazine.isGateBlocked();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     counts--;
+    gateBlocked = magazine.isGateBlocked();
+
+    // watch for ejecting power cells - edge detect blocked to unblocked
+    if (backwards && !gateBlocked && prev_gateBlocked) {
+      magazine.removePC();
+    }
+    // we could have had one finish going in too
+    if (!backwards && !gateBlocked && prev_gateBlocked) {
+      magazine.addPC();
+    }
   }
 
   // Called once the command ends or is interrupted.

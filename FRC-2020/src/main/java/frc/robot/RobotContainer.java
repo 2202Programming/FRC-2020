@@ -24,12 +24,13 @@ import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
 import frc.robot.commands.generic.CallFunctionCmd;
-import frc.robot.commands.intake.IntakeToggleCmd;
-import frc.robot.commands.intake.MagazineAdjust;
+import frc.robot.commands.intake.IntakePosition;
+import frc.robot.commands.intake.IntakePosition.Direction;
+import frc.robot.commands.intake.IntakePower;
+import frc.robot.commands.intake.IntakePower.Power;
+import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCaptureCmd;
-import frc.robot.commands.intake.ReverseIntake;
 import frc.robot.commands.intake.ShooterOn;
-import frc.robot.commands.intake.ToggleIntakeRaised;
 import frc.robot.commands.test.subsystem.MagazineManualWind_test;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
@@ -95,8 +96,7 @@ public class RobotContainer {
     //cameraSubsystem = new CameraSubsystem();
 
     // default commands
-    var mag = intake.getMagazine();
-    mag.setDefaultCommand(new MagazineCaptureCmd(mag));   //uses lightgate to load power cells
+    intake.getMagazine().setDefaultCommand(new MagazineCaptureCmd(intake));   //uses lightgate to load power cells
     
     // Add anything that has logging requirements
     logSubsystem.add(/*driveTrain, lidar,*/limelight, intake, pdp /*,driverControls, panel, detector*/);
@@ -131,22 +131,22 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
     // Assistant's buttons
-    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineAdjust(mag, false, 0.0), true); 
-    dc.bind(Id.Assistant, XboxButton.B).whenHeld(new ReverseIntake(intake, -0.5));
-    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineAdjust(mag, true, 0.4), true);
-    dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakeToggleCmd(intake, 0.7, 0.5)); // mag, intake
+    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineBeltAdjust(mag, false, 0.0), true); 
+    dc.bind(Id.Assistant, XboxButton.B).whenHeld(new IntakePower(intake, Power.ReverseOn, 0.5));
+    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineBeltAdjust(mag, true, 0.4), true);
+    dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakePower(intake, Power.Toggle, 0.5));
     //dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineRaiseLowerCmd(mag));
-    dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new ToggleIntakeRaised(intake));
+    dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new IntakePosition(intake, Direction.Toggle));
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
 
     //testing
     dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 10.0));
     dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -10.0));
     var magPos = intake.getMagazine().getMagPositioner();
-    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new 
-       InstantCommand( magPos::unlock)
-        .andThen( () ->  magPos.setAngle(35.0)) )
-        .whenReleased( () -> magPos.stopAndHold(false));
+    dc.bind(Id.Assistant, XboxButton.RB).whenPressed( 
+       new InstantCommand( magPos::unlock)
+          .andThen( () ->  magPos.setAngle(35.0)) )
+          .whenReleased( () -> magPos.stopAndHold(false));
 
     //right joystick pushdown button
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand(magPos::calibrate));

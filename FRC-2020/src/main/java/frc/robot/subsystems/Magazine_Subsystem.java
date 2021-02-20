@@ -265,7 +265,6 @@ public class Magazine_Subsystem extends SubsystemBase {
       if (setpoint > angleEncoder.getPosition()) {
         zeroPower(false);
         burp();
-        for (int i =0; i < 5000 ; i++) {int a = i*i; a=+i;}
       }
       unlock();
       CANError err = anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot);
@@ -296,10 +295,13 @@ public class Magazine_Subsystem extends SubsystemBase {
       anglePID.setReference(motor_speed, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage); 
     }
 
+    /**
+     * burp() - offload the pawl by moving in down direction to 
+     */
     void burp() 
     {
        // may have to burp the motor to unlock the pawl, go back slowly
-       anglePID.setReference(-100.0, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+       anglePID.setReference(-200.0, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
     }
 
     /**

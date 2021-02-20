@@ -148,8 +148,8 @@ public class RobotContainer {
           .whenReleased( () -> magPos.stopAndHold(false));
 
     //right joystick pushdown button
-    dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand(magPos::calibrate));
-        
+    dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( magPos::unlock /* magPos::calibrate*/));
+    dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( magPos::lock /* magPos::calibrate*/));   
   }
 
   /**

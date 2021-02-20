@@ -32,13 +32,11 @@ import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
 
 public class Magazine_Subsystem extends SubsystemBase {
-
-  static final double kInvert = 1.0;
   // Physical limits
-  static final double MIN_ANGLE = 22.0;
+  static final double MIN_ANGLE = 19.6;
   static final double MAX_ANGLE = 46.8;
 
-  static final double MAX_SOFT_STOP = 43.0;
+  static final double MAX_SOFT_STOP = 45.0;
   static final double MIN_SOFT_STOP = 25.0;
 
   /**
@@ -90,7 +88,7 @@ public class Magazine_Subsystem extends SubsystemBase {
    */
   public class MagazinePositioner extends SubsystemBase {
     // sparkmax config
-    final boolean kInverted = false;
+    final boolean kInverted = true;
     final int kPosSlot = 0;
     final int kVelSlot = 1;
 
@@ -115,8 +113,8 @@ public class Magazine_Subsystem extends SubsystemBase {
     static final double kMaxRPM = 30;
 
     // Pot Volts measured at top & bottom position
-    static final double VatMin = 0.650;   // volts at 22 degrees (min mag angle)
-    static final double VatMax = 3.75244; // volts at 46.8 degrees (max mag angle)
+    static final double VatMin = 0.6205;   // volts at 22 degrees (min mag angle)
+    static final double VatMax = 3.718; // volts at 46.8 degrees (max mag angle)
 
     static final double kToleranceDeg = 0.2;
     
@@ -158,7 +156,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       // configure sparkmax motor
       angleMotor.restoreFactoryDefaults(false);
       angleMotor.setInverted(kInverted);
-      angleMotor.setIdleMode(IdleMode.kBrake);
+      angleMotor.setIdleMode(IdleMode.kCoast);
      
       //copy the sw pidvalues to the hardware
       posPIDvalues.copyTo(anglePID, kPosSlot);
@@ -169,7 +167,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       //call periodic to read our values and calibrate
       periodic();
       calibrate();      // set motor encoder to zero and star
-      zeroPower(true);  // relase any holding, lock gear so mag stays in place
+      zeroPower(false);  // relase any holding, lock gear so mag stays in place
     }
 
     public void addDashboardWidgets(ShuffleboardLayout layout) {
@@ -244,7 +242,8 @@ public class Magazine_Subsystem extends SubsystemBase {
      * @return
      */
     public double get() {
-      return m_angle_motor;
+      return m_angle_pot;
+      //return m_angle_motor;
     }
 
     public void setAngle(double magDeg) {
@@ -279,7 +278,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       }
 
       pully_rpm = MathUtil.limit(pully_rpm, -kMaxRPM, kMaxRPM);
-      double motor_speed = kInvert * kGearRatio * pully_rpm;
+      double motor_speed = kGearRatio * pully_rpm;
       unlock();
       anglePID.setReference(motor_speed, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage); 
     }

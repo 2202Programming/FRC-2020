@@ -179,8 +179,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     lower_shooter = new FlyWheel(CAN.SHOOTER_LOWER_TALON, Shooter.lowerFWConfig);
 
     table = NetworkTableInstance.getDefault().getTable("Shooter");
-    nt_upperRPM = table.getEntry("Upper RPM");
-    nt_lowerRPM = table.getEntry("Lower RPM");
+    nt_upperRPM = table.getEntry("UpperRPM");
+    nt_lowerRPM = table.getEntry("LowerRPM");
 
     // build out matrix to calculate FW RPM from [omega , Vel] for power cell
     VelToRPM.set(0, 0, Shooter.PCEffectiveRadius / Shooter.lowerFWConfig.flywheelRadius);

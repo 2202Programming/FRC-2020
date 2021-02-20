@@ -298,8 +298,8 @@ public class Magazine_Subsystem extends SubsystemBase {
      *              false - leave it open
      */
     public void stopAndHold(boolean lock) {
-      // angleMotor.stopMotor(); //zero's motor current, idle mode hold only
-      setAngle(get());       // sets postion, keeps motor in position control, uses current position
+      angleMotor.stopMotor(); //zero's motor current, idle mode hold only
+      //setAngle(get());       // sets postion, keeps motor in position control, uses current position
       if (lock) lock();
     }
 

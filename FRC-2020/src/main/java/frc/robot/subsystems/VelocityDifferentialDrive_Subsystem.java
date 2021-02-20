@@ -15,6 +15,9 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.ControlType;
 
 import edu.wpi.first.networktables.EntryNotification;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
@@ -60,6 +63,16 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   final IdleMode KIdleMode = IdleMode.kCoast;
   final double Kgyro = -1.0; // ccw is positive, just like geometry class
 
+  private NetworkTable table;
+  private NetworkTableEntry nt_velLeft;
+  private NetworkTableEntry nt_velRight;
+  private NetworkTableEntry nt_posLeft;
+  private NetworkTableEntry nt_posRight;
+  private NetworkTableEntry nt_theta;
+  private NetworkTableEntry nt_accelX;
+  private NetworkTableEntry nt_accelY;
+  private NetworkTableEntry nt_accelZ;
+  
   // we only use this one PID slot for the drive lead controllers
   final int KpidSlot = 0;
 
@@ -146,6 +159,17 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     // save scaling factors, they are required to use SparkMax in Vel mode
     gearbox = gear;
     requestedGear = gearbox.getCurrentGear();
+
+
+   //direct networktables logging
+    table = NetworkTableInstance.getDefault().getTable("Drivetrain");
+    nt_velLeft = table.getEntry("VelLeft");
+    nt_velRight = table.getEntry("VelRight");
+    nt_posLeft = table.getEntry("PosLeft");
+    nt_theta = table.getEntry("Theta");
+    nt_accelX = table.getEntry("AccelX");
+    nt_accelY = table.getEntry("AccelY");
+    nt_accelZ = table.getEntry("AccelZ");
 
     // setup physical units - chassis * gearbox (rev per minute)
     K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60; // rpm/60 rps
@@ -523,6 +547,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
      * SmartDashboard.putString("Current Gear",
      * gearbox.getCurrentGear().toString());
      */
+    nt_velLeft.setDouble(m_velLeft);
+    nt_velRight.setDouble(m_velRight);
+    nt_posLeft.setDouble(m_posLeft);
+    nt_posRight.setDouble(m_posRight);
+    nt_theta.setDouble(m_theta);
+    nt_accelX.setDouble(m_gyro.getRawAccelX());
+    nt_accelY.setDouble(m_gyro.getRawAccelY());
+    nt_accelZ.setDouble(m_gyro.getRawAccelZ());
   }
 
   /**

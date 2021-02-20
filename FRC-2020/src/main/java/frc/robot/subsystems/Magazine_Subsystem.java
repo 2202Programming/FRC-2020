@@ -33,10 +33,15 @@ import frc.robot.util.misc.PIDFController;
 
 public class Magazine_Subsystem extends SubsystemBase {
   // Physical limits
-  static final double MIN_ANGLE = 19.6;
-  static final double MAX_ANGLE = 46.8;
+  static final double MIN_ANGLE = 20.7;  //measured at mechanical stops
+  static final double MAX_ANGLE = 47.3;  //measured at mechanical limit
 
-  static final double MAX_SOFT_STOP = 45.0;
+  // Pot Volts measured at top & bottom position
+  static final double VatMin = 0.4541; // volts at 21 degrees (min mag angle)
+  static final double VatMax = 3.718;  // volts at 46.8 degrees (max mag angle)
+
+
+  static final double MAX_SOFT_STOP = 46.0;
   static final double MIN_SOFT_STOP = 25.0;
 
   /**
@@ -59,8 +64,10 @@ public class Magazine_Subsystem extends SubsystemBase {
 
   // arm lengths for yo-yo pot anchor points
   static final double POT_UPPER_LEN = 19.25;  // inch
-  static final double POT_LOWER_LEN = 19.25;  // inch 
+  static final double POT_LOWER_LEN = 21.50;  // inch 
   static final double POT_OFFSET_E = 15.67;   //degrees - off set from pot angle base
+
+  
 
   // Strap / motor lengths - includes pully
   static final double STRAP_UPPER_LEN = 21.265;  // inch, includes pully takeup@max angle (unwound)
@@ -94,7 +101,7 @@ public class Magazine_Subsystem extends SubsystemBase {
 
     // we use velocity and positon modes, so two sets of PIDF values
     //pid values for motor P, I, D, F 
-    PIDFController posPIDvalues = new PIDFController(0.1, 0.001, 0.1, 0.0);
+    PIDFController posPIDvalues = new PIDFController(0.1, 0.001, 1, 0.0);
     PIDFController velPIDvalues = new PIDFController(0.00002, 1e-7, 0.0, 0.0021);
     {
        posPIDvalues.setIzone(5.0); 
@@ -111,10 +118,6 @@ public class Magazine_Subsystem extends SubsystemBase {
     static final double kRevPerInch = 1.0 / kInchPerMotorRev;
     static final double kMinVelZeroTol = 0.05;   //inches/sec
     static final double kMaxRPM = 30;
-
-    // Pot Volts measured at top & bottom position
-    static final double VatMin = 0.6205;   // volts at 22 degrees (min mag angle)
-    static final double VatMax = 3.718; // volts at 46.8 degrees (max mag angle)
 
     static final double kToleranceDeg = 0.2;
     
@@ -247,7 +250,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       //return m_angle_motor;
     }
 
-    public void setAngle(double magDeg) {
+    public void setAngle(double magDeg) { 
       //limit range and save our current setpoint
       m_angleSetpoint = MathUtil.limit(magDeg, MIN_ANGLE, MAX_ANGLE);
 
@@ -258,7 +261,12 @@ public class Magazine_Subsystem extends SubsystemBase {
       //calculate motor postion in revs from our calibration positon
       double setpoint = (m_lengthSetpoint - m_strap_zero)*kRevPerInch;
       
-      // unlock the gear before moving, tell angleMotor to go to position
+      // we need to give the pawl a chance to unlock
+      if (setpoint > angleEncoder.getPosition()) {
+        zeroPower(false);
+        burp();
+        for (int i =0; i < 5000 ; i++) {int a = i*i; a=+i;}
+      }
       unlock();
       CANError err = anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot);
       if (err != CANError.kOk) {
@@ -278,10 +286,20 @@ public class Magazine_Subsystem extends SubsystemBase {
        return;
       }
       // we can do a manual positon
-      pully_rpm = MathUtil.limit(pully_rpm, -kMaxRPM, kMaxRPM);
-      double motor_speed = kGearRatio * pully_rpm;
+      if (pully_rpm > 0) {
+        // may have to burp the motor to unlock the pawl, go back slowly
+        burp();
+      }
       unlock();
+      m_pully_rpm = MathUtil.limit(pully_rpm, -kMaxRPM, kMaxRPM);
+      double motor_speed = kGearRatio * m_pully_rpm;
       anglePID.setReference(motor_speed, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage); 
+    }
+
+    void burp() 
+    {
+       // may have to burp the motor to unlock the pawl, go back slowly
+       anglePID.setReference(-100.0, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
     }
 
     /**
@@ -325,7 +343,7 @@ public class Magazine_Subsystem extends SubsystemBase {
 
       // protect from manual driving at stops
       if ((isAtBottom() && m_pully_rpm < 0.0) || (isAtTop() && m_pully_rpm > 0.0)) {
-        zeroPower(false);
+        zeroPower(true);
         m_pully_rpm =0.0;
       }
 

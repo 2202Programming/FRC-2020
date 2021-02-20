@@ -139,16 +139,19 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
 
     //testing
-    dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 10.0));
-    dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -10.0));
     var magPos = intake.getMagazine().getMagPositioner();
+    dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 10.0))
+            .whenReleased( () -> magPos.stopAndHold(true));
+    dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -10.0))
+            .whenReleased( () -> magPos.stopAndHold(true));
+    
     dc.bind(Id.Assistant, XboxButton.RB).whenPressed( 
        new InstantCommand( magPos::unlock)
           .andThen( () ->  magPos.setAngle(35.0)) )
-          .whenReleased( () -> magPos.stopAndHold(false));
+          .whenReleased( () -> magPos.stopAndHold(true));
 
     //right joystick pushdown button
-    dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( magPos::unlock /* magPos::calibrate*/));
+    dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( magPos::calibrate));
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( magPos::lock /* magPos::calibrate*/));   
   }
 

@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -115,6 +116,7 @@ public class Robot extends TimedRobot {
     // Set the driveTrain default command
     Command drivecmd = RobotContainer.getInstance().dashboard.getDriverPreferences().getCommandChooser().getSelected();
     RobotContainer.getInstance().driveTrain.setDefaultCommand(drivecmd);
+    LiveWindow.setEnabled(false);
   }
 
   /**
@@ -137,6 +139,7 @@ public class Robot extends TimedRobot {
     if (m_testCommand != null) {
       CommandScheduler.getInstance().schedule(m_testCommand);
     }
+    LiveWindow.setEnabled(true);
   }
 
   /**

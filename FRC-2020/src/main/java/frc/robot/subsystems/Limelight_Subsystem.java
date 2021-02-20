@@ -42,7 +42,7 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
    private double filterTC = 0.8;   //seconds, cutoff 1.25Hz
 
   public Limelight_Subsystem() {
-    disableLED();
+   
     x_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
     area_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
     table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -51,6 +51,8 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
     ta = table.getEntry("ta");
     tv = table.getEntry("tv"); //target validity (1 or 0)
     leds = table.getEntry("ledMode"); 
+    booleanLeds = table.getEntry("booleanLeds");  
+    disableLED();
   }
 
   @Override

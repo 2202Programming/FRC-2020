@@ -166,6 +166,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     nt_velLeft = table.getEntry("VelLeft");
     nt_velRight = table.getEntry("VelRight");
     nt_posLeft = table.getEntry("PosLeft");
+    nt_posRight = table.getEntry("PosRight");
     nt_theta = table.getEntry("Theta");
     nt_accelX = table.getEntry("x");
     nt_accelY = table.getEntry("y");

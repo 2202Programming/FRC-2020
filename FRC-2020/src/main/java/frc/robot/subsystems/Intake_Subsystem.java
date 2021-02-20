@@ -17,6 +17,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Spark;
@@ -61,7 +64,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * 
    */
 
-  
+  private NetworkTable table;
+  private NetworkTableEntry nt_upperRPM;
+  private NetworkTableEntry nt_lowerRPM;
 
   // Intake
   Spark intake_spark = new Spark(PWM.INTAKE);
@@ -172,6 +177,10 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     SendableRegistry.setName(this,"Intake", "shooter");
     upper_shooter = new FlyWheel(CAN.SHOOTER_UPPER_TALON, Shooter.upperFWConfig);
     lower_shooter = new FlyWheel(CAN.SHOOTER_LOWER_TALON, Shooter.lowerFWConfig);
+
+    table = NetworkTableInstance.getDefault().getTable("Shooter");
+    nt_upperRPM = table.getEntry("Upper RPM");
+    nt_lowerRPM = table.getEntry("Lower RPM");
 
     // build out matrix to calculate FW RPM from [omega , Vel] for power cell
     VelToRPM.set(0, 0, Shooter.PCEffectiveRadius / Shooter.lowerFWConfig.flywheelRadius);
@@ -350,6 +359,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
+    nt_lowerRPM.setDouble(actual.upper);
+    nt_upperRPM.setDouble(actual.lower);
   }
 
 /**

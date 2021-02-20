@@ -84,7 +84,7 @@ public class RobotContainer {
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter); 
     intake = new Intake_Subsystem(); 
     limelight = new Limelight_Subsystem();
-    //limelight.disableLED();
+    limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
     pdp = new Pdp_subsystem();

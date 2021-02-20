@@ -560,7 +560,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     layout.addNumber("DT/pos/left", () -> m_posLeft);
     layout.addNumber("DT/pos/right", () -> m_posRight);
     layout.addNumber("DT/pos/theta", () -> m_theta);
-    layout.addNumber("DT/HeadingDot", () -> getTurnRate());
+    /*layout.addNumber("DT/HeadingDot", () -> getTurnRate());
     layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
     layout.addNumber("DT/POSE/X", () -> getPose().getX());
     layout.addNumber("DT/POSE/Y", () -> getPose().getY());
@@ -568,7 +568,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     layout.addNumber("DT/POSE/VoltLeft", () -> m_voltleft);
 	  layout.addNumber("DT/POSE/VoltRight", () -> m_voltright);
     layout.addBoolean("DT/Motor/RightInverted?", () -> frontRight.getInverted());
-    layout.addBoolean("DT/Motor/LeftInverted?", () -> frontLeft.getInverted());
+    layout.addBoolean("DT/Motor/LeftInverted?", () -> frontLeft.getInverted()); */
 	}
 
   /**

@@ -269,7 +269,7 @@ public class Magazine_Subsystem extends SubsystemBase {
      * @param speed  RPM of takeup pully
      */
     public void wind(double pully_rpm) {
-      if (isAtBottom() || isAtTop()) {
+      if ((isAtBottom() && pully_rpm < 0.0) || (isAtTop() && pully_rpm > 0.0)) {
         pully_rpm = 0.0;
       }
 

@@ -98,7 +98,7 @@ public class RobotContainer {
     intake.getMagazine().setDefaultCommand(new MagazineCaptureCmd(intake));   //uses lightgate to load power cells
     
     // Add anything that has logging requirements
-    logSubsystem.add(/*driveTrain, lidar,*/limelight, intake /*,driverControls, panel, detector*/);
+    logSubsystem.add(/*driveTrain,*/ lidar, limelight, intake /*,driverControls, panel, detector*/);
     
     //Add devices to map for XML parsing usage, names must be unique.
     deviceMap.put("lidar", lidar);

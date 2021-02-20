@@ -11,6 +11,9 @@ import static frc.robot.Constants.Tperiod;
 
 import com.playingwithfusion.TimeOfFlight;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -52,12 +55,22 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   private LinearFilter valid_fir;
   private double filterTC = 0.8;   //seconds, cutoff 1.25Hz
   
-
+  private NetworkTable table;
+  private NetworkTableEntry left;
+  private NetworkTableEntry right;
+  private NetworkTableEntry valid;
+  
   private boolean isreal; //if simulation mode, do not construct lidar and all methods return 0 or nothing.
   
   public Lidar_Subsystem() {
     this.isreal = RobotBase.isReal();
     SendableRegistry.setName(this, "LIDAR");
+
+    //direct networktables logging
+    table = NetworkTableInstance.getDefault().getTable("lidar");
+    left = table.getEntry("left");
+    right = table.getEntry("right");
+    valid = table.getEntry("valid");
 
     if (isreal){
       front_left_lidar = new TimeOfFlight(CAN.FRONT_LEFT_LIDAR);
@@ -103,6 +116,11 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putBoolean("/LIDAR/r-valid", right_valid);
     SmartDashboard.putNumber("/LIDAR/angle", angle);
     */
+
+    left.setDouble(left_lidar_range);
+    right.setDouble(right_lidar_range);
+    valid.setBoolean(valid());
+
   }
 
   public boolean valid() {

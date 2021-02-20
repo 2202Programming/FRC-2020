@@ -32,11 +32,13 @@ import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
 
 public class Magazine_Subsystem extends SubsystemBase {
+
+  static final double kInvert = 1.0;
   // Physical limits
   static final double MIN_ANGLE = 22.0;
-  static final double MAX_ANGLE = 55.0;
+  static final double MAX_ANGLE = 46.8;
 
-  static final double MAX_SOFT_STOP = 50.0;
+  static final double MAX_SOFT_STOP = 43.0;
   static final double MIN_SOFT_STOP = 25.0;
 
   /**
@@ -58,12 +60,12 @@ public class Magazine_Subsystem extends SubsystemBase {
   static final double MAG_ANGLE_OFFSET = 28.07; //degrees - rotation due to frame
 
   // arm lengths for yo-yo pot anchor points
-  static final double POT_UPPER_LEN = 18.283; // inch
-  static final double POT_LOWER_LEN = 18.18;  // inch
-  static final double POT_OFFSET_E = 15.67;   //degres - off set from pot angle base
+  static final double POT_UPPER_LEN = 19.25;  // inch
+  static final double POT_LOWER_LEN = 19.25;  // inch 
+  static final double POT_OFFSET_E = 15.67;   //degrees - off set from pot angle base
 
   // Strap / motor lengths - includes pully
-  static final double STRAP_UPPER_LEN = 23.183;  // inch - includes pully takeup
+  static final double STRAP_UPPER_LEN = 21.265;  // inch, includes pully takeup@max angle (unwound)
   static final double STRAP_LOWER_LEN = 20.22;   // inch
   static final double STRAP_OFFSET_E = 19.99;    //degres - off set from pot angle base
 
@@ -113,8 +115,8 @@ public class Magazine_Subsystem extends SubsystemBase {
     static final double kMaxRPM = 30;
 
     // Pot Volts measured at top & bottom position
-    static final double VatMin = 0.650; // volts at 22 degrees (min mag angle)
-    static final double VatMax = 3.7438; // volts at 55 degrees (max mag angle)
+    static final double VatMin = 0.650;   // volts at 22 degrees (min mag angle)
+    static final double VatMax = 3.75244; // volts at 46.8 degrees (max mag angle)
 
     static final double kToleranceDeg = 0.2;
     
@@ -266,15 +268,18 @@ public class Magazine_Subsystem extends SubsystemBase {
 
     /**
      * use velocity control to wind motor
+     *   + speed increases angle
+     *   - speed decreases angle
+     * 
      * @param speed  RPM of takeup pully
      */
     public void wind(double pully_rpm) {
-      if ((isAtBottom() && pully_rpm < 0.0) || (isAtTop() && pully_rpm > 0.0)) {
+      if ((isAtBottom() && pully_rpm <= 0.0) || (isAtTop() && pully_rpm >= 0.0)) {
         pully_rpm = 0.0;
       }
 
       pully_rpm = MathUtil.limit(pully_rpm, -kMaxRPM, kMaxRPM);
-      double motor_speed = kGearRatio*pully_rpm;
+      double motor_speed = kInvert * kGearRatio * pully_rpm;
       unlock();
       anglePID.setReference(motor_speed, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage); 
     }

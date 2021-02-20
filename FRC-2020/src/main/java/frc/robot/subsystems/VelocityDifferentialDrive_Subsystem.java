@@ -167,9 +167,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     nt_velRight = table.getEntry("VelRight");
     nt_posLeft = table.getEntry("PosLeft");
     nt_theta = table.getEntry("Theta");
-    nt_accelX = table.getEntry("AccelX");
-    nt_accelY = table.getEntry("AccelY");
-    nt_accelZ = table.getEntry("AccelZ");
+    nt_accelX = table.getEntry("x");
+    nt_accelY = table.getEntry("y");
+    nt_accelZ = table.getEntry("z");
 
     // setup physical units - chassis * gearbox (rev per minute)
     K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60; // rpm/60 rps

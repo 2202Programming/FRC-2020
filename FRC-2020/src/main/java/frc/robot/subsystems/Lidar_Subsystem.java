@@ -56,9 +56,10 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   private double filterTC = 0.8;   //seconds, cutoff 1.25Hz
   
   private NetworkTable table;
-  private NetworkTableEntry left;
-  private NetworkTableEntry right;
-  private NetworkTableEntry valid;
+  private NetworkTableEntry nt_left;
+  private NetworkTableEntry nt_right;
+  private NetworkTableEntry nt_valid;
+  private NetworkTableEntry nt_angle;
   
   private boolean isreal; //if simulation mode, do not construct lidar and all methods return 0 or nothing.
   
@@ -67,10 +68,11 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     SendableRegistry.setName(this, "LIDAR");
 
     //direct networktables logging
-    table = NetworkTableInstance.getDefault().getTable("lidar");
-    left = table.getEntry("left");
-    right = table.getEntry("right");
-    valid = table.getEntry("valid");
+    table = NetworkTableInstance.getDefault().getTable("Lidar");
+    nt_left = table.getEntry("Left");
+    nt_right = table.getEntry("Right");
+    nt_valid = table.getEntry("Valid");
+    nt_angle = table.getEntry("Angle");
 
     if (isreal){
       front_left_lidar = new TimeOfFlight(CAN.FRONT_LEFT_LIDAR);
@@ -117,9 +119,10 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     SmartDashboard.putNumber("/LIDAR/angle", angle);
     */
 
-    left.setDouble(left_lidar_range);
-    right.setDouble(right_lidar_range);
-    valid.setBoolean(valid());
+    nt_left.setDouble(left_lidar_range);
+    nt_right.setDouble(right_lidar_range);
+    nt_angle.setDouble(angle);
+    nt_valid.setBoolean(valid());
 
   }
 

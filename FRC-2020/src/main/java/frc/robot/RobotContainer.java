@@ -37,7 +37,6 @@ import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
-import frc.robot.subsystems.Pdp_subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.hid.XboxAxis;
@@ -70,7 +69,7 @@ public class RobotContainer {
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
   public final Dashboard dashboard;
-  public final Pdp_subsystem pdp;
+  //public final Pdp_subsystem pdp;
   
   
   /**
@@ -87,7 +86,7 @@ public class RobotContainer {
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
-    pdp = new Pdp_subsystem();
+    //pdp = new Pdp_subsystem();
     
     
     //panel = new Control_Panel();
@@ -99,7 +98,7 @@ public class RobotContainer {
     intake.getMagazine().setDefaultCommand(new MagazineCaptureCmd(intake));   //uses lightgate to load power cells
     
     // Add anything that has logging requirements
-    logSubsystem.add(/*driveTrain, lidar,*/limelight, intake, pdp /*,driverControls, panel, detector*/);
+    logSubsystem.add(/*driveTrain, lidar,*/limelight, intake /*, pdp,driverControls, panel, detector*/);
     
     //Add devices to map for XML parsing usage, names must be unique.
     deviceMap.put("lidar", lidar);

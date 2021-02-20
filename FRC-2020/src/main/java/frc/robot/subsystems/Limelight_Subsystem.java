@@ -7,14 +7,13 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.subsystems.ifx.Logger;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.LinearFilter;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.subsystems.ifx.Logger;
 
 public class Limelight_Subsystem extends SubsystemBase implements Logger {
   /**
@@ -22,6 +21,13 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
    */
 
    private NetworkTable table;
+   private NetworkTableEntry tx;
+   private NetworkTableEntry ty;
+   private NetworkTableEntry ta;
+   private NetworkTableEntry tv;
+   private NetworkTableEntry leds;
+   private NetworkTableEntry booleanLeds;
+
    private double x;
    private double filteredX;
    private double y;
@@ -39,17 +45,18 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
     disableLED();
     x_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
     area_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
+    table = NetworkTableInstance.getDefault().getTable("limelight");
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    table = NetworkTableInstance.getDefault().getTable("limelight");
-    NetworkTableEntry tx = table.getEntry("tx"); //-27 degrees to 27 degrees
-    NetworkTableEntry ty = table.getEntry("ty"); // -20.5 to 20.5 degrees
-    NetworkTableEntry ta = table.getEntry("ta");
-    NetworkTableEntry tv = table.getEntry("tv"); //target validity (1 or 0)
-    NetworkTableEntry leds = table.getEntry("ledMode"); 
+    tx = table.getEntry("tx"); //-27 degrees to 27 degrees
+    ty = table.getEntry("ty"); // -20.5 to 20.5 degrees
+    ta = table.getEntry("ta");
+    tv = table.getEntry("tv"); //target validity (1 or 0)
+    leds = table.getEntry("ledMode"); 
+    
 
     //updates global variables
 
@@ -92,11 +99,15 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
   }
 
   public void disableLED() {
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+    leds.setNumber(1);
+    ledStatus = false;
+    booleanLeds.setBoolean(ledStatus);
 }
 
 public void enableLED() {
-    NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+    leds.setNumber(3);
+    ledStatus = true;
+    booleanLeds.setBoolean(ledStatus);
 }
 
 public boolean valid(){
@@ -104,15 +115,6 @@ public boolean valid(){
 }
 
   public void log(){
-    /** 
-      SmartDashboard.putNumber("X value", x);
-      
-      SmartDashboard.putNumber("Y value", y);
-      SmartDashboard.putNumber("Area", area);
-      SmartDashboard.putNumber("Filtered area", filteredArea);
-    */
 
-    SmartDashboard.putNumber("Filtered X value (Angle)", filteredX);
-    SmartDashboard.putBoolean("Limelight Valid", target);
   }
 }

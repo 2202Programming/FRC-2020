@@ -101,10 +101,10 @@ public class Magazine_Subsystem extends SubsystemBase {
 
     // we use velocity and positon modes, so two sets of PIDF values
     //pid values for motor P, I, D, F 
-    PIDFController posPIDvalues = new PIDFController(0.1, 0.001, 1, 0.0);
-    PIDFController velPIDvalues = new PIDFController(0.00002, 1e-7, 0.0, 0.0021);
+    PIDFController posPIDvalues = new PIDFController(0.25, 0.001, 5, 0.0);
+    PIDFController velPIDvalues = new PIDFController(0.000028, 1e-7, 0.0, 0.0035);
     {
-       posPIDvalues.setIzone(5.0); 
+       posPIDvalues.setIzone(3.0); 
        velPIDvalues.setIzone(0.0);
     }
   
@@ -119,7 +119,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     static final double kMinVelZeroTol = 0.05;   //inches/sec
     static final double kMaxRPM = 30;
 
-    static final double kToleranceDeg = 0.2;
+    static final double kToleranceDeg = 0.5;
     
     // track encoder postion min/max - debugging
     double  min_encoder_pos;
@@ -262,15 +262,26 @@ public class Magazine_Subsystem extends SubsystemBase {
       double setpoint = (m_lengthSetpoint - m_strap_zero)*kRevPerInch;
       
       // we need to give the pawl a chance to unlock
-      if (setpoint > angleEncoder.getPosition()) {
-        zeroPower(false);
-        burp();
+      if (setpoint >= angleEncoder.getPosition() && isLocked()) {
+        waitForMotion();
       }
-      unlock();
+     
       CANError err = anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot);
       if (err != CANError.kOk) {
         System.out.println("SMARTMAX CAN ERROR in MAG POSITION"+ err);
       }
+    }
+
+    void waitForMotion() {
+      double initEncPos = angleEncoder.getPosition();
+      lock();
+      burp();
+      int count = 10;
+      while (angleEncoder.getPosition() > initEncPos) {
+        count--;
+        if (count <= 0) break;
+      }
+      unlock();
     }
 
     /**
@@ -287,7 +298,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       // we can do a manual positon
       if (pully_rpm > 0) {
         // may have to burp the motor to unlock the pawl, go back slowly
-        burp();
+       waitForMotion();
       }
       unlock();
       m_pully_rpm = MathUtil.limit(pully_rpm, -kMaxRPM, kMaxRPM);
@@ -301,7 +312,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     void burp() 
     {
        // may have to burp the motor to unlock the pawl, go back slowly
-       anglePID.setReference(-200.0, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+       anglePID.setReference(-150.0, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
     }
 
     /**
@@ -323,8 +334,9 @@ public class Magazine_Subsystem extends SubsystemBase {
      *              false - leave it open
      */
     public void stopAndHold(boolean lock) {
-      angleMotor.stopMotor(); //zero's motor current, idle mode hold only
-      //setAngle(get());       // sets postion, keeps motor in position control, uses current position
+      //angleMotor.stopMotor(); //zero's motor current, idle mode hold only
+      m_enc_pos = angleEncoder.getPosition();
+      anglePID.setReference(m_enc_pos, ControlType.kPosition, kPosSlot);
       if (lock) lock();
     }
 
@@ -345,7 +357,7 @@ public class Magazine_Subsystem extends SubsystemBase {
 
       // protect from manual driving at stops
       if ((isAtBottom() && m_pully_rpm < 0.0) || (isAtTop() && m_pully_rpm > 0.0)) {
-        zeroPower(true);
+        zeroPower(false);
         m_pully_rpm =0.0;
       }
 

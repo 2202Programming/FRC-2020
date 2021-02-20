@@ -34,12 +34,16 @@ public class MagazineAngle extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     // if interrupted, don't lock.  
-    magPositioner.stopAndHold(!interrupted);
+    magPositioner.stopAndHold(false);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return magPositioner.isAtSetpoint();
+    boolean  done = magPositioner.isAtSetpoint();
+    if (done) {
+      //magPositioner.stopAndHold(false);
+    }
+    return done;
   }
 }

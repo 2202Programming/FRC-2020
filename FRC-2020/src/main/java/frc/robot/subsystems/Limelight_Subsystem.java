@@ -46,20 +46,16 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
     x_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
     area_iir = LinearFilter.singlePoleIIR(filterTC, Constants.Tperiod);
     table = NetworkTableInstance.getDefault().getTable("limelight");
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
     tx = table.getEntry("tx"); //-27 degrees to 27 degrees
     ty = table.getEntry("ty"); // -20.5 to 20.5 degrees
     ta = table.getEntry("ta");
     tv = table.getEntry("tv"); //target validity (1 or 0)
     leds = table.getEntry("ledMode"); 
-    
+  }
 
+  @Override
+  public void periodic() {
     //updates global variables
-
     x = tx.getDouble(0.0);
     y = ty.getDouble(0.0);
     area = ta.getDouble(0.0);

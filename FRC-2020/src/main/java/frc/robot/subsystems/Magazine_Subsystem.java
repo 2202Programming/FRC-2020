@@ -145,7 +145,8 @@ public class Magazine_Subsystem extends SubsystemBase {
     double m_enc_pos = 0.0;         // raw 
     double m_strap_zero = 0.0;      // zero point for calibration
     boolean m_loose_strap = false;  // based on pot and motor speeds
-    
+    double  m_pully_rpm = 0;
+
     // setpoint values, used in periodic()
     double m_lengthSetpoint; // inches  <calculated from angleSetpoint>
     double m_angleSetpoint;  // degrees <input>
@@ -273,10 +274,10 @@ public class Magazine_Subsystem extends SubsystemBase {
      * @param speed  RPM of takeup pully
      */
     public void wind(double pully_rpm) {
-      if ((isAtBottom() && pully_rpm <= 0.0) || (isAtTop() && pully_rpm >= 0.0)) {
-        pully_rpm = 0.0;
+      if ((isAtBottom() && pully_rpm < 0.0) || (isAtTop() && pully_rpm > 0.0)) {
+       return;
       }
-
+      // we can do a manual positon
       pully_rpm = MathUtil.limit(pully_rpm, -kMaxRPM, kMaxRPM);
       double motor_speed = kGearRatio * pully_rpm;
       unlock();
@@ -292,7 +293,7 @@ public class Magazine_Subsystem extends SubsystemBase {
      *  This will let the struts push the magazine up if lock is false
      */
     public void zeroPower(boolean lock) {
-      angleMotor.set(0.0);
+      angleMotor.stopMotor();
       if (lock) lock();
     }
 
@@ -321,8 +322,12 @@ public class Magazine_Subsystem extends SubsystemBase {
 
     //checks to make sure we don't do stupid
     void safety() {
-      //not sure what stupid is yet
-      //maybe a current check for being against the stop?
+
+      // protect from manual driving at stops
+      if ((isAtBottom() && m_pully_rpm < 0.0) || (isAtTop() && m_pully_rpm > 0.0)) {
+        zeroPower(false);
+        m_pully_rpm =0.0;
+      }
 
       // if we get outside the range, recalibrate against the pot.  
       if (Math.abs(m_angle_motor - m_angle_pot) > 2.0) {

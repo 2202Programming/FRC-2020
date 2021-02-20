@@ -1,29 +1,59 @@
+
 h1, h2, h3, h4, h5, p, a, label, input, img, iframe{
     margin-left: 15px;
   }
   input, label { 
     margin: 10px;
   }
+
+  .button {
+    color: black;
+  }
+
   nav .navbar-nav li a{
-    color: black !important;
+    color: #C3C3C3 !important;
+  }
+  nav .navbar-nav li a:hover{
+    color: #FF7100 !important;
   }
   .centered {
     text-align: center;
   }
-  #card_img{
-    width: 200px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 30px;
-  }
-  
   div.card {
     width: 100px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    text-align: center;
+    box-shadow: 0 4px 8px 0 #FF7100, 0 6px 20px 0 #FF7100;
+    /* text-align: center; */
     display: block;
-  }
+    background-color:	#343a40;
+    width: 750px; 
+    text-align: left; 
+    padding: 20px; 
+    margin: 10px; 
+    margin-top: 20px;  }
 
   .align-left {
     text-align: left;
   }
+
+  #box {
+    background-color:	#343a40;
+    border-radius: 5px;
+    /* box-shadow: 0 4px 8px 0 #FF7100, 0 6px 20px 0 #FF7100; */
+  }
+
+  #outline {
+    border-style: solid;
+  }
+
+  #camera {
+    padding: 0;
+    /* position: fixed;
+    bottom: 0;
+    left: 0; */
+    width: 50vw;
+    height: 80vh;
+    overflow: hidden;
+    background-color: #333;
+    /* You'll need to mess with this a bit to get your camera to work. Replace the url with a live-updating image feed from your camera. Using other camera streaming systems will require some tweaking. */
+    background-image: url('http://10.22.2.12:1181/stream.mjpg');
+}

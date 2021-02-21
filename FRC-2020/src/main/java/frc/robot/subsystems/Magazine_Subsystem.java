@@ -15,6 +15,9 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -28,10 +31,11 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.PCM2;
 import frc.robot.Constants.PWM;
+import frc.robot.subsystems.ifx.Logger;
 import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
 
-public class Magazine_Subsystem extends SubsystemBase {
+public class Magazine_Subsystem extends SubsystemBase implements Logger {
   // Physical limits
   static final double MIN_ANGLE = 20.7;  //measured at mechanical stops
   static final double MAX_ANGLE = 47.3;  //measured at mechanical limit
@@ -85,7 +89,11 @@ public class Magazine_Subsystem extends SubsystemBase {
   //law of cosine constants for motor strap calcs
   static final double STRAP_LENGTH_MIN = lawOfCosineLength(STRAP_LOWER_LEN, STRAP_UPPER_LEN, MIN_ANGLE - STRAP_OFFSET_ANGLE);
   static final double STRAP_LENGTH_MAX = lawOfCosineLength(STRAP_LOWER_LEN, STRAP_UPPER_LEN, MAX_ANGLE - STRAP_OFFSET_ANGLE);
-      
+  
+  private NetworkTable table;
+  private NetworkTableEntry nt_angle;
+  private NetworkTableEntry nt_pcCount;
+
   /**
    * MagazinePositioner_Subsystem
    * 
@@ -98,6 +106,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     final boolean kInverted = true;
     final int kPosSlot = 0;
     final int kVelSlot = 1;
+
 
     // we use velocity and positon modes, so two sets of PIDF values
     //pid values for motor P, I, D, F 
@@ -418,10 +427,22 @@ public class Magazine_Subsystem extends SubsystemBase {
     this.intake = intake;
     this.positioner = new MagazinePositioner();
 
+    //direct networktables logging
+    table = NetworkTableInstance.getDefault().getTable("Magazine");
+    nt_angle= table.getEntry("MagazineAngle");
+    nt_pcCount = table.getEntry("PCCount");
+
     // fill out dashboard stuff
     SendableRegistry.setSubsystem(this, "Magazine");
     SendableRegistry.setName(lightGate, this.getName(), "Mag LightGate");
     SendableRegistry.setName(beltMotor, this.getName(), "Mag Belt");
+  }
+
+  public void log(){
+
+    //post these values to network tables
+    nt_angle.setNumber(positioner.m_angle_linear);
+    nt_pcCount.setNumber(m_pcCount);
   }
 
   @Override

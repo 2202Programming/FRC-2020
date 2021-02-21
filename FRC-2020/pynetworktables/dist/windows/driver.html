@@ -71,5 +71,44 @@
       </frc-dashboard>
       <script src="./frc-web-components.js"></script>
       <script src="/networktables/networktables.js"></script>
+      <script>
+
+        class NumberLabel extends webbit.Webbit {
+    
+          static get styles() {
+            return webbit.css`
+              :host {
+                display: inline;
+                font-size: inherit;
+                font-family: inherit;
+                font-weight: inherit;
+                text-align: inherit;
+                box-sizing: border-box;
+                color: inherit;
+              }
+            `;
+          }
+    
+          static get properties() {
+            return {
+              value: { type: Number, primary: true },
+              precision: { type: Number }
+            };
+          }
+    
+          constructor() {
+            super();
+            this.value = 0;
+            this.precision = 2;
+          }
+    
+          render() {
+            return webbit.html`${this.value.toFixed(this.precision)}`;
+          }
+        }
+    
+        webbitRegistry.define('frc-number-label', NumberLabel);
+    
+      </script>
 </body>
 </html>

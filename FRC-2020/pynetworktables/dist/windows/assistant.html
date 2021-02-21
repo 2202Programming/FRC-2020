@@ -55,9 +55,10 @@
               </div>
               <div class="col-sm-3">
                 <h4>Intake/Shooter</h4>
-                <p>Magazine angle: <frc-label source-key="/Shuffleboard/Sys/Shooter/MAGPos/angle_lin"></frc-label></p>
-                <p>Shooter Upper RPM: <frc-label source-key="/Shooter/UpperRPM"></frc-label></p>
-                <p>Shooter Lower RPM: <frc-label source-key="/Shooter/LowerRPM"></frc-label></p>
+                <p>Magazine angle: <frc-number-label source-key="/Magazine/MagazineAngle"></frc-number-label></p>
+                <p>PC Count: <frc-number-label source-key="/Magazine/PCCount"></frc-number-label></p>
+                <p>Shooter Upper RPM: <frc-number-label source-key="/Shooter/UpperRPM"></frc-number-label></p>
+                <p>Shooter Lower RPM: <frc-number-label source-key="/Shooter/LowerRPM"></frc-number-label></p>
               </div>
             </div>
           </div>
@@ -66,5 +67,44 @@
       </frc-dashboard>
       <script src="./frc-web-components.js"></script>
       <script src="/networktables/networktables.js"></script>
+      <script>
+
+        class NumberLabel extends webbit.Webbit {
+    
+          static get styles() {
+            return webbit.css`
+              :host {
+                display: inline;
+                font-size: inherit;
+                font-family: inherit;
+                font-weight: inherit;
+                text-align: inherit;
+                box-sizing: border-box;
+                color: inherit;
+              }
+            `;
+          }
+    
+          static get properties() {
+            return {
+              value: { type: Number, primary: true },
+              precision: { type: Number }
+            };
+          }
+    
+          constructor() {
+            super();
+            this.value = 0;
+            this.precision = 2;
+          }
+    
+          render() {
+            return webbit.html`${this.value.toFixed(this.precision)}`;
+          }
+        }
+    
+        webbitRegistry.define('frc-number-label', NumberLabel);
+    
+      </script>
 </body>
 </html>

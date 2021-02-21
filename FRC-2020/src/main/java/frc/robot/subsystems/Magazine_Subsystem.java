@@ -31,11 +31,10 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.PCM2;
 import frc.robot.Constants.PWM;
-import frc.robot.subsystems.ifx.Logger;
 import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
 
-public class Magazine_Subsystem extends SubsystemBase implements Logger {
+public class Magazine_Subsystem extends SubsystemBase {
   // Physical limits
   static final double MIN_ANGLE = 20.7;  //measured at mechanical stops
   static final double MAX_ANGLE = 47.3;  //measured at mechanical limit
@@ -438,15 +437,12 @@ public class Magazine_Subsystem extends SubsystemBase implements Logger {
     SendableRegistry.setName(beltMotor, this.getName(), "Mag Belt");
   }
 
-  public void log(){
-
-    //post these values to network tables
-    nt_angle.setNumber(positioner.m_angle_linear);
-    nt_pcCount.setNumber(m_pcCount);
-  }
-
   @Override
-  public void periodic() { }
+  public void periodic() {
+        //post these values to network tables
+        nt_angle.setNumber(positioner.m_angle_linear);
+        nt_pcCount.setNumber(m_pcCount);
+   }
 
   public void beltOn(double motorStrength) {
     beltMotor.set(motorStrength);

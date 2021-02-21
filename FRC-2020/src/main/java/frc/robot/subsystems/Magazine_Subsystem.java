@@ -430,6 +430,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     table = NetworkTableInstance.getDefault().getTable("Magazine");
     nt_angle= table.getEntry("MagazineAngle");
     nt_pcCount = table.getEntry("PCCount");
+    nt_pcCount.setNumber(m_pcCount);
 
     // fill out dashboard stuff
     SendableRegistry.setSubsystem(this, "Magazine");
@@ -441,7 +442,6 @@ public class Magazine_Subsystem extends SubsystemBase {
   public void periodic() {
         //post these values to network tables
         nt_angle.setNumber(positioner.m_angle_linear);
-        nt_pcCount.setNumber(m_pcCount);
    }
 
   public void beltOn(double motorStrength) {
@@ -480,11 +480,13 @@ public class Magazine_Subsystem extends SubsystemBase {
 
   public void addPC() {
     m_pcCount++;
+    nt_pcCount.setNumber(m_pcCount);
   }
 
   public void removePC() {
     if (m_pcCount > 0)
       m_pcCount--;
+      nt_pcCount.setNumber(m_pcCount);
   }
 
   public int getPC() {

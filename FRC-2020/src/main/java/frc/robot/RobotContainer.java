@@ -28,6 +28,7 @@ import frc.robot.commands.intake.IntakePosition;
 import frc.robot.commands.intake.IntakePosition.Direction;
 import frc.robot.commands.intake.IntakePower;
 import frc.robot.commands.intake.IntakePower.Power;
+import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCaptureCmd;
 import frc.robot.commands.intake.ShooterOn;
@@ -140,19 +141,16 @@ public class RobotContainer {
 
     //testing
     var magPos = intake.getMagazine().getMagPositioner();
-    dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 10.0))
-            .whenReleased( () -> magPos.stopAndHold(true));
-    dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -10.0))
-            .whenReleased( () -> magPos.stopAndHold(true));
+    dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 15.0));
+    dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -15.0));
+           // .whenReleased( () -> magPos.zeroPower(false));
     
-    dc.bind(Id.Assistant, XboxButton.RB).whenPressed( 
-       new InstantCommand( magPos::unlock)
-          .andThen( () ->  magPos.setAngle(35.0)) )
-          .whenReleased( () -> magPos.stopAndHold(true));
+    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineAngle(intake,  38.0));
+      //  .whenReleased( () -> magPos.stopAndHold(true));
 
     //right joystick pushdown button
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( magPos::calibrate));
-    dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( magPos::lock /* magPos::calibrate*/));   
+    dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( magPos::lock));   
   }
 
   /**

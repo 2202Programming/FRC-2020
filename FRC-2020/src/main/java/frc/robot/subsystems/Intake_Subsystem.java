@@ -371,11 +371,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
  * @param layout  - panel to put the data on
  */
   public void addDashboardWidgets(ShuffleboardLayout layout) {
-    layout.addNumber("MO/Upper", upper_shooter::getMotorOutputPercent ).withSize(2, 1) ;
+    /*layout.addNumber("MO/Upper", upper_shooter::getMotorOutputPercent ).withSize(2, 1) ;
     layout.addNumber("MO/Lower", lower_shooter::getMotorOutputPercent ) ;
     layout.addNumber("RPM/Upper", () -> actual.upper).withSize(2,1);
     layout.addNumber("RPM/Lower", ()-> actual.lower);
     layout.addNumber("RPM/ErrorL", () -> error.lower );
+    */
   }
 
 

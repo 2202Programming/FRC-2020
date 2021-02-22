@@ -12,6 +12,7 @@ import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
 
@@ -39,10 +40,9 @@ public class Magazine_Subsystem extends SubsystemBase {
   static final double MIN_ANGLE = 20.7;  //measured at mechanical stops
   static final double MAX_ANGLE = 47.3;  //measured at mechanical limit
 
-  // Pot Volts measured at top & bottom position
+  // Pot Volts measured at top & bottom position <measured>
   static final double VatMin = 0.4541; // volts at 21 degrees (min mag angle)
   static final double VatMax = 3.718;  // volts at 46.8 degrees (max mag angle)
-
 
   static final double MAX_SOFT_STOP = 46.0;
   static final double MIN_SOFT_STOP = 25.0;
@@ -63,19 +63,17 @@ public class Magazine_Subsystem extends SubsystemBase {
    * MAG_ANGLE_OFFSET gets us to the degrees from horizontal we need.
    * 
    */
-  static final double MAG_ANGLE_OFFSET = 28.07; //degrees - rotation due to frame
+  static final double MAG_ANGLE_OFFSET = 28.10; //degrees - rotation due to frame
 
   // arm lengths for yo-yo pot anchor points
-  static final double POT_UPPER_LEN = 19.25;  // inch
-  static final double POT_LOWER_LEN = 21.50;  // inch 
-  static final double POT_OFFSET_E = 15.67;   //degrees - off set from pot angle base
-
-  
+  static final double POT_UPPER_LEN = 19.25;  // inch - c"
+  static final double POT_LOWER_LEN = 20.11;  // inch - d"
+  static final double POT_OFFSET_E = 14.13;   //degrees - off set from pot angle base -E"
 
   // Strap / motor lengths - includes pully
-  static final double STRAP_UPPER_LEN = 21.265;  // inch, includes pully takeup@max angle (unwound)
-  static final double STRAP_LOWER_LEN = 20.22;   // inch
-  static final double STRAP_OFFSET_E = 19.99;    //degres - off set from pot angle base
+  static final double STRAP_UPPER_LEN = 23.12;  // inch, includes pully (unwound) - c'
+  static final double STRAP_LOWER_LEN = 20.58;   // inch - d'
+  static final double STRAP_OFFSET_E = 22.60;    //degres - off set from pot angle base E
 
   // Strap and yoyo pot have different angular offset based on the geometry
   static final double STRAP_OFFSET_ANGLE =  MAG_ANGLE_OFFSET - STRAP_OFFSET_E;
@@ -174,7 +172,6 @@ public class Magazine_Subsystem extends SubsystemBase {
       posPIDvalues.copyTo(anglePID, kPosSlot);
       velPIDvalues.copyTo(anglePID, kVelSlot);
       angleMotor.burnFlash();
-      angleEncoder.setPosition(0.0);
 
       //call periodic to read our values and calibrate
       periodic();
@@ -245,6 +242,10 @@ public class Magazine_Subsystem extends SubsystemBase {
       min_encoder_pos = (STRAP_LENGTH_MIN - m_strap_zero) * kRevPerInch;
       max_encoder_pos = (STRAP_LENGTH_MAX - m_strap_zero) * kRevPerInch;
 
+      //use the limits as soft limits on the motor controller
+      angleMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) min_encoder_pos);
+      angleMotor.setSoftLimit(SoftLimitDirection.kForward, (float) max_encoder_pos);
+
       // force angle setpoint to current position
       m_angleSetpoint = potang + POT_OFFSET_ANGLE;
     }
@@ -268,10 +269,14 @@ public class Magazine_Subsystem extends SubsystemBase {
 
       //calculate motor postion in revs from our calibration positon
       double setpoint = (m_lengthSetpoint - m_strap_zero)*kRevPerInch;
-      
+      setpoint = edu.wpi.first.wpiutil.math.MathUtil.clamp(setpoint, min_encoder_pos, max_encoder_pos);
+
       // we need to give the pawl a chance to unlock
-      if (setpoint >= angleEncoder.getPosition() && isLocked()) {
+      if (setpoint > angleEncoder.getPosition() && isLocked()) {
         waitForMotion();
+      } else if (isLocked()) {
+        // no need to wait for motion, going in pawl favorable direction
+        unlock();
       }
      
       CANError err = anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot);

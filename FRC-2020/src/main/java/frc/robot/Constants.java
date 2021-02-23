@@ -282,8 +282,8 @@ public final class Constants {
 
       // Reasonable baseline values for a RAMSETE follower in units of meters and
       // seconds - DPL not sure about how to convert to feet.
-      public static final double kRamseteB = .6;
-      public static final double kRamseteZeta = 0.1;
+      public static final double kRamseteB = .35;
+      public static final double kRamseteZeta = 0.9;
     }
 
 }

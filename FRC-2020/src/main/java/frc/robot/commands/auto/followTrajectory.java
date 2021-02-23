@@ -19,8 +19,8 @@ public class followTrajectory extends CommandBase {
   DifferentialDriveKinematics kinematics;
 
   // Ramsete constants - todo wire to ux
-  double beta = 2.0;
-  double zeta = 0.7;
+  double beta = .5;   // larger more aggressive convergence
+  double zeta = 0.9; //larger more damping 
 
   /** Creates a new followTrajectory. */
   public followTrajectory(VelocityDrive drive, Trajectory trajectory) {
@@ -44,7 +44,7 @@ public class followTrajectory extends CommandBase {
   @Override
   public void initialize() {
     // pull a trajectory from the chooser if possible
-    if ((trajectory == null) && (chooser != null)) {
+    if (chooser != null) {
       trajectory = chooser.getSelected();
     }
     if (trajectory != null) {

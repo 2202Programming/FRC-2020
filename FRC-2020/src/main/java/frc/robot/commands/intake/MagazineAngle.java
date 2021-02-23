@@ -9,41 +9,56 @@ import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Magazine_Subsystem.MagazinePositioner;
 
 public class MagazineAngle extends CommandBase {
+  // manual up/down at const motor speed or to an exact position
+  public enum Direction {Up, Down, ToPositon};
+  static final double RPM = 10;
 
-  MagazinePositioner  magPositioner; 
-  double degrees;
+  final MagazinePositioner  magPositioner; 
+  final double degrees;
+  final Direction direction;
 
   /** Creates a new MagazineAngle. */
+  public MagazineAngle(Intake_Subsystem intake, Direction dir) {
+    this.magPositioner = intake.getMagazine().getMagPositioner();
+    this.degrees = 0.0;
+    this.direction = dir;
+    addRequirements(magPositioner);
+  }
+
   public MagazineAngle(Intake_Subsystem intake, double degrees) {
-    magPositioner = intake.getMagazine().getMagPositioner();
+    this.magPositioner = intake.getMagazine().getMagPositioner();
     this.degrees = degrees;
+    this.direction=Direction.ToPositon;
     addRequirements(magPositioner);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    magPositioner.setAngle(degrees);
+    switch (direction) {
+      case Up:
+              magPositioner.wind(RPM);
+              break;
+      case Down:
+              magPositioner.wind(-RPM);
+              break;
+      case ToPositon:
+            magPositioner.setAngle(degrees);
+            break;
+    }
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // if interrupted, don't lock.  
+    // no matter how we got here, manual, or ToPosition, call it home.
     magPositioner.stopAndHold(false);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    boolean  done = magPositioner.isAtSetpoint();
-    if (done) {
-      //magPositioner.stopAndHold(false);
-    }
-    return done;
+   if ( direction == Direction.ToPositon) return magPositioner.isAtSetpoint();
+   return false;  // manual never done
   }
 }

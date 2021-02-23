@@ -32,7 +32,6 @@ import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCaptureCmd;
 import frc.robot.commands.intake.ShooterOn;
-import frc.robot.commands.test.subsystem.MagazineManualWind_test;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -140,17 +139,14 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new IntakePosition(intake, Direction.Toggle));
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
 
-    //testing
-    var magPos = intake.getMagazine().getMagPositioner();
-    dc.bind(Id.Assistant, XboxButton.START).whileHeld(new MagazineManualWind_test(intake, 15.0));
-    dc.bind(Id.Assistant, XboxButton.BACK).whileHeld(new MagazineManualWind_test(intake, -15.0));
-           // .whenReleased( () -> magPos.zeroPower(false));
-    
-    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineAngle(intake,  38.0));
 
-    //right joystick pushdown button
-    dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( magPos::calibrate));
-    dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( magPos::lock));   
+    //Magazine Angle - POV hat
+    dc.bind(Id.Assistant, XboxButton.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));
+    dc.bind(Id.Assistant, XboxButton.POV_DOWN).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Down));
+    dc.bind(Id.Assistant, XboxButton.POV_LEFT).whenPressed(new MagazineAngle(intake, 35.0));
+    dc.bind(Id.Assistant, XboxButton.POV_RIGHT).whenPressed(new MagazineAngle(intake, 42.0));
+    //allow a manual lock on the positioner
+    dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
   }
 
   /**

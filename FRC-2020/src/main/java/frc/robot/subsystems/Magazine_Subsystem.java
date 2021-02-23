@@ -104,7 +104,6 @@ public class Magazine_Subsystem extends SubsystemBase {
     final int kPosSlot = 0;
     final int kVelSlot = 1;
 
-
     // we use velocity and positon modes, so two sets of PIDF values
     //pid values for motor P, I, D, F 
     PIDFController posPIDvalues = new PIDFController(0.25, 0.001, 5, 0.0);
@@ -161,7 +160,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     double m_angleSetpoint;  // degrees <input>
 
     MagazinePositioner() {
-      SendableRegistry.setName(anglePot, this.getName(), "Mag Angle");
+      SendableRegistry.setName(anglePot, this.getName(), "YoYoPot");
       
       // configure sparkmax motor
       angleMotor.restoreFactoryDefaults(false);
@@ -180,6 +179,10 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
 
     public void addDashboardWidgets(ShuffleboardLayout layout) {
+      layout.addNumber("MAGPos/angle_mot", () -> m_angle_motor); 
+    }
+
+    public void addDebugDashboardWidgets(ShuffleboardLayout layout) {
       layout.addNumber("MAGPos/angle_lin", () -> m_angle_linear).withSize(2, 5);
       layout.addNumber("MAGPos/angle_pot", () -> m_angle_pot); 
       layout.addNumber("MAGPos/angle_mot", () -> m_angle_motor); 
@@ -187,7 +190,6 @@ public class Magazine_Subsystem extends SubsystemBase {
       layout.addNumber("MAGPos/len_strap", () -> m_length_motor );
       layout.addNumber("MAGPos/encoder",   () -> m_enc_pos);
     }
-
 
     @Override
     public void periodic() {

@@ -255,8 +255,8 @@ public class Magazine_Subsystem extends SubsystemBase {
      * @return
      */
     public double get() {
-      return m_angle_pot;
-      //return m_angle_motor;
+      //return m_angle_pot;
+      return m_angle_motor;
     }
 
     public void setAngle(double magDeg) { 

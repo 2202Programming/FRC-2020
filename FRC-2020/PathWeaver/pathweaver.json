@@ -1,9 +1,9 @@
 {
   "lengthUnit": "Foot",
   "exportUnit": "Same as Project",
-  "maxVelocity": 2.0,
+  "maxVelocity": 5.0,
   "maxAcceleration": 1.0,
-  "wheelBase": 2.083,
-  "gameName": "Galactic Search B",
+  "wheelBase": 2.125,
+  "gameName": "Infinite Recharge",
   "outputDir": ""
 }

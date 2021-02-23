@@ -67,11 +67,13 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private NetworkTable table;
   private NetworkTableEntry nt_upperRPM;
   private NetworkTableEntry nt_lowerRPM;
+  private NetworkTableEntry nt_autoShooterMode;
 
   // Intake
   Spark intake_spark = new Spark(PWM.INTAKE);
   DoubleSolenoid intakeSolenoid = new DoubleSolenoid(INTAKE_PCM_CAN_ID, INTAKE_UP_SOLENOID_PCM, INTAKE_DOWN_SOLENOID_PCM);
- 
+
+
   // Magazine is used for a few controls 
   Magazine_Subsystem magazine;
 
@@ -169,6 +171,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   //state variables
   private boolean intakeIsOn = false;
   private boolean shooterIsOn = false;
+  private boolean autoShootOn = false;
 
   public Intake_Subsystem() {
     // Construct the magazine 
@@ -181,6 +184,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     table = NetworkTableInstance.getDefault().getTable("Shooter");
     nt_upperRPM = table.getEntry("UpperRPM");
     nt_lowerRPM = table.getEntry("LowerRPM");
+    nt_autoShooterMode = table.getEntry("ShootingAutoMode");
+    nt_autoShooterMode.setBoolean(autoShootOn);
 
     // build out matrix to calculate FW RPM from [omega , Vel] for power cell
     VelToRPM.set(0, 0, Shooter.PCEffectiveRadius / Shooter.lowerFWConfig.flywheelRadius);
@@ -192,6 +197,15 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     //TODO: fix magazine.lower(); // must start in down positon
    ///dpl shop debug raiseIntake();    // must start in the up position
    lowerIntake(); //dpl shop debug
+  }
+
+  public void toggleShootingMode() {
+    shooterIsOn = shooterIsOn ? false : true;
+    nt_autoShooterMode.setBoolean(autoShootOn);
+  }
+
+  public boolean getShootingMode(){
+    return shooterIsOn;
   }
 
   @Override

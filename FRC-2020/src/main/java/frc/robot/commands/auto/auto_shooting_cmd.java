@@ -18,8 +18,9 @@ public class auto_shooting_cmd extends SequentialCommandGroup {
   public auto_shooting_cmd(Intake_Subsystem intake, ShooterOn.Data cmdData, ArcadeDrive drive, 
                             Limelight_Subsystem limelight, double maxSpeed) {
 
-    if (intake.getShootingMode())
-    { //limelight-guided auto-aim shooting mode
+    if (intake.getShootingMode() && limelight.valid())
+    { //limelight-guided auto-aim shooting mode, only auto-aim if limelight has a target
+      //todo: warmup the shooter?
       addCommands(new auto_limelightTurnToShoot_cmd(drive, limelight, 1),
                   new ShooterOn(intake, ShooterOnCmd.data));
     } else {

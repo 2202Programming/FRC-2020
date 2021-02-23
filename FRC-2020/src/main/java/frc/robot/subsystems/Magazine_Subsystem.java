@@ -166,7 +166,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       // configure sparkmax motor
       angleMotor.restoreFactoryDefaults(false);
       angleMotor.setInverted(kInverted);
-      angleMotor.setIdleMode(IdleMode.kCoast);
+      angleMotor.setIdleMode(IdleMode.kBrake);
      
       //copy the sw pidvalues to the hardware
       posPIDvalues.copyTo(anglePID, kPosSlot);
@@ -325,7 +325,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     void burp() 
     {
        // may have to burp the motor to unlock the pawl, go back slowly
-       anglePID.setReference(-150.0, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+       anglePID.setReference(-250.0, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
     }
 
     /**

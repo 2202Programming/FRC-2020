@@ -277,6 +277,11 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     return new FlywheelRPM(omega.get(0,0), omega.get(1,0));
   }
 
+  public void shooterWarmup(double goals){
+    upper_shooter.setRPM(goals);
+    lower_shooter.setRPM(goals);
+  }
+
   /**
    * Commands shooter flwwheels to target RPM
    * 

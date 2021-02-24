@@ -16,8 +16,14 @@ import frc.robot.subsystems.ifx.ArcadeDrive;
 public class auto_shooting_cmd extends SequentialCommandGroup {
   /** Creates a new auto_shooting_cmd. */
 
+  private final Intake_Subsystem intake;
+  private final Limelight_Subsystem limelight;
+
   public auto_shooting_cmd(Intake_Subsystem intake, ShooterOn.Data cmdData, ArcadeDrive drive, 
                             Limelight_Subsystem limelight, double maxSpeed) {
+    
+    this.intake = intake;
+    this.limelight = limelight;
 
     if (intake.getShootingMode() && limelight.valid())
     { //limelight-guided auto-aim shooting mode, only auto-aim if limelight has a target
@@ -28,6 +34,13 @@ public class auto_shooting_cmd extends SequentialCommandGroup {
     } else {
       addCommands(new ShooterOn(intake, ShooterOnCmd.data));
     }
-    
   }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+      intake.shooterOff();
+      limelight.disableLED();
+    }
+
 }

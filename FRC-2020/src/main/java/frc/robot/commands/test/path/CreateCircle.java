@@ -34,20 +34,24 @@ public class CreateCircle {
     double theta0 = 0.0;
     Rotation2d thetaRot2d;
 
+    final Rotation2d offset = Rotation2d.fromDegrees(90);  //assume robot is facing away from us
+
     if (k < 0.0) {
         X0 = radius;
         radius *= -1.0;
       //theta0 = Math.toRadians(360);
     }
 
-    // walk the circle
+    // walk the circle 
     for (double t = 0.0; t < (totalTime); t += dt) {
       double theta = w * t + theta0;
       thetaRot2d = new Rotation2d(theta);
       double x = radius * thetaRot2d.getCos() + X0;
       double y = radius * thetaRot2d.getSin() + Y0;
 
-      var pose = new Pose2d(x, y, thetaRot2d);
+      // correct theta for robot pose
+      var th = thetaRot2d.rotateBy(offset); 
+      var pose = new Pose2d(x, y, th);
       circlePoints.add(new State(t, velocity, 0.0, pose, k));
     }
 

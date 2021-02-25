@@ -154,7 +154,7 @@ public class RobotContainer {
     //test
     CreateCircle circle = new CreateCircle(2, 1.5, 360);
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
-
+    System.out.println(circle);
   }
 
   /**

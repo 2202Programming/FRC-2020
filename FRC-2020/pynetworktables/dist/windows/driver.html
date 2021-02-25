@@ -46,19 +46,19 @@
         <div class="container-fluid">
             <div class="row">
               <div class="col-sm-6">
-                <frc-differential-drivebase source-key="/LiveWindow/Ungrouped/DifferentialDrive[1]"></frc-differential-drivebase>
-                <frc-gyro source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/theta" precision="2"></frc-gyro>
-              </div>
-              <div class="col-sm-3">
-                <div id="shooter_camera" style="margin-top: 40px;"></div>
+                <div id="shooter_camera_2" style="margin-top: 40px;"></div>
                 <p>Shooter</p>
               </div>
-              <div class="col-sm-3">
-                <div id="limelight_camera" style="margin-top: 40px;"></div>
+              <div class="col-sm-6">
+                <div id="limelight_camera_2" style="margin-top: 40px;"></div>
                 <p>Limelight</p>
               </div>
             </div>
             <div class="row">
+              <div class="col-sm-6 bg-dark">
+                <frc-differential-drivebase source-key="/LiveWindow/Ungrouped/DifferentialDrive[1]"></frc-differential-drivebase>
+                <frc-gyro source-key="/Shuffleboard/Sys/DriveTrain/DT/pos/theta" precision="2"></frc-gyro>
+              </div>
               <div class="col-sm-3">
                 <h4>Modes</h4>
                 <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/DriverMode/active"></frc-label></p>

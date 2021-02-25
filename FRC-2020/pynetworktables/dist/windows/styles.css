@@ -102,3 +102,75 @@ h1, h2, h3, h4, h5, p, a, label, input, img, iframe{
   /* You'll need to mess with this a bit to get your camera to work. Replace the url with a live-updating image feed from your camera. Using other camera streaming systems will require some tweaking. */
   background-image: url('http://10.22.2.11:5800/');
 }
+
+#shooter_camera_2 {
+  padding: 0;
+  /* position: fixed;
+  bottom: 0;
+  left: 0; */
+  width: 500px;
+  height: 375px;
+  overflow: hidden;
+  background-color: #333;
+  /* You'll need to mess with this a bit to get your camera to work. Replace the url with a live-updating image feed from your camera. Using other camera streaming systems will require some tweaking. */
+  background-image: url('http://10.22.2.12:1181/stream.mjpg');
+  background-repeat: no-repeat;
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
+
+#magazine_camera_2 {
+padding: 0;
+/* position: fixed;
+bottom: 0;
+left: 0; */
+width: 500px;
+height: 375px;
+overflow: hidden;
+background-color: #333;
+/* You'll need to mess with this a bit to get your camera to work. Replace the url with a live-updating image feed from your camera. Using other camera streaming systems will require some tweaking. */
+background-image: url('http://10.22.2.12:1182/stream.mjpg');
+background-repeat: no-repeat;
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
+
+#intake_camera_2 {
+padding: 0;
+/* position: fixed;
+bottom: 0;
+left: 0; */
+width: 500px;
+height: 375px;
+overflow: hidden;
+background-color: #333;
+/* You'll need to mess with this a bit to get your camera to work. Replace the url with a live-updating image feed from your camera. Using other camera streaming systems will require some tweaking. */
+background-image: url('http://10.22.2.12:1183/stream.mjpg');
+background-repeat: no-repeat;
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
+
+#limelight_camera_2 {
+padding: 0;
+/* position: fixed;
+bottom: 0;
+left: 0; */
+width: 500px;
+height: 375px;
+overflow: hidden;
+background-color: #333;
+/* You'll need to mess with this a bit to get your camera to work. Replace the url with a live-updating image feed from your camera. Using other camera streaming systems will require some tweaking. */
+background-image: url('http://10.22.2.11:5800/');
+background-repeat: no-repeat;
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}

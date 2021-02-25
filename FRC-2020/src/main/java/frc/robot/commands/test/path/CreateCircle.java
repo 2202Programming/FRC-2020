@@ -8,54 +8,75 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
 
 public class CreateCircle {
-
-  final double N = 10;  //points / second
-  final double dt;  // sec timestep
+  final double dt = .1;  // sec timestep
+  final double radius;
   final double k;
+  final double velocity;
+  final double distance;
+  final double totalTime;
+  final double w;
+
+  double X0;
+  double Y0;
+  double theta0;
 
   Trajectory trajectory;
+  final Rotation2d robot_offset;
   Pose2d initPose;
   Pose2d finalPose;
 
   public CreateCircle(double radius, double velocity, double degrees) {
+    // inital position of robot... [0,0,90] [x, y, theta]
+    robot_offset = Rotation2d.fromDegrees(90);  //assume robot is facing away from us
+    this.velocity = velocity;
 
     ArrayList<State> circlePoints = new ArrayList<>();
-    double distance =  Math.abs(Math.toRadians(degrees) * radius);
-    double totalTime =  distance / velocity; // seconds
-    double w = Math.toRadians(degrees) / totalTime; // radians /s
+    distance =  Math.abs(Math.toRadians(degrees) * radius);
+    totalTime =  distance / velocity; // seconds
+    w = Math.toRadians(degrees) / totalTime; // radians /s
     k = Math.copySign( 1.0 / radius, degrees);
 
-    // set dt based on having N pts / sec
-    dt = .1;
+    // field coordinates
+    Y0 = 0.0; 
+    theta0 = 0.0;  // portion of the arc we are computing,  [0 .. degrees]
 
-    // field coordinates// really function of incoming pose, assume [0,0,0] [x, y, theta]
-    double X0 = -radius; 
-    double Y0 = 0.0;
-    double theta0 = 0.0;
-    Rotation2d thetaRot2d;
-
-    final Rotation2d offset = Rotation2d.fromDegrees(90);  //assume robot is facing away from us
-
+    // positive to the left, negitive to the right; adjust so robot is 0, 0
+    // also adjust radius based on left/right curvature
     if (k < 0.0) {
         X0 = radius;
-        radius *= -1.0;
-      //theta0 = Math.toRadians(360);
-    }
+        this.radius = -radius;
+    } 
+    else {
+       X0 = -radius; 
+      this.radius = radius;     
+    } 
 
-    // walk the circle 
+    // walk the circle - field coord, theta is not robot, it is just for calc X, Y of arc 
     for (double t = 0.0; t < (totalTime); t += dt) {
-      double theta = w * t + theta0;
-      thetaRot2d = new Rotation2d(theta);
-      double x = radius * thetaRot2d.getCos() + X0;
-      double y = radius * thetaRot2d.getSin() + Y0;
-
-      // correct theta for robot pose
-      var th = thetaRot2d.rotateBy(offset); 
-      var pose = new Pose2d(x, y, th);
-      circlePoints.add(new State(t, velocity, 0.0, pose, k));
+      circlePoints.add(calculatePoint(t));
     }
-
+    //add one more point at the exact ending time
+    circlePoints.add(calculatePoint(totalTime));
+   
+    // construct the trajectory
     trajectory = new Trajectory(circlePoints);
+  }
+
+  /**
+   * 
+   * @param t - where in the time series to calculate based on circle
+   * @return  State object on the circle
+   */
+  State calculatePoint(double t) {
+    double theta = w * t + theta0;
+    Rotation2d thetaRot2d = new Rotation2d(theta);
+    double x = radius * thetaRot2d.getCos() + X0;
+    double y = radius * thetaRot2d.getSin() + Y0;
+
+    // correct theta for robot pose
+    var th = thetaRot2d.rotateBy(robot_offset); 
+    var pose = new Pose2d(x, y, th);
+    return new State(t, velocity, 0.0, pose, k);
   }
 
   public Trajectory getTrajectory() {return trajectory;}

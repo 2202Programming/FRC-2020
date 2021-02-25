@@ -26,7 +26,7 @@ public class CreateCircle {
     k = Math.copySign( 1.0 / radius, degrees);
 
     // set dt based on having N pts / sec
-    dt = 1.0 / totalTime * N;
+    dt = .1;
 
     // field coordinates// really function of incoming pose, assume [0,0,0] [x, y, theta]
     double X0 = -radius; 

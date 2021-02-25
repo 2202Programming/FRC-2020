@@ -282,8 +282,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
      * encoder.getVelocity() - motor turn in RPM ; rps = rpm/60
      *
      **/
-    m_velLeft = (K_ft_per_rev * WheelWearLeft * kGR / 60.0) * leftEncoder.getVelocity();
-    m_velRight = (K_ft_per_rev * WheelWearRight * kGR / 60.0) * rightEncoder.getVelocity();
+    m_velLeft = (Kleft * K_ft_per_rev * WheelWearLeft * kGR / 60.0) * leftEncoder.getVelocity();
+    m_velRight = (Kright * K_ft_per_rev * WheelWearRight * kGR / 60.0) * rightEncoder.getVelocity();
 
     // Update the odometry in the periodic block, physical units
     m_odometry.update(readGyro(), m_posLeft, m_posRight);

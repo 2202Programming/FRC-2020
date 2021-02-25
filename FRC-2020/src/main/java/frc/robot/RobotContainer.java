@@ -20,6 +20,7 @@ import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.auto_drivePath_cmd;
 import frc.robot.commands.auto.auto_shooting_cmd;
+import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -32,6 +33,7 @@ import frc.robot.commands.intake.IntakePower.Power;
 import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCaptureCmd;
+import frc.robot.commands.test.path.CreateCircle;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -148,6 +150,11 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.POV_RIGHT).whenPressed(new MagazineAngle(intake, 42.0));
     //allow a manual lock on the positioner
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
+
+    //test
+    CreateCircle circle = new CreateCircle(3, 2, 180);
+    dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
+
   }
 
   /**

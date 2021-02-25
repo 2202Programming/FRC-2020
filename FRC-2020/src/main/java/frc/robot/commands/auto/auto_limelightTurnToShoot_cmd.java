@@ -81,7 +81,7 @@ public class auto_limelightTurnToShoot_cmd extends CommandBase {
     SmartDashboard.putData(anglePIDController);
   
     // move rotation only
-    drive.arcadeDrive(0, angleCmd);
+    drive.arcadeDrive(0, -angleCmd);
   }
 
   // Called once the command ends or is interrupted.

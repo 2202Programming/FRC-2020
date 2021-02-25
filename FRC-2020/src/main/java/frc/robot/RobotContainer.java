@@ -15,10 +15,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.DriverPrefs;
-import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
-import frc.robot.commands.auto.auto_shooting_cmd;
+import frc.robot.commands.auto.auto_limelightTurnToShoot_cmd;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
@@ -141,7 +140,9 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new InstantCommand(intake::toggleShootingMode)); 
     dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new IntakePosition(intake, Direction.Toggle));
     //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
-    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new auto_shooting_cmd(intake, ShooterOnCmd.data, driveTrain, limelight, 1.0)); 
+   // dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new auto_shooting_cmd(intake, ShooterOnCmd.data, driveTrain, limelight, 1.0)); 
+    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenPressed(new auto_limelightTurnToShoot_cmd(driveTrain, limelight, 1)); 
+    
 
     //Magazine Angle - POV hat
     dc.bind(Id.Assistant, XboxButton.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));

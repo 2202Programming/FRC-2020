@@ -200,12 +200,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
   public void toggleShootingMode() {
-    shooterIsOn = shooterIsOn ? false : true;
+    autoShootOn = autoShootOn ? false : true;
     nt_autoShooterMode.setBoolean(autoShootOn);
   }
 
   public boolean getShootingMode(){
-    return shooterIsOn;
+    return autoShootOn;
   }
 
   @Override

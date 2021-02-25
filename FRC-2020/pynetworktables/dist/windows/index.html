@@ -116,11 +116,31 @@
           <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/PathChooser/active"></frc-label></p>
         </div>
       </div>
-      <div class="row">
+      <br>
+      <br>
+      <div class="row bg-dark">
+        <div class="col-sm-3">
+          <frc-3-axis-accelerometer source-key="/Drivetrain" style="margin-left: 20px; margin-top: 40px;"></frc-3-axis-accelerometer>
+        </div>
         <div class="col-sm-6">
-          <frc-3-axis-accelerometer source-key="/Drivetrain" style="margin-left: 20px;"></frc-3-axis-accelerometer>
+          <nt-string key="/Shooter/title" value="Shooter RPM"></nt-string>
+          <nt-number key="/Shooter/minY" value="0"></nt-number>
+          <nt-number key="/Shooter/maxY" value="4000"></nt-number>
+          <nt-string key="/Shooter/xAxisLabel" value="Time"></nt-string>
+          <nt-string key="/Shooter/yAxisLabel" value="RPM"></nt-string>
+          <nt-string key="/Shooter/UpperRPM/label" value="Upper RPM"></nt-string>
+          <nt-string key="/Shooter/LowerRPM/label" value="Upper RPM"></nt-string>
+          <nt-string key="/Shooter/UpperRPM/color" value="green"></nt-string>
+          <nt-string key="/Shooter/LowerRPM/color" value="red"></nt-string>
+          <frc-line-chart
+          source-key="/Shooter">
+            <frc-chart-data source-key="/Shooter/UpperRPM"></frc-chart-data>
+            <frc-chart-data source-key="/Shooter/LowerRPM"></frc-chart-data>
+      </frc-line-chart></p>
         </div>
       </div>
+      <br>
+      <br>
       <div class="row">
         <div class="col-sm-6">
           <h4>Camera test</h4>
@@ -133,20 +153,6 @@
           style="width: 798px; -height: 759px;"
           ></frc-camera>
           <p>
-            <nt-string key="/Shooter/title" value="Shooter RPM"></nt-string>
-            <nt-number key="/Shooter/minY" value="0"></nt-number>
-            <nt-number key="/Shooter/maxY" value="4000"></nt-number>
-            <nt-string key="/Shooter/xAxisLabel" value="Time"></nt-string>
-            <nt-string key="/Shooter/yAxisLabel" value="RPM"></nt-string>
-            <nt-string key="/Shooter/UpperRPM/label" value="Upper RPM"></nt-string>
-            <nt-string key="/Shooter/LowerRPM/label" value="Upper RPM"></nt-string>
-            <nt-string key="/Shooter/UpperRPM/color" value="green"></nt-string>
-            <nt-string key="/Shooter/LowerRPM/color" value="red"></nt-string>
-            <frc-line-chart
-            source-key="/Shooter">
-              <frc-chart-data source-key="/Shooter/UpperRPM"></frc-chart-data>
-              <frc-chart-data source-key="/Shooter/LowerRPM"></frc-chart-data>
-        </frc-line-chart></p>
 
         </div>
       </div>

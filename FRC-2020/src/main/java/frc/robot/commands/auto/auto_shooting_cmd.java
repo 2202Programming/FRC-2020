@@ -41,6 +41,7 @@ public class auto_shooting_cmd extends SequentialCommandGroup {
     public void end(boolean interrupted) {
       intake.shooterOff();
       limelight.disableLED();
+      intake.getMagazine().beltOff();
     }
 
 }

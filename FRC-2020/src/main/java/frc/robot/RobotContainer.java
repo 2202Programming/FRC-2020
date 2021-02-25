@@ -18,7 +18,6 @@ import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
-import frc.robot.commands.auto.auto_drivePath_cmd;
 import frc.robot.commands.auto.auto_shooting_cmd;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.drive.InvertDriveControls;
@@ -39,6 +38,7 @@ import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
+import frc.robot.subsystems.Pdp_subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.hid.XboxAxis;
@@ -71,7 +71,7 @@ public class RobotContainer {
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
   public final Dashboard dashboard;
-  //public final Pdp_subsystem pdp;
+  public final Pdp_subsystem pdp;
   
   
   /**
@@ -88,7 +88,7 @@ public class RobotContainer {
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
-    //pdp = new Pdp_subsystem();
+    pdp = new Pdp_subsystem();
     
     
     //panel = new Control_Panel();
@@ -128,7 +128,7 @@ public class RobotContainer {
 
     //auto path testing
     //dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getPath()));
-    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd/*followTrajectory*/(driveTrain, dashboard.getTrajectoryChooser()));
+    dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
 
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
@@ -152,7 +152,7 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
 
     //test
-    CreateCircle circle = new CreateCircle(3, 1.5, 180);
+    CreateCircle circle = new CreateCircle(2, 1.5, 360);
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
 
   }

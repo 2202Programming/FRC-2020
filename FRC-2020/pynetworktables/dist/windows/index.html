@@ -44,8 +44,8 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-6 bg-dark">
-            <frc-differential-drivebase source-key="/LiveWindow/Ungrouped/DifferentialDrive[1]"></frc-differential-drivebase>
-            <frc-gyro source-key="/Drivetrain/Theta" precision="2"></frc-gyro>
+            <frc-differential-drivebase source-key="/LiveWindow/Ungrouped/DifferentialDrive[1]" style="margin-top: 20px;"></frc-differential-drivebase>
+            <frc-gyro source-key="/Drivetrain/Theta" precision="2" style="margin-bottom: 20px;"></frc-gyro>
         </div>
         <div class="col-sm-3">
           <div>
@@ -123,6 +123,10 @@
           <nt-number key="/Drivetrain/min" value="-2"></nt-number>
           <nt-number key="/Drivetrain/max" value="2"></nt-number>
           <frc-3-axis-accelerometer source-key="/Drivetrain" style="margin-left: 20px; margin-top: 40px;"></frc-3-axis-accelerometer>
+          <h4>Voltage</h4>
+          <nt-number key="/LiveWindow/PowerDistributionPain[0]/Voltage/min" value="0"></nt-number>
+          <nt-number key="/LiveWindow/PowerDistributionPain[0]/Voltage/max" value="14"></nt-number>
+          <frc-number-bar source-key="/LiveWindow/PowerDistributionPain[0]/Voltage" style="margin-left: 20px;"></frc-number-bar>
         </div>
         <div class="col-sm-4">
           <nt-string key="/Shooter/title" value="Shooter RPM"></nt-string>

@@ -149,14 +149,16 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     public double vel;   // power cell ft/sec 
     public double rps;   // power cell rotations/sec 
     public double angle; // angle to set the shooter output
+    public double velTol; // percent velocity Shooter must be at or below to fire
 
-    public ShooterSettings(double vel, double rps, double angle) {
+    public ShooterSettings(double vel, double rps, double angle, double velTol) {
       this.vel = vel; 
       this.rps = rps;
       this.angle = angle;
+      this.velTol = velTol;
     }
-    public ShooterSettings(ShooterSettings s) {this(s.vel, s.rps, s.angle);}
-    public ShooterSettings() {this(0.0, 0.0, 0.0);}
+    public ShooterSettings(ShooterSettings s) {this(s.vel, s.rps, s.angle, s.velTol);}
+    public ShooterSettings() {this(0.0, 0.0, 0.0, 0.1);}
   }
 
   // All RPM are in FW-RPM, not motor.
@@ -241,7 +243,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     intake_spark.set(motorStrength);
   }
 
-  public boolean intakeIsOn() {
+  public boolean isIntakeOn() {
     return intakeIsOn;
   }
 
@@ -268,7 +270,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    *
    * @return FlywheelRPM goal
    */
-  public FlywheelRPM calculateGoals(ShooterSettings s) {
+   FlywheelRPM calculateGoals(ShooterSettings s) {
     final double radPerSec2revPerMin = 60 / (2.0*Math.PI);
     // order of input vector must match VelToRPM matrix order
     vel.set(0, 0, s.rps*2.0*Math.PI); //rad/s
@@ -277,17 +279,38 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     return new FlywheelRPM(omega.get(0,0), omega.get(1,0));
   }
 
-  public void shooterWarmup(double goals){
-    upper_shooter.setRPM(goals);
-    lower_shooter.setRPM(goals);
+  /**
+   * spinupShooter(ShooterSettings settings)
+   * 
+   * Preferred interface for controlling Flywheels and angle.
+   * This will not shoot, that requires control of the belt and
+   * perhaps some targing feedback.
+   * 
+   * Use this interface to Warm-up the flywheels.
+   * 
+   * @param goals
+   */
+  public void spinupShooter(ShooterSettings setting) {
+    shooterIsOn = true;
+    // shooter will run at the target goals
+    target.copy(calculateGoals(setting));
+
+    if (setting.angle != 0.0 ) {
+      magazine.getMagPositioner().setAngle(setting.angle);
+    }
+
+    upper_shooter.setRPM(target.upper);
+    lower_shooter.setRPM(target.lower);
   }
+
 
   /**
    * Commands shooter flwwheels to target RPM
    * 
+   * 
    * @param goals   (flywheel rpm goals)
    */
-  public void shooterOn(FlywheelRPM goals) {
+  void shooterOn(FlywheelRPM goals) {
     shooterIsOn = true;
     // save the targets for at goal calcs
     target.copy(goals);
@@ -296,13 +319,16 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     lower_shooter.setRPM(target.lower);
   }
 
-  public void shooterOnPercent(double upperPct, double lowerPct) {
+  /**
+   * Shouldn't use this api, debugging only.
+   */
+  void shooterOnPercent(double upperPct, double lowerPct) {
     shooterIsOn = true;
       upper_shooter.setPercent(upperPct); 
       lower_shooter.setPercent(lowerPct); 
   }
 
-  public boolean shooterIsOn() {
+  public boolean isShooterOn() {
     return shooterIsOn;
   }
 
@@ -351,6 +377,18 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
   /**
+   * isAtGoal(ShooterSettings goal)
+   * @param goal where we want the shooter, speed & angle
+   * @return true - ready to shoot
+   *         false - either angle or flywheels not up to speed
+   */
+
+  public boolean isAtGoal(ShooterSettings goal) {
+    return isAtGoalRPM(goal.velTol) && 
+      magazine.getMagPositioner().isAtSetpoint();
+  }
+
+  /**
    * Checks to see if both flywheels are at the desired speed
    * All goals are given in Flywheel RPM.
    * 
@@ -361,7 +399,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * @param tol
    * @retur
    */
-  public boolean atGoalRPM(double tol) {
+  public boolean isAtGoalRPM(double tol) {
     // return true if BOTH upper and lower are within tolerance 
     return ((Math.abs(error.upper) < (target.upper*tol)) &&
             (Math.abs(error.lower) < (target.lower*tol)) );

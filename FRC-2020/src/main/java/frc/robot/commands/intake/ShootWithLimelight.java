@@ -10,23 +10,37 @@ package frc.robot.commands.intake;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 
-public class ShooterOnAuto extends ShooterOn  {
+/**
+ * 
+ * Uses Limelight to calculate angle/vel for the shooter.
+ * 
+ * The basic Shoot command is used, but the CalculateShooterSettings()
+ * is overidden with goals.ShooterSettings calculated from limelight
+ * area as an approxmation to distance.
+ * 
+ * Simple model for estimating angle from area
+ *   y = mA + b  <angle>
+ * 
+ *  A = area measured from limelight
+ *  m = slope <degres per Area>
+ *  b =  min angle <degrees>
+ * 
+ */
+
+public class ShootWithLimelight extends Shoot  {
  
   private Limelight_Subsystem m_limelight;
   private double upper_slope;
   private double upper_yIntercept;
-  private double lower_slope;
-  private double lower_yIntercept;
 
-  public ShooterOnAuto(Intake_Subsystem intake, double backupSec, double upper_slope, double upper_yIntercept, double lower_slope, double lower_yIntercept, Limelight_Subsystem limelight)  {
+  public ShootWithLimelight(Intake_Subsystem intake, double upper_slope, double upper_yIntercept, Limelight_Subsystem limelight)  {
     super(intake);
     
     // new functionality for limelight
     m_limelight = limelight;
     this.upper_slope = upper_slope;
     this.upper_yIntercept = upper_yIntercept;
-    this.lower_slope = lower_slope;
-    this.lower_yIntercept = lower_yIntercept;
+  
   }
 
   /**
@@ -39,20 +53,20 @@ public class ShooterOnAuto extends ShooterOn  {
    *          false - keep calling this function every frame, shooter will wait
    */
   @Override
-  public boolean calculateShooterSpeed() {
+  public boolean calculateShooterSettings() {
      if (m_limelight.getTarget()){
           calculateRPMFromLimelight();
-          intake.shooterOn(rpmSetpoint); //Start shooter spin up to actual RPM goals
-          System.out.println("Got Limelight Area, Calc Upper RPM" + rpmSetpoint.toString() + "\n"); 
+          //System.out.println("Got Limelight Area, Calc Upper RPM" + goals.ShooterGoal.toString() + "\n"); 
           return true;
      }
      // keep trying for target
      return false;
   }
 
-  //find RPM goals from limelight area and slope/intercept of measured RPM data
+  //find RPM/angle goals from limelight area and slope/intercept of measured RPM data
   private void calculateRPMFromLimelight(){ 
-    rpmSetpoint.upper = upper_slope*m_limelight.getArea() + upper_yIntercept;
-    rpmSetpoint.lower = lower_slope*m_limelight.getArea() + lower_yIntercept;
+    goals.ShooterGoal.angle =  upper_slope*m_limelight.getArea() + upper_yIntercept;
+    goals.ShooterGoal.rps = 10;
+    goals.ShooterGoal.vel = 35;
   }
 }

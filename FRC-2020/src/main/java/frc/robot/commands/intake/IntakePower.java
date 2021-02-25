@@ -25,7 +25,7 @@ public class IntakePower extends InstantCommand {
     Power cmd = m_power;
 
     if (m_power == Power.Toggle)   {
-      cmd = (m_intake.intakeIsOn()) ? Power.Off : Power.On;
+      cmd = (m_intake.isIntakeOn()) ? Power.Off : Power.On;
     }
     
     switch (cmd) {

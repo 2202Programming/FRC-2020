@@ -7,7 +7,7 @@
 
 package frc.robot;
 
-import frc.robot.commands.intake.ShooterOn;
+import frc.robot.commands.intake.Shoot;
 import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.util.misc.PIDFController;
@@ -254,12 +254,17 @@ public final class Constants {
      * 
      */
     public static final class ShooterOnCmd {
-        public static ShooterOn.Data data = new ShooterOn.Data();
+        public static final double VEL_TOL = 0.005;  
+        public static Shoot.Data dataHigh = new Shoot.Data();
         static {
-            data.BackupSec = .1;    // seconds
-            data.Tolerance = .005;  //0.5%
-            data.HighGoal = new ShooterSettings(35.0, 0.0, 41.0);  //vel, rps, angle
-            data.LowGoal =  new ShooterSettings(39.0, 6.0, 22.0);  //vel, rps, angle
+            dataHigh.BackupSec = .1;    // seconds
+            dataHigh.ShooterGoal = new ShooterSettings(35.0, 0.0, 42.0, VEL_TOL);  //vel, rps, angle, tol
+        }
+
+        public static Shoot.Data dataLow = new Shoot.Data();
+        static {
+            dataLow.BackupSec = .1;    // seconds
+            dataLow.ShooterGoal = new ShooterSettings(39.0, 6.0, 35.0, VEL_TOL);  //vel, rps, angle
         }
        
     }

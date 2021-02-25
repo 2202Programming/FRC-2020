@@ -7,8 +7,8 @@ package frc.robot.commands.auto;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ShooterOnCmd;
-import frc.robot.commands.intake.ShooterOn;
-import frc.robot.commands.intake.ShooterStartup;
+import frc.robot.commands.intake.Shoot;
+import frc.robot.commands.intake.ShooterWarmUp;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.ifx.ArcadeDrive;
@@ -17,10 +17,17 @@ import frc.robot.subsystems.ifx.ArcadeDrive;
 public class auto_shooting_cmd extends SequentialCommandGroup {
   /** Creates a new auto_shooting_cmd. */
 
+  /**
+   *   Need to set this up to do the right checks at init or execute(), not construction.
+   *   Intent makes sense, just not at construction.
+   * 
+   *  TODO:  fix command order and exection timing.
+   */
+
   private final Intake_Subsystem intake;
   private final Limelight_Subsystem limelight;
 
-  public auto_shooting_cmd(Intake_Subsystem intake, ShooterOn.Data cmdData, ArcadeDrive drive, 
+  public auto_shooting_cmd(Intake_Subsystem intake, Shoot.Data cmdData, ArcadeDrive drive, 
                             Limelight_Subsystem limelight, double maxSpeed) {
     
     this.intake = intake;
@@ -30,11 +37,12 @@ public class auto_shooting_cmd extends SequentialCommandGroup {
     if (intake.getShootingMode() && limelight.valid())
     { //limelight-guided auto-aim shooting mode, only auto-aim if limelight has a target
       //todo: warmup the shooter?
-      addCommands(new ShooterStartup(intake, 2000), //warmup flywheels to 2000 RPM
+            // warm up the shooter to the high goal settings (RPM and angle)
+      addCommands(new ShooterWarmUp(intake, ShooterOnCmd.dataHigh.ShooterGoal), 
                   new auto_limelightTurnToShoot_cmd(drive, limelight, 1),
-                  new ShooterOn(intake, ShooterOnCmd.data));
+                  new Shoot(intake, ShooterOnCmd.dataHigh));
     } else {
-      addCommands(new ShooterOn(intake, ShooterOnCmd.data));
+      addCommands(new Shoot(intake, ShooterOnCmd.dataHigh));
     }
   }
 

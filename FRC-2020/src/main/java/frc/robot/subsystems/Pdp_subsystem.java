@@ -4,35 +4,36 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.subsystems.ifx.Logger;
 
 public class Pdp_subsystem extends SubsystemBase implements Logger {
   /** Creates a new Pdp_subsystem. */
-  private static final int kChannels = 16;
   private final PowerDistributionPanel pdp;
-  private double[] channelCurrent = new double[kChannels];
 
+  private NetworkTable table;
+  private NetworkTableEntry nt_voltage;
 
   public Pdp_subsystem() {
     pdp = new PowerDistributionPanel(CAN.PDP);
+    table = NetworkTableInstance.getDefault().getTable("PDP");
+    nt_voltage = table.getEntry("Voltage/value");
+
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    nt_voltage.setNumber(pdp.getVoltage());
   }
 
   public void log(){
-    for (int i = 0; i < kChannels; i++){
-      channelCurrent[i] = pdp.getCurrent(i);
-     SmartDashboard.putNumber("PDP/CurrentChannel"+i, channelCurrent[i]);
-    }
-    SmartDashboard.putNumber("PDP/TotalCurrent", pdp.getTotalCurrent());
-    SmartDashboard.putNumber("PDP/Voltage", pdp.getVoltage());
+
     
   }
 }

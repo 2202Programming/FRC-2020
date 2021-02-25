@@ -83,8 +83,8 @@
           <h4>Intake/Shooter</h4>
           <p>Magazine angle: <frc-number-label source-key="/Magazine/MagazineAngle"></frc-number-label></p>
           <p>PC Count: <frc-number-label source-key="/Magazine/PCCount"></frc-number-label></p>
-          <p>Shooter Upper RPM: <frc-number-label source-key="/Shooter/UpperRPM"></frc-number-label></p>
-          <p>Shooter Lower RPM: <frc-number-label source-key="/Shooter/LowerRPM"></frc-number-label></p>
+          <p>Shooter Upper RPM: <frc-number-label source-key="/Shooter/UpperRPM/value"></frc-number-label></p>
+          <p>Shooter Lower RPM: <frc-number-label source-key="/Shooter/LowerRPM/value"></frc-number-label></p>
           <p>Shooter Auto On: <frc-boolean-box
               webbit-id="frc-boolean-box"
               slot=""
@@ -138,14 +138,14 @@
             <nt-number key="/Shooter/maxY" value="4000"></nt-number>
             <nt-string key="/Shooter/xAxisLabel" value="Time"></nt-string>
             <nt-string key="/Shooter/yAxisLabel" value="RPM"></nt-string>
-            <nt-string key="/UpperRPM/label" value="Upper RPM"></nt-string>
-            <nt-string key="/LowerRPM/label" value="Upper RPM"></nt-string>
-            <nt-string key="/UpperRPM/color" value="green"></nt-string>
-            <nt-string key="/LowerRPM/color" value="red"></nt-string>
+            <nt-string key="/Shooter/UpperRPM/label" value="Upper RPM"></nt-string>
+            <nt-string key="/Shooter/LowerRPM/label" value="Upper RPM"></nt-string>
+            <nt-string key="/Shooter/UpperRPM/color" value="green"></nt-string>
+            <nt-string key="/Shooter/LowerRPM/color" value="red"></nt-string>
             <frc-line-chart
             source-key="/Shooter">
-              <frc-chart-data source-key="/UpperRPM"></frc-chart-data>
-              <frc-chart-data source-key="/LowerRPM"></frc-chart-data>
+              <frc-chart-data source-key="/Shooter/UpperRPM"></frc-chart-data>
+              <frc-chart-data source-key="/Shooter/LowerRPM"></frc-chart-data>
         </frc-line-chart></p>
 
         </div>

@@ -182,8 +182,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     lower_shooter = new FlyWheel(CAN.SHOOTER_LOWER_TALON, Shooter.lowerFWConfig);
 
     table = NetworkTableInstance.getDefault().getTable("Shooter");
-    nt_upperRPM = table.getEntry("UpperRPM");
-    nt_lowerRPM = table.getEntry("LowerRPM");
+    nt_upperRPM = table.getEntry("UpperRPM/value");
+    nt_lowerRPM = table.getEntry("LowerRPM/value");
     nt_autoShooterMode = table.getEntry("ShootingAutoMode");
     nt_autoShooterMode.setBoolean(autoShootOn);
 

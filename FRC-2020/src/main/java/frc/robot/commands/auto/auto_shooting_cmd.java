@@ -4,6 +4,7 @@
 
 package frc.robot.commands.auto;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.intake.ShooterOn;
@@ -24,6 +25,7 @@ public class auto_shooting_cmd extends SequentialCommandGroup {
     
     this.intake = intake;
     this.limelight = limelight;
+    addCommands(new InstantCommand(limelight::enableLED)); //turn on limelight to get target; may not be enought time?
 
     if (intake.getShootingMode() && limelight.valid())
     { //limelight-guided auto-aim shooting mode, only auto-aim if limelight has a target

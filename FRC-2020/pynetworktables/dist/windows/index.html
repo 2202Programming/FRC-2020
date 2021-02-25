@@ -52,8 +52,8 @@
             <h4>Odometer</h4>
             <p>Odometer left: <frc-number-label source-key="/Drivetrain/PosLeft"></frc-number-label></p>
             <p>Odometer right: <frc-number-label source-key="/Drivetrain/PosRight"></frc-number-label></p>
-            <p>Velocity left: <frc-number-label source-key="/Drivetrain/VelLeft"></frc-number-label></p>
-            <p>Velocity right: <frc-number-label source-key="/Drivetrain/VelRight"></frc-number-label></p>
+            <p>Velocity left: <frc-number-label source-key="/Drivetrain/VelLeft/value"></frc-number-label></p>
+            <p>Velocity right: <frc-number-label source-key="/Drivetrain/VelRight/value"></frc-number-label></p>
           </div>
         </div>
         <div class="col-sm-3">
@@ -122,7 +122,7 @@
         <div class="col-sm-3">
           <frc-3-axis-accelerometer source-key="/Drivetrain" style="margin-left: 20px; margin-top: 40px;"></frc-3-axis-accelerometer>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <nt-string key="/Shooter/title" value="Shooter RPM"></nt-string>
           <nt-number key="/Shooter/minY" value="0"></nt-number>
           <nt-number key="/Shooter/maxY" value="4000"></nt-number>
@@ -136,6 +136,22 @@
           source-key="/Shooter">
             <frc-chart-data source-key="/Shooter/UpperRPM"></frc-chart-data>
             <frc-chart-data source-key="/Shooter/LowerRPM"></frc-chart-data>
+      </frc-line-chart></p>
+        </div>
+        <div class="col-sm-4">
+          <nt-string key="/Drivetrain/title" value="Velocity"></nt-string>
+          <nt-number key="/Drivetrain/minY" value="0"></nt-number>
+          <nt-number key="/Drivetrain/maxY" value="4000"></nt-number>
+          <nt-string key="/Drivetrain/xAxisLabel" value="Time"></nt-string>
+          <nt-string key="/Drivetrain/yAxisLabel" value="ft/s"></nt-string>
+          <nt-string key="/Drivetrain/VelLeft/label" value="Velocity Left"></nt-string>
+          <nt-string key="/Drivetrain/VelRight/label" value="Velocity Right"></nt-string>
+          <nt-string key="/Drivetrain/VelLeft/color" value="green"></nt-string>
+          <nt-string key="/Drivetrain/VelRight/color" value="red"></nt-string>
+          <frc-line-chart
+          source-key="/Drivetrain">
+            <frc-chart-data source-key="/Drivetrain/VelLeft"></frc-chart-data>
+            <frc-chart-data source-key="/Drivetrain/VelRight"></frc-chart-data>
       </frc-line-chart></p>
         </div>
       </div>

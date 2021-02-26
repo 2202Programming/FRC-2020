@@ -137,7 +137,7 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineBeltAdjust(mag, true, 0.4), true);
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakePower(intake, Power.Toggle, 0.5));
     //dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineRaiseLowerCmd(mag));
-    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new InstantCommand(intake::toggleShootingMode)); 
+    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new InstantCommand(() -> { } )); 
     dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new IntakePosition(intake, Direction.Toggle));
     //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
    // dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new auto_shooting_cmd(intake, ShooterOnCmd.data, driveTrain, limelight, 1.0)); 

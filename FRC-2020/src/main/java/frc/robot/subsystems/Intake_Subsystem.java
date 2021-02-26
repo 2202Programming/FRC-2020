@@ -111,7 +111,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   /**
    * RPMSet and Data are static classes to help configure the comma
    */
-    public static class FlywheelRPM {
+    static class FlywheelRPM {
     public double upper;
     public double lower;
 
@@ -173,8 +173,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   //state variables
   private boolean intakeIsOn = false;
   private boolean shooterIsOn = false;
-  private boolean autoShootOn = false;
-
+  private boolean m_readyToShoot = false;  // looks at setpoint
+  ShooterSettings m_setpoint;              // current shooter setpoint 
+  
   public Intake_Subsystem() {
     // Construct the magazine 
     magazine = new Magazine_Subsystem(this);
@@ -187,7 +188,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     nt_upperRPM = table.getEntry("UpperRPM/value");
     nt_lowerRPM = table.getEntry("LowerRPM/value");
     nt_autoShooterMode = table.getEntry("ShootingAutoMode");
-    nt_autoShooterMode.setBoolean(autoShootOn);
+   
 
     // build out matrix to calculate FW RPM from [omega , Vel] for power cell
     VelToRPM.set(0, 0, Shooter.PCEffectiveRadius / Shooter.lowerFWConfig.flywheelRadius);
@@ -196,18 +197,8 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     VelToRPM.set(1, 1, 1.0 / Shooter.upperFWConfig.flywheelRadius);
     VelToRPM.times(0.5);  // common factor 1/2
 
-    //TODO: fix magazine.lower(); // must start in down positon
-   ///dpl shop debug raiseIntake();    // must start in the up position
-   lowerIntake(); //dpl shop debug
-  }
-
-  public void toggleShootingMode() {
-    autoShootOn = autoShootOn ? false : true;
-    nt_autoShooterMode.setBoolean(autoShootOn);
-  }
-
-  public boolean getShootingMode(){
-    return autoShootOn;
+    //magazine.lower(); // must start in down positon
+    //raiseIntake();    // must start in the up position
   }
 
   @Override
@@ -219,6 +210,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
     error.upper = target.upper - actual.upper;
     error.lower = target.lower - actual.lower;
+
+    // monitor if the  shooter/angle is ready to shoot
+    isAtGoal(m_setpoint);
   }
 
   public void raiseIntake() {
@@ -291,18 +285,15 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * @param goals
    */
   public void spinupShooter(ShooterSettings setting) {
-    shooterIsOn = true;
+    // save the current setpoint
+    m_setpoint = setting;
+    // if an angle was requested, set that
+    if (m_setpoint.angle != 0.0 ) {
+      magazine.getMagPositioner().setAngle(m_setpoint.angle);
+    } 
     // shooter will run at the target goals
-    target.copy(calculateGoals(setting));
-
-    if (setting.angle != 0.0 ) {
-      magazine.getMagPositioner().setAngle(setting.angle);
-    }
-
-    upper_shooter.setRPM(target.upper);
-    lower_shooter.setRPM(target.lower);
+    shooterOn(calculateGoals(m_setpoint));
   }
-
 
   /**
    * Commands shooter flwwheels to target RPM
@@ -383,10 +374,21 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    *         false - either angle or flywheels not up to speed
    */
 
-  public boolean isAtGoal(ShooterSettings goal) {
-    return isAtGoalRPM(goal.velTol) && 
-      magazine.getMagPositioner().isAtSetpoint();
+  boolean isAtGoal(ShooterSettings goal) {
+    m_readyToShoot = false;
+    if (goal == null) return false;
+
+    // see if we are at the given goal, keep state var updated
+    m_readyToShoot = isAtGoalRPM(goal.velTol) &&  magazine.getMagPositioner().isAtSetpoint();
+    return m_readyToShoot;
   }
+
+  /**
+   * isReadyToShoot - public API, calculated in periodic from m_setpoint
+   * @return  true  angle/speed ready
+   *          false something is not ready
+   */
+  public boolean isReadyToShoot() {return m_readyToShoot;}
 
   /**
    * Checks to see if both flywheels are at the desired speed
@@ -399,7 +401,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    * @param tol
    * @retur
    */
-  public boolean isAtGoalRPM(double tol) {
+  boolean isAtGoalRPM(double tol) {
     // return true if BOTH upper and lower are within tolerance 
     return ((Math.abs(error.upper) < (target.upper*tol)) &&
             (Math.abs(error.lower) < (target.lower*tol)) );
@@ -418,6 +420,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     // Put any useful log message here, called about 10x per second
     nt_lowerRPM.setDouble(actual.upper);
     nt_upperRPM.setDouble(actual.lower);
+    nt_autoShooterMode.setBoolean(m_readyToShoot);  
   }
 
 /**

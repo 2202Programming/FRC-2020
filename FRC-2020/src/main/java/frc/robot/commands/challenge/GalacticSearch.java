@@ -1,4 +1,4 @@
-package frc.robot.commands.auto;
+package frc.robot.commands.challenge;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.auto.followTrajectory;
 import frc.robot.subsystems.Magazine_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 

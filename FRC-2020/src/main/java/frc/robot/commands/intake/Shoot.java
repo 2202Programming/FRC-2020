@@ -49,9 +49,14 @@ public class Shoot extends CommandBase {
     public int    AtGoalBeforeShoot;     // frames to wait at goal to ensure stable
 
     public Data() {
-      // do nothing
+      BackupSec = 0.1;
+      AtGoalBeforeShoot = 0;
     }
-    /**
+    public Data(ShooterSettings goal) {
+      this();
+      ShooterGoal = goal;
+    }
+     /**
      * copy constructor
      * @param d
      */
@@ -123,7 +128,7 @@ public class Shoot extends CommandBase {
       break;
 
       case WaitingForFlyWheel: //stage 1, pause magazine while shooters get to RPM goal
-        if (intake.isAtGoal(goals.ShooterGoal) && 
+        if (intake.isReadyToShoot() && 
             (atGoalCount++ >= goals.AtGoalBeforeShoot)) {
           //Flywheel at speed, move to shooting
           stage = Stage.Shooting;
@@ -134,7 +139,7 @@ public class Shoot extends CommandBase {
 
       case Shooting: 
         //magazine forward fast to shoot while at RPM goals              
-        if (!intake.isAtGoal(goals.ShooterGoal)) { 
+        if (!intake.isReadyToShoot()) { 
           time = System.currentTimeMillis();
           atGoalCount = 0;
           //back to WaitingForFlywheel
@@ -171,6 +176,12 @@ public class Shoot extends CommandBase {
     magazine.beltOff();
     intake.intakeOff();
     magazine.setPC(0);
+  }
+
+  @Override
+  public boolean isFinished() {
+    // done when nothing else to shoot
+    return (magazine.getPC() == 0);
   }
 
 }

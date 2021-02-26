@@ -73,6 +73,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   private NetworkTableEntry nt_accelY;
   private NetworkTableEntry nt_accelZ;
   
+  //Field position
+  Field2d m_field = new Field2d();
+
   // we only use this one PID slot for the drive lead controllers
   final int KpidSlot = 0;
 
@@ -151,15 +154,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   public DifferentialDrivetrainSim m_drivetrainSimulator;
   private EncoderSim2 m_leftEncoderSim;
   private EncoderSim2 m_rightEncoderSim;
+
   // The Field2d class shows the field in the sim GUI
-  private Field2d m_fieldSim;
   private AHRS_GyroSim m_gyroSim;
 
   public VelocityDifferentialDrive_Subsystem(final Shifter gear) {
     // save scaling factors, they are required to use SparkMax in Vel mode
     gearbox = gear;
     requestedGear = gearbox.getCurrentGear();
-
 
    //direct networktables logging
     table = NetworkTableInstance.getDefault().getTable("Drivetrain");
@@ -171,6 +173,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     nt_accelX = table.getEntry("x");
     nt_accelY = table.getEntry("y");
     nt_accelZ = table.getEntry("z");
+    SmartDashboard.putData("Field", m_field);
 
     // setup physical units - chassis * gearbox (rev per minute)
     K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60; // rpm/60 rps
@@ -285,8 +288,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     m_velLeft = (Kleft * K_ft_per_rev * WheelWearLeft * kGR / 60.0) * leftEncoder.getVelocity();
     m_velRight = (Kright * K_ft_per_rev * WheelWearRight * kGR / 60.0) * rightEncoder.getVelocity();
 
-    // Update the odometry in the periodic block, physical units
+    // Update the odometry in the periodic block, physical units, update field
     m_odometry.update(readGyro(), m_posLeft, m_posRight);
+    m_field.setRobotPose(m_odometry.getPoseMeters());
   }
 
   /**
@@ -653,7 +657,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   }
 
   /**
-   * Resets the odometry to the specified pose.
+   * Resets the odometry to the specified pose. X, Y are set as is the expected rotation.
+   * The gyro is sampled and used as an offset internally.
    *
    * @param pose The pose to which to set the odometry.
    */
@@ -693,10 +698,6 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     m_leftEncoderSim = new EncoderSim2(leftController);
     m_rightEncoderSim = new EncoderSim2(rightController);
     m_gyroSim = new AHRS_GyroSim(m_gyro);
-
-    // the Field2d class lets us visualize our robot in the simulation GUI.
-    m_fieldSim = new Field2d();
-    SmartDashboard.putData("Field", m_fieldSim);
   }
 
   @Override

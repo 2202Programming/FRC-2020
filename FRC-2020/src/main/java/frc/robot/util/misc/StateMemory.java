@@ -37,5 +37,9 @@ public class StateMemory {
   public void saveRobotState(){
     savedPose = driveTrain.getPose();
     savedMagAngle = intake.getMagazine().getAngle();
+    System.out.println("Saved X:" + savedPose.getX());
+    System.out.println("Saved Y:" + savedPose.getY());
+    System.out.println("Saved Robot Angle:" + savedPose.getRotation().getDegrees());
+    System.out.println("Saved Mag Angle:" + savedMagAngle);
   }
 }

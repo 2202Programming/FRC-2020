@@ -72,7 +72,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   private NetworkTableEntry nt_accelX;
   private NetworkTableEntry nt_accelY;
   private NetworkTableEntry nt_accelZ;
-  
+  private NetworkTableEntry nt_currentPoseX;
+  private NetworkTableEntry nt_currentPoseY;
+  private NetworkTableEntry nt_currentPoseR;
+  private NetworkTableEntry nt_savedPoseX;
+  private NetworkTableEntry nt_savedPoseY;
+  private NetworkTableEntry nt_savedPoseR;
+
   //Field position
   Field2d m_field = new Field2d();
 
@@ -176,6 +182,13 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     nt_accelX = table.getEntry("x");
     nt_accelY = table.getEntry("y");
     nt_accelZ = table.getEntry("z");
+    nt_currentPoseX = table.getEntry("CurrentX");
+    nt_currentPoseY = table.getEntry("CurrentY");
+    nt_currentPoseR = table.getEntry("CurrentR");
+    nt_savedPoseX = table.getEntry("SavedX");
+    nt_savedPoseY = table.getEntry("SavedY");
+    nt_savedPoseR = table.getEntry("SavedR");
+
     SmartDashboard.putData("Field", m_field);
 
     // setup physical units - chassis * gearbox (rev per minute)
@@ -214,6 +227,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     resetPosition();
     m_odometry = new DifferentialDriveOdometry(readGyro());
     savedPose = m_odometry.getPoseMeters(); //set savedPose to starting position initally
+    nt_savedPoseX.setDouble(savedPose.getX());
+    nt_savedPoseY.setDouble(savedPose.getY());
+    nt_savedPoseR.setDouble(savedPose.getRotation().getDegrees());
   }
 
   void calcSpeedSettings() {
@@ -564,6 +580,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     nt_accelX.setDouble(m_gyro.getRawAccelX());
     nt_accelY.setDouble(m_gyro.getRawAccelY());
     nt_accelZ.setDouble(m_gyro.getRawAccelZ());
+    nt_currentPoseX.setDouble(m_odometry.getPoseMeters().getX());
+    nt_currentPoseY.setDouble(m_odometry.getPoseMeters().getY());
+    nt_currentPoseR.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());
   }
 
   /**
@@ -658,6 +677,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   //update the savedPose on demand
   public void savePose(){
     savedPose = m_odometry.getPoseMeters();
+    nt_savedPoseX.setDouble(savedPose.getX());
+    nt_savedPoseY.setDouble(savedPose.getY());
+    nt_savedPoseR.setDouble(savedPose.getRotation().getDegrees());
     return;
   }
 

@@ -33,22 +33,24 @@
     <br>
     <br>
     <nt-string key="/team" value="2202"></nt-string>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-4">
-        </div>
-        <div class="col-sm-4">
-          <div style="text-align: center;">
-            <h1>
-              Team <frc-label source-key="/team"></frc-label>
-            </h1>
-            <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
-          </div>
-        </div>
-        <div class="col-sm-4">
-          <frc-sim-robot-state></frc-sim-robot-state>
-          <frc-sim-joystick></frc-sim-joystick>
-        </div>
+      <div style="text-align: center;">
+        <h1>
+          Team <frc-label source-key="/team"></frc-label>
+        </h1>
+      <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
+    </div>
+
+    <div class="row bg-light" style="margin-top: 30px;">
+      <div class="col-sm-3">
+        <frc-sim-robot-state style="margin-left: 50px;"></frc-sim-robot-state>
+      </div>
+      <div class="col-sm-4">
+        <frc-sim-joystick></frc-sim-joystick>
+      </div>
+      <div class="col-sm-4">
+        <frc-sim-joystick></frc-sim-joystick>
+      </div>
+    </div>
 
     <div class="container-fluid" style="margin-top: 50px;">
       <div class="row">

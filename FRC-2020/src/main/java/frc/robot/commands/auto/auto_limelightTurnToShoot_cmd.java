@@ -25,7 +25,7 @@ public class auto_limelightTurnToShoot_cmd extends CommandBase {
   private double angleToleranceDeg = 1;
   private double kDegreesToDPS = 1; //convert PID rotation output to degrees per second for VelocityDifferentalDrive
   private double maxSpeed;
-  private double Kap = 0.1, Kai = 0.001, Kad = 0.0; //angle drive PIDs
+  private double Kap = 0.02, Kai = 0.000, Kad = 3.0; //angle drive PIDs
   private final PIDController anglePIDController;
   private double target_angle;
 
@@ -94,6 +94,6 @@ public class auto_limelightTurnToShoot_cmd extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(target_angle) < angleToleranceDeg;
+    return (Math.abs(target_angle) < angleToleranceDeg) && (Math.abs(drive.getLeftVel(false))<0.05);
   }
 }

@@ -155,7 +155,7 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
 
     //test
-    CreateCircle circle = new CreateCircle(2, 1.5, 360);
+    CreateCircle circle = new CreateCircle(2, 1.5, -360);
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
 
     //go from current position to stored position

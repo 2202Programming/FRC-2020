@@ -56,6 +56,7 @@ public class goToPose extends CommandBase {
                          Constants.RamseteProfile.kMaxAccelerationFeetPerSecondSquared)
         // Add kinematics to ensure max speed is actually obeyed
         .setKinematics(Constants.RamseteProfile.kDriveKinematics)
+        .setReversed(true)
         // Apply the voltage constraint
         .addConstraint(autoVoltageConstraint);
     System.out.println("Start X:" + startPose.getX());

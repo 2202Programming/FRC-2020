@@ -149,8 +149,8 @@ public final class Constants {
         public static final double WheelAxleDistance = 25.5/12.0; // feet
 
         //wheel wear compensation - adjust when distance is off by small amount
-        public static final double WheelWearLeft = 1.0;   //[percent] of nominal
-        public static final double WheelWearRight = 1.0;  //[percent] of nominal
+        public static final double WheelWearLeft = 0.99;   //[percent] of nominal
+        public static final double WheelWearRight = 0.99;  //[percent] of nominal
         
     }
 
@@ -283,8 +283,6 @@ public final class Constants {
       public static final double kPDriveVel = 2.44; 
 
       // Change these to go faster/slower for commands using ramsete and VoltageDrive
-      //unused??  public static final double kMaxSpeedFeetPerSecond = 2;
-      //unused??  public static final double kMaxAccelerationFeetPerSecondSquared = 1;
 
       // Reasonable baseline values for a RAMSETE follower in units of meters and
       // seconds - DPL not sure about how to convert to feet.

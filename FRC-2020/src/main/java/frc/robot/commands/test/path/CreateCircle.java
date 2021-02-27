@@ -21,13 +21,13 @@ public class CreateCircle {
   double theta0;
 
   Trajectory trajectory;
-  final Rotation2d robot_offset;
-  Pose2d initPose;
-  Pose2d finalPose;
+  Rotation2d robot_offset;
+  //Pose2d initPose;
+  //Pose2d finalPose;
 
   public CreateCircle(double radius, double velocity, double degrees) {
     // inital position of robot... [0,0,90] [x, y, theta]
-    robot_offset = Rotation2d.fromDegrees(90);  //assume robot is facing away from us
+    
     this.velocity = velocity;
 
     ArrayList<State> circlePoints = new ArrayList<>();
@@ -37,18 +37,21 @@ public class CreateCircle {
     k = Math.copySign( 1.0 / radius, degrees);
 
     // field coordinates
-    Y0 = 0.0; 
-    theta0 = 0.0;  // portion of the arc we are computing,  [0 .. degrees]
+    X0 = 0.0; 
+    theta0 = 0.0;  // portion of the arc we are computing,  [0 .. degrees] or [180 .. deg]
+    this.radius = radius;
 
     // positive to the left, negitive to the right; adjust so robot is 0, 0
     // also adjust radius based on left/right curvature
     if (k < 0.0) {
-        X0 = radius;
-        this.radius = -radius;
+      robot_offset = Rotation2d.fromDegrees(180);  //assume robot is facing away from us
+      Y0 = radius;
+      theta0 = Math.PI;
     } 
-    else {
-       X0 = -radius; 
-      this.radius = radius;     
+    else { //positive curvature
+      robot_offset = Rotation2d.fromDegrees(0);  //assume robot is facing away from us
+      Y0 = -radius;
+      theta0=0; 
     } 
 
     // walk the circle - field coord, theta is not robot, it is just for calc X, Y of arc 
@@ -70,11 +73,12 @@ public class CreateCircle {
   State calculatePoint(double t) {
     double theta = w * t + theta0;
     Rotation2d thetaRot2d = new Rotation2d(theta);
-    double x = radius * thetaRot2d.getCos() + X0;
-    double y = radius * thetaRot2d.getSin() + Y0;
+    double y = -(radius * thetaRot2d.getCos() + Y0);
+    double x = radius * thetaRot2d.getSin() + X0;
 
     // correct theta for robot pose
-    var th = thetaRot2d.rotateBy(robot_offset); 
+    var th = thetaRot2d.minus(robot_offset); 
+    var th_deg = th.getDegrees();
     var pose = new Pose2d(x, y, th);
     return new State(t, velocity, 0.0, pose, k);
   }

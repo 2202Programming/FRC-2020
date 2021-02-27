@@ -10,6 +10,9 @@ package frc.robot;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -19,6 +22,7 @@ import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.auto_limelightTurnToShoot_cmd;
 import frc.robot.commands.auto.followTrajectory;
+import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -131,6 +135,9 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
 
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
+
+    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, driveTrain.getPose(), new Pose2d(new Translation2d(0,0), new Rotation2d(0))));
+
 
     // Assistant's buttons
     dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineBeltAdjust(mag, false, 0.0)); 

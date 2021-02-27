@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import frc.robot.commands.intake.Shoot;
 import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
@@ -289,6 +290,15 @@ public final class Constants {
       // seconds - DPL not sure about how to convert to feet.
       public static final double kRamseteB = .35;
       public static final double kRamseteZeta = 0.9;
+      public static final double kTrackwidthFeet = 2.08333;   // from char=1.4348; //updated2
+
+      public static final DifferentialDriveKinematics kDriveKinematics =
+      new DifferentialDriveKinematics(kTrackwidthFeet);
+
+      
+    public static final double kMaxSpeedFeetPerSecond = 1;
+    public static final double kMaxAccelerationFeetPerSecondSquared = 1;
+      
     }
 
 }

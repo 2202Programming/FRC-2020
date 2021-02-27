@@ -10,7 +10,6 @@ package frc.robot.commands.intake;
 import static frc.robot.Constants.DT;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.subsystems.Magazine_Subsystem;
@@ -70,13 +69,30 @@ public class Shoot extends CommandBase {
 
   // commanded target goals
   Data goals;
-
+  // pick reasonable defaults and shoot from whatever manual angle is set
+  static Data onTheFly = new Shoot.Data();
+  static {
+     onTheFly.ShooterGoal.angle = 0.0;  // use current position
+     onTheFly.AtGoalBeforeShoot = 0;
+     onTheFly.ShooterGoal.rps = 5;
+     onTheFly.ShooterGoal.vel = 38;
+  }
+  /**
+   * Shoot where we are at.
+   * 
+   * @param intake
+   */
   public Shoot(Intake_Subsystem intake) {
     // using dummy upper/lower target rpm.  If this construsctor is used, calculateShooterSpeed()
     // will be overriden.  USe the Constant data.
-    this(intake, ShooterOnCmd.dataLow);      
+    this(intake, onTheFly);      
   }
 
+  /**
+   * Shoot at a specific command data set
+   * @param intake
+   * @param cmdData
+   */
   public Shoot(Intake_Subsystem intake, Shoot.Data cmdData) {
     this.intake = intake;
     magazine = intake.getMagazine();
@@ -181,7 +197,8 @@ public class Shoot extends CommandBase {
   @Override
   public boolean isFinished() {
     // done when nothing else to shoot
-    return (magazine.getPC() == 0);
+    //return (magazine.getPC() == 0);
+    return false;
   }
 
 }

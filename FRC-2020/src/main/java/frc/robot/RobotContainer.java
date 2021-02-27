@@ -10,9 +10,6 @@ package frc.robot;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -133,10 +130,8 @@ public class RobotContainer {
     //auto path testing
     //dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getPath()));
     dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
-
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
-    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, driveTrain.getPose(), new Pose2d(new Translation2d(0,0), new Rotation2d(0))));
 
 
     // Assistant's buttons
@@ -162,6 +157,13 @@ public class RobotContainer {
     //test
     CreateCircle circle = new CreateCircle(2, 1.5, 360);
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
+
+    //go from current position to stored position
+    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, driveTrain.getPose(), driveTrain.getSavedPose()));
+
+    //store current position
+    dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(driveTrain::savePose));
+
   }
 
   /**

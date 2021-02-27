@@ -76,6 +76,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   //Field position
   Field2d m_field = new Field2d();
 
+  //save a pose
+  Pose2d savedPose;
+
   // we only use this one PID slot for the drive lead controllers
   final int KpidSlot = 0;
 
@@ -210,6 +213,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     // clear our starting position.
     resetPosition();
     m_odometry = new DifferentialDriveOdometry(readGyro());
+    savedPose = m_odometry.getPoseMeters(); //set savedPose to starting position initally
   }
 
   void calcSpeedSettings() {
@@ -649,6 +653,16 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
    */
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
+  }
+
+  //update the savedPose on demand
+  public void savePose(){
+    savedPose = m_odometry.getPoseMeters();
+    return;
+  }
+
+  public Pose2d getSavedPose(){
+    return savedPose;
   }
 
   // Need to use getYaw to get -180 to 180 as expected.

@@ -11,7 +11,7 @@ import frc.robot.subsystems.Magazine_Subsystem.MagazinePositioner;
 public class MagazineAngle extends CommandBase {
   // manual up/down at const motor speed or to an exact position
   public enum Direction {Up, Down, ToPositon};
-  static final double RPM = 10;
+  static final double RPM = 3;
 
   final MagazinePositioner  magPositioner; 
   final double degrees;

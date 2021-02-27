@@ -259,7 +259,7 @@ public final class Constants {
         public static Shoot.Data dataHigh = new Shoot.Data();
         static {
             dataHigh.BackupSec = .1;    // seconds
-            dataHigh.ShooterGoal = new ShooterSettings(35.0, 0.0, 42.0, VEL_TOL);  //vel, rps, angle, tol
+            dataHigh.ShooterGoal = new ShooterSettings(39.0, 10.0, 40.8, VEL_TOL);  //vel, rps, angle, tol
         }
 
         public static Shoot.Data dataLow = new Shoot.Data();

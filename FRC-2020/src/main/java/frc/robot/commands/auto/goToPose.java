@@ -14,12 +14,14 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.util.misc.StateMemory;
 
 public class goToPose extends CommandBase {
   final VelocityDifferentialDrive_Subsystem drive;
   //
   Pose2d startPose;
   Pose2d endPose;
+  private StateMemory state;
 
   RamseteCommand ramsete;
   RamseteController rsController;
@@ -29,8 +31,9 @@ public class goToPose extends CommandBase {
   double zeta = 0.9; //larger more damping 
 
   /** Creates a new goToPose. */
-  public goToPose(VelocityDifferentialDrive_Subsystem drive) {
+  public goToPose(VelocityDifferentialDrive_Subsystem drive, StateMemory state) {
     this.drive = drive;
+    this.state = state;
 
 
     kinematics = this.drive.getDriveKinematics();
@@ -41,7 +44,7 @@ public class goToPose extends CommandBase {
   @Override
   public void initialize() {
     startPose = drive.getPose();
-    endPose = drive.getSavedPose();
+    endPose = state.getSavedPose();
 
     var autoVoltageConstraint =
         new DifferentialDriveVoltageConstraint(

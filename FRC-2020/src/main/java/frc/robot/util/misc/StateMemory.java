@@ -9,14 +9,14 @@ import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
 /** Add your docs here. */
-public class RobotState {
+public class StateMemory {
 
   private final VelocityDifferentialDrive_Subsystem driveTrain;
   private final Intake_Subsystem intake;
   private Pose2d savedPose;
   private double savedMagAngle;
 
-  public RobotState(VelocityDifferentialDrive_Subsystem driveTrain, Intake_Subsystem intake){
+  public StateMemory(VelocityDifferentialDrive_Subsystem driveTrain, Intake_Subsystem intake){
     this.driveTrain = driveTrain;
     this.intake = intake;
 

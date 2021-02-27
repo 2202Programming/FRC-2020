@@ -47,6 +47,7 @@ import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.hid.XboxPOV;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
+import frc.robot.util.misc.StateMemory;
 import frc.robot.ux.Dashboard;
 import frc.robot.ux.DriverPreferences;
 
@@ -74,6 +75,7 @@ public class RobotContainer {
   public final Log_Subsystem logSubsystem;
   public final Dashboard dashboard;
   public final Pdp_subsystem pdp;
+  public StateMemory state;
   
   
   /**
@@ -91,7 +93,7 @@ public class RobotContainer {
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
     pdp = new Pdp_subsystem();
-    
+    state = new StateMemory(driveTrain, intake);
     
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
@@ -160,10 +162,10 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
 
     //go from current position to stored position
-    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain));
+    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain,state));
 
     //store current position
-    dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(driveTrain::savePose));
+    dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState));
 
   }
 

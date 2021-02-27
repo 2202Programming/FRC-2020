@@ -296,7 +296,7 @@ public final class Constants {
       new DifferentialDriveKinematics(kTrackwidthFeet);
 
       
-    public static final double kMaxSpeedFeetPerSecond = 1;
+    public static final double kMaxSpeedFeetPerSecond = 5;
     public static final double kMaxAccelerationFeetPerSecondSquared = 1;
       
     }

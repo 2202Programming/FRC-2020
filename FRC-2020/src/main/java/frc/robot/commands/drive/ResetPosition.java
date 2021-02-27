@@ -7,6 +7,8 @@
 
 package frc.robot.commands.drive;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ifx.Odometry;
 
@@ -24,7 +26,8 @@ public class ResetPosition extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() { 
-    m_subsystem.resetPosition();
+    //m_subsystem.resetPosition();
+    m_subsystem.resetOdometry(new Pose2d(0,0,new Rotation2d(0.0)));
   }
 
 }

@@ -684,6 +684,8 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   }
 
   public Pose2d getSavedPose(){
+    System.out.println("Saved X:" + savedPose.getX());
+    System.out.println("Saved Y:" + savedPose.getY());
     return savedPose;
   }
 

@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConst
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.Constants;
-import frc.robot.subsystems.ifx.VelocityDrive;
+import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
 public class goToPose extends CommandBase {
-  final VelocityDrive drive;
+  final VelocityDifferentialDrive_Subsystem drive;
   //
   Pose2d startPose;
   Pose2d endPose;
@@ -29,10 +29,9 @@ public class goToPose extends CommandBase {
   double zeta = 0.9; //larger more damping 
 
   /** Creates a new goToPose. */
-  public goToPose(VelocityDrive drive, Pose2d startPose, Pose2d endPose) {
+  public goToPose(VelocityDifferentialDrive_Subsystem drive) {
     this.drive = drive;
-    this.startPose = startPose;
-    this.endPose = endPose;
+
 
     kinematics = this.drive.getDriveKinematics();
     addRequirements(drive);
@@ -41,6 +40,9 @@ public class goToPose extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    startPose = drive.getPose();
+    endPose = drive.getSavedPose();
+
     var autoVoltageConstraint =
         new DifferentialDriveVoltageConstraint(
             new SimpleMotorFeedforward(Constants.RamseteProfile.ksVolts,
@@ -56,16 +58,20 @@ public class goToPose extends CommandBase {
         .setKinematics(Constants.RamseteProfile.kDriveKinematics)
         // Apply the voltage constraint
         .addConstraint(autoVoltageConstraint);
+    System.out.println("Start X:" + startPose.getX());
+    System.out.println("Start Y:" + startPose.getY());
+    System.out.println("End X:" + endPose.getX());
+    System.out.println("End Y:" + endPose.getY());
 
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
         startPose,
+        //new Pose2d(startPose.getX(),startPose.getY(),new Rotation2d(0)),
         // Pass through these two interior waypoints, making an 's' curve path
         List.of(
-            //new Translation2d(1, 1),
+            //new Translation2d((startPose.getX()+endPose.getX())/2,(startPose.getY()+endPose.getY())/2)
             //new Translation2d(2, -1)
         ),
-        // End 3 meters straight ahead of where we started, facing forward
+        //new Pose2d(endPose.getX(),endPose.getY(),new Rotation2d(0)),
         endPose,
         // Pass config
         config

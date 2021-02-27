@@ -159,7 +159,7 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
 
     //go from current position to stored position
-    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, driveTrain.getPose(), driveTrain.getSavedPose()));
+    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain));
 
     //store current position
     dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(driveTrain::savePose));

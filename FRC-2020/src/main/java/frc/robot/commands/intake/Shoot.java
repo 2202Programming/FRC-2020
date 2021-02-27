@@ -48,6 +48,7 @@ public class Shoot extends CommandBase {
     public int    AtGoalBeforeShoot;     // frames to wait at goal to ensure stable
 
     public Data() {
+      ShooterGoal = new ShooterSettings();
       BackupSec = 0.1;
       AtGoalBeforeShoot = 0;
     }

@@ -42,6 +42,7 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.hid.XboxAxis;
 import frc.robot.subsystems.hid.XboxButton;
+import frc.robot.subsystems.hid.XboxPOV;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.ux.Dashboard;
@@ -132,23 +133,22 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
     // Assistant's buttons
-    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineBeltAdjust(mag, false, 0.0), true); 
+    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineBeltAdjust(mag, false, 0.0)); 
     dc.bind(Id.Assistant, XboxButton.B).whenHeld(new IntakePower(intake, Power.ReverseOn, 0.5));
-    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineBeltAdjust(mag, true, 0.4), true);
+    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineBeltAdjust(mag, true, 0.4));
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakePower(intake, Power.Toggle, 0.5));
     //dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineRaiseLowerCmd(mag));
-    dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new InstantCommand(() -> { } )); 
     dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new IntakePosition(intake, Direction.Toggle));
     //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new ShooterOn(intake, ShooterOnCmd.data)); 
-   // dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new auto_shooting_cmd(intake, ShooterOnCmd.data, driveTrain, limelight, 1.0)); 
+    //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new auto_shooting_cmd(intake, ShooterOnCmd.data, driveTrain, limelight, 1.0)); 
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenPressed(new auto_limelightTurnToShoot_cmd(driveTrain, limelight, 1)); 
     
 
     //Magazine Angle - POV hat
-    dc.bind(Id.Assistant, XboxButton.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));
-    dc.bind(Id.Assistant, XboxButton.POV_DOWN).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Down));
-    dc.bind(Id.Assistant, XboxButton.POV_LEFT).whenPressed(new MagazineAngle(intake, 35.0));
-    dc.bind(Id.Assistant, XboxButton.POV_RIGHT).whenPressed(new MagazineAngle(intake, 42.0));
+    dc.bind(Id.Assistant, XboxPOV.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));
+    dc.bind(Id.Assistant, XboxPOV.POV_DOWN).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Down));
+    dc.bind(Id.Assistant, XboxPOV.POV_LEFT).whenPressed(new MagazineAngle(intake, 35.0));
+    dc.bind(Id.Assistant, XboxPOV.POV_RIGHT).whenPressed(new MagazineAngle(intake, 42.0));
     //allow a manual lock on the positioner
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
 

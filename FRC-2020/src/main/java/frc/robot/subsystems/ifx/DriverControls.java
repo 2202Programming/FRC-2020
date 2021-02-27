@@ -9,14 +9,17 @@ package frc.robot.subsystems.ifx;
 
 import java.util.HashMap;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.subsystems.hid.GeneralTrigger;
+import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.hid.JoystickTrigger;
 import frc.robot.subsystems.hid.XboxAxis;
 import frc.robot.subsystems.hid.XboxButton;
-import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.subsystems.hid.XboxPOV;
 
 /**
  * 
@@ -120,6 +123,10 @@ public interface DriverControls extends Subsystem {
     return (deviceMap.get(id) != null) ? new JoystickTrigger(deviceMap.get(id), axis.getCode(), 0.5) : null;
   }
 
+  public default POVButton bind(Id id, XboxPOV pov) {
+    return (deviceMap.get(id) != null) ? new POVButton(deviceMap.get(id), pov.get()) : null;
+  }
+  
   public default GeneralTrigger bind(Id id, XboxButton buttonId1, XboxButton buttonId2) {
     return (deviceMap.get(id) != null) ? new GeneralTrigger(
         () -> deviceMap.get(id).getRawButton(buttonId1.getCode()) && 

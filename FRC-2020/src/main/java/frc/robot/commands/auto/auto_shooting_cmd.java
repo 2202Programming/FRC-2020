@@ -34,14 +34,13 @@ public class auto_shooting_cmd extends SequentialCommandGroup {
     this.limelight = limelight;
     addCommands(new InstantCommand(limelight::enableLED)); //turn on limelight to get target; may not be enought time?
 
-    if (limelight.valid())
-    { //limelight-guided auto-aim shooting mode, only auto-aim if limelight has a target
-      //todo: warmup the shooter?
-            // warm up the shooter to the high goal settings (RPM and angle)
+    if (limelight.valid() && intake.getAutoShootingMode())
+    { //limelight-guided auto-aim shooting mode, only auto-aim if limelight has a target, and if auto shooting mode is true 
       addCommands(new ShooterWarmUp(intake, ShooterOnCmd.dataHigh.ShooterGoal), 
                   new auto_limelightTurnToShoot_cmd(drive, limelight, 1),
                   new Shoot(intake, ShooterOnCmd.dataHigh));
     } else {
+      //otherwise simple manual shooting
       addCommands(new Shoot(intake, ShooterOnCmd.dataHigh));
     }
   }

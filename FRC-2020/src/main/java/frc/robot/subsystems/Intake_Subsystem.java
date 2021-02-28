@@ -175,6 +175,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private boolean shooterIsOn = false;
   private boolean m_readyToShoot = false;  // looks at setpoint
   ShooterSettings m_setpoint;              // current shooter setpoint 
+  private boolean autoShootingModeOn = false;
   
   public Intake_Subsystem() {
     // Construct the magazine 
@@ -415,12 +416,20 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     return (upperPerc + lowerPerc)*0.5;
   }
 
+  public void toggleAutoShootingMode() {
+    autoShootingModeOn = autoShootingModeOn ? false : true;
+  }
+
+  public boolean getAutoShootingMode(){
+    return autoShootingModeOn;
+  }
+
   @Override
   public void log() {
     // Put any useful log message here, called about 10x per second
     nt_lowerRPM.setDouble(actual.upper);
     nt_upperRPM.setDouble(actual.lower);
-    nt_autoShooterMode.setBoolean(m_readyToShoot);  
+    nt_autoShooterMode.setBoolean(autoShootingModeOn);  
   }
 
 /**

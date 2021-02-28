@@ -167,6 +167,9 @@ public class RobotContainer {
     //store current position
     dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState));
 
+    //toggle auto shooting mode
+    dc.bind(Id.Driver, XboxButton.R3).whenPressed(new InstantCommand(intake::toggleAutoShootingMode));
+
   }
 
   /**

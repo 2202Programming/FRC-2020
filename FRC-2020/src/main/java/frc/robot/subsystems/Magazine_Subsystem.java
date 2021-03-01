@@ -497,6 +497,10 @@ public class Magazine_Subsystem extends SubsystemBase {
     return (m_pcCount >= MAG_FULL_COUNT);
   }
 
+  public boolean isMagEmpty() {
+    return (m_pcCount == 0);
+  }
+
   public double getAngle() {
     return positioner.get();
   }

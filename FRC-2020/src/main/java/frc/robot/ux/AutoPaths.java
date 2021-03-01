@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj2.command.Command;
 
 //Loads the json pathweaver files into Trajectories
 
@@ -32,6 +33,9 @@ public class AutoPaths {
   // what we find
   SendableChooser<Trajectory> pathChooser = new SendableChooser<>();
   Map<String, Trajectory> m_map = new LinkedHashMap<>();
+  
+  SendableChooser<Command> autoCommandChooser = new SendableChooser<Command>();
+  boolean auto_default_cmd_set = false;
 
   public AutoPaths(ShuffleboardTab tab) {
 
@@ -49,9 +53,26 @@ public class AutoPaths {
 
     // put the chooser on the tab we were given
     tab.getLayout("AutoPath", BuiltInLayouts.kList).withSize(2, 2).add(pathChooser);
+    tab.getLayout("Autonomous Command", BuiltInLayouts.kList).withSize(3, 2).add(autoCommandChooser);
+
   }
 
   public SendableChooser<Trajectory> getChooser() { return pathChooser;}
+
+  public Command getAutonomousCommand() {
+    return autoCommandChooser.getSelected();
+  }
+
+  public void addAutoCommand(String name, Command cmd) {
+    if (auto_default_cmd_set) {
+      autoCommandChooser.addOption(name, cmd);
+    }
+      else {
+        // first command added gets to be the default
+        autoCommandChooser.setDefaultOption(name, cmd);
+        auto_default_cmd_set = true;
+      }
+  }
 
   /**
    * Reads the selected trajectory file and retrns parsed object.

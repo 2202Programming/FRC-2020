@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 
 /**
@@ -60,6 +61,11 @@ public class Dashboard {
       layout.add(chooser);
   }
   
+
+  public void addAutoCommand(String name, Command autoCmd) {
+    m_autopaths.addAutoCommand(name, autoCmd);
+  }
+
   /**
    * Chooser<> get() methods
    * @return
@@ -67,6 +73,7 @@ public class Dashboard {
   public SendableChooser<Trajectory> getTrajectoryChooser() {return m_autopaths.getChooser(); }
   public DriverPreferences getDriverPreferences() {return m_drivers;}
   public Trajectory getTrajectory(String trajName) { return m_autopaths.get(trajName); }
+  public Command getAutonomousCommand() { return m_autopaths.getAutonomousCommand(); }
 }
 
 

@@ -24,6 +24,7 @@ import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
+import frc.robot.commands.challenge.GalacticSearch;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -126,6 +127,12 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings(driverControls);
 
+
+     // Setup AutoCommands
+     dashboard.addAutoCommand("def", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
+     dashboard.addAutoCommand("GalaticSearch A", new GalacticSearch(driveTrain, true));
+     dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
+
     // Shuffleboard runnable Commands
     SmartDashboard.putData("Match Ready", new MatchReadyCmd());
     SmartDashboard.putData("Match Zero PC Count", new InstantCommand(() -> magazine.setPC(0)));
@@ -185,7 +192,6 @@ public class RobotContainer {
     CreateCircle circle = new CreateCircle(2, 1.5, -360);
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
 
-
   }
 
   /**
@@ -215,9 +221,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    // return new CommandBase() {};
-    return new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar);
+      return dashboard.getAutonomousCommand();
    }
 
   /**

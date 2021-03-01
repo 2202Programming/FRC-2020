@@ -15,14 +15,14 @@ import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 
 
-public class auto_move_and_shoot extends SequentialCommandGroup {
+public class scoot_and_shoot extends SequentialCommandGroup {
 //move to pose then shoot, either blindly or with limelight targeting
 
   private final Intake_Subsystem intake;
   private final Limelight_Subsystem limelight;
   private final VelocityDifferentialDrive_Subsystem drive;
 
-  public auto_move_and_shoot(Intake_Subsystem intake, Shoot.Data cmdData, VelocityDifferentialDrive_Subsystem drive, 
+  public scoot_and_shoot(Intake_Subsystem intake, Shoot.Data cmdData, VelocityDifferentialDrive_Subsystem drive, 
                             Limelight_Subsystem limelight, Pose2d endPose, double maxSpeed) {
     
     this.intake = intake;

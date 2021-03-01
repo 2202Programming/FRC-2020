@@ -7,15 +7,19 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.ShooterOnCmd.dataHigh;
+import static frc.robot.Constants.ShooterOnCmd.dataLow;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.DriverPrefs;
-import frc.robot.Constants.ShooterOnCmd;
+import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.followTrajectory;
@@ -33,12 +37,14 @@ import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCaptureCmd;
 import frc.robot.commands.intake.Shoot;
+import frc.robot.commands.intake.ShooterWarmUp;
 import frc.robot.commands.test.path.CreateCircle;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
+import frc.robot.subsystems.Magazine_Subsystem;
 import frc.robot.subsystems.Pdp_subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
@@ -70,6 +76,7 @@ public class RobotContainer {
   public final GearShifter gearShifter;
   public final VelocityDifferentialDrive_Subsystem driveTrain;
   public final Intake_Subsystem intake;
+  public final Magazine_Subsystem magazine;
   public final Limelight_Subsystem limelight;
   public final Lidar_Subsystem lidar;
   public final Log_Subsystem logSubsystem;
@@ -87,7 +94,8 @@ public class RobotContainer {
     driverControls = new HID_Xbox_Subsystem(DriverPrefs.VelExpo, DriverPrefs.RotationExpo, DriverPrefs.StickDeadzone); 
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter); 
-    intake = new Intake_Subsystem(); 
+    intake = new Intake_Subsystem();
+    magazine = intake.getMagazine();
     limelight = new Limelight_Subsystem();
     limelight.disableLED();
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
@@ -117,11 +125,13 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings(driverControls);
+
+    // Shuffleboard runnable Commands
+    SmartDashboard.putData("Match Ready", new MatchReadyCmd());
+    SmartDashboard.putData("Match Zero PC Count", new InstantCommand(() -> magazine.setPC(0)));
   }
 
   private void configureButtonBindings(DriverControls dc) {
-    var mag = intake.getMagazine();
-
     // Drivers buttons
     dc.bind(Id.Driver, XboxButton.A).whenPressed(new InvertDriveControls(dc)); 
     dc.bind(Id.Driver, XboxButton.B).whenPressed(new auto_cmd_group(dc, driveTrain, intake, limelight, lidar));
@@ -147,13 +157,13 @@ public class RobotContainer {
     
 
     // Assistant's buttons
-    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineBeltAdjust(mag, false, 0.0)); 
+    dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineBeltAdjust(magazine, false, 0.0)); 
     dc.bind(Id.Assistant, XboxButton.B).whenHeld(new IntakePower(intake, Power.ReverseOn, 0.5));
-    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineBeltAdjust(mag, true, 0.4));
+    dc.bind(Id.Assistant, XboxButton.Y).whenPressed(new MagazineBeltAdjust(magazine, true, 0.4));
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakePower(intake, Power.Toggle, 0.5));
-    //dc.bind(Id.Assistant, XboxButton.RB).whenPressed(new MagazineRaiseLowerCmd(mag));
+    //dc.bind(Id.Assistant, XboxButton.RB).whenPressed();
     dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new IntakePosition(intake, Direction.Toggle));
-    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new Shoot(intake, ShooterOnCmd.dataHigh)); 
+    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new Shoot()); 
     //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new auto_shooting_cmd(intake, ShooterOnCmd.data, driveTrain, limelight, 1.0)); 
     //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenPressed(new auto_limelightTurnToShoot_cmd(driveTrain, limelight, 1)); 
     
@@ -161,8 +171,13 @@ public class RobotContainer {
     //Magazine Angle - POV hat
     dc.bind(Id.Assistant, XboxPOV.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));
     dc.bind(Id.Assistant, XboxPOV.POV_DOWN).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Down));
-    dc.bind(Id.Assistant, XboxPOV.POV_LEFT).whenPressed(new MagazineAngle(intake, 35.0));
-    dc.bind(Id.Assistant, XboxPOV.POV_RIGHT).whenPressed(new MagazineAngle(intake, 42.0));
+    dc.bind(Id.Assistant, XboxPOV.POV_LEFT).whenPressed(new MagazineAngle(intake, dataLow)
+      .andThen(new ShooterWarmUp())  //uncomment for fulltime flywheels
+    );
+    dc.bind(Id.Assistant, XboxPOV.POV_RIGHT).whenPressed(new MagazineAngle(intake, dataHigh)
+      .andThen(new ShooterWarmUp()) //uncomment for fulltime flywheels
+    );
+
     //allow a manual lock on the positioner
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
 

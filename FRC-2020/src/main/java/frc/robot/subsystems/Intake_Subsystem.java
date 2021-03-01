@@ -34,10 +34,12 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.Intake;
 import frc.robot.Constants.PWM;
 import frc.robot.Constants.Shooter;
+import frc.robot.subsystems.Magazine_Subsystem.MagazinePositioner;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.util.misc.PIDFController;
 
 public class Intake_Subsystem extends SubsystemBase implements Logger {
+  public static final double USE_CURRENT_ANGLE = 0.0;
   /**
    * Creates a new Intake_Subsystem.
    * 
@@ -70,16 +72,16 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private NetworkTableEntry nt_autoShooterMode;
 
   // Intake
-  Spark intake_spark = new Spark(PWM.INTAKE);
-  DoubleSolenoid intakeSolenoid = new DoubleSolenoid(INTAKE_PCM_CAN_ID, INTAKE_UP_SOLENOID_PCM, INTAKE_DOWN_SOLENOID_PCM);
-
+  final Spark intake_spark = new Spark(PWM.INTAKE);
+  final DoubleSolenoid intakeSolenoid = new DoubleSolenoid(INTAKE_PCM_CAN_ID, INTAKE_UP_SOLENOID_PCM, INTAKE_DOWN_SOLENOID_PCM);
 
   // Magazine is used for a few controls 
-  Magazine_Subsystem magazine;
+  final Magazine_Subsystem magazine;
+  final MagazinePositioner positioner;
 
   // Flywheels 
-  FlyWheel  upper_shooter; 
-  FlyWheel  lower_shooter; 
+  final FlyWheel  upper_shooter; 
+  final FlyWheel  lower_shooter; 
 
   /**
    * PID Gains may have to be adjusted based on the responsiveness of control
@@ -109,7 +111,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   };
 
   /**
-   * RPMSet and Data are static classes to help configure the comma
+   * RPMSet and Data are static classes to help configure flywheel speeds
    */
     static class FlywheelRPM {
     public double upper;
@@ -161,6 +163,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     public ShooterSettings() {this(0.0, 0.0, 0.0, 0.1);}
   }
 
+  // default ShooterSetting that let you shoot 
+  final ShooterSettings defaultShooterSettings = new ShooterSettings(38.0, 10.0, USE_CURRENT_ANGLE, 0.01);
+
   // All RPM are in FW-RPM, not motor.
   FlywheelRPM actual = new FlywheelRPM();
   FlywheelRPM target = new FlywheelRPM();
@@ -174,12 +179,17 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   private boolean intakeIsOn = false;
   private boolean shooterIsOn = false;
   private boolean m_readyToShoot = false;  // looks at setpoint
-  ShooterSettings m_setpoint;              // current shooter setpoint 
+  ShooterSettings m_setpoint;              // current shooter setpoint, angle, flywheel speeds
   private boolean autoShootingModeOn = false;
   
+
+  /**
+   * 
+   */
   public Intake_Subsystem() {
-    // Construct the magazine 
+    // Construct the magazine, keep references to it an positioner
     magazine = new Magazine_Subsystem(this);
+    positioner = magazine.getMagPositioner();
 
     SendableRegistry.setName(this,"Intake", "shooter");
     upper_shooter = new FlyWheel(CAN.SHOOTER_UPPER_TALON, Shooter.upperFWConfig);
@@ -198,8 +208,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     VelToRPM.set(1, 1, 1.0 / Shooter.upperFWConfig.flywheelRadius);
     VelToRPM.times(0.5);  // common factor 1/2
 
-    //magazine.lower(); // must start in down positon
-    //raiseIntake();    // must start in the up position
+    m_setpoint = defaultShooterSettings;
   }
 
   @Override
@@ -213,7 +222,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     error.lower = target.lower - actual.lower;
 
     // monitor if the  shooter/angle is ready to shoot
-    isAtGoal(m_setpoint);
+    isAtGoal();
   }
 
   public void raiseIntake() {
@@ -274,24 +283,29 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     return new FlywheelRPM(omega.get(0,0), omega.get(1,0));
   }
 
+
+  public void setShooterSettings(ShooterSettings s) {
+    // default setting will shoot from any angle
+    s = (s == null) ? defaultShooterSettings : s;
+    m_setpoint = s;
+  }
+  public ShooterSettings getShooterSettings() { 
+    return m_setpoint;
+  }
+
   /**
-   * spinupShooter(ShooterSettings settings)
+   * spinupShooter()
    * 
-   * Preferred interface for controlling Flywheels and angle.
+   * Preferred interface for controlling Flywheels
    * This will not shoot, that requires control of the belt and
    * perhaps some targing feedback.
    * 
+   * Uses the m_setpoint settings
+   * 
    * Use this interface to Warm-up the flywheels.
    * 
-   * @param goals
    */
-  public void spinupShooter(ShooterSettings setting) {
-    // save the current setpoint
-    m_setpoint = setting;
-    // if an angle was requested, set that
-    if (m_setpoint.angle != 0.0 ) {
-      magazine.getMagPositioner().setAngle(m_setpoint.angle);
-    } 
+  public void spinupShooter() {
     // shooter will run at the target goals
     shooterOn(calculateGoals(m_setpoint));
   }
@@ -331,8 +345,6 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     upper_shooter.setPercent(0.0);
     lower_shooter.setPercent(0.0);
   }
-
-  
 
   /**
    * getShooterAvgRPM()  - average of upper and lower wheels
@@ -375,12 +387,12 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
    *         false - either angle or flywheels not up to speed
    */
 
-  boolean isAtGoal(ShooterSettings goal) {
+  boolean isAtGoal() {
     m_readyToShoot = false;
-    if (goal == null) return false;
-
+    
     // see if we are at the given goal, keep state var updated
-    m_readyToShoot = isAtGoalRPM(goal.velTol) &&  magazine.getMagPositioner().isAtSetpoint();
+    m_readyToShoot = isAtGoalRPM(m_setpoint.velTol) &&  
+      (m_setpoint.angle == USE_CURRENT_ANGLE) ? true : magazine.getMagPositioner().isAtSetpoint();
     return m_readyToShoot;
   }
 

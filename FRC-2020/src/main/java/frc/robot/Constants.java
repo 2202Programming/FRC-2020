@@ -8,7 +8,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
-import frc.robot.commands.intake.Shoot;
 import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.util.misc.PIDFController;
@@ -256,20 +255,10 @@ public final class Constants {
      */
     public static final class ShooterOnCmd {
         public static final double VEL_TOL = 0.005;  
-        public static Shoot.Data dataHigh = new Shoot.Data();
-        static {
-            dataHigh.BackupSec = .1;    // seconds
-            dataHigh.ShooterGoal = new ShooterSettings(39.0, 10.0, 40.8, VEL_TOL);  //vel, rps, angle, tol
-        }
-
-        public static Shoot.Data dataLow = new Shoot.Data();
-        static {
-            dataLow.BackupSec = .1;    // seconds
-            dataLow.ShooterGoal = new ShooterSettings(39.0, 6.0, 35.0, VEL_TOL);  //vel, rps, angle
-        }
-       
+        public static ShooterSettings dataHigh = new ShooterSettings(39.0, 10.0, 40.8, VEL_TOL);  //vel, rps, angle, tol
+        public static ShooterSettings dataLow  = new ShooterSettings(39.0, 6.0, 35.0, VEL_TOL);  //vel, rps, angle
     }
-
+    
     public static final class RamseteProfile {
       // These characterization values MUST be determined either experimentally or
       // theoretically for *your* robot's drive.

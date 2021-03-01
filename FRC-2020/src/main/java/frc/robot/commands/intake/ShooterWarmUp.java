@@ -5,27 +5,33 @@
 package frc.robot.commands.intake;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 
-// NOTE:  Consider using this command inline, rather than writing a subclass.  For more
-// information, see:
-// https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShooterWarmUp extends InstantCommand {
-  
+
   final Intake_Subsystem intake;
   ShooterSettings goals;
 
-  public ShooterWarmUp(Intake_Subsystem intake, ShooterSettings goals) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    // not sure about requierments addRequirements(intake);
-    this.intake = intake;
+  public ShooterWarmUp() {
+    this.intake = RobotContainer.getInstance().intake;
+    goals = null;
+  }
+
+  public ShooterWarmUp(ShooterSettings goals) {
+    this();
     this.goals = goals;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intake.spinupShooter(goals);
+    if (goals != null) {
+      // use what the intake has
+      intake.setShooterSettings(goals);
+    }
+    // go ahead and spin it up at whatever settings are there
+    intake.spinupShooter();
   }
 }

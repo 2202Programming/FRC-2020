@@ -10,6 +10,7 @@ import frc.robot.Constants.ShooterOnCmd;
 import frc.robot.commands.intake.Shoot;
 import frc.robot.commands.intake.ShooterWarmUp;
 import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.ifx.ArcadeDrive;
 
@@ -27,7 +28,7 @@ public class auto_shooting_cmd extends SequentialCommandGroup {
   private final Intake_Subsystem intake;
   private final Limelight_Subsystem limelight;
 
-  public auto_shooting_cmd(Intake_Subsystem intake, Shoot.Data cmdData, ArcadeDrive drive, 
+  public auto_shooting_cmd(Intake_Subsystem intake, ShooterSettings cmdData, ArcadeDrive drive, 
                             Limelight_Subsystem limelight, double maxSpeed) {
     
     this.intake = intake;
@@ -36,12 +37,12 @@ public class auto_shooting_cmd extends SequentialCommandGroup {
 
     if (limelight.valid() && intake.getAutoShootingMode())
     { //limelight-guided auto-aim shooting mode, only auto-aim if limelight has a target, and if auto shooting mode is true 
-      addCommands(new ShooterWarmUp(intake, ShooterOnCmd.dataHigh.ShooterGoal), 
+      addCommands(new ShooterWarmUp(ShooterOnCmd.dataHigh), 
                   new auto_limelightTurnToShoot_cmd(drive, limelight, 1),
-                  new Shoot(intake, ShooterOnCmd.dataHigh));
+                  new Shoot(ShooterOnCmd.dataHigh));
     } else {
       //otherwise simple manual shooting
-      addCommands(new Shoot(intake, ShooterOnCmd.dataHigh));
+      addCommands(new Shoot(ShooterOnCmd.dataHigh));
     }
   }
 

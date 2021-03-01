@@ -4,10 +4,7 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.DT;
-
 import com.revrobotics.CANEncoder;
-import com.revrobotics.CANError;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
@@ -41,8 +38,8 @@ public class Magazine_Subsystem extends SubsystemBase {
   static final double MAX_ANGLE = 47.3;  //measured at mechanical limit
 
   // Pot Volts measured at top & bottom position <measured>
-  static final double VatMin = 0.4541; // volts at 21 degrees (min mag angle)
-  static final double VatMax = 3.718;  // volts at 46.8 degrees (max mag angle)
+  static final double VatMin = 0.4541; // volts at 20.7 degrees (min mag angle)
+  static final double VatMax = 3.718;  // volts at 47.3 degrees (max mag angle)
 
   static final double MAX_SOFT_STOP = 46.0;
   static final double MIN_SOFT_STOP = 22.0;
@@ -142,10 +139,9 @@ public class Magazine_Subsystem extends SubsystemBase {
     final DoubleSolenoid solenoid = new DoubleSolenoid(CAN.PCM2, PCM2.MAG_LOCK, PCM2.MAG_UNLOCK);
   
     // measurements
-    double m_angle_linear = 0.0;    // mag angle linear estimate from pot
+    //m_double m_angle_linear = 0.0;    // mag angle linear estimate from pot
     double m_length_pot = 0.0;      // used to check measurements
     double m_length_pot_prev = 0.0; // used to measure speed
-    double m_speed_pot = 0.0;       // dl/dt based on pot <unfiltered>
     double m_length_motor = 0.0;    // used to check measurements 
     double m_angle_pot = 0.0;       // mag angle using cosine and pot length
     double m_angle_motor = 0.0;     // mag angle using cosin and motor position
@@ -157,7 +153,9 @@ public class Magazine_Subsystem extends SubsystemBase {
 
     // setpoint values, used in periodic()
     double m_lengthSetpoint; // inches  <calculated from angleSetpoint>
+    double m_setpoint;       // encoder <calulated count postion from desired angleSetpoint>
     double m_angleSetpoint;  // degrees <input>
+    boolean m_unlock_confirmed; // true down-motion detected so pawl should be free
 
     MagazinePositioner() {
       SendableRegistry.setName(anglePot, this.getName(), "YoYoPot");
@@ -183,37 +181,29 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
 
     public void addDebugDashboardWidgets(ShuffleboardLayout layout) {
-      layout.addNumber("MAGPos/angle_lin", () -> m_angle_linear).withSize(2, 5);
-      layout.addNumber("MAGPos/angle_pot", () -> m_angle_pot); 
+      layout.addNumber("MAGPos/angle_pot", () -> m_angle_pot).withSize(2, 5);; 
       layout.addNumber("MAGPos/angle_mot", () -> m_angle_motor); 
       layout.addNumber("MAGPos/len_pot",   () -> m_length_pot);
       layout.addNumber("MAGPos/len_strap", () -> m_length_motor );
       layout.addNumber("MAGPos/encoder",   () -> m_enc_pos);
+      layout.addNumber("MAGPos/encoder_sp",   () -> m_setpoint);
     }
 
     @Override
     public void periodic() {
-      m_length_pot_prev = m_length_pot;
-
+     
       // read pot to get length of pot, then calculate the angle based on potentiometer 
       double apv =anglePot.getAverageVoltage();
       m_length_pot =  (apv - VatMin) * kInchPerVolt + POT_LENGTH_MIN;
       m_angle_pot = lawOfCosineAngle(POT_LOWER_LEN, POT_UPPER_LEN, m_length_pot) + POT_OFFSET_ANGLE;
       
-      // use linear estimate should be good enough based on spreadsheet 
-      m_angle_linear = (apv - VatMin) * kDegPerVolt + MIN_ANGLE;
-      
-      // nw calc the angle based on the motor length
+      // now calc the angle based on the motor length
       m_enc_pos =  angleEncoder.getPosition();
       m_length_motor = m_strap_zero + m_enc_pos* kInchPerMotorRev;
       m_angle_motor = lawOfCosineAngle(STRAP_LOWER_LEN, STRAP_UPPER_LEN, m_length_motor) + STRAP_OFFSET_ANGLE;
     
-      //measure strap speed
+      //measure strap speed [in/s] of the strap
       m_strap_speed = angleEncoder.getVelocity()*(kInchPerMotorRev/60.0);
-
-      // estimate pot speed inch/s
-      m_speed_pot = (m_length_pot_prev - m_length_pot) / DT;
-      isMoving();
       safety();
     }
 
@@ -270,33 +260,21 @@ public class Magazine_Subsystem extends SubsystemBase {
       m_lengthSetpoint = lawOfCosineLength(STRAP_LOWER_LEN, STRAP_UPPER_LEN, strap_deg);
 
       //calculate motor postion in revs from our calibration positon
-      double setpoint = (m_lengthSetpoint - m_strap_zero)*kRevPerInch;
-      setpoint = edu.wpi.first.wpiutil.math.MathUtil.clamp(setpoint, min_encoder_pos, max_encoder_pos);
+      m_setpoint = (m_lengthSetpoint - m_strap_zero)*kRevPerInch;
+      m_setpoint = edu.wpi.first.wpiutil.math.MathUtil.clamp(m_setpoint, min_encoder_pos, max_encoder_pos);
 
       // we need to give the pawl a chance to unlock
-      if (setpoint > angleEncoder.getPosition() && isLocked()) {
-        waitForMotion();
-      } else if (isLocked()) {
-        // no need to wait for motion, going in pawl favorable direction
-        unlock();
-      }
-     
-      CANError err = anglePID.setReference(setpoint, ControlType.kPosition, kPosSlot);
-      if (err != CANError.kOk) {
-        System.out.println("SMARTMAX CAN ERROR in MAG POSITION"+ err);
-      }
-    }
-
-    void waitForMotion() {
-      double initEncPos = angleEncoder.getPosition();
-      lock();
-      burp();
-      int count = 10;
-      while (angleEncoder.getPosition() > initEncPos) {
-        count--;
-        if (count <= 0) break;
-      }
+      if (isLocked() && 
+          (m_setpoint > angleEncoder.getPosition()) && 
+          !m_unlock_confirmed) {
+            unlock();
+            return;
+      } 
+      // no need to wait for motion, going in pawl favorable direction
       unlock();
+           
+      //issue the command
+      anglePID.setReference(m_setpoint, ControlType.kPosition, kPosSlot);
     }
 
     /**
@@ -310,10 +288,12 @@ public class Magazine_Subsystem extends SubsystemBase {
       if ((isAtBottom() && pully_rpm < 0.0) || (isAtTop() && pully_rpm > 0.0)) {
        return;
       }
-      // we can do a manual positon
-      if (pully_rpm > 0) {
-        // may have to burp the motor to unlock the pawl, go back slowly
-       waitForMotion();
+     
+      // guard against pulling into pawl
+      if ((pully_rpm > 0) && isLocked() && !m_unlock_confirmed ) {
+        // we have to burp the motor and make sure we are unlocked
+        unlock();  // can't trust this one if there is any tension 
+        return;
       }
       unlock();
       m_pully_rpm = MathUtil.limit(pully_rpm, -kMaxRPM, kMaxRPM);
@@ -322,12 +302,17 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
 
     /**
-     * burp() - offload the pawl by moving in down direction to 
+     * burp() - offload the pawl by moving in down direction.
+     *   this must be controlled by a Command so movement logic
+     *   can be done.
      */
-    void burp() 
-    {
-       // may have to burp the motor to unlock the pawl, go back slowly
-       anglePID.setReference(-250.0, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
+    public void burp() 
+    { 
+      final double inps = 0.3;
+      double burpSpeed = -(kRevPerInch*60)*inps;  //[rev/in][sec/min][in/sec] = [rpm] Down
+
+       // burp the motor to unlock the pawl, i.e. go back slowly
+       anglePID.setReference(burpSpeed, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage);
     }
 
     /**
@@ -383,12 +368,23 @@ public class Magazine_Subsystem extends SubsystemBase {
       }  
     }
   
+    /**
+     * called by a Command when motion is detected
+     */
+    public void unlockConfirmed() {
+      m_unlock_confirmed = true;
+    }
 
+    public boolean getUnlockConfirmed() { 
+      return m_unlock_confirmed;
+    }
+    
     /**
      * controls for the lock on the 
      */
     public void lock() {
       solenoid.set(Value.kForward);
+      m_unlock_confirmed = false;
     }
   
     public void unlock() {
@@ -401,24 +397,29 @@ public class Magazine_Subsystem extends SubsystemBase {
 
     public boolean isMoving() {
       // possible motor is moving and mag isn't 
-      boolean mag_moving = Math.abs(m_speed_pot) > kMinVelZeroTol;
       boolean motor_moving = Math.abs(m_strap_speed) > kMinVelZeroTol;
-      m_loose_strap = (mag_moving != motor_moving);
+      return motor_moving;
+    }
 
-      return (mag_moving || motor_moving);
+    /**
+     * isMovingDown means we could be releasing load on the pawl
+     */
+    public boolean isMovingDown() {
+      // possible motor is moving and mag isn't 
+      boolean motor_moving = m_strap_speed > kMinVelZeroTol;
+      return motor_moving;
     }
 
   } // MagazinePositioner
 
 
   /**
-   * 
+   *  Belt controls
    */
-  final int MAG_FULL_COUNT = 3;
+  final int MAG_FULL_COUNT = 3;   //number of power cells
 
   // magazine Belt
   final Spark beltMotor = new Spark(PWM.MAGAZINE);
-
   final DigitalInput lightGate = new DigitalInput(DigitalIO.MAGAZINE_GATE);
 
   // Intake and Mag must talk, keep a reference
@@ -439,16 +440,16 @@ public class Magazine_Subsystem extends SubsystemBase {
     nt_pcCount = table.getEntry("PCCount");
     nt_pcCount.setNumber(m_pcCount);
 
-    // fill out dashboard stuff
-    SendableRegistry.setSubsystem(this, "Magazine");
-    SendableRegistry.setName(lightGate, this.getName(), "Mag LightGate");
-    SendableRegistry.setName(beltMotor, this.getName(), "Mag Belt");
+    // fill out dashboard stuff - commented out to save bandwidth
+    //SendableRegistry.setSubsystem(this, "Magazine");
+    //SendableRegistry.setName(lightGate, this.getName(), "Mag LightGate");
+    //SendableRegistry.setName(beltMotor, this.getName(), "Mag Belt");
   }
 
   @Override
   public void periodic() {
         //post these values to network tables
-        nt_angle.setNumber(positioner.m_angle_linear);
+        nt_angle.setNumber(positioner.get());
    }
 
   public void beltOn(double motorStrength) {
@@ -502,6 +503,7 @@ public class Magazine_Subsystem extends SubsystemBase {
 
   public void setPC(int c) {
     m_pcCount = (c >= 0  && c <= MAG_FULL_COUNT) ? c : 0;
+    nt_pcCount.setNumber(m_pcCount);
   }
   public boolean isMagFull() {
     return (m_pcCount >= MAG_FULL_COUNT);

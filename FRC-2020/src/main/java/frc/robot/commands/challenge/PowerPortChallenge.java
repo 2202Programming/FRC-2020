@@ -12,6 +12,7 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.intake.Shoot;
 import frc.robot.commands.intake.ShooterWarmUp;
 import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Magazine_Subsystem;
 
@@ -22,17 +23,17 @@ public class PowerPortChallenge extends SequentialCommandGroup  {
   final Limelight_Subsystem limelight;
   final Shoot shootCmd;
 
-  public PowerPortChallenge(Shoot.Data shootData) { 
+  public PowerPortChallenge(ShooterSettings shootData) { 
     this.withName("PowerPortChallenge");
     RobotContainer rc = RobotContainer.getInstance();
     intake = rc.intake;
     limelight = rc.limelight;
     mag = intake.getMagazine();
 
-    shootCmd = new Shoot(intake, shootData);
+    shootCmd = new Shoot(shootData);
 
     addCommands(
-      new ShooterWarmUp(rc.intake, shootData.ShooterGoal),
+      new ShooterWarmUp(shootData),
       new InstantCommand(rc.limelight::enableLED)
       );
   }

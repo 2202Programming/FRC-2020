@@ -78,7 +78,7 @@ public class CreateCircle {
 
     // correct theta for robot pose
     var th = thetaRot2d.minus(robot_offset); 
-    var th_deg = th.getDegrees();
+    ///debug var th_deg = th.getDegrees();
     var pose = new Pose2d(x, y, th);
     return new State(t, velocity, 0.0, pose, k);
   }

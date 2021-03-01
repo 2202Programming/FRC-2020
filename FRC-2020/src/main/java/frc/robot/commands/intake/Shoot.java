@@ -1,29 +1,26 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2019 FIRST. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot.commands.intake;
 
 import static frc.robot.Constants.DT;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.subsystems.Magazine_Subsystem;
 
 public class Shoot extends CommandBase {
   //belt constants
-  private double SLOW_MAG_REVERSE = -0.8; // motor power
-  private double FAST_MAG_FORWARD =  1; // motor power
-  
-  Intake_Subsystem intake;
-  Magazine_Subsystem magazine;
+  double SLOW_MAG_REVERSE = -0.8; // motor power
+  double FAST_MAG_FORWARD =  1;   // motor power
 
-  private final int backupCount;
-  private int count;
+  // shooting controll constants
+  final double BACKUPSEC = 0.1;     // secs to back up before shooting
+  final int AtGoalBeforeShoot = 0;
+  
+  final Intake_Subsystem intake;
+  final Magazine_Subsystem magazine;
+  int backupCount;
+  int count;
   
   // testing/reporting controls
   double time;
@@ -38,55 +35,23 @@ public class Shoot extends CommandBase {
   }
   Stage stage;
   int atGoalCount = 0;       // require flywheels to be at goal for a few frames
+  
+  ShooterSettings shooterSettings;  // pc vel, rotation, and mag angle
 
   /**
-   * Constant/control data needed as input for this command.
-   */
-  public static class Data { 
-    public ShooterSettings ShooterGoal;  // pc vel, rotation, and mag angle
-    public double BackupSec;             // seconds to backup
-    public int    AtGoalBeforeShoot;     // frames to wait at goal to ensure stable
-
-    public Data() {
-      ShooterGoal = new ShooterSettings();
-      BackupSec = 0.1;
-      AtGoalBeforeShoot = 0;
-    }
-    public Data(ShooterSettings goal) {
-      this();
-      ShooterGoal = goal;
-    }
-     /**
-     * copy constructor
-     * @param d
-     */
-    public Data( Data d) {
-      // make deep copy of incoming data
-      ShooterGoal = new ShooterSettings(d.ShooterGoal);
-      BackupSec = d.BackupSec;
-      AtGoalBeforeShoot = d.AtGoalBeforeShoot;
-    }
-  }
-
-  // commanded target goals
-  Data goals;
-  // pick reasonable defaults and shoot from whatever manual angle is set
-  static Data onTheFly = new Shoot.Data();
-  static {
-     onTheFly.ShooterGoal.angle = 0.0;  // use current position
-     onTheFly.AtGoalBeforeShoot = 0;
-     onTheFly.ShooterGoal.rps = 5;
-     onTheFly.ShooterGoal.vel = 38;
-  }
-  /**
-   * Shoot where we are at.
+   * Shoot where we are at with rea
    * 
    * @param intake
    */
-  public Shoot(Intake_Subsystem intake) {
-    // using dummy upper/lower target rpm.  If this construsctor is used, calculateShooterSpeed()
-    // will be overriden.  USe the Constant data.
-    this(intake, onTheFly);      
+  public Shoot() {
+    this.intake = RobotContainer.getInstance().intake;
+    this.magazine = intake.getMagazine();
+    this.backupCount = (int) Math.floor(BACKUPSEC / DT); 
+    this.stage = Stage.DoingNothing;
+    this.shooterSettings = null;     // use what the intake has
+
+    // we will control the belt for shooting, add it as requirement
+    addRequirements(magazine);
   }
 
   /**
@@ -94,15 +59,9 @@ public class Shoot extends CommandBase {
    * @param intake
    * @param cmdData
    */
-  public Shoot(Intake_Subsystem intake, Shoot.Data cmdData) {
-    this.intake = intake;
-    magazine = intake.getMagazine();
-    goals = cmdData;
-    backupCount = (int) Math.floor(goals.BackupSec / DT);
-    stage = Stage.DoingNothing;
-
-    // we will control the belt for shooting, add it as requirement
-    addRequirements(magazine);
+  public Shoot(ShooterSettings ss) {
+    this();
+    this.shooterSettings = ss;
   }
 
   // Called when the command is initially scheduled.
@@ -111,6 +70,10 @@ public class Shoot extends CommandBase {
     stage = Stage.DoingNothing;
     magazine.beltOff();
     intake.intakeOff();
+    if (shooterSettings != null)  {
+      // use what this command was given
+      intake.setShooterSettings(shooterSettings);
+    }
     count = 0;
     atGoalCount = 0;
   }
@@ -139,18 +102,18 @@ public class Shoot extends CommandBase {
           break;  // break means we don't have solution, keep waiting
         
         // we have our shoot target speeds, turn shooter on
-        intake.spinupShooter(goals.ShooterGoal);
+        intake.spinupShooter();
         time = System.currentTimeMillis();    //time for spin up start
         stage = Stage.WaitingForFlyWheel;
       break;
 
       case WaitingForFlyWheel: //stage 1, pause magazine while shooters get to RPM goal
         if (intake.isReadyToShoot() && 
-            (atGoalCount++ >= goals.AtGoalBeforeShoot)) {
+            (atGoalCount++ >= AtGoalBeforeShoot)) {
           //Flywheel at speed, move to shooting
           stage = Stage.Shooting;
           magazine.beltOn(FAST_MAG_FORWARD);
-          magazine.removePC();   // we will shoot 1
+         
         }
       break;
 
@@ -161,7 +124,8 @@ public class Shoot extends CommandBase {
           atGoalCount = 0;
           //back to WaitingForFlywheel
           stage = Stage.WaitingForFlyWheel;
-          magazine.beltOff();
+          magazine.beltOff(); 
+          magazine.removePC();   // we shot 1
        }
       break;
     }

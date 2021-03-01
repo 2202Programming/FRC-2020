@@ -100,7 +100,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
                     new WaitCommand(0.7),
                     new MagazineAngle(intake, 40.0).withTimeout(2.0),
                     new WaitCommand(1.2),
-                    new Shoot(intake, ShooterOnCmd.dataLow).withTimeout(3), //need to add Data type to parser
+                    new Shoot(ShooterOnCmd.dataLow).withTimeout(3), //need to add Data type to parser
                     new MagazineAngle(intake, 25.0).withTimeout(2.0),
                     new IntakePosition(intake, Direction.Up)
             );
@@ -126,7 +126,7 @@ public class auto_cmd_group extends SequentialCommandGroup {
                         new auto_drive_straight_cmd(drive, 1.5).withTimeout(2), // pressure on wall during dump
 
                         // Deploy balls
-                        new Shoot(intake).withTimeout(2) // turn shooter on for 2 seconds
+                        new Shoot().withTimeout(2) // turn shooter on for 2 seconds
                 ),
 
                 // Drive backwards at departure angle using lidar

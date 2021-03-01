@@ -7,7 +7,6 @@
 
 package frc.robot.commands.intake;
 
-import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
 
 /**
@@ -33,8 +32,8 @@ public class ShootWithLimelight extends Shoot  {
   private double upper_slope;
   private double upper_yIntercept;
 
-  public ShootWithLimelight(Intake_Subsystem intake, double upper_slope, double upper_yIntercept, Limelight_Subsystem limelight)  {
-    super(intake);
+  public ShootWithLimelight(double upper_slope, double upper_yIntercept, Limelight_Subsystem limelight)  {
+    super();
     
     // new functionality for limelight
     m_limelight = limelight;
@@ -65,8 +64,8 @@ public class ShootWithLimelight extends Shoot  {
 
   //find RPM/angle goals from limelight area and slope/intercept of measured RPM data
   private void calculateRPMFromLimelight(){ 
-    goals.ShooterGoal.angle =  upper_slope*m_limelight.getArea() + upper_yIntercept;
-    goals.ShooterGoal.rps = 10;
-    goals.ShooterGoal.vel = 35;
+    shooterSettings.angle =  upper_slope*m_limelight.getArea() + upper_yIntercept;
+    shooterSettings.rps = 10;
+    shooterSettings.vel = 35;
   }
 }

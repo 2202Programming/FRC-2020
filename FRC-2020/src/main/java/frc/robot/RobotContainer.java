@@ -135,7 +135,16 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
+    //go from current position to stored position
+    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain,driveTrain.getPose(),state.getSavedPose()));
 
+    //store current position
+    dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState));
+
+    //toggle auto shooting mode
+    dc.bind(Id.Driver, XboxButton.R3).whenPressed(new InstantCommand(intake::toggleAutoShootingMode));
+
+    
 
     // Assistant's buttons
     dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineBeltAdjust(mag, false, 0.0)); 
@@ -161,14 +170,6 @@ public class RobotContainer {
     CreateCircle circle = new CreateCircle(2, 1.5, -360);
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
 
-    //go from current position to stored position
-    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain,state));
-
-    //store current position
-    dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState));
-
-    //toggle auto shooting mode
-    dc.bind(Id.Driver, XboxButton.R3).whenPressed(new InstantCommand(intake::toggleAutoShootingMode));
 
   }
 

@@ -129,9 +129,12 @@ public class RobotContainer {
 
 
      // Setup AutoCommands
-     dashboard.addAutoCommand("def", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
+     dashboard.addAutoCommand("match", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
      dashboard.addAutoCommand("GalaticSearch A", new GalacticSearch(driveTrain, true));
      dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
+     //test
+    CreateCircle circle = new CreateCircle(2, 1.5, -360);
+    dashboard.addAutoCommand("computed-circle", new followTrajectory(driveTrain, circle.getTrajectory()));
 
     // Shuffleboard runnable Commands
     SmartDashboard.putData("Match Ready", new MatchReadyCmd());
@@ -187,11 +190,7 @@ public class RobotContainer {
 
     //allow a manual lock on the positioner
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
-
-    //test
-    CreateCircle circle = new CreateCircle(2, 1.5, -360);
-    dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new followTrajectory(driveTrain, circle.getTrajectory()));
-
+    
   }
 
   /**

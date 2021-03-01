@@ -22,7 +22,7 @@ public class scoot_and_shoot extends SequentialCommandGroup {
   private final Limelight_Subsystem limelight;
   private final VelocityDifferentialDrive_Subsystem drive;
 
-  public scoot_and_shoot(Intake_Subsystem intake, Shoot.Data cmdData, VelocityDifferentialDrive_Subsystem drive, 
+  public scoot_and_shoot(Intake_Subsystem intake, VelocityDifferentialDrive_Subsystem drive, 
                             Limelight_Subsystem limelight, Pose2d endPose, double maxSpeed) {
     
     this.intake = intake;
@@ -35,13 +35,13 @@ public class scoot_and_shoot extends SequentialCommandGroup {
 
     if (limelight.valid())
     { //limelight-guided auto-aim shooting mode, only auto-aim if limelight has a target
-      addCommands(new ShooterWarmUp(intake, ShooterOnCmd.dataHigh.ShooterGoal), 
+      addCommands(new ShooterWarmUp(ShooterOnCmd.dataHigh), 
                   new auto_limelightTurnToShoot_cmd(drive, limelight, 1),
-                  new Shoot(intake, ShooterOnCmd.dataHigh));
+                  new Shoot(ShooterOnCmd.dataHigh));
 
     } else {
       //otherwise blindly shoot
-      addCommands(new Shoot(intake, ShooterOnCmd.dataHigh));
+      addCommands(new Shoot(ShooterOnCmd.dataHigh));
     }
   }
 

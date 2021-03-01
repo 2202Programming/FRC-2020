@@ -289,6 +289,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     s = (s == null) ? defaultShooterSettings : s;
     m_setpoint = s;
   }
+  
   public ShooterSettings getShooterSettings() { 
     return m_setpoint;
   }
@@ -391,8 +392,9 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
     m_readyToShoot = false;
     
     // see if we are at the given goal, keep state var updated
-    m_readyToShoot = isAtGoalRPM(m_setpoint.velTol) &&  
-      (m_setpoint.angle == USE_CURRENT_ANGLE) ? true : magazine.getMagPositioner().isAtSetpoint();
+    boolean fw_ready = isAtGoalRPM(m_setpoint.velTol);
+    boolean angle_ready = (m_setpoint.angle == USE_CURRENT_ANGLE) ? true : positioner.isAtSetpoint(m_setpoint.angle);
+    m_readyToShoot = fw_ready && angle_ready;
     return m_readyToShoot;
   }
 

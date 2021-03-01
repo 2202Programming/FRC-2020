@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.wpiutil.math.MathUtil.clamp;
+
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
@@ -29,7 +31,6 @@ import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.PCM2;
 import frc.robot.Constants.PWM;
-import frc.robot.util.misc.MathUtil;
 import frc.robot.util.misc.PIDFController;
 
 public class Magazine_Subsystem extends SubsystemBase {
@@ -216,7 +217,7 @@ public class Magazine_Subsystem extends SubsystemBase {
      *  If that is happening, the geometry measurements are off somewhere.
      * 
      * State variable used:
-     *    m_pot_lenght     <input>
+     *    m_pot_lenght     <input>  calibrate to measured pot lenght
      *    m_strap_zero     <output>
      *    m_angleSetpoint  <output>
      * 
@@ -253,7 +254,7 @@ public class Magazine_Subsystem extends SubsystemBase {
 
     public void setAngle(double magDeg) { 
       //limit range and save our current setpoint
-      m_angleSetpoint = MathUtil.limit(magDeg, MIN_ANGLE, MAX_ANGLE);
+      m_angleSetpoint = clamp(magDeg, MIN_ANGLE, MAX_ANGLE);
 
       //figure out desired motor strap length
       double strap_deg = m_angleSetpoint - STRAP_OFFSET_ANGLE;
@@ -261,18 +262,11 @@ public class Magazine_Subsystem extends SubsystemBase {
 
       //calculate motor postion in revs from our calibration positon
       m_setpoint = (m_lengthSetpoint - m_strap_zero)*kRevPerInch;
-      m_setpoint = edu.wpi.first.wpiutil.math.MathUtil.clamp(m_setpoint, min_encoder_pos, max_encoder_pos);
+      m_setpoint = clamp(m_setpoint, min_encoder_pos, max_encoder_pos);
 
-      // we need to give the pawl a chance to unlock
-      if (isLocked() && 
-          (m_setpoint > angleEncoder.getPosition()) && 
-          !m_unlock_confirmed) {
-            unlock();
-            return;
-      } 
-      // no need to wait for motion, going in pawl favorable direction
-      unlock();
-           
+      // we need to give the pawl a chance to unlock, so don't hit hardware if unsafe
+      if (getUnlockConfirmed()== false) return;
+
       //issue the command
       anglePID.setReference(m_setpoint, ControlType.kPosition, kPosSlot);
     }
@@ -296,7 +290,7 @@ public class Magazine_Subsystem extends SubsystemBase {
         return;
       }
       unlock();
-      m_pully_rpm = MathUtil.limit(pully_rpm, -kMaxRPM, kMaxRPM);
+      m_pully_rpm = clamp(pully_rpm, -kMaxRPM, kMaxRPM);
       double motor_speed = kGearRatio * m_pully_rpm;
       anglePID.setReference(motor_speed, ControlType.kVelocity, kVelSlot, kArbFFHoldVolts, ArbFFUnits.kVoltage); 
     }
@@ -348,18 +342,12 @@ public class Magazine_Subsystem extends SubsystemBase {
       return (get() >= MAX_SOFT_STOP)  ?  true : false;
     }
     
-    public boolean isAtSetpoint() {
-      return (Math.abs(get() - m_angleSetpoint) < kToleranceDeg)  ? true : false;     
+    public boolean isAtSetpoint(double angle_setpoint) {
+      return (Math.abs(get() - angle_setpoint) < kToleranceDeg)  ? true : false;     
     }
 
     //checks to make sure we don't do stupid
     void safety() {
-
-      // protect from manual driving at stops
-      if ((isAtBottom() && m_pully_rpm < 0.0) || (isAtTop() && m_pully_rpm > 0.0)) {
-        zeroPower(false);
-        m_pully_rpm =0.0;
-      }
 
       // if we get outside the range, recalibrate against the pot.  
       if (Math.abs(m_angle_motor - m_angle_pot) > 2.0) {
@@ -406,7 +394,7 @@ public class Magazine_Subsystem extends SubsystemBase {
      */
     public boolean isMovingDown() {
       // possible motor is moving and mag isn't 
-      boolean motor_moving = m_strap_speed > kMinVelZeroTol;
+      boolean motor_moving = m_strap_speed < -kMinVelZeroTol;
       return motor_moving;
     }
 

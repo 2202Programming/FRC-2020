@@ -38,7 +38,6 @@ import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCaptureCmd;
 import frc.robot.commands.intake.Shoot;
-import frc.robot.commands.intake.ShooterWarmUp;
 import frc.robot.commands.test.path.CreateCircle;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
@@ -182,10 +181,10 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxPOV.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));
     dc.bind(Id.Assistant, XboxPOV.POV_DOWN).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Down));
     dc.bind(Id.Assistant, XboxPOV.POV_LEFT).whenPressed(new MagazineAngle(intake, dataLow)
-      .andThen(new ShooterWarmUp())  //uncomment for fulltime flywheels
+      //.andThen(new ShooterWarmUp())  //uncomment for fulltime flywheels
     );
     dc.bind(Id.Assistant, XboxPOV.POV_RIGHT).whenPressed(new MagazineAngle(intake, dataHigh)
-      .andThen(new ShooterWarmUp()) //uncomment for fulltime flywheels
+      //.andThen(new ShooterWarmUp()) //uncomment for fulltime flywheels
     );
 
     //allow a manual lock on the positioner

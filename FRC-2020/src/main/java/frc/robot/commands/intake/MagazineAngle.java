@@ -5,8 +5,11 @@
 package frc.robot.commands.intake;
 
 import static frc.robot.Constants.DT;
+import static frc.robot.subsystems.Magazine_Subsystem.MAX_SOFT_STOP;
+import static frc.robot.subsystems.Magazine_Subsystem.MIN_SOFT_STOP;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.subsystems.Magazine_Subsystem.MagazinePositioner;
@@ -17,11 +20,12 @@ public class MagazineAngle extends CommandBase {
     Up, Down, ToPositon
   };
 
-  static final double RPM = 3;
-  static final double DEG_PER_SEC = 4.0;
+  //static final double RPM = 3;
+  static final double DEG_PER_SEC = 3.0;
   static final double DEG_PER_PERIOD = DEG_PER_SEC * DT;
-  static final double CONFIRM_MOVE_DEG = 0.2;
-  static final int BURP_COUNT = 5; // frames to let motor go down before unlocking
+  static final double CONFIRM_MOVE_DEG = 0.5;
+  static final int    MIN_DOWN_COUNT = 3;
+  static final int    BURP_COUNT = 10; // frames to let motor go down before unlocking
 
   final Intake_Subsystem intake;
   final MagazinePositioner magPositioner;
@@ -36,6 +40,8 @@ public class MagazineAngle extends CommandBase {
   double m_last_cmd_angle;    // track what we send to avoid repeated sending of angle
   boolean m_locked;           // lock stat at init of command
   boolean m_problem_detected; // couldn't unlock log and stop trying
+  int m_down_count;
+  boolean m_ok_to_lock;
 
   /** Creates a new MagazineAngle. */
   private  MagazineAngle(Intake_Subsystem intake){
@@ -70,19 +76,24 @@ public class MagazineAngle extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_ok_to_lock = false;
     m_problem_detected = false;
     m_init_angle = magPositioner.get();
-    m_integrated_angle = m_init_angle;
+    // clamp the command in case our measured is a bit outside the soft limits
+    m_integrated_angle =MathUtil.clamp(m_init_angle, MIN_SOFT_STOP, MAX_SOFT_STOP);
     m_locked = magPositioner.isLocked() || !magPositioner.getUnlockConfirmed();
     m_delay = 0;
     m_last_cmd_angle = -1;
+    m_down_count = 0;
 
+    magPositioner.unlock();
+    
     // see if we need to burp the motor to unlock the pawl
     if (m_locked
         && ((direction == Direction.Up) || ((direction == Direction.ToPositon) && (m_init_angle <= cmd_degrees)))) {
       // we have to back up the motor and unlock
       magPositioner.burp();
-      magPositioner.unlock();
+     
       m_delay = BURP_COUNT;
     } else {
       // heading down, confirm the unlock right away
@@ -112,6 +123,7 @@ public class MagazineAngle extends CommandBase {
 
     // getting here, now we know we are unlocked, perform the commands
     // up/down will ramp up a position, ToPosition just sets the end goal.
+
     switch (direction) {
       case Up:  //magPositioner.wind(RPM);
         m_integrated_angle += DEG_PER_PERIOD;
@@ -124,10 +136,14 @@ public class MagazineAngle extends CommandBase {
         break;
     }
     
+    //enforce soft limits
+    m_integrated_angle = MathUtil.clamp(m_integrated_angle, MIN_SOFT_STOP, MAX_SOFT_STOP);
+
     //don't repeat postion commands
     if (m_last_cmd_angle == m_integrated_angle) 
       return;
-    magPositioner.setAngle(m_integrated_angle);
+
+      magPositioner.setAngle(m_integrated_angle);
     m_last_cmd_angle = m_integrated_angle;
   }
 
@@ -135,14 +151,19 @@ public class MagazineAngle extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     // no matter how we got here, manual, or ToPosition, call it home.
-    magPositioner.stopAndHold(false);
+    boolean lock = m_ok_to_lock && !interrupted;
+    magPositioner.stopAndHold(lock);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     if (m_problem_detected)    return true;
-    if (direction == Direction.ToPositon)  return magPositioner.isAtSetpoint(cmd_degrees);
+    if ((direction == Direction.ToPositon) && 
+         magPositioner.isAtSetpoint(cmd_degrees)) {
+      m_ok_to_lock = true;
+      return true;
+    }
     return false; // manual never done
   }
 
@@ -151,11 +172,12 @@ public class MagazineAngle extends CommandBase {
   // if going down, it is ok because pawl will disengage
   boolean confirmUnlocked() {
     // check for motion
-    if ((magPositioner.isMovingDown() && 
-        (m_init_angle - magPositioner.get()) > CONFIRM_MOVE_DEG)) {
-      // moving down and far enough, unlock worked
-      magPositioner.unlockConfirmed();
-      m_delay = 0;
+    if ((magPositioner.isMovingDown()) &&
+       (m_down_count++ >= MIN_DOWN_COUNT)) {
+        // moving down and far enough, unlock worked
+        magPositioner.unlockConfirmed();
+        m_delay = 0;
+        System.out.println("*****burp count=" + m_down_count) ;
     } 
     // still waiting for movement and within BURP_COUNT
     m_delay--;

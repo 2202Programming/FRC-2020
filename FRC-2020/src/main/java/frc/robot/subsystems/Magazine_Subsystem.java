@@ -35,15 +35,15 @@ import frc.robot.util.misc.PIDFController;
 
 public class Magazine_Subsystem extends SubsystemBase {
   // Physical limits
-  static final double MIN_ANGLE = 20.7;  //measured at mechanical stops
-  static final double MAX_ANGLE = 47.3;  //measured at mechanical limit
+  public static final double MIN_ANGLE = 20.7;  //measured at mechanical stops
+  public static final double MAX_ANGLE = 47.3;  //measured at mechanical limit
 
   // Pot Volts measured at top & bottom position <measured>
   static final double VatMin = 0.4541; // volts at 20.7 degrees (min mag angle)
   static final double VatMax = 3.718;  // volts at 47.3 degrees (max mag angle)
 
-  static final double MAX_SOFT_STOP = 46.0;
-  static final double MIN_SOFT_STOP = 22.0;
+  public static final double MAX_SOFT_STOP = 46.0;
+  public static final double MIN_SOFT_STOP = 22.0;
 
   /**
    * See this doc for calcs and numbers
@@ -178,7 +178,8 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
 
     public void addDashboardWidgets(ShuffleboardLayout layout) {
-      layout.addNumber("MAGPos/angle_mot", () -> m_angle_motor); 
+      layout.addNumber("MAGPos/angle_mot", () -> m_angle_motor);
+      layout.addNumber("MAGPos/strap_speed", () -> m_strap_speed); 
     }
 
     public void addDebugDashboardWidgets(ShuffleboardLayout layout) {
@@ -348,7 +349,6 @@ public class Magazine_Subsystem extends SubsystemBase {
 
     //checks to make sure we don't do stupid
     void safety() {
-
       // if we get outside the range, recalibrate against the pot.  
       if (Math.abs(m_angle_motor - m_angle_pot) > 2.0) {
         System.out.println("Mag Angle Calibration Event ang_mot=" + m_angle_motor + " ang_pot=" + m_angle_pot );
@@ -384,6 +384,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
 
     public boolean isMoving() {
+      m_strap_speed = angleEncoder.getVelocity()*(kInchPerMotorRev/60.0);
       // possible motor is moving and mag isn't 
       boolean motor_moving = Math.abs(m_strap_speed) > kMinVelZeroTol;
       return motor_moving;
@@ -393,6 +394,7 @@ public class Magazine_Subsystem extends SubsystemBase {
      * isMovingDown means we could be releasing load on the pawl
      */
     public boolean isMovingDown() {
+      m_strap_speed = angleEncoder.getVelocity()*(kInchPerMotorRev/60.0);
       // possible motor is moving and mag isn't 
       boolean motor_moving = m_strap_speed < -kMinVelZeroTol;
       return motor_moving;

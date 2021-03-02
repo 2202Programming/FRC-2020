@@ -3,6 +3,7 @@ package frc.robot.commands.challenge;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.followTrajectory;
@@ -50,14 +51,16 @@ public class GalacticSearch extends SequentialCommandGroup {
       *   based on what we found.
       */
       this.addCommands(
-        new InstantCommand( ()->  { magazine.setPC(0);} ),
+        new InstantCommand( ()->  { magazine.setPC(0); } ),
         new IntakePosition(intake, Direction.Down),
         new IntakePower(intake, Power.On, 0.5),
-        new  followTrajectory(drive, startTraj), // starting path
+        new followTrajectory(drive, startTraj).andThen(new PrintCommand("GS-Start trajectory done.")), 
         new ConditionalCommand(
-          new followTrajectory(drive, blueTraj),  // on true, found nothing do blue
-          new followTrajectory(drive, redTraj),   // on False, found something do read
-          magazine::isMagEmpty)                   // conditional
+            // on true, magEmpty, found nothing do blue
+            new PrintCommand("GS-Blue Trajectory").andThen(new followTrajectory(drive, blueTraj)),  
+            // on False, found something do read
+            new PrintCommand("GS-found PC,Red Trajectory").andThen(new followTrajectory(drive, redTraj)),   
+            magazine::isMagEmpty)         // conditional
       );
 
   }

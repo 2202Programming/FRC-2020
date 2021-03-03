@@ -19,8 +19,8 @@ public class followTrajectory extends CommandBase {
   DifferentialDriveKinematics kinematics;
 
   // Ramsete constants - todo wire to ux
-  double beta = .5;   // larger more aggressive convergence
-  double zeta = 0.9; //larger more damping 
+  double beta = .12; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft
+  double zeta = 0.8; //larger more damping 
 
   /** Creates a new followTrajectory. */
   public followTrajectory(VelocityDrive drive, Trajectory trajectory) {

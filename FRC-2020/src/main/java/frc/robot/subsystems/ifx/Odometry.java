@@ -19,6 +19,7 @@ public interface Odometry extends Subsystem {
   public Pose2d getPose();
   public void resetOdometry(Pose2d pose);
   public DifferentialDriveWheelSpeeds getWheelSpeeds();
+  public DifferentialDriveWheelSpeeds getCommandedWheelSpeeds();
 
   public DifferentialDriveKinematics getDriveKinematics();
 

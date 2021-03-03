@@ -97,4 +97,9 @@ public class DummyVelocityDrive implements VelocityDrive {
     return 0;
   }
 
+  @Override
+  public DifferentialDriveWheelSpeeds getCommandedWheelSpeeds() {
+    return null;
+  }
+
 }

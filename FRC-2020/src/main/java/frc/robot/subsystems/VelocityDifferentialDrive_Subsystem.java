@@ -143,6 +143,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   Gear requestedGear; // where driver or external logic wants the gear
   boolean coastMode = false; // attempt to coast when Vcmd > Vrequest
 
+  // Save our commanded wheelspeeds and current speeds
+  final DifferentialDriveWheelSpeeds m_commandedWheelSpeeds = new DifferentialDriveWheelSpeeds();
+  final DifferentialDriveWheelSpeeds m_currentWheelSpeeds = new DifferentialDriveWheelSpeeds();
+
   // measurements, taken in periodic(), robot coordinates
   double m_velLeft = 0.0; // fps, positive moves robot forward
   double m_velRight = 0.0; // fps, positive moves robot forward
@@ -308,6 +312,9 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     m_velLeft = (Kleft * K_ft_per_rev * WheelWearLeft * kGR / 60.0) * leftEncoder.getVelocity();
     m_velRight = (Kright * K_ft_per_rev * WheelWearRight * kGR / 60.0) * rightEncoder.getVelocity();
 
+    m_currentWheelSpeeds.leftMetersPerSecond = m_velLeft;
+    m_currentWheelSpeeds.rightMetersPerSecond = m_velRight;
+
     // Update the odometry in the periodic block, physical units, update field
     m_odometry.update(readGyro(), m_posLeft, m_posRight);
     m_field.setRobotPose(m_odometry.getPoseMeters());
@@ -435,6 +442,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
    * @param velRight [length/s] positive movee forward
    */
   public void velocityTankDrive(double velLeft, double velRight) {
+    // save commanded speeds
+    m_commandedWheelSpeeds.leftMetersPerSecond = velLeft;         // not meters, we use ft/s
+    m_commandedWheelSpeeds.rightMetersPerSecond = velRight;
+
     // Spark Max uses RPM for velocity closed loop mode
     // so we need to convert ft/s to RPM command which is dependent
     // on the gear ratio.
@@ -662,8 +673,14 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
    * @return The current wheel speeds.
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(m_velLeft, m_velRight);
+    return m_currentWheelSpeeds; 
+    //was new DifferentialDriveWheelSpeeds(m_velLeft, m_velRight);
   }
+
+  public DifferentialDriveWheelSpeeds getCommandedWheelSpeeds() {
+    return m_commandedWheelSpeeds;
+  }
+
 
   /**
    * Returns the currently-estimated pose of the robot.

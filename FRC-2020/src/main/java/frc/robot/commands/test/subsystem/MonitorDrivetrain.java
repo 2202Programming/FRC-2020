@@ -32,7 +32,7 @@ public class MonitorDrivetrain extends CommandBase {
   StringBuilder data = new StringBuilder();
 
   public MonitorDrivetrain(VelocityDrive drive) {
-
+    this.drive = drive;
   }
 
   // Called when the command is initially scheduled.

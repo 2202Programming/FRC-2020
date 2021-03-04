@@ -182,7 +182,7 @@ public final class Constants {
         // PIDS are in the SparkMax, PIDFControler is used to hold the values
         // for initializing the hardware. The PID object not run on RIO.
         public static final PIDFController pidValues =
-             new PIDFController(0.00005, 0.0, 0.0, 0.00025); // P, I, D, FF
+             new PIDFController(0.000155, 0.0, 6.0, 0.00016666); // P, I, D, FF
 
 
         // shifter settings

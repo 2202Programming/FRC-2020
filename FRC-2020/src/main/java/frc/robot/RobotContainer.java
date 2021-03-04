@@ -135,12 +135,12 @@ public class RobotContainer {
      dashboard.addAutoCommand("GalaticSearch A", new GalacticSearch(driveTrain, true));
      dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
      //test
-    CreateCircle circle = new CreateCircle(2, 1.5, -360);
+    CreateCircle circle = new CreateCircle(3, 5, -360);
     dashboard.addAutoCommand("computed-circle", new followTrajectory(driveTrain, circle.getTrajectory()));
     dashboard.addAutoCommand("velocityStep", 
     new ParallelCommandGroup(
       new MonitorDrivetrain(driveTrain),              // captures data to NT
-      new VelocityStepTest(driveTrain, 1.0, 4.0, 3)   // speed ft/s, duration s, repeat
+      new VelocityStepTest(driveTrain, 2.0, 4.0, 4)   // speed ft/s, duration s, repeat
     ));
 
     // Shuffleboard runnable Commands

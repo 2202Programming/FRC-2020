@@ -22,6 +22,7 @@ public class VelocityStepTest extends CommandBase {
   double endTime;  // for current state        .
   State state;
   int count; 
+  double cmd_speed;
    
   public VelocityStepTest(VelocityDrive drive, double speed, double duration, int repeat) {
     this.drive = drive;
@@ -36,6 +37,7 @@ public class VelocityStepTest extends CommandBase {
   public void initialize() {
     state = State.Init;
     count = 0;
+    cmd_speed = 0.0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -62,11 +64,12 @@ public class VelocityStepTest extends CommandBase {
       default:
         break;
       }
+      drive.velocityTankDrive(cmd_speed, cmd_speed);
   }
 
   void startCycle() {
-    drive.velocityTankDrive(speed, speed);
     endTime =  Timer.getFPGATimestamp() + duration;
+    cmd_speed = speed;
   }
 
   void endCycle() {
@@ -74,11 +77,16 @@ public class VelocityStepTest extends CommandBase {
     endTime = Timer.getFPGATimestamp() + DELAY_TIME;
     speed = -speed;   // go backwards next time
     count++;          // cycle done
+    cmd_speed =0.0;
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) 
+  {
+     speed = Math.abs(speed);
+     count = 0;
+  }
 
   // Returns true when the command should end.
   @Override

@@ -39,7 +39,7 @@ public class GalacticSearch extends SequentialCommandGroup {
     if (isA) {
       startTraj = rc.getTrajectory("SearchAStart");
       blueTraj = rc.getTrajectory("SearchABlue");
-      redTraj = rc.getTrajectory("SearchARed.");
+      redTraj = rc.getTrajectory("SearchARed");
     } else {
       startTraj =  rc.getTrajectory("SearchBStart");
       blueTraj = rc.getTrajectory("SearchBBlue");
@@ -60,7 +60,9 @@ public class GalacticSearch extends SequentialCommandGroup {
             new PrintCommand("GS-Blue Trajectory").andThen(new followTrajectory(drive, blueTraj)),  
             // on False, found something do read
             new PrintCommand("GS-found PC,Red Trajectory").andThen(new followTrajectory(drive, redTraj)),   
-            magazine::isMagEmpty)         // conditional
+            magazine::isMagEmpty),         // conditional
+        new IntakePower(intake, Power.Off, 0.0)
+        
       );
 
   }

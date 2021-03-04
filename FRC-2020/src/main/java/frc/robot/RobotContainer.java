@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.DriverPrefs;
 import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.toggleLED;
@@ -39,6 +40,8 @@ import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCaptureCmd;
 import frc.robot.commands.intake.Shoot;
 import frc.robot.commands.test.path.CreateCircle;
+import frc.robot.commands.test.subsystem.MonitorDrivetrain;
+import frc.robot.commands.test.subsystem.VelocityStepTest;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -134,6 +137,11 @@ public class RobotContainer {
      //test
     CreateCircle circle = new CreateCircle(2, 1.5, -360);
     dashboard.addAutoCommand("computed-circle", new followTrajectory(driveTrain, circle.getTrajectory()));
+    dashboard.addAutoCommand("velocityStep", 
+    new ParallelCommandGroup(
+      new MonitorDrivetrain(driveTrain),              // captures data to NT
+      new VelocityStepTest(driveTrain, 1.0, 4.0, 3)   // speed ft/s, duration s, repeat
+    ));
 
     // Shuffleboard runnable Commands
     SmartDashboard.putData("Match Ready", new MatchReadyCmd());
@@ -189,7 +197,7 @@ public class RobotContainer {
 
     //allow a manual lock on the positioner
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
-    
+
   }
 
   /**

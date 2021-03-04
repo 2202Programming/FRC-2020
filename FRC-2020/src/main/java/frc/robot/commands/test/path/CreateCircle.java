@@ -1,11 +1,16 @@
 package frc.robot.commands.test.path;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import frc.robot.Constants;
 
 public class CreateCircle {
   final double dt = .1;  // sec timestep
@@ -54,13 +59,40 @@ public class CreateCircle {
       theta0=0; 
     } 
 
+    // create a short line in X direction 
+    var line = lineSegment(radius);
+    var states = line.getStates();
+    int count = states.size() / 2;
+
+    for (int i=0; i < count; i++) {
+      circlePoints.add(states.get(i));
+    }
+    State lineOffset = states.get(count + 1);
+
     // walk the circle - field coord, theta is not robot, it is just for calc X, Y of arc 
     for (double t = 0.0; t < (totalTime); t += dt) {
-      circlePoints.add(calculatePoint(t));
+      circlePoints.add(calculatePoint(t, lineOffset));
     }
     //add one more point at the exact ending time
-    circlePoints.add(calculatePoint(totalTime));
-   
+    circlePoints.add(calculatePoint(totalTime, lineOffset));
+    var lastCircleState = circlePoints.get(circlePoints.size()-1);
+
+    // now add the remaining line
+    for(int i= count+2; i < states.size(); i++) {
+      var linePt = states.get(i);
+
+      var p = new Pose2d(linePt.poseMeters.getTranslation().plus(lastCircleState.poseMeters.getTranslation())
+                                .minus(lineOffset.poseMeters.getTranslation()),
+                         lastCircleState.poseMeters.getRotation() );
+
+      var st = new State(linePt.timeSeconds - lineOffset.timeSeconds + lastCircleState.timeSeconds, 
+                linePt.velocityMetersPerSecond,
+                linePt.accelerationMetersPerSecondSq,
+                p,
+                linePt.curvatureRadPerMeter);
+      circlePoints.add(st);
+    }
+
     // construct the trajectory
     trajectory = new Trajectory(circlePoints);
   }
@@ -70,7 +102,7 @@ public class CreateCircle {
    * @param t - where in the time series to calculate based on circle
    * @return  State object on the circle
    */
-  State calculatePoint(double t) {
+  State calculatePoint(double t, State offset) {
     double theta = w * t + theta0;
     Rotation2d thetaRot2d = new Rotation2d(theta);
     double y = -(radius * thetaRot2d.getCos() + Y0);
@@ -79,8 +111,9 @@ public class CreateCircle {
     // correct theta for robot pose
     var th = thetaRot2d.minus(robot_offset); 
     ///debug var th_deg = th.getDegrees();
-    var pose = new Pose2d(x, y, th);
-    return new State(t, velocity, 0.0, pose, k);
+    var pose = new Pose2d(x + offset.poseMeters.getX(), 
+                          y + offset.poseMeters.getY(), th);
+    return new State(offset.timeSeconds + t, velocity, 0.0, pose, k);
   }
 
   public Trajectory getTrajectory() {return trajectory;}
@@ -101,6 +134,26 @@ public class CreateCircle {
 
     CreateCircle testCircle2 = new CreateCircle(5, 1.0, -180);
     System.out.println(testCircle2);
+  }
+
+  Trajectory lineSegment(double distance) {
+    TrajectoryConfig config =
+    new TrajectoryConfig(velocity, 2*velocity)  // assume we can get to target speed in .5 seconds
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(Constants.RamseteProfile.kDriveKinematics);
+        
+    Trajectory segment = TrajectoryGenerator.generateTrajectory(
+        new Pose2d(0.0, 0.0, new Rotation2d(0) ),
+        //new Pose2d(startPose.getX(),startPose.getY(),new Rotation2d(0)),
+        // Pass through these two interior waypoints, making an 's' curve path
+        List.of(
+            new Translation2d(distance / 2.0, 0.0)
+        ),
+        //new Pose2d(endPose.getX(),endPose.getY(),new Rotation2d(0)),
+        new Pose2d(distance, 0.0, new Rotation2d(0)),
+        // Pass config
+        config ); 
+        return segment;
   }
 
 }

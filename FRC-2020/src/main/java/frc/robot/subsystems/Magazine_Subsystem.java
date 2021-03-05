@@ -167,6 +167,7 @@ public class Magazine_Subsystem extends SubsystemBase {
       angleMotor.restoreFactoryDefaults(false);
       angleMotor.setInverted(kInverted);
       angleMotor.setIdleMode(IdleMode.kBrake);
+      angleMotor.setSmartCurrentLimit(5);   //DPL - testing this for stall protection
      
       //copy the sw pidvalues to the hardware
       posPIDvalues.copyTo(anglePID, kPosSlot);

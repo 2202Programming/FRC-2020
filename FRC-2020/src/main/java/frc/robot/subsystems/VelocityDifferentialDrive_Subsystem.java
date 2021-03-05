@@ -12,6 +12,7 @@ import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.ControlType;
 
 import edu.wpi.first.networktables.EntryNotification;
@@ -279,6 +280,10 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     DriveTrain.pidValues.copyTo(leftPID, KpidSlot);
     DriveTrain.pidValues.copyTo(rightPID, KpidSlot);
 
+    // master controller have faster CAN Timing
+    setMasterControlerTiming(leftController);
+    setMasterControlerTiming(rightController);
+
     // zero adjust will set the default limits for accel and currents
     adjustAccelerationLimit(0.0);
     adjustFeedForward(0.0);
@@ -383,7 +388,22 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
       c.setInverted(KInvertMotor);
       c.setIdleMode(KIdleMode);
       c.clearFaults();
+
+      // lower CAN message rates, for everyone. Masters will get set higher later
+      c.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 200); // applied output (norm 10ms)
+      c.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 500); // motor Vel,T, Volt  (norm 20ms)
+      c.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500); // motor pos (norm 20ms)
     }
+  }
+
+  /**
+   * Master controllers need to report back faster or at normal rate
+   * @param c SparkMax controller used as a master
+   */
+  private void setMasterControlerTiming(CANSparkMax c) {
+    c.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // applied output (norm 10ms)
+    c.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10); // motor Vel,T, Volt  (norm 20ms)
+    c.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20); // motor pos (norm 20ms)
   }
 
   private void saveControllers() {

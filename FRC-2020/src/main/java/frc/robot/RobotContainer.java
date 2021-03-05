@@ -26,6 +26,7 @@ import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.challenge.GalacticSearch;
+import frc.robot.commands.drive.GyroHeadingCompensator;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
@@ -140,6 +141,7 @@ public class RobotContainer {
     dashboard.addAutoCommand("velocityStep", 
     new ParallelCommandGroup(
       new MonitorDrivetrain(driveTrain),              // captures data to NT
+      new GyroHeadingCompensator(driveTrain),         // drive straight
       new VelocityStepTest(driveTrain, 2.0, 4.0, 4)   // speed ft/s, duration s, repeat
     ));
 

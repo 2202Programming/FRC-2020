@@ -6,6 +6,8 @@ import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 import static frc.robot.Constants.RobotPhysical.WheelWearLeft;
 import static frc.robot.Constants.RobotPhysical.WheelWearRight;
 
+import java.util.function.Supplier;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
@@ -157,6 +159,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   double m_theta; // heading
   double m_voltleft; // save voltages that we send to motor
   double m_voltright;
+  Supplier<Double> m_heading_compensator;
 
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
@@ -176,6 +179,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     // save scaling factors, they are required to use SparkMax in Vel mode
     gearbox = gear;
     requestedGear = gearbox.getCurrentGear();
+    setHeadingCompensator(null);
 
    //direct networktables logging
     table = NetworkTableInstance.getDefault().getTable("Drivetrain");
@@ -428,20 +432,22 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     // on the gear ratio.
     
     // [s/min] / [ft /wheel-rev] / [motor-rev / wheel-rev] = [motor-rpm / ft/s]
-    double k = (60.0 / K_ft_per_rev) /gearbox.getGearRatio();  
+    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();  
     double maxSpeed = getMaxSpeed(m_currentGear);
 
     // limit vel to max for the gear ratio
     double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
-    double rpm = k * vcmd;  // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
+    double rpm = kGR * vcmd;  // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
 
     /**
      * Rotation controls
      */
     // Convert to rad/s split between each wheel
     double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
+    rps = rps + m_heading_compensator.get();
+
     //     [mo-rpm/ ft/s]  [rad/deg] [ft] [deg/s] =  [mo-rpm/ ft/s] * [ft/s] = mo-rpm
-    double vturn_rpm = k * (Math.PI / 180.0)*(0.5*WheelAxleDistance) * rps;
+    double vturn_rpm = kGR * (Math.PI / 180.0)*(0.5*WheelAxleDistance) * rps;
 
     // compute each wheel, pos rpm moves forward, pos turn is CCW
     double vl_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ); // turn left, +CCW, slows left wheel
@@ -470,14 +476,33 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     // so we need to convert ft/s to RPM command which is dependent
     // on the gear ratio.
     // [s/min] / [ft/wheel-rev] / [wheel-rev / motor-rev] = [mo-rev / min] / [ft/s] = [mo-rpm / ft/s]
-    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();   
-    
+    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio(); 
+    double rps = m_heading_compensator.get();
+    double vturn_rpm = (Math.PI / 180.0)*(0.5*WheelAxleDistance) * rps;
+  
     // [mo-rpm / ft/s] * [ft/s]  = [rpm-mo]
-    double rpm_l = kGR * velLeft;  
-    double rpm_r = kGR * velRight; 
+    double rpm_l = kGR * (velLeft - vturn_rpm);  
+    double rpm_r = kGR * (velRight + vturn_rpm); 
     // scale to rpm and ouput to contollers, no coast mode
     output(rpm_l, rpm_r, false);
   }
+
+  /**
+   * 
+   * sets supplier for heading compensation in degs/sec
+   * 
+   * @param headingDotComp  degs/sec to turn based on external system like limelight or gyro
+   */
+  public void setHeadingCompensator(Supplier<Double> headingDotComp) {
+    if (null == headingDotComp) {
+      m_heading_compensator = this::defaultHeadingCompensator;
+    }
+  }
+  /**
+   * No heading compensation - use by default
+   * @return 0.0
+   */
+  double defaultHeadingCompensator() {return 0.0;}
 
   /**
    * Issues all the output changes to the motor controller and gear shifter when

@@ -354,19 +354,18 @@ public class Magazine_Subsystem extends SubsystemBase {
     void safety() {
       // if we get outside the range, recalibrate against the pot.  
       if (Math.abs(m_angle_motor - m_angle_pot) > 2.0) {
-        System.out.println("Mag Angle Calibration Event ang_mot=" + m_angle_motor + " ang_pot=" + m_angle_pot );
+        DriverStation.reportWarning("Mag Angle Calibration Event ang_mot=" + m_angle_motor + " ang_pot=" + m_angle_pot, false );
         //calibrate();
       }  
       // monitor analog pot getting too close to limit. Just kill it
-      if (m_apv <= VatMin*1.02) {
-        angleMotor.set(0.0);
-        DriverStation.reportWarning("Mag Angle too close to limit - shutting down. Check pawl.", false);
-        m_unlock_confirmed = false;
+      if (m_unlock_confirmed == false && m_apv <= VatMin*1.02) {
+        zeroPower(false);
+        DriverStation.reportWarning("Mag Angle too close to limit during burp - shutting down. Check pawl.", false);
       }
     }
   
     /**
-     * called by a Command when motion is detected
+     * called by a Command when down motion is detected
      */
     public void unlockConfirmed() {
       m_unlock_confirmed = true;
@@ -457,20 +456,6 @@ public class Magazine_Subsystem extends SubsystemBase {
 
   public void beltOff() {
     beltMotor.set(0);
-  }
-
-  public void raise() {
-    // intake will come down much faster than magazine will go up
-    // so no delay here should be OK... famous last words.
-    if (intake.isIntakeUp()) {
-      intake.lowerIntake();
-    }
-    // start moving the mag to the desired angle
-    positioner.setAngle(MAX_SOFT_STOP);
-  }
-
-  public void lower() {
-    positioner.setAngle(MIN_SOFT_STOP);
   }
 
   /**

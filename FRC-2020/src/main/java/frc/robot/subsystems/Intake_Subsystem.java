@@ -31,7 +31,6 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Vector;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.Constants.CAN;
-import frc.robot.Constants.Intake;
 import frc.robot.Constants.PWM;
 import frc.robot.Constants.Shooter;
 import frc.robot.subsystems.Magazine_Subsystem.MagazinePositioner;
@@ -40,6 +39,7 @@ import frc.robot.util.misc.PIDFController;
 
 public class Intake_Subsystem extends SubsystemBase implements Logger {
   public static final double USE_CURRENT_ANGLE = 0.0;
+  public static final double SAFE_INTAKE_ANGLE = 28.0;   //Mag angle for raising Intake
   /**
    * Creates a new Intake_Subsystem.
    * 
@@ -131,9 +131,22 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
      * Copy(src) - copy data into structure from a source
      * @param src
      */
-    public void copy(FlywheelRPM src) {
+    public FlywheelRPM copy(FlywheelRPM src) {
       this.upper = src.upper;
       this.lower = src.lower;
+      return this;
+    }
+
+    public FlywheelRPM set( double upper, double lower) {
+      this.upper = upper;
+      this.lower= lower;
+      return this;
+    }
+
+    public FlywheelRPM minus(FlywheelRPM a, FlywheelRPM b) {
+      this.upper = a.upper - b.upper;
+      this.lower = a.lower - b.lower;
+      return this;
     }
     public String toString() {
       return Double.toString(upper) + "/" + Double.toString(lower);
@@ -213,24 +226,17 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
 
   @Override
   public void periodic() {
-    // update RPM variables here, because we do controls on them and don't
-    // want to have measurement lag.
-    actual.upper = upper_shooter.getRPM(); 
-    actual.lower = lower_shooter.getRPM();
+    //measure flywheel rpm and calculate our error 
+    actual.set(upper_shooter.getRPM(), lower_shooter.getRPM());
+    error.minus(target, actual);
 
-    error.upper = target.upper - actual.upper;
-    error.lower = target.lower - actual.lower;
-
-    // monitor if the  shooter/angle is ready to shoot
+    // monitor if the  shooter rpm and angle is ready to shoot
     isAtGoal();
   }
 
   public void raiseIntake() {
     // can't have magazine up with intake up, force it down.
-    // Magazine goes down faster, so should be ok...
-    if (magazine.positioner.get() > Intake.MAG_UP_ANGLE) { 
-      magazine.lower();
-    }
+    // Command Layer needs to confirm this.
     intakeSolenoid.set(DoubleSolenoid.Value.kForward);
   }
 

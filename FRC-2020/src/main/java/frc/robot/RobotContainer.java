@@ -129,12 +129,12 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings(driverControls);
 
-
-     // Setup AutoCommands
-     dashboard.addAutoCommand("match", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
-     dashboard.addAutoCommand("GalaticSearch A", new GalacticSearch(driveTrain, true));
-     dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
-     //test
+    // Setup AutoCommands
+    dashboard.addAutoCommand("match", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
+    dashboard.addAutoCommand("GalaticSearch A", new GalacticSearch(driveTrain, true));
+    dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
+    
+    //test commands
     CreateCircle circle = new CreateCircle(3, 5, -360);
     dashboard.addAutoCommand("computed-circle", new followTrajectory(driveTrain, circle.getTrajectory()));
     dashboard.addAutoCommand("velocityStep", 
@@ -143,9 +143,9 @@ public class RobotContainer {
       new VelocityStepTest(driveTrain, 2.0, 4.0, 4)   // speed ft/s, duration s, repeat
     ));
 
-    // Shuffleboard runnable Commands
+    // Shuffleboard runnable Commands - Soft buttons
     SmartDashboard.putData("Match Ready", new MatchReadyCmd());
-    SmartDashboard.putData("Match Zero PC Count", new InstantCommand(() -> magazine.setPC(0)));
+    SmartDashboard.putData("Match Zero PC", new InstantCommand(() -> magazine.setPC(0)));
   }
 
   private void configureButtonBindings(DriverControls dc) {

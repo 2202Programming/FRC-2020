@@ -25,7 +25,7 @@ public class MagazineAngle extends CommandBase {
   static final double DEG_PER_PERIOD = DEG_PER_SEC * DT;
   static final double CONFIRM_MOVE_DEG = 0.5;
   static final int    MIN_DOWN_COUNT = 3;
-  static final int    BURP_COUNT = 10; // frames to let motor go down before unlocking
+  static final int    BURP_COUNT = 10; // frames to let motor go down before giving up
 
   final Intake_Subsystem intake;
   final MagazinePositioner magPositioner;

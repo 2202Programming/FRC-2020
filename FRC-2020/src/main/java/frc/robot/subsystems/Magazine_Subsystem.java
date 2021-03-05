@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -151,6 +152,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     double m_strap_zero = 0.0;      // zero point for calibration
     boolean m_loose_strap = false;  // based on pot and motor speeds
     double  m_pully_rpm = 0;
+    double m_apv = 0;     //angle pot avg voltage 
 
     // setpoint values, used in periodic()
     double m_lengthSetpoint; // inches  <calculated from angleSetpoint>
@@ -195,8 +197,8 @@ public class Magazine_Subsystem extends SubsystemBase {
     public void periodic() {
      
       // read pot to get length of pot, then calculate the angle based on potentiometer 
-      double apv =anglePot.getAverageVoltage();
-      m_length_pot =  (apv - VatMin) * kInchPerVolt + POT_LENGTH_MIN;
+      m_apv =anglePot.getAverageVoltage();
+      m_length_pot =  (m_apv - VatMin) * kInchPerVolt + POT_LENGTH_MIN;
       m_angle_pot = lawOfCosineAngle(POT_LOWER_LEN, POT_UPPER_LEN, m_length_pot) + POT_OFFSET_ANGLE;
       
       // now calc the angle based on the motor length
@@ -352,8 +354,14 @@ public class Magazine_Subsystem extends SubsystemBase {
       // if we get outside the range, recalibrate against the pot.  
       if (Math.abs(m_angle_motor - m_angle_pot) > 2.0) {
         System.out.println("Mag Angle Calibration Event ang_mot=" + m_angle_motor + " ang_pot=" + m_angle_pot );
-        calibrate();
+        //calibrate();
       }  
+      // monitor analog pot getting too close to limit. Just kill it
+      if (m_apv <= VatMin*1.02) {
+        angleMotor.set(0.0);
+        DriverStation.reportWarning("Mag Angle too close to limit - shutting down. Check pawl.", false);
+        m_unlock_confirmed = false;
+      }
     }
   
     /**

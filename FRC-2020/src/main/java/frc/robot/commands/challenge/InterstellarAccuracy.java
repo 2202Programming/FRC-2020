@@ -76,18 +76,18 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
         .setKinematics(Constants.RamseteProfile.kDriveKinematics);
    
     Command leg1 = build_leg(StartPose, Zone1Pose, SSZone1);
-    //Command leg2 = build_leg(IntroPose, Zone2Pose, SSZone2);
-    //Command leg3 = build_leg(IntroPose, Zone3Pose, SSZone3);
-    //Command leg4 = build_leg(IntroPose, Zone4Pose, SSZone4);
-    //Command leg5 = build_leg(IntroPose, Zone4Pose, SSZone4);
+    Command leg2 = build_leg(IntroPose, Zone2Pose, SSZone2);
+    Command leg3 = build_leg(IntroPose, Zone3Pose, SSZone3);
+    Command leg4 = build_leg(IntroPose, Zone4Pose, SSZone4);
+    Command leg5 = build_leg(IntroPose, Zone4Pose, SSZone4);
 
     this.addCommands(
       new InstantCommand(() -> {magazine.setPC(3); } ),    
-      leg1);
-     // leg2);
-      //leg3,
-      //leg4, 
-      //leg5);
+      leg1,
+      leg2,
+      leg3,
+      leg4, 
+      leg5);
 
   }
 
@@ -145,6 +145,12 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
    */
   Trajectory computeTrajectory(Pose2d start, Pose2d end) 
   {
+    System.out.println("***ComputeTraj: Start X="+start.getX());
+    System.out.println("***ComputeTraj: Start Y="+start.getY());
+    System.out.println("***ComputeTraj: End X="+end.getX());
+    System.out.println("***ComputeTraj: End Y="+end.getY());
+
+
     var trajectory = TrajectoryGenerator.generateTrajectory(
         start,
         List.of(

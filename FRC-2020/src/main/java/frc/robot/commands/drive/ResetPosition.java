@@ -27,7 +27,7 @@ public class ResetPosition extends InstantCommand {
   @Override
   public void initialize() { 
     //m_subsystem.resetPosition();
-    m_subsystem.resetOdometry(new Pose2d(0,0,new Rotation2d(0.0)));
+    m_subsystem.resetOdometry(new Pose2d(2.5,2.5,new Rotation2d(0.0)));
   }
 
 }

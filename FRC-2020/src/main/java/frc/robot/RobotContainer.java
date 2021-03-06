@@ -199,6 +199,7 @@ public class RobotContainer {
 
     //allow a manual lock on the positioner
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
+    dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));   
 
   }
 

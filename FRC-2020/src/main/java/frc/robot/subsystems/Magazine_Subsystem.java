@@ -43,7 +43,7 @@ public class Magazine_Subsystem extends SubsystemBase {
   static final double VatMin = 0.4541; // volts at 20.7 degrees (min mag angle)
   static final double VatMax = 3.718;  // volts at 47.3 degrees (max mag angle)
 
-  public static final double MAX_SOFT_STOP = 46.0;
+  public static final double MAX_SOFT_STOP = 47.1;
   public static final double MIN_SOFT_STOP = 22.0;
 
   /**

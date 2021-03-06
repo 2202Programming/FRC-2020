@@ -160,6 +160,17 @@ public class Magazine_Subsystem extends SubsystemBase {
     double m_angleSetpoint;  // degrees <input>
     boolean m_unlock_confirmed; // true down-motion detected so pawl should be free
 
+    //network tables
+    private NetworkTable table;
+    private NetworkTableEntry nt_angle_mot;
+    private NetworkTableEntry nt_strap_speed;
+    private NetworkTableEntry nt_angle_pot;
+    private NetworkTableEntry nt_len_pot;
+    private NetworkTableEntry nt_len_strap;
+    private NetworkTableEntry nt_encoder;
+    private NetworkTableEntry nt_encoder_sp;
+    private int x;
+
     MagazinePositioner() {
       SendableRegistry.setName(anglePot, this.getName(), "YoYoPot");
       
@@ -174,6 +185,17 @@ public class Magazine_Subsystem extends SubsystemBase {
       velPIDvalues.copyTo(anglePID, kVelSlot);
       angleMotor.burnFlash();
 
+      //network tables setup
+      table = NetworkTableInstance.getDefault().getTable("MAGPos");
+      nt_angle_mot = table.getEntry("AngleMot");
+      nt_strap_speed = table.getEntry("StrapSpeed");
+      nt_angle_pot = table.getEntry("AnglePot");
+      nt_len_pot = table.getEntry("LenPot");
+      nt_len_strap = table.getEntry("LenStrap");
+      nt_encoder = table.getEntry("Encoder");
+      nt_encoder_sp = table.getEntry("EncoderSP");
+      x=0;
+
       //call periodic to read our values and calibrate
       periodic();
       calibrate();      // set motor encoder to zero and star
@@ -181,17 +203,17 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
 
     public void addDashboardWidgets(ShuffleboardLayout layout) {
-      layout.addNumber("MAGPos/angle_mot", () -> m_angle_motor);
-      layout.addNumber("MAGPos/strap_speed", () -> m_strap_speed); 
+      //layout.addNumber("MAGPos/angle_mot", () -> m_angle_motor);
+      //layout.addNumber("MAGPos/strap_speed", () -> m_strap_speed); 
     }
 
     public void addDebugDashboardWidgets(ShuffleboardLayout layout) {
-      layout.addNumber("MAGPos/angle_pot", () -> m_angle_pot).withSize(2, 5);; 
+     /* layout.addNumber("MAGPos/angle_pot", () -> m_angle_pot).withSize(2, 5);; 
       layout.addNumber("MAGPos/angle_mot", () -> m_angle_motor); 
       layout.addNumber("MAGPos/len_pot",   () -> m_length_pot);
       layout.addNumber("MAGPos/len_strap", () -> m_length_motor );
       layout.addNumber("MAGPos/encoder",   () -> m_enc_pos);
-      layout.addNumber("MAGPos/encoder_sp",   () -> m_setpoint);
+      layout.addNumber("MAGPos/encoder_sp",   () -> m_setpoint);*/
     }
 
     @Override
@@ -210,6 +232,18 @@ public class Magazine_Subsystem extends SubsystemBase {
       //measure strap speed [in/s] of the strap
       m_strap_speed = angleEncoder.getVelocity()*(kInchPerMotorRev/60.0);
       safety();
+
+      //network table outputs
+      x++;
+      if (x%10==0){ //every 10 cycles since no log extension
+        nt_angle_mot.setDouble(m_angle_motor);
+        nt_strap_speed.setDouble(m_strap_speed);
+        nt_angle_pot.setDouble(m_angle_pot);
+        nt_len_pot.setDouble(m_length_pot);
+        nt_len_strap.setDouble(m_length_motor);
+        nt_encoder.setDouble(m_enc_pos);
+        nt_encoder_sp.setDouble(m_setpoint);
+      }
     }
 
     /**

@@ -63,6 +63,8 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   
   private boolean isreal; //if simulation mode, do not construct lidar and all methods return 0 or nothing.
   
+  private int x;
+
   public Lidar_Subsystem() {
     this.isreal = RobotBase.isReal();
     SendableRegistry.setName(this, "LIDAR");
@@ -73,6 +75,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
     nt_right = table.getEntry("Right");
     nt_valid = table.getEntry("Valid");
     nt_angle = table.getEntry("Angle");
+    x=0;
 
     if (isreal){
       front_left_lidar = new TimeOfFlight(CAN.FRONT_LEFT_LIDAR);
@@ -142,26 +145,29 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   public void periodic() {
     // This method will be called once per scheduler run
     // read sensor and valid flags, skip if simulated
-    if (isreal) {
-      left_raw = front_left_lidar.getRange();
-      right_raw = front_right_lidar.getRange();
-      left_valid = front_left_lidar.isRangeValid();
-      right_valid = front_right_lidar.isRangeValid();
-    }
-    else {
-      // make something up
-      left_raw = (left_raw + 1) % 200;
-      right_raw = (right_raw + 1.03) % 200;
-      right_valid = (right_raw <100);
-      left_valid = (left_raw < 125);
-    }
-    double temp = (valid()) ? 1.0 : 0.0;
-    filteredValid = valid_fir.calculate(temp);
-    left_lidar_range = left_iir.calculate(left_raw) - BUMPER_DISTANCE; 
-    right_lidar_range = right_iir.calculate(right_raw) - BUMPER_DISTANCE;
-    findAngle(); 
-  }
 
+    x++;
+    if(x%10==0){ //reduce lidar CPU cost
+      if (isreal) {
+        left_raw = front_left_lidar.getRange();
+        right_raw = front_right_lidar.getRange();
+        left_valid = front_left_lidar.isRangeValid();
+        right_valid = front_right_lidar.isRangeValid();
+      }
+      else {
+        // make something up
+        left_raw = (left_raw + 1) % 200;
+        right_raw = (right_raw + 1.03) % 200;
+        right_valid = (right_raw <100);
+        left_valid = (left_raw < 125);
+      }
+      double temp = (valid()) ? 1.0 : 0.0;
+      filteredValid = valid_fir.calculate(temp);
+      left_lidar_range = left_iir.calculate(left_raw) - BUMPER_DISTANCE; 
+      right_lidar_range = right_iir.calculate(right_raw) - BUMPER_DISTANCE;
+      findAngle(); 
+    }
+  }
   public void addDashboardWidgets(ShuffleboardLayout layout) {
     /*layout.addNumber("LDR/left",  () -> left_lidar_range).withSize(2,1);
     layout.addNumber("LDR/right", () -> right_lidar_range);

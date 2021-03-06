@@ -332,7 +332,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   public double adjustFeedForward(final double deltaFF) {
     arbFeedFwd = MathUtil.limit((arbFeedFwd + deltaFF), 0.0, ARBIT_FEEDFWD_MAX_VOLT);
 
-    SmartDashboard.putNumber("/DT/limits/arbFF", arbFeedFwd);
+    //SmartDashboard.putNumber("/DT/limits/arbFF", arbFeedFwd);
     return arbFeedFwd;
   }
 
@@ -353,7 +353,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
     leftController.setClosedLoopRampRate(slewRateLimit);
     rightController.setClosedLoopRampRate(slewRateLimit);
 
-    SmartDashboard.putNumber("/DT/limits/slewRate", slewRateLimit);
+    //SmartDashboard.putNumber("/DT/limits/slewRate", slewRateLimit);
     return slewRateLimit;
   }
 
@@ -372,7 +372,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
       // smart current limit
       c.setSmartCurrentLimit(smartCurrentLimit);
     }
-    SmartDashboard.putNumber("DT/limits/smart_I", smartCurrentLimit);
+    //SmartDashboard.putNumber("DT/limits/smart_I", smartCurrentLimit);
     return smartCurrentLimit;
   }
 

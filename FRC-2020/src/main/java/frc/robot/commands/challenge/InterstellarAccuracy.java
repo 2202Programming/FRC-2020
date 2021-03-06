@@ -58,6 +58,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
   final Magazine_Subsystem magazine;
   final Limelight_Subsystem limelight;
   final TrajectoryConfig config;
+  final TrajectoryConfig reverse_config;
   final Command LLComp = new LimeLightTargetCompensator();
 
   /** Creates a new InterstellarAccuacy. */
@@ -73,12 +74,16 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     config = new TrajectoryConfig(maxVel, maxAccel)
         // Add kinematics to ensure max speed is actually obeyed
         .setKinematics(Constants.RamseteProfile.kDriveKinematics);
+    reverse_config = new TrajectoryConfig(maxVel, maxAccel)
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(Constants.RamseteProfile.kDriveKinematics)
+        .setReversed(true);
    
-    Command leg1 = build_leg(StartPose, Zone1Pose, SSZone1);
-    Command leg2 = build_leg(IntroPose, Zone2Pose, SSZone2);
-    Command leg3 = build_leg(IntroPose, Zone3Pose, SSZone3);
-    Command leg4 = build_leg(IntroPose, Zone4Pose, SSZone4);
-    Command leg5 = build_leg(IntroPose, Zone4Pose, SSZone4);
+    Command leg1 = build_leg(StartPose, Zone1Pose, SSZone1, true);
+    Command leg2 = build_leg(IntroPose, Zone2Pose, SSZone2, false);
+    Command leg3 = build_leg(IntroPose, Zone3Pose, SSZone3, false);
+    Command leg4 = build_leg(IntroPose, Zone4Pose, SSZone4, false);
+    Command leg5 = build_leg(IntroPose, Zone4Pose, SSZone4, false);
 
     this.addCommands(
       new InstantCommand(() -> {magazine.setPC(3); } ),    
@@ -116,20 +121,21 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
    * @param ss           ShooterSetings for angle, vel to shoot with
    * @return
    */
-  Command build_leg(Pose2d startpose, Pose2d shootpose, ShooterSettings ss) {
+  Command build_leg(Pose2d startpose, Pose2d shootpose, ShooterSettings ss, boolean start) {
     // move where where we are to shoot point
     var cmd = new ParallelRaceGroup();
+    var cfg = (start) ? config : reverse_config;  // start goes forward, others are reverse on traj #1
     cmd.addCommands(
-      new followTrajectory(drive, computeTrajectory(startpose, shootpose)),  // finishes
+      new followTrajectory(drive, computeTrajectory(startpose, shootpose, cfg)),  // finishes
       new ShooterWarmUp(ss)                                                  // never finishes
      );
      
      cmd.andThen(new InstantCommand(limelight::enableLED))
         .andThen(new ParallelRaceGroup(
-                      LLComp,              // never finishes 
+                      new LimeLightTargetCompensator(),              // never finishes 
                       new Shoot(ss)) )     // finishes when mag is empty
         .andThen(new IntakePower(intake, Power.On, 0.5))
-        .andThen(new followTrajectory(drive, computeTrajectory(shootpose, IntroPose)))
+        .andThen(new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)))
         .andThen(new WaitUntilCommand( magazine::isMagFull) );
 
     return cmd;
@@ -142,7 +148,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
    * @param end    ending pose
    * @return
    */
-  Trajectory computeTrajectory(Pose2d start, Pose2d end) 
+  Trajectory computeTrajectory(Pose2d start, Pose2d end, TrajectoryConfig cfg) 
   {
     System.out.println("***ComputeTraj: Start X="+start.getX());
     System.out.println("***ComputeTraj: Start Y="+start.getY());
@@ -154,7 +160,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
         start,
         List.of(
             //new Translation2d((start.getX()+end.getX())/2,(start.getY()+end.getY())/2)
-        ),  end,  config );
+        ),  end,  cfg );
     return trajectory;
   }
 }

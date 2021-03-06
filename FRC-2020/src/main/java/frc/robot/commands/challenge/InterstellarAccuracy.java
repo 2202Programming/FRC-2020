@@ -8,7 +8,6 @@ import java.util.List;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -154,7 +153,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     var trajectory = TrajectoryGenerator.generateTrajectory(
         start,
         List.of(
-            new Translation2d((start.getX()+end.getX())/2,(start.getY()+end.getY())/2)
+            //new Translation2d((start.getX()+end.getX())/2,(start.getY()+end.getY())/2)
         ),  end,  config );
     return trajectory;
   }

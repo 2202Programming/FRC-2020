@@ -76,18 +76,18 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
         .setKinematics(Constants.RamseteProfile.kDriveKinematics);
    
     Command leg1 = build_leg(StartPose, Zone1Pose, SSZone1);
-    Command leg2 = build_leg(IntroPose, Zone2Pose, SSZone2);
-    Command leg3 = build_leg(IntroPose, Zone3Pose, SSZone3);
-    Command leg4 = build_leg(IntroPose, Zone4Pose, SSZone4);
-    Command leg5 = build_leg(IntroPose, Zone4Pose, SSZone4);
+    //Command leg2 = build_leg(IntroPose, Zone2Pose, SSZone2);
+    //Command leg3 = build_leg(IntroPose, Zone3Pose, SSZone3);
+    //Command leg4 = build_leg(IntroPose, Zone4Pose, SSZone4);
+    //Command leg5 = build_leg(IntroPose, Zone4Pose, SSZone4);
 
     this.addCommands(
       new InstantCommand(() -> {magazine.setPC(3); } ),    
-      leg1,
-      leg2,
-      leg3,
-      leg4, 
-      leg5);
+      leg1);
+     // leg2);
+      //leg3,
+      //leg4, 
+      //leg5);
 
   }
 

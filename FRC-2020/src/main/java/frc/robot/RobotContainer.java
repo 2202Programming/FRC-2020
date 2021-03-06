@@ -23,6 +23,7 @@ import frc.robot.Constants.DriverPrefs;
 import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
+import frc.robot.commands.auto.auto_limelightTurnToShoot_cmd;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.challenge.GalacticSearch;
@@ -39,7 +40,6 @@ import frc.robot.commands.intake.IntakePower.Power;
 import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCaptureCmd;
-import frc.robot.commands.intake.Shoot;
 import frc.robot.commands.test.path.CreateCircle;
 import frc.robot.commands.test.subsystem.MonitorDrivetrain;
 import frc.robot.commands.test.subsystem.VelocityStepTest;
@@ -165,7 +165,7 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
 
     //go from current position to stored position
-    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain,driveTrain.getPose(),state.getSavedPose()));
+    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));
 
     //store current position
     dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState));
@@ -182,9 +182,9 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.X).whenPressed(new IntakePower(intake, Power.Toggle, 0.5));
     //dc.bind(Id.Assistant, XboxButton.RB).whenPressed();
     dc.bind(Id.Assistant, XboxButton.LB).whenPressed(new IntakePosition(intake, Direction.Toggle));
-    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new Shoot()); 
+    //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new Shoot()); 
     //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new auto_shooting_cmd(intake, ShooterOnCmd.data, driveTrain, limelight, 1.0)); 
-    //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenPressed(new auto_limelightTurnToShoot_cmd(driveTrain, limelight, 1)); 
+    dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenPressed(new auto_limelightTurnToShoot_cmd(driveTrain, limelight, 1)); 
     
 
     //Magazine Angle - POV hat

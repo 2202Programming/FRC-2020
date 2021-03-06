@@ -29,8 +29,8 @@ public class scoot_and_shoot extends SequentialCommandGroup {
     this.limelight = limelight;
     this.drive = drive;
 
-    addCommands(new InstantCommand(limelight::enableLED), //enable limelight LED
-                new goToPose(drive, drive.getPose(), endPose) //go to Pose
+    addCommands(new InstantCommand(limelight::enableLED) //enable limelight LED
+                //new goToPose(drive, ) //go to Pose
                ); 
 
     if (limelight.valid())

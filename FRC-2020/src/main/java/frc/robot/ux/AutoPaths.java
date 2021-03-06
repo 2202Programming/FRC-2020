@@ -35,6 +35,7 @@ public class AutoPaths {
   Map<String, Trajectory> m_map = new LinkedHashMap<>();
   
   SendableChooser<Command> autoCommandChooser = new SendableChooser<Command>();
+  
   boolean auto_default_cmd_set = false;
 
   public AutoPaths(ShuffleboardTab tab) {
@@ -51,7 +52,8 @@ public class AutoPaths {
       //OK to continune, it was some IO error, just eat it.
     }
 
-    // put the chooser on the tab we were given
+    // put the chooser on the tab we were given 
+    SendableRegistry.setName(autoCommandChooser,"AutoChooser");
     tab.getLayout("AutoPath", BuiltInLayouts.kList).withSize(2, 2).add(pathChooser);
     tab.getLayout("Autonomous Command", BuiltInLayouts.kList).withSize(3, 2).add(autoCommandChooser);
 

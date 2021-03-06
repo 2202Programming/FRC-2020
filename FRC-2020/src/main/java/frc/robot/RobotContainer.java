@@ -31,7 +31,6 @@ import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
-import frc.robot.commands.generic.CallFunctionCmd;
 import frc.robot.commands.intake.IntakePosition;
 import frc.robot.commands.intake.IntakePosition.Direction;
 import frc.robot.commands.intake.IntakePower;
@@ -131,7 +130,7 @@ public class RobotContainer {
     configureButtonBindings(driverControls);
 
     // Setup AutoCommands
-    dashboard.addAutoCommand("match", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
+    //dashboard.addAutoCommand("match", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
     dashboard.addAutoCommand("GalaticSearch A", new GalacticSearch(driveTrain, true));
     dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
     
@@ -156,7 +155,7 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.B).whenPressed(new auto_cmd_group(dc, driveTrain, intake, limelight, lidar));
     dc.bind(Id.Driver, XboxButton.X).whenPressed(new toggleLED(limelight));
     dc.bind(Id.Driver, XboxButton.Y).whenPressed(new ToggleAutoShiftCmd(gearShifter));
-    dc.bind(Id.Driver, XboxButton.RB).whenPressed(new CallFunctionCmd(() -> {return -1;} ));  //placeholder, do nothing
+    //dc.bind(Id.Driver, XboxButton.RB).whenPressed(new InstantCommand( () -> {return;} ));  //placeholder, do nothing
     dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(gearShifter));
 
     //auto path testing

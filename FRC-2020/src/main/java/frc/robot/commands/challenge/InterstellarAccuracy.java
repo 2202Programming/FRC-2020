@@ -38,7 +38,7 @@ import frc.robot.subsystems.ifx.VelocityDrive;
  *   Y = 7.5 is the centerline of the field where the target is
  * 
  */
-public class InterstellarAccuacy extends SequentialCommandGroup {
+public class InterstellarAccuracy extends SequentialCommandGroup {
   //                                         X    Y        Heading
   final Pose2d StartPose = new Pose2d( 2.0, 7.5, new Rotation2d(0.0));
   final Pose2d Zone1Pose = new Pose2d( 5.5, 7.5, new Rotation2d(0.0));
@@ -62,7 +62,7 @@ public class InterstellarAccuacy extends SequentialCommandGroup {
   final Command LLComp = new LimeLightTargetCompensator();
 
   /** Creates a new InterstellarAccuacy. */
-  public InterstellarAccuacy(double maxVel, double maxAccel) {
+  public InterstellarAccuracy(double maxVel, double maxAccel) {
     this.withName("Intrastellar Accuracy");
     RobotContainer rc = RobotContainer.getInstance();
     drive = rc.driveTrain;
@@ -124,6 +124,7 @@ public class InterstellarAccuacy extends SequentialCommandGroup {
       new followTrajectory(drive, computeTrajectory(startpose, shootpose)),  // finishes
       new ShooterWarmUp(ss)                                                  // never finishes
      );
+     
      cmd.andThen(new InstantCommand(limelight::enableLED))
         .andThen(new ParallelRaceGroup(
                       LLComp,              // never finishes 

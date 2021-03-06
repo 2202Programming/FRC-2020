@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.DriverPrefs;
+import frc.robot.Constants.InterstellarSettings;
 import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
@@ -201,6 +202,11 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));   
 
+    // Switchboard
+    dc.bind(Id.SwitchBoard, XboxButton.BACK).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone1));
+    dc.bind(Id.SwitchBoard, XboxButton.START).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone2));
+    dc.bind(Id.SwitchBoard, XboxButton.L3).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
+    dc.bind(Id.SwitchBoard, XboxButton.R3).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
   }
 
   /**

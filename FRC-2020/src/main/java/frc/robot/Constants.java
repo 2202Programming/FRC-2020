@@ -258,6 +258,15 @@ public final class Constants {
         public static ShooterSettings dataHigh = new ShooterSettings(38.0, 5, 38.0, VEL_TOL);  //vel, rps, angle, tol
         public static ShooterSettings dataLow  = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
     }
+
+    // IA ShooterSettings
+    public static final class InterstellarSettings {
+      public static final double VEL_TOL = 0.005; 
+      public static ShooterSettings ssZone1 = new ShooterSettings(37.0, 0, 40.8, VEL_TOL);  //vel, rps, angle, tol
+      public static ShooterSettings ssZone2 = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
+      public static ShooterSettings ssZone3 = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
+      public static ShooterSettings ssZone4 = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
+    }
     
     public static final class RamseteProfile {
       // These characterization values MUST be determined either experimentally or

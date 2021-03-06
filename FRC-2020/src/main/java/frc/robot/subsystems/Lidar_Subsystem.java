@@ -163,9 +163,10 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   }
 
   public void addDashboardWidgets(ShuffleboardLayout layout) {
-    layout.addNumber("LDR/left",  () -> left_lidar_range).withSize(2,1);
+    /*layout.addNumber("LDR/left",  () -> left_lidar_range).withSize(2,1);
     layout.addNumber("LDR/right", () -> right_lidar_range);
 		layout.addBoolean("LDR/valid", this::isFilteredValid);
+    */
 	}
 
 }

@@ -75,13 +75,13 @@ public class PIDFController extends PIDController {
      */
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("PIDFController");
+        /*builder.setSmartDashboardType("PIDFController");
         builder.addDoubleProperty("P", this::getP, this::setP);
         builder.addDoubleProperty("I", this::getI, this::setI);
         builder.addDoubleProperty("D", this::getD, this::setD);
         builder.addDoubleProperty("F", this::getF, this::setF);
         builder.addDoubleProperty("Iz", this::getIzone, this::setIzone);
-        builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+        builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);*/
     }
 
     /**

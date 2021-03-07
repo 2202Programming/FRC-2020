@@ -478,9 +478,9 @@ public class Magazine_Subsystem extends SubsystemBase {
     table = NetworkTableInstance.getDefault().getTable("Magazine");
     nt_angle= table.getEntry("MagazineAngle");
     nt_pcCount = table.getEntry("PCCount");
-    nt_ballOne = table.getEntry("BallOne");
-    nt_ballTwo = table.getEntry("BallTwo");
-    nt_ballThree = table.getEntry("BallThree");
+    nt_ballOne = table.getEntry("BallOne/value");
+    nt_ballTwo = table.getEntry("BallTwo/value");
+    nt_ballThree = table.getEntry("BallThree/value");
 
     nt_pcCount.setNumber(m_pcCount);
     nt_ballOne.setBoolean(ballOne);
@@ -569,7 +569,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     nt_pcCount.setNumber(m_pcCount);
     setBallBooleans();
   }
-  
+
   public boolean isMagFull() {
     return (m_pcCount >= MAG_FULL_COUNT);
   }

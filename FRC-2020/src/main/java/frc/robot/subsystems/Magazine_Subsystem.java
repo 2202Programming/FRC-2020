@@ -89,6 +89,14 @@ public class Magazine_Subsystem extends SubsystemBase {
   private NetworkTable table;
   private NetworkTableEntry nt_angle;
   private NetworkTableEntry nt_pcCount;
+  private NetworkTableEntry nt_ballOne;
+  private NetworkTableEntry nt_ballTwo;
+  private NetworkTableEntry nt_ballThree;
+
+  private boolean ballOne = false;
+  private boolean ballTwo = false;
+  private boolean ballThree = false;
+
 
   /**
    * MagazinePositioner_Subsystem
@@ -470,7 +478,14 @@ public class Magazine_Subsystem extends SubsystemBase {
     table = NetworkTableInstance.getDefault().getTable("Magazine");
     nt_angle= table.getEntry("MagazineAngle");
     nt_pcCount = table.getEntry("PCCount");
+    nt_ballOne = table.getEntry("BallOne");
+    nt_ballTwo = table.getEntry("BallTwo");
+    nt_ballThree = table.getEntry("BallThree");
+
     nt_pcCount.setNumber(m_pcCount);
+    nt_ballOne.setBoolean(ballOne);
+    nt_ballTwo.setBoolean(ballTwo);
+    nt_ballThree.setBoolean(ballThree);
 
     // fill out dashboard stuff - commented out to save bandwidth
     //SendableRegistry.setSubsystem(this, "Magazine");
@@ -504,15 +519,45 @@ public class Magazine_Subsystem extends SubsystemBase {
     return lightGate.get();
   }
 
+  public void setBallBooleans (){ //for webpage magic, need three separate booleans for the balls for some cool graphics
+    switch (m_pcCount) {
+      case 0:
+        ballOne = false;
+        ballTwo = false;
+        ballThree = false;
+        break;
+      case 1:
+        ballOne = true;
+        ballTwo = false;
+        ballThree = false;
+        break;
+      case 2:
+        ballOne = true;
+        ballTwo = true;
+        ballThree = false;
+        break;
+      case 3:
+        ballOne = true;
+        ballTwo = true;
+        ballThree = true;
+        break;
+    }
+    nt_ballOne.setBoolean(ballOne);
+    nt_ballTwo.setBoolean(ballTwo);
+    nt_ballThree.setBoolean(ballThree);
+  }
+
   public void addPC() {
     m_pcCount++;
     nt_pcCount.setNumber(m_pcCount);
+    setBallBooleans();
   }
 
   public void removePC() {
     if (m_pcCount > 0)
       m_pcCount--;
       nt_pcCount.setNumber(m_pcCount);
+      setBallBooleans();
   }
 
   public int getPC() {
@@ -522,7 +567,9 @@ public class Magazine_Subsystem extends SubsystemBase {
   public void setPC(int c) {
     m_pcCount = (c >= 0  && c <= MAG_FULL_COUNT) ? c : 0;
     nt_pcCount.setNumber(m_pcCount);
+    setBallBooleans();
   }
+  
   public boolean isMagFull() {
     return (m_pcCount >= MAG_FULL_COUNT);
   }

@@ -13,6 +13,8 @@ import static frc.robot.Constants.ShooterOnCmd.dataLow;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -165,8 +167,8 @@ public class RobotContainer {
     //auto path testing
     //dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getPath()));
     dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
-    dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
-
+    dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
+    
     //go from current position to stored position
     dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));
 

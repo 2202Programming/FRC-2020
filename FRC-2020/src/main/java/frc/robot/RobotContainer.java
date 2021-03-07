@@ -27,6 +27,7 @@ import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.challenge.GalacticSearch;
+import frc.robot.commands.challenge.InterstellarAccuracy;
 import frc.robot.commands.drive.GyroHeadingCompensator;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
@@ -134,7 +135,7 @@ public class RobotContainer {
     //dashboard.addAutoCommand("match", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
     dashboard.addAutoCommand("GalaticSearch A", new GalacticSearch(driveTrain, true));
     dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
-    //dashboard.addAutoCommand("Interstellar", new InterstellarAccuracy(4, 3));
+    dashboard.addAutoCommand("Interstellar", new InterstellarAccuracy(4, 3));
     
     //test commands
     CreateCircle circle = new CreateCircle(3, 5, -360);

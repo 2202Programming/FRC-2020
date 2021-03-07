@@ -38,7 +38,7 @@ import frc.robot.subsystems.ifx.VelocityDrive;
  * 
  */
 public class InterstellarAccuracy extends SequentialCommandGroup {
-  //                                         X    Y        Heading
+  //                                    X    Y        Heading
   final Pose2d StartPose = new Pose2d( 2.0, 7.5, new Rotation2d(0.0));
   final Pose2d Zone1Pose = new Pose2d( 5.5, 7.5, new Rotation2d(0.0));
   final Pose2d Zone2Pose = new Pose2d(10.0, 7.5, new Rotation2d(0.0));
@@ -46,7 +46,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
   final Pose2d Zone4Pose = new Pose2d(20.0, 7.5, new Rotation2d(0.0));
   final Pose2d IntroPose = new Pose2d(24.0, 7.5, new Rotation2d(0.0));
                             
-  //                                                 vel  rot  deg   tol
+  //                                                   vel  rot  deg   tol
   final ShooterSettings  SSZone1 = new ShooterSettings(38, 6.0, 45.0, .005);
   final ShooterSettings  SSZone2 = new ShooterSettings(38, 6.0, 45.0, .005);
   final ShooterSettings  SSZone3 = new ShooterSettings(38, 6.0, 45.0, .005);
@@ -72,10 +72,8 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
 
     //trajectory parameters
     config = new TrajectoryConfig(maxVel, maxAccel)
-        // Add kinematics to ensure max speed is actually obeyed
         .setKinematics(Constants.RamseteProfile.kDriveKinematics);
     reverse_config = new TrajectoryConfig(maxVel, maxAccel)
-        // Add kinematics to ensure max speed is actually obeyed
         .setKinematics(Constants.RamseteProfile.kDriveKinematics)
         .setReversed(true);
    
@@ -86,31 +84,9 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     Command leg5 = build_leg(IntroPose, Zone4Pose, SSZone4, false);
 
     this.addCommands(
-      new InstantCommand(() -> {magazine.setPC(3); } ),    
-      leg1,
-      leg2,
-      leg3,
-      leg4, 
-      leg5);
+      new InstantCommand(() -> {magazine.setPC(3); } ),   
+      leg1, leg2, leg3, leg4,  leg5 );
 
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {}
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
   }
 
   /**
@@ -127,18 +103,19 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     var cfg = (start) ? config : reverse_config;  // start goes forward, others are reverse on traj #1
     cmd.addCommands(
       new followTrajectory(drive, computeTrajectory(startpose, shootpose, cfg)),  // finishes
-      new ShooterWarmUp(ss)                                                  // never finishes
+      new ShooterWarmUp(ss)                                                       // never finishes
      );
-     
-     cmd.andThen(new InstantCommand(limelight::enableLED))
-        .andThen(new ParallelRaceGroup(
-                      new LimeLightTargetCompensator(),              // never finishes 
-                      new Shoot(ss)) )     // finishes when mag is empty
-        .andThen(new IntakePower(intake, Power.On, 0.5))
-        .andThen(new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)))
-        .andThen(new WaitUntilCommand( magazine::isMagFull) );
+    // Build the Shoot and return to Introduction zone sequence 
+    var andThen = new SequentialCommandGroup(
+       new InstantCommand(limelight::enableLED),
+       new ParallelRaceGroup(
+            new LimeLightTargetCompensator(),       // never finishes 
+            new Shoot(ss)),                         // finishes when mag is empty
+       new IntakePower(intake, Power.On, 0.5),
+       new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)),
+       new WaitUntilCommand( magazine::isMagFull));
 
-    return cmd;
+    return cmd.andThen(andThen);
   }
 
   /**
@@ -150,12 +127,6 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
    */
   Trajectory computeTrajectory(Pose2d start, Pose2d end, TrajectoryConfig cfg) 
   {
-    System.out.println("***ComputeTraj: Start X="+start.getX());
-    System.out.println("***ComputeTraj: Start Y="+start.getY());
-    System.out.println("***ComputeTraj: End X="+end.getX());
-    System.out.println("***ComputeTraj: End Y="+end.getY());
-
-
     var trajectory = TrajectoryGenerator.generateTrajectory(
         start,
         List.of(

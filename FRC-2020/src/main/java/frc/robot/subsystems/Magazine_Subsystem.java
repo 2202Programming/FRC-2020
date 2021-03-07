@@ -475,6 +475,7 @@ public class Magazine_Subsystem extends SubsystemBase {
 
   // measurements update in periodic()
   int m_pcCount = 0;
+  int NT_update_mag = 0;
 
   /** Creates a new Magazine_subsystem. */
   public Magazine_Subsystem(Intake_Subsystem intake) {
@@ -502,9 +503,16 @@ public class Magazine_Subsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-        //post these values to network tables
-        nt_angle.setNumber(positioner.get());
+        updateNetworkTablesMag();
    }
+
+   void updateNetworkTablesMag() {
+    // network table outputs every 10 cycles
+    if ((NT_update_mag++ % 10) == 0){
+      nt_angle.setNumber(positioner.get());
+    }
+  }
+
 
   public void beltOn(double motorStrength) {
     beltMotor.set(motorStrength);

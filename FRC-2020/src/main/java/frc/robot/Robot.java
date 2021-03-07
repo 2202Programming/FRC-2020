@@ -95,6 +95,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    LiveWindow.disableAllTelemetry();
   }
 
   /**
@@ -117,7 +118,8 @@ public class Robot extends TimedRobot {
     // Set the driveTrain default command
     Command drivecmd = RobotContainer.getInstance().dashboard.getDriverPreferences().getCommandChooser().getSelected();
     RobotContainer.getInstance().driveTrain.setDefaultCommand(drivecmd);
-    LiveWindow.setEnabled(false);
+
+    LiveWindow.disableAllTelemetry();
   }
 
   /**
@@ -140,7 +142,6 @@ public class Robot extends TimedRobot {
     if (m_testCommand != null) {
       CommandScheduler.getInstance().schedule(m_testCommand);
     }
-    LiveWindow.setEnabled(true);
   }
 
   /**

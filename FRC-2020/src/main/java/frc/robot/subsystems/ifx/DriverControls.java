@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.subsystems.hid.GeneralTrigger;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.hid.JoystickTrigger;
+import frc.robot.subsystems.hid.SideboardController;
 import frc.robot.subsystems.hid.XboxAxis;
 import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.hid.XboxPOV;
@@ -118,7 +119,7 @@ public interface DriverControls extends Subsystem {
    public default JoystickButton bind(Id id, XboxButton button) {
     return bindButton(id, button.getCode());
   }
-  
+
   public default JoystickTrigger bind(Id id, XboxAxis axis) {
     return (deviceMap.get(id) != null) ? new JoystickTrigger(deviceMap.get(id), axis.getCode(), 0.5) : null;
   }
@@ -126,6 +127,11 @@ public interface DriverControls extends Subsystem {
   public default POVButton bind(Id id, XboxPOV pov) {
     return (deviceMap.get(id) != null) ? new POVButton(deviceMap.get(id), pov.get()) : null;
   }
+
+  public default JoystickButton bind(Id id, SideboardController.SBButton sw) {
+    return  bindButton(id, sw.value);
+  }
+
   
   public default GeneralTrigger bind(Id id, XboxButton buttonId1, XboxButton buttonId2) {
     return (deviceMap.get(id) != null) ? new GeneralTrigger(

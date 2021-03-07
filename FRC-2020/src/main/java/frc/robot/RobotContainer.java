@@ -53,6 +53,7 @@ import frc.robot.subsystems.Magazine_Subsystem;
 import frc.robot.subsystems.Pdp_subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
+import frc.robot.subsystems.hid.SideboardController.SBButton;
 import frc.robot.subsystems.hid.XboxAxis;
 import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.hid.XboxPOV;
@@ -204,10 +205,10 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));   
 
     // Switchboard
-    dc.bind(Id.SwitchBoard, XboxButton.BACK).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone1));
-    dc.bind(Id.SwitchBoard, XboxButton.START).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone2));
-    dc.bind(Id.SwitchBoard, XboxButton.L3).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
-    dc.bind(Id.SwitchBoard, XboxButton.R3).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
+    dc.bind(Id.SwitchBoard, SBButton.Sw21).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone1));
+    dc.bind(Id.SwitchBoard, SBButton.Sw22).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone2));
+    dc.bind(Id.SwitchBoard, SBButton.Sw23).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
+    dc.bind(Id.SwitchBoard, SBButton.Sw24).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
   }
 
   /**

@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Vector;
@@ -35,9 +34,10 @@ import frc.robot.Constants.PWM;
 import frc.robot.Constants.Shooter;
 import frc.robot.subsystems.Magazine_Subsystem.MagazinePositioner;
 import frc.robot.subsystems.ifx.Logger;
+import frc.robot.subsystems.util.MonitoredSubsystemBase;
 import frc.robot.util.misc.PIDFController;
 
-public class Intake_Subsystem extends SubsystemBase implements Logger {
+public class Intake_Subsystem extends MonitoredSubsystemBase implements Logger {
   public static final double USE_CURRENT_ANGLE = 0.0;
   public static final double SAFE_INTAKE_ANGLE = 28.0;   //Mag angle for raising Intake
   /**
@@ -225,7 +225,7 @@ public class Intake_Subsystem extends SubsystemBase implements Logger {
   }
 
   @Override
-  public void periodic() {
+  public void monitored_periodic() {
     //measure flywheel rpm and calculate our error 
     actual.set(upper_shooter.getRPM(), lower_shooter.getRPM());
     error.minus(target, actual);

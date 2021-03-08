@@ -18,13 +18,13 @@ import edu.wpi.first.wpilibj.LinearFilter;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.LIDAR;
 import frc.robot.Constants.RobotPhysical;
 import frc.robot.subsystems.ifx.Logger;
+import frc.robot.subsystems.util.MonitoredSubsystemBase;
 
-public class Lidar_Subsystem extends SubsystemBase implements Logger {
+public class Lidar_Subsystem extends MonitoredSubsystemBase implements Logger {
   /**
    * Creates a new Lidar_Subsystem.
    */
@@ -142,7 +142,7 @@ public class Lidar_Subsystem extends SubsystemBase implements Logger {
   }
 
   @Override
-  public void periodic() {
+  public void monitored_periodic() {
     // This method will be called once per scheduler run
     // read sensor and valid flags, skip if simulated
 

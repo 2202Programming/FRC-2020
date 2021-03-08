@@ -37,7 +37,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.Constants.CAN;
@@ -54,9 +53,10 @@ import frc.robot.subsystems.ifx.Shifter;
 import frc.robot.subsystems.ifx.Shifter.Gear;
 import frc.robot.subsystems.ifx.VelocityDrive;
 import frc.robot.subsystems.ifx.VoltageDrive;
+import frc.robot.subsystems.util.MonitoredSubsystemBase;
 import frc.robot.util.misc.MathUtil;
 
-public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
+public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     implements Logger, DualDrive, VelocityDrive, VoltageDrive, DashboardUpdate {
   // Sign conventions, apply to encoder and command inputs
   // Brushless SparkMax cannot invert the encoders
@@ -289,7 +289,7 @@ public class VelocityDifferentialDrive_Subsystem extends SubsystemBase
   }
 
   @Override
-  public void periodic() {
+  public void monitored_periodic() {
     m_currentGear = gearbox.getCurrentGear();
     m_theta = Kgyro * m_gyro.getYaw();
     double kGR = gearbox.getGearRatio();

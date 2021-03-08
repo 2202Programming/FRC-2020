@@ -11,11 +11,11 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.LinearFilter;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.ifx.Logger;
+import frc.robot.subsystems.util.MonitoredSubsystemBase;
 
-public class Limelight_Subsystem extends SubsystemBase implements Logger {
+public class Limelight_Subsystem extends MonitoredSubsystemBase implements Logger {
   /**
    * Creates a new Limelight_Subsystem.
    */
@@ -56,7 +56,7 @@ public class Limelight_Subsystem extends SubsystemBase implements Logger {
   }
 
   @Override
-  public void periodic() {
+  public void monitored_periodic() {
     //updates global variables
     x = tx.getDouble(0.0);
     y = ty.getDouble(0.0);

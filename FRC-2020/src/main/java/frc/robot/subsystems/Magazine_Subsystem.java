@@ -26,15 +26,15 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AnalogIn;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.PCM2;
 import frc.robot.Constants.PWM;
+import frc.robot.subsystems.util.MonitoredSubsystemBase;
 import frc.robot.util.misc.PIDFController;
 
-public class Magazine_Subsystem extends SubsystemBase {
+public class Magazine_Subsystem extends MonitoredSubsystemBase {
   // Physical limits
   public static final double MIN_ANGLE = 20.7;  //measured at mechanical stops
   public static final double MAX_ANGLE = 47.3;  //measured at mechanical limit
@@ -105,7 +105,7 @@ public class Magazine_Subsystem extends SubsystemBase {
    * commands.
    * 
    */
-  public class MagazinePositioner extends SubsystemBase {
+  public class MagazinePositioner extends MonitoredSubsystemBase {
     // sparkmax config
     final boolean kInverted = true;
     final int kPosSlot = 0;
@@ -229,7 +229,7 @@ public class Magazine_Subsystem extends SubsystemBase {
     }
 
     @Override
-    public void periodic() {
+    public void monitored_periodic() {
       // update pot voltage for monitoring and safety()
       m_apv = anglePot.getAverageVoltage();
 
@@ -502,7 +502,7 @@ public class Magazine_Subsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
+  public void monitored_periodic() {
         updateNetworkTablesMag();
    }
 

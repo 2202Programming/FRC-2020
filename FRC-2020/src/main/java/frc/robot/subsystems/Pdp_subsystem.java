@@ -8,11 +8,11 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.subsystems.ifx.Logger;
+import frc.robot.subsystems.util.MonitoredSubsystemBase;
 
-public class Pdp_subsystem extends SubsystemBase implements Logger {
+public class Pdp_subsystem extends MonitoredSubsystemBase implements Logger {
   /** Creates a new Pdp_subsystem. */
   private final PowerDistributionPanel pdp;
 
@@ -27,7 +27,7 @@ public class Pdp_subsystem extends SubsystemBase implements Logger {
   }
 
   @Override
-  public void periodic() {
+  public void monitored_periodic() {
     // This method will be called once per scheduler run
     
   }

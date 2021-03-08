@@ -6,10 +6,10 @@ import static frc.robot.Constants.GEARSHIFT_PCM_CAN_ID;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.ifx.Shifter;
+import frc.robot.subsystems.util.MonitoredSubsystemBase;
 
-public class GearShifter extends SubsystemBase implements Shifter {
+public class GearShifter extends MonitoredSubsystemBase implements Shifter {
     // define the gear ratios for high and low gear
     public final static double K_shaft = 1.0/18.75; //motor revs to wheel revs
     //shifter stage with 
@@ -86,5 +86,10 @@ public class GearShifter extends SubsystemBase implements Shifter {
     public boolean disableAutoShift() {
        autoShiftEnabled = false;
        return autoShiftEnabled;
+    }
+
+    @Override
+    public void monitored_periodic() {
+      //does nothing
     }
 }

@@ -6,11 +6,12 @@
 /*----------------------------------------------------------------------------*/
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.ArrayList;
+
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import frc.robot.Robot;
 import frc.robot.subsystems.ifx.Logger;
+import frc.robot.subsystems.util.MonitoredSubsystemBase;
 
 /**
  * 
@@ -22,7 +23,7 @@ import frc.robot.subsystems.ifx.Logger;
  * 
  */
 
-public class Log_Subsystem extends SubsystemBase implements Logger {
+public class Log_Subsystem extends MonitoredSubsystemBase implements Logger {
   /**
    * Creates a new Log_Subsystem.
    */
@@ -52,7 +53,7 @@ public class Log_Subsystem extends SubsystemBase implements Logger {
   }
 
   @Override
-  public void periodic() {
+  public void monitored_periodic() {
       if ((counter++ % logFrame) == 0) {
       loggers.get(lastLog++).log();
       

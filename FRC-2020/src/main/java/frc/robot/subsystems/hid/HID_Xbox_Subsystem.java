@@ -10,9 +10,9 @@ package frc.robot.subsystems.hid;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.Logger;
+import frc.robot.subsystems.util.MonitoredSubsystemBase;
 
 
 /**
@@ -41,7 +41,7 @@ import frc.robot.subsystems.ifx.Logger;
  *      Y stick forward will be positive creates positive velocity for that side.
  * 
  */
-public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls, Logger {
+public class HID_Xbox_Subsystem extends MonitoredSubsystemBase implements DriverControls, Logger {
   /**
    * Creates a new HID_Subsystem.
    */
@@ -131,7 +131,7 @@ public class HID_Xbox_Subsystem extends SubsystemBase implements DriverControls,
   }
 
   @Override
-  public void periodic() {
+  public void monitored_periodic() {
     // This method will be called once per scheduler frame and read all stick inputs
     // for all possible modes.  This is a few extra calcs and could be made modal to
     // only read/shape the stick mode.

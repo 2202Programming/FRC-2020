@@ -4,24 +4,26 @@
 
 package frc.robot.subsystems.util;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/** Add your docs here. */
 public abstract class MonitoredSubsystemBase extends SubsystemBase {
   static final double k_uS_to_mS = 1000.0; // microseconds
   
-  static HashMap<String, MonitoredSubsystemBase> s_map = new HashMap<>();
+  static Map<String, MonitoredSubsystemBase> s_map = new ConcurrentHashMap<String, MonitoredSubsystemBase>();
   static boolean s_enabled = true;
+  static long s_resetTime;
+  static long s_lastEndTime;
 
   long min;
   long max;
   long total;
   long count;
 
-  public MonitoredSubsystemBase() {
+   public MonitoredSubsystemBase() {
     super();
     s_map.put(getName(), this);
     reset();
@@ -35,10 +37,12 @@ public abstract class MonitoredSubsystemBase extends SubsystemBase {
       monitored_periodic();
       return;
     }
-    var startTime = RobotController.getFPGATime();
+    long startTime = RobotController.getFPGATime();
     count++;
     monitored_periodic();
-    var time = RobotController.getFPGATime() - startTime;
+    s_lastEndTime = RobotController.getFPGATime();
+    long time = s_lastEndTime - startTime;
+    
     //save the stats
     total += time;
     min = Math.min(min, time);
@@ -69,8 +73,11 @@ public abstract class MonitoredSubsystemBase extends SubsystemBase {
 
   public static String getStats() {
     StringBuilder s = new StringBuilder();
-
+    long fcount = s_map.values().stream().findFirst().get().count;
+    
     s.append("\n***********************************************************\n");
+    s.append(String.format("Total run time: %05.5f seconds.\n", (s_lastEndTime - s_resetTime) / 1e6));
+    s.append(String.format("Estimated frame period: %05.5f milli-seconds.\n\n", (s_lastEndTime - s_resetTime) / k_uS_to_mS / fcount));
     for (String k : s_map.keySet()) { 
       s.append(s_map.get(k).toString());
     }
@@ -82,6 +89,7 @@ public abstract class MonitoredSubsystemBase extends SubsystemBase {
     for (String k : s_map.keySet()) { 
      s_map.get(k).reset();
     }
+    s_resetTime = RobotController.getFPGATime();
   }
 
   public static void setEnabled(boolean enabled) {

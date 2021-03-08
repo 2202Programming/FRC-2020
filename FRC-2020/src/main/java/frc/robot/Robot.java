@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-  
+    MonitoredSubsystemBase.resetAllStats();
   }
 
   @Override
@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     // report 
     DriverStation.reportWarning(MonitoredSubsystemBase.getStats(), false);
-    MonitoredSubsystemBase.resetAllStats();
+    
   }
 
   @Override
@@ -101,6 +101,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.schedule();
     }
     LiveWindow.disableAllTelemetry();
+    MonitoredSubsystemBase.resetAllStats();
   }
 
   /**
@@ -124,6 +125,7 @@ public class Robot extends TimedRobot {
     RobotContainer.getInstance().driveTrain.setDefaultCommand(drivecmd);
 
     LiveWindow.disableAllTelemetry();
+    MonitoredSubsystemBase.resetAllStats();
   }
 
   /**
@@ -131,11 +133,11 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    CommandScheduler.getInstance().run();
   }
 
   @Override
   public void testInit() {
+    MonitoredSubsystemBase.resetAllStats();
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
     m_testCommand = m_robotContainer.getTestCommand();
@@ -154,6 +156,5 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     m_robotContainer.runTestPeriod();
-    CommandScheduler.getInstance().run();
   }
 }

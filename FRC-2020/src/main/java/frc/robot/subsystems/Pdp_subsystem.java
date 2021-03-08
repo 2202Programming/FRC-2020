@@ -29,11 +29,10 @@ public class Pdp_subsystem extends SubsystemBase implements Logger {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    nt_voltage.setNumber(pdp.getVoltage());
+    
   }
 
   public void log(){
-
-    
+    nt_voltage.setNumber(pdp.getVoltage());
   }
 }

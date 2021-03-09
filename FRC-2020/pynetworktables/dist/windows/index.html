@@ -48,7 +48,7 @@
         <frc-sim-joystick></frc-sim-joystick>
       </div>
       <div class="col-sm-4">
-        <frc-sim-joystick source-key="joystick/1"></frc-sim-joystick>
+        <frc-sim-joystick source-key="joystick/1" gamepad="1"></frc-sim-joystick>
       </div>
     </div>
 
@@ -96,7 +96,7 @@
             <p>Lidar left: <frc-number-label source-key="/Lidar/Left"></frc-number-label></p>
             <p>Lidar right: <frc-number-label source-key="/Lidar/Right"></frc-number-label></p>
             <p>Lidar anlge: <frc-number-label source-key="/Lidar/Angle"></frc-number-label></p>
-            <p>Lidar valid: <frc-number-label source-key="/Lidar/Valid"></frc-number-label></p>
+            <p>Lidar valid: <frc-boolean-label source-key="/Lidar/Valid"></frc-boolean-label></p>
         </div>
         <div class="col-sm-3">
           <h4>Intake/Shooter</h4>
@@ -213,41 +213,51 @@
   <script src="/networktables/utils.js"></script>
   <script>
 
-    class NumberLabel extends webbit.Webbit {
+class BooleanLabel extends webbit.LitElement {
+ 
+ static get styles() {
+   return webbit.css`
+       :host {
+         display: inline;
+         font-size: inherit;
+         font-family: inherit;
+         font-weight: inherit;
+         text-align: inherit;
+         margin: 0;
+         padding: 0;
+       }
+     `;
+   }
 
-      static get styles() {
-        return webbit.css`
-          :host {
-            display: inline;
-            font-size: inherit;
-            font-family: inherit;
-            font-weight: inherit;
-            text-align: inherit;
-            box-sizing: border-box;
-            color: inherit;
-          }
-        `;
-      }
+   static get properties() {
+     return {
+       value: { type: Boolean, reflect: true },
+     };
+   }
 
-      static get properties() {
-        return {
-          value: { type: Number, primary: true },
-          precision: { type: Number }
-        };
-      }
+   constructor() {
+     super();
+     this.value = false;
+   }
 
-      constructor() {
-        super();
-        this.value = 0;
-        this.precision = 2;
-      }
+   render() {
+     return webbit.html`${this.value.toString()}`;
+   }
+ }
 
-      render() {
-        return webbit.html`${this.value.toFixed(this.precision)}`;
-      }
-    }
+ customElements.define('frc-boolean-label', BooleanLabel);
 
-    webbitRegistry.define('frc-number-label', NumberLabel);
+ webbitRegistry.addExisting('frc-boolean-label', {
+ displayName: 'Boolean Label',
+ category: 'General',
+ description: 'A label for boolean values',
+ slots: [],
+ editorTabs: ['properties', 'sources'],
+ resizable: { left: true, right: true, top: false, bottom: false },
+ properties: {
+   value: { type: Boolean, primary: true },
+ }
+});
 
   </script>
 </body>

@@ -13,6 +13,8 @@ import static frc.robot.Constants.ShooterOnCmd.dataLow;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,6 +29,7 @@ import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.challenge.GalacticSearch;
+import frc.robot.commands.challenge.InterstellarAccuracy;
 import frc.robot.commands.drive.GyroHeadingCompensator;
 import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
@@ -52,6 +55,7 @@ import frc.robot.subsystems.Magazine_Subsystem;
 import frc.robot.subsystems.Pdp_subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
+import frc.robot.subsystems.hid.SideboardController.SBButton;
 import frc.robot.subsystems.hid.XboxAxis;
 import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.hid.XboxPOV;
@@ -134,7 +138,7 @@ public class RobotContainer {
     //dashboard.addAutoCommand("match", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
     dashboard.addAutoCommand("GalaticSearch A", new GalacticSearch(driveTrain, true));
     dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
-    //dashboard.addAutoCommand("Interstellar", new InterstellarAccuracy(4, 3));
+    dashboard.addAutoCommand("Interstellar", new InterstellarAccuracy(4, 3));
     
     //test commands
     CreateCircle circle = new CreateCircle(3, 5, -360);
@@ -163,8 +167,8 @@ public class RobotContainer {
     //auto path testing
     //dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getPath()));
     dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
-    dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain));
-
+    dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
+    
     //go from current position to stored position
     dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));
 
@@ -203,10 +207,10 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));   
 
     // Switchboard
-    dc.bind(Id.SwitchBoard, XboxButton.BACK).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone1));
-    dc.bind(Id.SwitchBoard, XboxButton.START).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone2));
-    dc.bind(Id.SwitchBoard, XboxButton.L3).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
-    dc.bind(Id.SwitchBoard, XboxButton.R3).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
+    dc.bind(Id.SwitchBoard, SBButton.Sw21).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone1));
+    dc.bind(Id.SwitchBoard, SBButton.Sw22).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone2));
+    dc.bind(Id.SwitchBoard, SBButton.Sw23).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
+    dc.bind(Id.SwitchBoard, SBButton.Sw24).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
   }
 
   /**

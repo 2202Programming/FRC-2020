@@ -20,12 +20,19 @@ public class SideboardController extends GenericHID {
     }
 
     @SuppressWarnings({ "MemberName", "PMD.SingularField" })
-    public enum Button {
+    public enum SBButton {
       // Buttons
-      DelayA(1),DelayB(2),DelayC(3); 
+      // functional names
+      DelayA(1),DelayB(2),DelayC(3), 
+      //Row1
+      Sw11(1), Sw12(2), Sw13(3), Sw14(4), Sw15(5), Sw16(6),
+      //Row2
+      Sw21(7), Sw22(8), Sw23(9), Sw24(10), Sw25(11), Sw26(12),
+      //Row3
+      Sw31(13), Sw32(14), Sw33(15), Sw34(16);
 
       public int value;
-      private Button(final int val) {
+      private SBButton(final int val) {
         value = val;
       }
     }

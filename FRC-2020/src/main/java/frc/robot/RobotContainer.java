@@ -147,7 +147,7 @@ public class RobotContainer {
     new ParallelCommandGroup(
       new MonitorDrivetrain(driveTrain),              // captures data to NT
       new GyroHeadingCompensator(driveTrain),         // drive straight
-      new VelocityStepTest(driveTrain, 2.0, 4.0, 4)   // speed ft/s, duration s, repeat
+      new VelocityStepTest(driveTrain, 3.0, 3.0, 4)   // speed ft/s, duration s, repeat
     ));
 
     // Shuffleboard runnable Commands - Soft buttons

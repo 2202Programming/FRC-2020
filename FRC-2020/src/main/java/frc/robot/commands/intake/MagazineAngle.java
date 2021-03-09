@@ -21,7 +21,7 @@ public class MagazineAngle extends CommandBase {
   };
 
   //static final double RPM = 3;
-  static final double DEG_PER_SEC = 3.0;
+  static final double DEG_PER_SEC = 6.0;
   static final double DEG_PER_PERIOD = DEG_PER_SEC * DT;
   static final double CONFIRM_MOVE_DEG = 0.5;
   static final int    MIN_DOWN_COUNT = 3;

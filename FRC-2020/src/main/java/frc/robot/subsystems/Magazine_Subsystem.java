@@ -36,14 +36,14 @@ import frc.robot.util.misc.PIDFController;
 
 public class Magazine_Subsystem extends MonitoredSubsystemBase {
   // Physical limits
-  public static final double MIN_ANGLE = 20.7;  //measured at mechanical stops
-  public static final double MAX_ANGLE = 47.3;  //measured at mechanical limit
+  public static final double MIN_ANGLE = 20.0;  //measured at mechanical stops
+  public static final double MAX_ANGLE = 59.5;  //measured at mechanical limit
 
   // Pot Volts measured at top & bottom position <measured>
-  static final double VatMin = 0.4541; // volts at 20.7 degrees (min mag angle)
-  static final double VatMax = 3.718;  // volts at 47.3 degrees (max mag angle)
+  static final double VatMin = 0.1770; // volts at 20.7 degrees (min mag angle)
+  static final double VatMax = 4.3225;  // volts at 59.5 degrees (max mag angle)
 
-  public static final double MAX_SOFT_STOP = 47.1;
+  public static final double MAX_SOFT_STOP = 55.5;
   public static final double MIN_SOFT_STOP = 22.0;
 
   /**
@@ -65,8 +65,8 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
   static final double MAG_ANGLE_OFFSET = 28.10; //degrees - rotation due to frame
 
   // arm lengths for yo-yo pot anchor points
-  static final double POT_UPPER_LEN = 19.25;  // inch - c"
-  static final double POT_LOWER_LEN = 20.11;  // inch - d"
+  static final double POT_UPPER_LEN = 16.625; // inch - c"
+  static final double POT_LOWER_LEN = 15.875;  // inch - d"
   static final double POT_OFFSET_E = 14.13;   //degrees - offset from pot angle base -E"
 
   // Strap / motor lengths - includes pully
@@ -131,7 +131,7 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
     static final double kMinVelZeroTol = 0.05; // inches/sec
     static final double kMaxRPM = 30;
 
-    static final double kToleranceDeg = 0.5;
+    static final double kToleranceDeg = 0.25;
 
     // track encoder postion min/max - debugging
     double min_encoder_pos;

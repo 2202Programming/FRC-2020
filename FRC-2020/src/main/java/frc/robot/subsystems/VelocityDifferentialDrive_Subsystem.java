@@ -253,9 +253,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     if (maxRPM_High > DriveTrain.motorMaxRPM) {
       System.out.println("Warning: maxFPS not reachable. maxFPS= " + (DriveTrain.motorMaxRPM * K_high_fps_rpm));
     }
-    if (maxFPS_Low >= maxFPS_High) {
-      System.out.println("Warning: maxFPS low/high overlap" + maxFPS_Low + ">=" + maxRPM_High);
-    }
   }
 
   // Process any Dashboard events

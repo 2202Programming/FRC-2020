@@ -1,3 +1,3 @@
 [NetworkTables Storage 3.0]
-double "/Shuffleboard/DriversChoice/Robot Speeds/deg-per-sec"=30
-double "/Shuffleboard/DriversChoice/Robot Speeds/feet-per-sec"=10.2312
+double "/Shuffleboard/DriversChoice/Robot Speeds/deg-per-sec"=360
+double "/Shuffleboard/DriversChoice/Robot Speeds/feet-per-sec"=7.83929

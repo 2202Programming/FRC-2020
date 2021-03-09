@@ -21,9 +21,6 @@ public class Shoot extends CommandBase {
   final Magazine_Subsystem magazine;
   int backupCount;
   int count;
-  
-  // testing/reporting controls
-  double time;
 
   // Shooter states (verbs) for state machine
   enum Stage {
@@ -103,7 +100,6 @@ public class Shoot extends CommandBase {
         
         // we have our shoot target speeds, turn shooter on
         intake.spinupShooter();
-        time = System.currentTimeMillis();    //time for spin up start
         stage = Stage.WaitingForFlyWheel;
       break;
 
@@ -120,7 +116,6 @@ public class Shoot extends CommandBase {
       case Shooting: 
         //magazine forward fast to shoot while at RPM goals              
         if (!intake.isReadyToShoot()) { 
-          time = System.currentTimeMillis();
           atGoalCount = 0;
           //back to WaitingForFlywheel
           stage = Stage.WaitingForFlyWheel;

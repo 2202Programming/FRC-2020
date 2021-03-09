@@ -177,7 +177,7 @@ public final class Constants {
         // motor constraints
         public static final double motorMaxRPM= 5600;    // motor limits
         public static final double maxFPS = 14;          // max speed in feet/sec
-        public static final double maxRotDPS = 100;      // max rotation rate in deg/sec
+        public static final double maxRotDPS = 180;      // max rotation rate in deg/sec
         
         // PIDS are in the SparkMax, PIDFControler is used to hold the values
         // for initializing the hardware. The PID object not run on RIO.

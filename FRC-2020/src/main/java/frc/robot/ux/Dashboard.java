@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
+import frc.robot.commands.MatchReadyCmd;
+import frc.robot.commands.intake.SetPowerCellCount;
 
 /**
  * Dashboard
@@ -53,6 +55,11 @@ public class Dashboard {
     
     m_autopaths = new AutoPaths(matchTab);
     m_drivers = new DriverPreferences(driverTab);
+
+     // Shuffleboard runnable Commands - Soft buttons
+     matchTab.add("Match Ready", new MatchReadyCmd());
+     matchTab.add("Zero PC", new SetPowerCellCount(0) );
+     matchTab.add("Three PC", new SetPowerCellCount(3) );
   }
 
   public void add(String tabName, String title, SendableChooser<?> chooser) {

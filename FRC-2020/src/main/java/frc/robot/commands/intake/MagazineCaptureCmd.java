@@ -16,7 +16,7 @@ public class MagazineCaptureCmd extends CommandBase {
 
   // constants tuned to move power cells smoothly and clear light gate
   final double kMotorStrength = 0.7;
-  final int kFrameCount = 6;     // number of frames to run after LG opens, 20ms /frame
+  final int kFrameCount = 8;     // number of frames to run after LG opens, 20ms /frame
 
   Intake_Subsystem intake;
   Magazine_Subsystem mag;

@@ -182,7 +182,7 @@ public final class Constants {
         // PIDS are in the SparkMax, PIDFControler is used to hold the values
         // for initializing the hardware. The PID object not run on RIO.
         public static final PIDFController pidValues =
-             new PIDFController(0.000155, 0.0, 2.0, 0.00016666); // P, I, D, FF
+             new PIDFController(0.000155, 0.0, 0.2, 0.00016666); // P, I, D, FF
 
 
         // shifter settings
@@ -255,17 +255,17 @@ public final class Constants {
      */
     public static final class ShooterOnCmd {
         public static final double VEL_TOL = 0.005;  
-        public static ShooterSettings dataHigh = new ShooterSettings(38.0, 5, 38.0, VEL_TOL);  //vel, rps, angle, tol
+        public static ShooterSettings dataHigh = new ShooterSettings(37.0, 0, 40.8, VEL_TOL);  //vel, rps, angle, tol
         public static ShooterSettings dataLow  = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
     }
 
     // IA ShooterSettings
     public static final class InterstellarSettings {
       public static final double VEL_TOL = 0.005; 
-      public static ShooterSettings ssZone1 = new ShooterSettings(37.0, 0, 40.8, VEL_TOL);  //vel, rps, angle, tol
-      public static ShooterSettings ssZone2 = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
-      public static ShooterSettings ssZone3 = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
-      public static ShooterSettings ssZone4 = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
+      public static ShooterSettings ssZone1 = new ShooterSettings(20.0, 15, 47.5, VEL_TOL);  //vel, rps, angle, tol
+      public static ShooterSettings ssZone2 = new ShooterSettings(37.5, 0, 40.5, VEL_TOL);  //vel, rps, angle
+      public static ShooterSettings ssZone3 = new ShooterSettings(38.0, 5, 39.0, VEL_TOL);  //vel, rps, angle
+      public static ShooterSettings ssZone4 = new ShooterSettings(39.0, 5, 38.5, VEL_TOL);  //vel, rps, angle
     }
     
     public static final class RamseteProfile {

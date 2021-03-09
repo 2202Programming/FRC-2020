@@ -17,6 +17,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.ControlType;
 
+import edu.wpi.first.hal.can.CANJNI;
 import edu.wpi.first.hal.can.CANStatus;
 import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTable;
@@ -630,6 +631,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
      * SmartDashboard.putString("Current Gear",
      * gearbox.getCurrentGear().toString());
      */
+
+    CANJNI.GetCANStatus(canStatus);
     nt_velLeft.setDouble(m_velLeft);
     nt_velRight.setDouble(m_velRight);
     nt_posLeft.setDouble(m_posLeft);

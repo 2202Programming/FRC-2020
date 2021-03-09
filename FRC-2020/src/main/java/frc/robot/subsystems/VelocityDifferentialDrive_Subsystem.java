@@ -85,7 +85,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private NetworkTableEntry nt_canTxError;
   private NetworkTableEntry nt_canRxError;
   
-  private CANStatus canStatus;
+  private CANStatus canStatus = new CANStatus();
 
   //Field position
   Field2d m_field = new Field2d();

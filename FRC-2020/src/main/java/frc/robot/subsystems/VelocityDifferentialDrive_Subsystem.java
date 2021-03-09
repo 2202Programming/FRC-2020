@@ -78,6 +78,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private NetworkTableEntry nt_currentPoseX;
   private NetworkTableEntry nt_currentPoseY;
   private NetworkTableEntry nt_currentPoseR;
+  private NetworkTableEntry nt_leftOutput;
+  private NetworkTableEntry nt_rightOutput;
 
   //Field position
   Field2d m_field = new Field2d();
@@ -191,6 +193,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_currentPoseX = table.getEntry("CurrentX");
     nt_currentPoseY = table.getEntry("CurrentY");
     nt_currentPoseR = table.getEntry("CurrentR");
+    nt_rightOutput = table.getEntry("Right Motor Speed");
+    nt_leftOutput = table.getEntry("Left Motor Speed");
+    
 
     SmartDashboard.putData("Field", m_field);
 
@@ -630,6 +635,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_currentPoseX.setDouble(m_odometry.getPoseMeters().getX());
     nt_currentPoseY.setDouble(m_odometry.getPoseMeters().getY());
     nt_currentPoseR.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());
+    nt_leftOutput.setDouble(backLeft.getAppliedOutput());
+    nt_rightOutput.setDouble(backRight.getAppliedOutput());
   }
 
   /**

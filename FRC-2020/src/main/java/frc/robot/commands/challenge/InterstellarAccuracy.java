@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.InterstellarSettings;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.drive.LimeLightTargetCompensator;
@@ -32,26 +33,27 @@ import frc.robot.subsystems.ifx.VelocityDrive;
 
 /**
  * 
- *  Robot starts near the target for this challenge. 
- *   X = 0.0 is the Target line
- *   Y = 7.5 is the centerline of the field where the target is
+ * Robot starts near the target for this challenge. X = 0.0 is the Target line Y
+ * = 7.5 is the centerline of the field where the target is
  * 
  */
 public class InterstellarAccuracy extends SequentialCommandGroup {
-  //                                    X    Y        Heading
-  final Pose2d StartPose = new Pose2d( 2.0, 7.5, new Rotation2d(0.0));
-  final Pose2d Zone1Pose = new Pose2d( 5.5, 7.5, new Rotation2d(0.0));
+  // X Y Heading
+  final Pose2d StartPose = new Pose2d(2.0, 7.5, new Rotation2d(0.0));
+  final Pose2d Zone1Pose = new Pose2d(5.5, 7.5, new Rotation2d(0.0));
   final Pose2d Zone2Pose = new Pose2d(10.0, 7.5, new Rotation2d(0.0));
   final Pose2d Zone3Pose = new Pose2d(15.0, 7.5, new Rotation2d(0.0));
   final Pose2d Zone4Pose = new Pose2d(20.0, 7.5, new Rotation2d(0.0));
   final Pose2d IntroPose = new Pose2d(24.0, 7.5, new Rotation2d(0.0));
-                            
-  //                                                   vel  rot  deg   tol
-  final ShooterSettings  SSZone1 = new ShooterSettings(38, 6.0, 45.0, .005);
-  final ShooterSettings  SSZone2 = new ShooterSettings(38, 6.0, 45.0, .005);
-  final ShooterSettings  SSZone3 = new ShooterSettings(38, 6.0, 45.0, .005);
-  final ShooterSettings  SSZone4 = new ShooterSettings(38, 6.0, 45.0, .005);
-  
+
+  /*
+   * // vel rot deg tol final ShooterSettings SSZone1 = new ShooterSettings(38,
+   * 6.0, 45.0, .005); final ShooterSettings SSZone2 = new ShooterSettings(38,
+   * 6.0, 45.0, .005); final ShooterSettings SSZone3 = new ShooterSettings(38,
+   * 6.0, 45.0, .005); final ShooterSettings SSZone4 = new ShooterSettings(38,
+   * 6.0, 45.0, .005);
+   */
+
   // subsystems - about everything
   final VelocityDrive drive;
   final Intake_Subsystem intake;
@@ -70,18 +72,16 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     limelight = rc.limelight;
     magazine = intake.getMagazine();
 
-    //trajectory parameters
-    config = new TrajectoryConfig(maxVel, maxAccel)
-        .setKinematics(Constants.RamseteProfile.kDriveKinematics);
-    reverse_config = new TrajectoryConfig(maxVel, maxAccel)
-        .setKinematics(Constants.RamseteProfile.kDriveKinematics)
+    // trajectory parameters
+    config = new TrajectoryConfig(maxVel, maxAccel).setKinematics(Constants.RamseteProfile.kDriveKinematics);
+    reverse_config = new TrajectoryConfig(maxVel, maxAccel).setKinematics(Constants.RamseteProfile.kDriveKinematics)
         .setReversed(true);
-   
-    Command leg1 = build_leg(StartPose, Zone1Pose, SSZone1, true);
-    Command leg2 = build_leg(IntroPose, Zone2Pose, SSZone2, false);
-    Command leg3 = build_leg(IntroPose, Zone3Pose, SSZone3, false);
-    Command leg4 = build_leg(IntroPose, Zone4Pose, SSZone4, false);
-    Command leg5 = build_leg(IntroPose, Zone4Pose, SSZone4, false);
+
+    Command leg1 = build_leg(StartPose, Zone1Pose, InterstellarSettings.ssZone1, true);
+    Command leg2 = build_leg(IntroPose, Zone2Pose, InterstellarSettings.ssZone2, false);
+    Command leg3 = build_leg(IntroPose, Zone3Pose, InterstellarSettings.ssZone3, false);
+    Command leg4 = build_leg(IntroPose, Zone4Pose, InterstellarSettings.ssZone4, false);
+    Command leg5 = build_leg(IntroPose, Zone4Pose, InterstellarSettings.ssZone4, false);
 
     this.addCommands(
       new InstantCommand(() -> {magazine.setPC(3); } ),   
@@ -99,23 +99,21 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
    */
   Command build_leg(Pose2d startpose, Pose2d shootpose, ShooterSettings ss, boolean start) {
     // move where where we are to shoot point
-    var cmd = new ParallelRaceGroup();
+    var cmd = new SequentialCommandGroup();
     var cfg = (start) ? config : reverse_config;  // start goes forward, others are reverse on traj #1
-    cmd.addCommands(
-      new followTrajectory(drive, computeTrajectory(startpose, shootpose, cfg)),  // finishes
-      new ShooterWarmUp(ss)                                                       // never finishes
-     );
-    // Build the Shoot and return to Introduction zone sequence 
-    var andThen = new SequentialCommandGroup(
-       new InstantCommand(limelight::enableLED),
-       new ParallelRaceGroup(
+    cmd.addCommands( 
+      new ShooterWarmUp(ss),
+      new followTrajectory(drive, computeTrajectory(startpose, shootpose, cfg)),                                    
+      // Build the Shoot and return to Introduction zone sequence 
+      new InstantCommand(limelight::enableLED),
+      new ParallelRaceGroup(
             new LimeLightTargetCompensator(),       // never finishes 
-            new Shoot(ss)),                         // finishes when mag is empty
-       new IntakePower(intake, Power.On, 0.5),
-       new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)),
-       new WaitUntilCommand( magazine::isMagFull));
+            new Shoot(ss)).withTimeout(6.0),        // finishes when mag is empty, or timeout
+      new IntakePower(intake, Power.On, 0.5),
+      new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)),
+      new WaitUntilCommand( magazine::isMagFull).withTimeout(10.0));
 
-    return cmd.andThen(andThen);
+    return cmd;
   }
 
   /**

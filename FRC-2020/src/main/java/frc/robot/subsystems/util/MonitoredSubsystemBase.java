@@ -67,7 +67,7 @@ public abstract class MonitoredSubsystemBase extends SubsystemBase {
   } 
 
   public String toString() {
-   return String.format("Timing for %-25.20s: min = %05.5fms  max = %05.5fms avg = %05.5fms (%d) \n", getName(),
+   return String.format("Timing for %-25.20s: min = %05.3fms  max = %05.3fms avg = %05.3fms (%d) \n", getName(),
     getMinTime(), getMaxTime(), getAvgTime(), count );
   }
 

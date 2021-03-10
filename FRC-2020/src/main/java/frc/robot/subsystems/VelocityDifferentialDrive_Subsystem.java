@@ -17,6 +17,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.ControlType;
 
+import edu.wpi.first.hal.can.CANJNI;
+import edu.wpi.first.hal.can.CANStatus;
 import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -80,6 +82,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private NetworkTableEntry nt_currentPoseR;
   private NetworkTableEntry nt_leftOutput;
   private NetworkTableEntry nt_rightOutput;
+  private NetworkTableEntry nt_canUtilization;
+  private NetworkTableEntry nt_canTxError;
+  private NetworkTableEntry nt_canRxError;
+  
+  private CANStatus canStatus = new CANStatus();
 
   //Field position
   Field2d m_field = new Field2d();
@@ -195,6 +202,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_currentPoseR = table.getEntry("CurrentR");
     nt_rightOutput = table.getEntry("Right Motor Speed");
     nt_leftOutput = table.getEntry("Left Motor Speed");
+    nt_canUtilization = table.getEntry("CanUtilization");
+    nt_canRxError = table.getEntry("CanRxError");
+    nt_canTxError = table.getEntry("CanTxError");
     
 
     SmartDashboard.putData("Field", m_field);
@@ -252,9 +262,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // check we can hit max requested speed in high gear
     if (maxRPM_High > DriveTrain.motorMaxRPM) {
       System.out.println("Warning: maxFPS not reachable. maxFPS= " + (DriveTrain.motorMaxRPM * K_high_fps_rpm));
-    }
-    if (maxFPS_Low >= maxFPS_High) {
-      System.out.println("Warning: maxFPS low/high overlap" + maxFPS_Low + ">=" + maxRPM_High);
     }
   }
 
@@ -624,6 +631,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
      * SmartDashboard.putString("Current Gear",
      * gearbox.getCurrentGear().toString());
      */
+
+    CANJNI.GetCANStatus(canStatus);
     nt_velLeft.setDouble(m_velLeft);
     nt_velRight.setDouble(m_velRight);
     nt_posLeft.setDouble(m_posLeft);
@@ -637,6 +646,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_currentPoseR.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());
     nt_leftOutput.setDouble(backLeft.getAppliedOutput());
     nt_rightOutput.setDouble(backRight.getAppliedOutput());
+    nt_canUtilization.setDouble(canStatus.percentBusUtilization);
+    nt_canRxError.setNumber(canStatus.receiveErrorCount);
+    nt_canTxError.setNumber(canStatus.transmitErrorCount);
   }
 
   /**

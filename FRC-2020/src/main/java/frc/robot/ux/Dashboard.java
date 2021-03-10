@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.commands.MatchReadyCmd;
+import frc.robot.commands.intake.MagazineCalibrate;
 import frc.robot.commands.intake.SetPowerCellCount;
 
 /**
@@ -60,6 +61,8 @@ public class Dashboard {
      matchTab.add("Match Ready", new MatchReadyCmd());
      matchTab.add("Zero PC", new SetPowerCellCount(0) );
      matchTab.add("Three PC", new SetPowerCellCount(3) );
+     matchTab.add("Calibrate MagAngle", new MagazineCalibrate());
+    
   }
 
   public void add(String tabName, String title, SendableChooser<?> chooser) {

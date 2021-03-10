@@ -63,7 +63,7 @@ public class DriverPreferences {
 
     maxRotationNTE = layout.addPersistent("deg-per-sec", DriveTrain.maxRotDPS)
       .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("Min", 30.0, "Max", 180.0, "Block Increment", 15 ))
+      .withProperties(Map.of("Min", 30.0, "Max", 360.0, "Block Increment", 15 ))
       .getEntry();
 
     maxRotationNTE.addListener(event -> 

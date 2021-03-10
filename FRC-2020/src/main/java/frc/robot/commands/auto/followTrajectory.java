@@ -17,6 +17,7 @@ public class followTrajectory extends CommandBase {
   RamseteCommand ramsete;
   RamseteController rsController;
   DifferentialDriveKinematics kinematics;
+  long startTime;
 
   // Ramsete constants - todo wire to ux
   double beta = .12; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft
@@ -61,6 +62,7 @@ public class followTrajectory extends CommandBase {
 
       // initize ramsete
       ramsete.initialize();
+      startTime = System.currentTimeMillis();
     }
   }
 
@@ -76,6 +78,8 @@ public class followTrajectory extends CommandBase {
   public void end(boolean interrupted) {
     if (ramsete != null)
       ramsete.end(interrupted);
+    System.out.println("***FollowTrajectory time (ms) = " + (System.currentTimeMillis() - startTime));
+    System.out.println("***Beta = " + beta + ", Zeta = " + zeta);  
   }
 
   // Returns true when the command should end.

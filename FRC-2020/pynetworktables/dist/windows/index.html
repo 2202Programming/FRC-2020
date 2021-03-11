@@ -94,11 +94,11 @@
         </div>
         <div class="col-sm-3">
           <h4>CAN</h4>
-            <p>CAN Utilization: <frc-number-label source-key="/Drivetrain/CanUtilization"></frc-number-label></p>
-            <p>CAN Tx Errors: <frc-number-label source-key="/Drivetrain/CanTxError"></frc-number-label></p>
-            <p>CAN Rx Errors: <frc-number-label source-key="/Drivetrain/CanRxError"></frc-number-label></p>
-        </div>
-        <div class="col-sm-3">
+          <p>CAN Utilization: <frc-number-label source-key="/Drivetrain/CanUtilization"></frc-number-label></p>
+          <p>CAN Tx Errors: <frc-number-label source-key="/Drivetrain/CanTxError"></frc-number-label></p>
+          <p>CAN Rx Errors: <frc-number-label source-key="/Drivetrain/CanRxError"></frc-number-label></p>
+      </div>
+      <div class="col-sm-3">
           <h4>Intake/Shooter</h4>
           <p>Magazine angle: <frc-number-label source-key="/Magazine/MagazineAngle"></frc-number-label></p>
           <p>PC Count: <frc-number-label source-key="/Magazine/PCCount"></frc-number-label></p>
@@ -133,6 +133,30 @@
           <h4>Modes</h4>
           <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/DriverMode/active"></frc-label></p>
           <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/PathChooser/active"></frc-label></p>
+        </div>
+        <div class="col-sm-6">
+          <h4>Balls in Magazine:</h4>
+          <style>
+            .with-styles::part(box) {
+              border-radius: 50%;
+              border: 1px solid black;
+              color: white;
+              width: 50px;
+              height: 50px;
+              margin: 5px;
+              padding: 5px;
+
+            }
+          </style>
+          <frc-boolean-box source-key="/Magazine/BallOne/" class="with-styles" true-color="yellow" false-color="white" value>
+            Boolean Circle
+          </frc-boolean-box>
+          <frc-boolean-box source-key="/Magazine/BallTwo/" class="with-styles" true-color="yellow" false-color="white" value>
+            Boolean Circle
+          </frc-boolean-box>
+          <frc-boolean-box  source-key="/Magazine/BallThree/" class="with-styles" true-color="yellow" false-color="white" value>
+            Boolean Circle
+          </frc-boolean-box>
         </div>
       </div>
       <br>

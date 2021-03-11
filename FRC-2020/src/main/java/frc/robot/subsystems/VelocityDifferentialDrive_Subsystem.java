@@ -638,9 +638,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_posLeft.setDouble(m_posLeft);
     nt_posRight.setDouble(m_posRight);
     nt_theta.setDouble(m_theta);
-    nt_accelX.setDouble(m_gyro.getRawAccelX());
-    nt_accelY.setDouble(m_gyro.getRawAccelY());
-    nt_accelZ.setDouble(m_gyro.getRawAccelZ());
+    nt_accelX.setDouble(m_gyro.getWorldLinearAccelX());
+    nt_accelY.setDouble(m_gyro.getWorldLinearAccelY());
+    nt_accelZ.setDouble(m_gyro.getWorldLinearAccelZ());
     nt_currentPoseX.setDouble(m_odometry.getPoseMeters().getX());
     nt_currentPoseY.setDouble(m_odometry.getPoseMeters().getY());
     nt_currentPoseR.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());

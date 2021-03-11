@@ -119,7 +119,8 @@ public class RobotContainer {
     
     // Add anything that has logging requirements
     logSubsystem.add(driveTrain, lidar, limelight, intake, pdp /*,driverControls, panel, detector*/);
-    
+    logSubsystem.setLogModulo(driveTrain, 1); 
+
     //Add devices to map for XML parsing usage, names must be unique.
     deviceMap.put("lidar", lidar);
     deviceMap.put("driveTrain", driveTrain);

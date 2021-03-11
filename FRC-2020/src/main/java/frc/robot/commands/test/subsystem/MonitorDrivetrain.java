@@ -15,6 +15,12 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ifx.VelocityDrive;
 
+
+/**
+ * WIP - collect data on drivetrain and send it back over NT.
+ * Still need to put togethter python/java app to gather up the data.
+ * 
+ */
 public class MonitorDrivetrain extends CommandBase {
 
   VelocityDrive drive;

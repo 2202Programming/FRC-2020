@@ -33,6 +33,7 @@ import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
+import frc.robot.commands.generic.PositionRecorder;
 import frc.robot.commands.intake.IntakePosition;
 import frc.robot.commands.intake.IntakePosition.Direction;
 import frc.robot.commands.intake.IntakePower;
@@ -148,6 +149,9 @@ public class RobotContainer {
       new GyroHeadingCompensator(driveTrain),         // drive straight
       new VelocityStepTest(driveTrain, 3.0, 3.0, 4)   // speed ft/s, duration s, repeat
     ));
+
+    PositionRecorder recorder = new PositionRecorder(driveTrain);
+    recorder.setIsRunning(false);
 
     // Shuffleboard runnable Commands - Soft buttons
      // SmartDashboard.putData("Match Ready", new MatchReadyCmd());

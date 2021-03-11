@@ -1,5 +1,6 @@
 package frc.robot.commands.auto;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
@@ -11,6 +12,10 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.subsystems.ifx.VelocityDrive;
 
 public class followTrajectory extends CommandBase {
+
+  static Trajectory s_currentTrajectory;
+  static long s_startTime;
+
   final VelocityDrive drive;
   SendableChooser<Trajectory> chooser = null;
 
@@ -24,7 +29,7 @@ public class followTrajectory extends CommandBase {
   // Ramsete constants - todo wire to ux
   double beta = .12; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft
   double zeta = 0.8; //larger more damping 
-  
+
   Pose2d poseTolerance = new Pose2d(.1, .1, Rotation2d.fromDegrees(1.0));
 
   /** Creates a new followTrajectory. */
@@ -53,6 +58,9 @@ public class followTrajectory extends CommandBase {
       trajectory = chooser.getSelected();
     }
     if (trajectory != null) {
+      // for monitoring
+      s_currentTrajectory = trajectory;
+
       // Reset odometry to the starting pose of the trajectory.
       drive.resetOdometry(trajectory.getInitialPose());
 
@@ -67,7 +75,8 @@ public class followTrajectory extends CommandBase {
 
       // initize ramsete
       ramsete.initialize();
-      startTime = System.currentTimeMillis();
+      startTime = RobotController.getFPGATime(); 
+      s_startTime = startTime;
     }
   }
 
@@ -81,9 +90,10 @@ public class followTrajectory extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    s_currentTrajectory = null;
     if (ramsete != null)
       ramsete.end(interrupted);
-    System.out.println("***FollowTrajectory time (ms) = " + (System.currentTimeMillis() - startTime));
+    System.out.println("***FollowTrajectory time (ms) = " + (RobotController.getFPGATime() - startTime)/1000.0);
     System.out.println("***Beta = " + beta + ", Zeta = " + zeta);  
   }
 
@@ -94,4 +104,8 @@ public class followTrajectory extends CommandBase {
       return ramsete.isFinished();
     return true;
   }
+
+  // for logging in PositionRecorder
+  public static long getStartTime() {return s_startTime; }
+  public static Trajectory getCurrentTrajectory() { return s_currentTrajectory;}
 }

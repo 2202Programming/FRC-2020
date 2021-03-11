@@ -1,6 +1,8 @@
 package frc.robot.commands.auto;
 
 import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -22,6 +24,8 @@ public class followTrajectory extends CommandBase {
   // Ramsete constants - todo wire to ux
   double beta = .12; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft
   double zeta = 0.8; //larger more damping 
+  
+  Pose2d poseTolerance = new Pose2d(.1, .1, Rotation2d.fromDegrees(1.0));
 
   /** Creates a new followTrajectory. */
   public followTrajectory(VelocityDrive drive, Trajectory trajectory) {
@@ -54,6 +58,7 @@ public class followTrajectory extends CommandBase {
 
       // construct new Ramsete
       rsController = new RamseteController(this.beta, this.zeta);
+      rsController.setTolerance(poseTolerance);
       ramsete = new RamseteCommand(trajectory, drive::getPose, // odmetry package in drive
           rsController, // outer loop non-linear controller (follower)
           kinematics, // robot chassis model

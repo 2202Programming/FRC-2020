@@ -32,10 +32,9 @@
   <frc-dashboard>
     <br>
     <br>
-    <nt-string key="/team" value="2202"></nt-string>
       <div style="text-align: center;">
         <h1>
-          Team <frc-label source-key="/team"></frc-label>
+          Team 2202
         </h1>
       <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
     </div>
@@ -77,13 +76,8 @@
         <div class="col-sm-3">
           <div>
             <h4>Choose Path</h4>
-            <!-- <frc-radio-group source-key="/Shuffleboard/Match/AutoPath/PathChooser/selected">
-              <frc-radio-button value="Do nothing" label="Do nothing"><div style="color: #C3C3C3">Do nothing</div></frc-radio-button>
-              <frc-radio-button value="BounceSinglePath" label="BounceSinglePath"><div style="color: #C3C3C3">BounceSinglePath</div></frc-radio-button>
-              <frc-radio-button value="TurnNinetyRight" label="TurnNinetyRight"><div style="color: #C3C3C3">TurnNinetyRight</div></frc-radio-button>
-              <frc-radio-button value="StraightDrive v3 a1" label="StraightDrive v3 a1"><div style="color: #C3C3C3">StraightDrive v3 a1</div></frc-radio-button>
-            </frc-radio-group> -->
-            <frc-combo-box source-key="/Shuffleboard/Match/Autonomous Command/SendableChooser[1]"></frc-combo-box>
+            <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/selected" value="do nothing"></nt-string>
+            <frc-combo-box source-key="/Shuffleboard/Match/AutoPath/PathChooser"></frc-combo-box>
           </div>
         </div>
       </div>

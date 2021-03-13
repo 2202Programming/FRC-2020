@@ -27,7 +27,7 @@ public class followTrajectory extends CommandBase {
   long startTime;
 
   // Ramsete constants - todo wire to ux
-  double beta = .12; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft
+  double beta = .18; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft
   double zeta = 0.8; //larger more damping 
 
   Pose2d poseTolerance = new Pose2d(.1, .1, Rotation2d.fromDegrees(1.0));

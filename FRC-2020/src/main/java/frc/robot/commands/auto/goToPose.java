@@ -50,14 +50,14 @@ public class goToPose extends CommandBase {
             new SimpleMotorFeedforward(Constants.RamseteProfile.ksVolts,
                                       Constants.RamseteProfile.kvVoltSecondsPerFoot,
                                       Constants.RamseteProfile.kaVoltSecondsSquaredPerFoot),
-                                      Constants.RamseteProfile.kDriveKinematics,
+                                      kinematics,
             10);
 
     TrajectoryConfig config =
     new TrajectoryConfig(Constants.RamseteProfile.kMaxSpeedFeetPerSecond,
                          Constants.RamseteProfile.kMaxAccelerationFeetPerSecondSquared)
         // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(Constants.RamseteProfile.kDriveKinematics)
+        .setKinematics(kinematics)
         .setReversed(true)
         // Apply the voltage constraint
         .addConstraint(autoVoltageConstraint);

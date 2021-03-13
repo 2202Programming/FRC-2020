@@ -7,7 +7,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.util.misc.PIDFController;
@@ -288,8 +287,9 @@ public final class Constants {
       public static final double kRamseteZeta = 0.9;
       public static final double kTrackwidthFeet = 2.135; //2.08333;   // from char=1.4348; //updated2
 
-      public static final DifferentialDriveKinematics kDriveKinematics =
-      new DifferentialDriveKinematics(kTrackwidthFeet);
+      // Use the kinematics from the drivetrain, computed from RobotPhysical constants above
+      // public static final DifferentialDriveKinematics kDriveKinematics =
+      // new DifferentialDriveKinematics(kTrackwidthFeet);
 
       
     public static final double kMaxSpeedFeetPerSecond = 5;

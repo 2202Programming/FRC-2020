@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Constants;
 import frc.robot.Constants.InterstellarSettings;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.followTrajectory;
@@ -73,8 +72,8 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     magazine = intake.getMagazine();
 
     // trajectory parameters
-    config = new TrajectoryConfig(maxVel, maxAccel).setKinematics(Constants.RamseteProfile.kDriveKinematics);
-    reverse_config = new TrajectoryConfig(maxVel, maxAccel).setKinematics(Constants.RamseteProfile.kDriveKinematics)
+    config = new TrajectoryConfig(maxVel, maxAccel).setKinematics(drive.getDriveKinematics());
+    reverse_config = new TrajectoryConfig(maxVel, maxAccel).setKinematics(drive.getDriveKinematics())
         .setReversed(true);
 
     Command leg1 = build_leg(StartPose, Zone1Pose, InterstellarSettings.ssZone1, true);

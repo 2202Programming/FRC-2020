@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
 public class CreateCircle {
   final double dt = .1;  // sec timestep
@@ -140,7 +140,7 @@ public class CreateCircle {
     TrajectoryConfig config =
     new TrajectoryConfig(velocity, 2*velocity)  // assume we can get to target speed in .5 seconds
         // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(Constants.RamseteProfile.kDriveKinematics);
+        .setKinematics(RobotContainer.getInstance().driveTrain.getDriveKinematics());
         
     Trajectory segment = TrajectoryGenerator.generateTrajectory(
         new Pose2d(0.0, 0.0, new Rotation2d(0) ),

@@ -141,7 +141,7 @@ public class RobotContainer {
     dashboard.addAutoCommand("Interstellar", new InterstellarAccuracy(4, 3));
     
     //test commands
-    CreateCircle circle = new CreateCircle(3, 5, -360);
+    CreateCircle circle = new CreateCircle(3, 2, -360);
     dashboard.addAutoCommand("computed-circle", new followTrajectory(driveTrain, circle.getTrajectory()));
     dashboard.addAutoCommand("velocityStep", 
     new ParallelCommandGroup(

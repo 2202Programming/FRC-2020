@@ -60,7 +60,7 @@ public class CreateCircle {
     } 
 
     // create a short line in X direction 
-    var line = lineSegment(radius);
+    var line = lineSegment(0.1);  //was "radius"
     var states = line.getStates();
     int count = states.size() / 2;
 

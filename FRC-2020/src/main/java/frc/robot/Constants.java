@@ -145,7 +145,7 @@ public final class Constants {
 
         //chassis  
         public static final double WheelDiameter = 6.0; // inches, nominal
-        public static final double WheelAxleDistance = 25.5/12.0; // feet
+        public static final double WheelAxleDistance = 2.135; //25.5/12.0; // feet
 
         //wheel wear compensation - adjust when distance is off by small amount
         public static final double WheelWearLeft = 0.99;   //[percent] of nominal
@@ -286,7 +286,7 @@ public final class Constants {
       // seconds - DPL not sure about how to convert to feet.
       public static final double kRamseteB = .35;
       public static final double kRamseteZeta = 0.9;
-      public static final double kTrackwidthFeet = 2.08333;   // from char=1.4348; //updated2
+      public static final double kTrackwidthFeet = 2.135; //2.08333;   // from char=1.4348; //updated2
 
       public static final DifferentialDriveKinematics kDriveKinematics =
       new DifferentialDriveKinematics(kTrackwidthFeet);

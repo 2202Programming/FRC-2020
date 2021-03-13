@@ -9,6 +9,7 @@ import java.util.Date;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -34,6 +35,7 @@ public class PositionRecorder extends CommandBase {
   long start;
 
   String directoryName="recordings";
+  String workingDir;
 
   NetworkTableEntry directoryNameEntry;
   NetworkTableEntry isRunningEntry;
@@ -43,11 +45,11 @@ public class PositionRecorder extends CommandBase {
     initSmartDashboard();
     this.drivetrain = drivetrain;
   }
+  
   public void initSmartDashboard(){
     ShuffleboardTab tab =Shuffleboard.getTab("Position Recorder");
     isRunningEntry=tab.add("Is running", isRunning).withWidget("Toggle Button").getEntry();
     directoryNameEntry=tab.add("Directory Name", directoryName).getEntry();
-
 
     isRunningEntry.addListener((EntryNotification e)-> setIsRunning(e.value.getBoolean()), EntryListenerFlags.kUpdate|EntryListenerFlags.kNew);
 
@@ -75,10 +77,11 @@ public class PositionRecorder extends CommandBase {
     System.out.println("Position Recorder Begin");
     try {
       String filename = new SimpleDateFormat("MM-dd_HH_mm_ss").format(new Date())+".csv";
+  
+      workingDir =  Filesystem.getOperatingDirectory().toString() + "/" +directoryName;
+      new File(workingDir).mkdirs();
 
-      new File(directoryName).mkdirs();
-
-      File f = new File(directoryName,filename);
+      File f = new File(workingDir, filename);
       f.createNewFile();
       writer = new PrintWriter(f); // PrintWriter is buffered
       writer.println("elapsed-uS, x, y, rotation, traj-time, traj-x, traj-y, traj-rot");

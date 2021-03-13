@@ -38,7 +38,7 @@
         </h1>
       <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
     </div>
-
+    
     <div class="row bg-light" style="margin-top: 30px;">
       <div class="col-sm-3">
         <frc-sim-robot-state style="margin-left: 50px;"></frc-sim-robot-state>
@@ -50,158 +50,181 @@
         <frc-sim-joystick source-key="joystick/1" gamepad="1"></frc-sim-joystick>
       </div>
     </div>
-
-    <div class="container-fluid" style="margin-top: 50px;">
-      <div class="row">
-        
-        <div class="col-sm-6 bg-light">
-            <frc-differential-drivebase source-key="/Drivetrain" style="margin-top: 20px;"></frc-differential-drivebase>
-            <frc-gyro source-key="/Drivetrain/Theta" precision="2" style="margin-bottom: 20px;"></frc-gyro>
-        </div>
-        <div class="col-sm-3">
-          <div>
-            <h4>Odometer</h4>
-            <p>Odometer left: <frc-number-label source-key="/Drivetrain/PosLeft"></frc-number-label></p>
-            <p>Odometer right: <frc-number-label source-key="/Drivetrain/PosRight"></frc-number-label></p>
-            <p>Velocity left: <frc-number-label source-key="/Drivetrain/VelLeft/value"></frc-number-label></p>
-            <p>Velocity right: <frc-number-label source-key="/Drivetrain/VelRight/value"></frc-number-label></p>
-            <p>Current Position X: <frc-number-label source-key="/Drivetrain/currentX"></frc-number-label></p>
-            <p>Current Position Y: <frc-number-label source-key="/Drivetrain/currentY"></frc-number-label></p>
-            <p>Current Position Rot: <frc-number-label source-key="/Drivetrain/currentR"></frc-number-label></p>
-            <p>Saved Position X: <frc-number-label source-key="/Drivetrain/savedX"></frc-number-label></p>
-            <p>Saved Position Y: <frc-number-label source-key="/Drivetrain/savedY"></frc-number-label></p>
-            <p>Saved Position Rot: <frc-number-label source-key="/Drivetrain/savedR"></frc-number-label></p>
-          </div>
-        </div>
-        <div class="col-sm-3">
-          <div>
-            <h4>Choose Path</h4>
-            <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/selected" value="do nothing"></nt-string>
-            <frc-combo-box source-key="/Shuffleboard/Match/AutoPath/PathChooser"></frc-combo-box>
-          </div>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border">Intake</legend>
+      <div class="container-fluid" style="margin-top: 20px;">
+        <div class="row">
+          <div class="col-sm-3">
+            <h4>Intake/Shooter</h4>
+            <p>Magazine angle: <frc-number-label source-key="/Magazine/MagazineAngle"></frc-number-label></p>
+            <p>PC Count: <frc-number-label source-key="/Magazine/PCCount"></frc-number-label></p>
+            <p>Shooter Upper RPM: <frc-number-label source-key="/Shooter/UpperRPM/value"></frc-number-label></p>
+            <p>Shooter Lower RPM: <frc-number-label source-key="/Shooter/LowerRPM/value"></frc-number-label></p>
+            <p>Shooter Auto On: <frc-boolean-box
+                webbit-id="frc-boolean-box"
+                slot=""
+                source-provider="NetworkTables"
+                from-properties="[]"
+                default-color="black"
+                true-color="green"
+                false-color="red"
+                label=""
+                class="draggable"
+                data-x="0"
+                data-y="0"
+                style="width: 100px; height: 26px; transform: translate(5px, 10px);"
+                source-key="/Shooter/ShootingAutoMode"
+              ></frc-boolean-box>
+            </p>
+            </div>
+            <div class="col-sm-6">
+              <h4>Balls in Magazine:</h4>
+              <style>
+                .with-styles::part(box) {
+                  border-radius: 50%;
+                  border: 1px solid black;
+                  color: white;
+                  width: 50px;
+                  height: 50px;
+                  margin: 5px;
+                  padding: 5px;
+                }
+              </style>
+              <frc-boolean-box source-key="/Magazine/BallOne/value" class="with-styles" true-color="yellow" false-color="white" value>
+              </frc-boolean-box>
+              <frc-boolean-box source-key="/Magazine/BallTwo/value" class="with-styles" true-color="yellow" false-color="white" value>
+              </frc-boolean-box>
+              <frc-boolean-box  source-key="/Magazine/BallThree/value" class="with-styles" true-color="yellow" false-color="white" value>
+              </frc-boolean-box>
+            </div>
         </div>
       </div>
     </div>
+    </fieldset>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border">Path</legend>
+      <div class="container-fluid" style="margin-top: 50px;">
+        <div class="row">
+          <div class="col-sm-3">
+            <div>
+              <h4>Choose Path</h4>
+              <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/selected" value="do nothing"></nt-string>
+              <frc-combo-box source-key="/Shuffleboard/Match/AutoPath/PathChooser"></frc-combo-box>
+            </div>
+          </div>
+          <div class="col-sm-9">
+              <frc-field game="Slalom Path" style="width: 800px">
+                <frc-field-robot unit="ft"></frc-field-robot>
+            </frc-field>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border">Direction</legend>
+      <div class="container-fluid" style="margin-top: 50px;">
+        <div class="row">
+          <div class="col-sm-6 bg-light">
+            <frc-differential-drivebase source-key="/Drivetrain" style="margin-top: 20px;"></frc-differential-drivebase>
+            <frc-gyro source-key="/Drivetrain/Theta" precision="2" style="margin-bottom: 20px;"></frc-gyro>
+          </div>
+          <div class="col-sm-3">
+            <div>
+              <h4>Odometer</h4>
+              <p>Odometer left: <frc-number-label source-key="/Drivetrain/PosLeft"></frc-number-label></p>
+              <p>Odometer right: <frc-number-label source-key="/Drivetrain/PosRight"></frc-number-label></p>
+              <p>Velocity left: <frc-number-label source-key="/Drivetrain/VelLeft/value"></frc-number-label></p>
+              <p>Velocity right: <frc-number-label source-key="/Drivetrain/VelRight/value"></frc-number-label></p>
+              <p>Current Position X: <frc-number-label source-key="/Drivetrain/currentX"></frc-number-label></p>
+              <p>Current Position Y: <frc-number-label source-key="/Drivetrain/currentY"></frc-number-label></p>
+              <p>Current Position Rot: <frc-number-label source-key="/Drivetrain/currentR"></frc-number-label></p>
+              <p>Saved Position X: <frc-number-label source-key="/Drivetrain/savedX"></frc-number-label></p>
+              <p>Saved Position Y: <frc-number-label source-key="/Drivetrain/savedY"></frc-number-label></p>
+              <p>Saved Position Rot: <frc-number-label source-key="/Drivetrain/savedR"></frc-number-label></p>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <h4>Lidar</h4>
+              <p>Lidar left: <frc-number-label source-key="/Lidar/Left"></frc-number-label></p>
+              <p>Lidar right: <frc-number-label source-key="/Lidar/Right"></frc-number-label></p>
+              <p>Lidar anlge: <frc-number-label source-key="/Lidar/Angle"></frc-number-label></p>
+              <p>Lidar valid: <frc-boolean-label source-key="/Lidar/Valid"></frc-boolean-label></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <h4>Limelight</h4>
+            <p>Limelight X: <frc-number-label source-key="/limelight/tx"></frc-number-label></p>
+            <p>Limelight Y: <frc-number-label source-key="/limelight/ty"></frc-number-label></p>
+            <p>Limelight Area: <frc-number-label source-key="/limelight/ta"></frc-number-label></p>
+            <p>Limelight Valid: <frc-number-label source-key="/limelight/tv"></frc-number-label></p>
+            <p>Limelight LEDs: <frc-number-label source-key="/limelight/ledMode"></frc-number-label></p>
+          </div>
+          <div class="col-sm-3">
+            <h4>Modes</h4>
+            <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/DriverMode/active"></frc-label></p>
+            <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/PathChooser/active"></frc-label></p>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border">Data</legend>
+      <div class="container-fluid" style="margin-top: 50px;">
+        <div class="row bg-light">
+          <div class="col-sm-3">
+            <nt-number key="/Drivetrain/min" value="-2"></nt-number>
+            <nt-number key="/Drivetrain/max" value="2"></nt-number>
+            <frc-3-axis-accelerometer source-key="/Drivetrain" style="margin-left: 20px; margin-top: 40px; color: black;"></frc-3-axis-accelerometer>
+            <h4>Voltage</h4>
+            <nt-number key="/PDP/Voltage/min" value="10"></nt-number>
+            <nt-number key="/PDP/Voltage/max" value="13"></nt-number>
+            <frc-number-bar source-key="/PDP/Voltage" style="margin-left: 20px; color: black;"></frc-number-bar>
+          </div>
+          <div class="col-sm-4">
+            <nt-string key="/Shooter/title" value="Shooter RPM"></nt-string>
+            <nt-number key="/Shooter/minY" value="0"></nt-number>
+            <nt-number key="/Shooter/maxY" value="4000"></nt-number>
+            <nt-string key="/Shooter/xAxisLabel" value="Time"></nt-string>
+            <nt-string key="/Shooter/yAxisLabel" value="RPM"></nt-string>
+            <nt-string key="/Shooter/UpperRPM/label" value="Upper RPM"></nt-string>
+            <nt-string key="/Shooter/LowerRPM/label" value="Upper RPM"></nt-string>
+            <nt-string key="/Shooter/UpperRPM/color" value="green"></nt-string>
+            <nt-string key="/Shooter/LowerRPM/color" value="red"></nt-string>
+            <frc-line-chart
+            source-key="/Shooter">
+              <frc-chart-data source-key="/Shooter/UpperRPM"></frc-chart-data>
+              <frc-chart-data source-key="/Shooter/LowerRPM"></frc-chart-data>
+        </frc-line-chart></p>
+          </div>
+          <div class="col-sm-4">
+            <nt-string key="/Drivetrain/title" value="Velocity"></nt-string>
+            <nt-number key="/Drivetrain/minY" value="-10"></nt-number>
+            <nt-number key="/Drivetrain/maxY" value="10"></nt-number>
+            <nt-string key="/Drivetrain/xAxisLabel" value="Time"></nt-string>
+            <nt-string key="/Drivetrain/yAxisLabel" value="ft/s"></nt-string>
+            <nt-string key="/Drivetrain/VelLeft/label" value="Velocity Left"></nt-string>
+            <nt-string key="/Drivetrain/VelRight/label" value="Velocity Right"></nt-string>
+            <nt-string key="/Drivetrain/VelLeft/color" value="green"></nt-string>
+            <nt-string key="/Drivetrain/VelRight/color" value="red"></nt-string>
+            <frc-line-chart
+            source-key="/Drivetrain">
+              <frc-chart-data source-key="/Drivetrain/VelLeft"></frc-chart-data>
+              <frc-chart-data source-key="/Drivetrain/VelRight"></frc-chart-data>
+        </frc-line-chart></p>
+          </div>
+        </div>
+        <div class="row">   
+          <div class="col-sm-3">
+            <h4>CAN</h4>
+            <p>CAN Utilization: <frc-number-label source-key="/Drivetrain/CanUtilization"></frc-number-label></p>
+            <p>CAN Tx Errors: <frc-number-label source-key="/Drivetrain/CanTxError"></frc-number-label></p>
+            <p>CAN Rx Errors: <frc-number-label source-key="/Drivetrain/CanRxError"></frc-number-label></p>
+         </div>
+        </div>
+      </div>
+    </fieldset>
 
-    <div class="container-fluid" style="margin-top: 50px;">
-      <div class="row">
-        <div class="col-sm-3">
-          <h4>Lidar</h4>
-            <p>Lidar left: <frc-number-label source-key="/Lidar/Left"></frc-number-label></p>
-            <p>Lidar right: <frc-number-label source-key="/Lidar/Right"></frc-number-label></p>
-            <p>Lidar anlge: <frc-number-label source-key="/Lidar/Angle"></frc-number-label></p>
-            <p>Lidar valid: <frc-boolean-label source-key="/Lidar/Valid"></frc-boolean-label></p>
-        </div>
-        <div class="col-sm-3">
-          <h4>CAN</h4>
-          <p>CAN Utilization: <frc-number-label source-key="/Drivetrain/CanUtilization"></frc-number-label></p>
-          <p>CAN Tx Errors: <frc-number-label source-key="/Drivetrain/CanTxError"></frc-number-label></p>
-          <p>CAN Rx Errors: <frc-number-label source-key="/Drivetrain/CanRxError"></frc-number-label></p>
-      </div>
-      <div class="col-sm-3">
-          <h4>Intake/Shooter</h4>
-          <p>Magazine angle: <frc-number-label source-key="/Magazine/MagazineAngle"></frc-number-label></p>
-          <p>PC Count: <frc-number-label source-key="/Magazine/PCCount"></frc-number-label></p>
-          <p>Shooter Upper RPM: <frc-number-label source-key="/Shooter/UpperRPM/value"></frc-number-label></p>
-          <p>Shooter Lower RPM: <frc-number-label source-key="/Shooter/LowerRPM/value"></frc-number-label></p>
-          <p>Shooter Auto On: <frc-boolean-box
-              webbit-id="frc-boolean-box"
-              slot=""
-              source-provider="NetworkTables"
-              from-properties="[]"
-              default-color="black"
-              true-color="green"
-              false-color="red"
-              label=""
-              class="draggable"
-              data-x="0"
-              data-y="0"
-              style="width: 100px; height: 26px; transform: translate(5px, 10px);"
-              source-key="/Shooter/ShootingAutoMode"
-            ></frc-boolean-box>
-          </p>
-        </div>
-        <div class="col-sm-3">
-          <h4>Limelight</h4>
-          <p>Limelight X: <frc-number-label source-key="/limelight/tx"></frc-number-label></p>
-          <p>Limelight Y: <frc-number-label source-key="/limelight/ty"></frc-number-label></p>
-          <p>Limelight Area: <frc-number-label source-key="/limelight/ta"></frc-number-label></p>
-          <p>Limelight Valid: <frc-number-label source-key="/limelight/tv"></frc-number-label></p>
-          <p>Limelight LEDs: <frc-number-label source-key="/limelight/ledMode"></frc-number-label></p>
-        </div>
-        <div class="col-sm-3">
-          <h4>Modes</h4>
-          <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/DriverMode/active"></frc-label></p>
-          <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/PathChooser/active"></frc-label></p>
-        </div>
-        <div class="col-sm-6">
-          <h4>Balls in Magazine:</h4>
-          <style>
-            .with-styles::part(box) {
-              border-radius: 50%;
-              border: 1px solid black;
-              color: white;
-              width: 50px;
-              height: 50px;
-              margin: 5px;
-              padding: 5px;
-            }
-          </style>
-          <frc-boolean-box source-key="/Magazine/BallOne/value" class="with-styles" true-color="yellow" false-color="white" value>
-          </frc-boolean-box>
-          <frc-boolean-box source-key="/Magazine/BallTwo/value" class="with-styles" true-color="yellow" false-color="white" value>
-          </frc-boolean-box>
-          <frc-boolean-box  source-key="/Magazine/BallThree/value" class="with-styles" true-color="yellow" false-color="white" value>
-          </frc-boolean-box>
-        </div>
-      </div>
-      <br>
-      <br>
-      <div class="row bg-light">
-        <div class="col-sm-3">
-          <nt-number key="/Drivetrain/min" value="-2"></nt-number>
-          <nt-number key="/Drivetrain/max" value="2"></nt-number>
-          <frc-3-axis-accelerometer source-key="/Drivetrain" style="margin-left: 20px; margin-top: 40px; color: black;"></frc-3-axis-accelerometer>
-          <h4>Voltage</h4>
-          <nt-number key="/PDP/Voltage/min" value="10"></nt-number>
-          <nt-number key="/PDP/Voltage/max" value="13"></nt-number>
-          <frc-number-bar source-key="/PDP/Voltage" style="margin-left: 20px; color: black;"></frc-number-bar>
-        </div>
-        <div class="col-sm-4">
-          <nt-string key="/Shooter/title" value="Shooter RPM"></nt-string>
-          <nt-number key="/Shooter/minY" value="0"></nt-number>
-          <nt-number key="/Shooter/maxY" value="4000"></nt-number>
-          <nt-string key="/Shooter/xAxisLabel" value="Time"></nt-string>
-          <nt-string key="/Shooter/yAxisLabel" value="RPM"></nt-string>
-          <nt-string key="/Shooter/UpperRPM/label" value="Upper RPM"></nt-string>
-          <nt-string key="/Shooter/LowerRPM/label" value="Upper RPM"></nt-string>
-          <nt-string key="/Shooter/UpperRPM/color" value="green"></nt-string>
-          <nt-string key="/Shooter/LowerRPM/color" value="red"></nt-string>
-          <frc-line-chart
-          source-key="/Shooter">
-            <frc-chart-data source-key="/Shooter/UpperRPM"></frc-chart-data>
-            <frc-chart-data source-key="/Shooter/LowerRPM"></frc-chart-data>
-      </frc-line-chart></p>
-        </div>
-        <div class="col-sm-4">
-          <nt-string key="/Drivetrain/title" value="Velocity"></nt-string>
-          <nt-number key="/Drivetrain/minY" value="-10"></nt-number>
-          <nt-number key="/Drivetrain/maxY" value="10"></nt-number>
-          <nt-string key="/Drivetrain/xAxisLabel" value="Time"></nt-string>
-          <nt-string key="/Drivetrain/yAxisLabel" value="ft/s"></nt-string>
-          <nt-string key="/Drivetrain/VelLeft/label" value="Velocity Left"></nt-string>
-          <nt-string key="/Drivetrain/VelRight/label" value="Velocity Right"></nt-string>
-          <nt-string key="/Drivetrain/VelLeft/color" value="green"></nt-string>
-          <nt-string key="/Drivetrain/VelRight/color" value="red"></nt-string>
-          <frc-line-chart
-          source-key="/Drivetrain">
-            <frc-chart-data source-key="/Drivetrain/VelLeft"></frc-chart-data>
-            <frc-chart-data source-key="/Drivetrain/VelRight"></frc-chart-data>
-      </frc-line-chart></p>
-        </div>
-      </div>
-      <br>
-      <br>
     </div>
     <br>
     <div class="container-fluid" style="margin-top: 50px;">
@@ -224,9 +247,7 @@
         </div>
       </div>
     </div>
-    <frc-field game="Slalom Path" style="width: 800px">
-      <frc-field-robot unit="ft"></frc-field-robot>
-  </frc-field>  
+
   </frc-dashboard>
   <script src="./frc-web-components.js"></script>
   <script src="/networktables/networktables.js"></script>

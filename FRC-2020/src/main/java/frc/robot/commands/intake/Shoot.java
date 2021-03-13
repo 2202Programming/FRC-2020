@@ -15,7 +15,7 @@ public class Shoot extends CommandBase {
 
   // shooting controll constants
   final double BACKUPSEC = 0.1;     // secs to back up before shooting
-  final int AtGoalBeforeShoot = 0;
+  final int AtGoalBeforeShoot = 5;
   
   final Intake_Subsystem intake;
   final Magazine_Subsystem magazine;

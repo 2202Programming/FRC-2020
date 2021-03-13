@@ -65,7 +65,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final double Kleft = 1.0;
   final double Kright = -1.0;
   final boolean KInvertMotor = true; // convention required in robot characterization
-  final IdleMode KIdleMode = IdleMode.kCoast;
+  final IdleMode KIdleMode = IdleMode.kBrake;
   final double Kgyro = -1.0; // ccw is positive, just like geometry class
 
   private NetworkTable table;

@@ -14,7 +14,7 @@ import frc.robot.subsystems.Magazine_Subsystem;
 
 public class MagazineBeltAdjust extends CommandBase {
   private Magazine_Subsystem magazine;
-  private double strength = 0.6;
+  private double strength = 0.65;
   private int pulseCounts = -1;
   private int counts; // count down timer
   private boolean backwards;

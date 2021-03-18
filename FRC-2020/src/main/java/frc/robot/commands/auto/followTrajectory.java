@@ -27,8 +27,9 @@ public class followTrajectory extends CommandBase {
   long startTime;
 
   // Ramsete constants - todo wire to ux
-  double beta = .18; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft
-  double zeta = 0.8; //larger more damping 
+  double beta = 0.18; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft
+  //JR notes - 0.05, 0.1 look similar to 0.18.  2.0 is out of control
+  double zeta = 0.99; //larger more damping 0.99, 0.9, 0.8 look similar.  20 is crazy, so is 2
 
   Pose2d poseTolerance = new Pose2d(.1, .1, Rotation2d.fromDegrees(1.0));
 

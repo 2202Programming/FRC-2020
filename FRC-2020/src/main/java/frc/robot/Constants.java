@@ -144,7 +144,7 @@ public final class Constants {
 
         //chassis  
         public static final double WheelDiameter = 6.0; // inches, nominal
-        public static final double WheelAxleDistance = 26.75/12.0; // feet
+        public static final double WheelAxleDistance = 25.5/12.0; // feet 25.5 mid-wheel, 26.75 outer wheel
 
         //wheel wear compensation - adjust when distance is off by small amount
         public static final double WheelWearLeft = 0.99;   //[percent] of nominal
@@ -181,7 +181,8 @@ public final class Constants {
         // PIDS are in the SparkMax, PIDFControler is used to hold the values
         // for initializing the hardware. The PID object not run on RIO.
         public static final PIDFController pidValues =
-             new PIDFController(0.000155, 0.0, 0.0, 0.00016666); // P, I, D, FF
+             new PIDFController(0.000155, 0.0, 2.0, 0.00016666); // P, I, D, FF
+             //JR 3/17 settings 0.000155, 0.0, 0.0, 0.00016666
 
 
         // shifter settings
@@ -285,7 +286,7 @@ public final class Constants {
       // seconds - DPL not sure about how to convert to feet.
       public static final double kRamseteB = .35;
       public static final double kRamseteZeta = 0.9;
-      public static final double kTrackwidthFeet = 2.135; //2.08333;   // from char=1.4348; //updated2
+      //public static final double kTrackwidthFeet = 2.135; //2.08333;   // from char=1.4348; //updated2
 
       // Use the kinematics from the drivetrain, computed from RobotPhysical constants above
       // public static final DifferentialDriveKinematics kDriveKinematics =

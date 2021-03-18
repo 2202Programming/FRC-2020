@@ -29,6 +29,10 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  public Robot(){
+    super(0.01);
+  }
+
   //what command robot is running
   public static String command = "none";
 
@@ -45,6 +49,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     MonitoredSubsystemBase.resetAllStats();
+    m_robotContainer.limelight.disableLED();
   }
 
   @Override

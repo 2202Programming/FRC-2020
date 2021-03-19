@@ -8,10 +8,10 @@
 package frc.robot.commands.drive;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ifx.Odometry;
 
-public class ResetPosition extends InstantCommand {
+public class ResetPosition extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final Odometry m_subsystem;
   private final Pose2d m_pose;
@@ -30,5 +30,8 @@ public class ResetPosition extends InstantCommand {
     //m_subsystem.resetPosition();
     m_subsystem.resetOdometry(m_pose);
   }
+
+  @Override
+  public boolean runsWhenDisabled() { return true;}
 
 }

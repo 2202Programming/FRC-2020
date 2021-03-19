@@ -8,7 +8,6 @@ import static frc.robot.Constants.RobotPhysical.WheelWearRight;
 
 import java.util.function.Supplier;
 
-import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANPIDController.ArbFFUnits;
@@ -17,18 +16,14 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.ControlType;
 
-import edu.wpi.first.hal.can.CANJNI;
-import edu.wpi.first.hal.can.CANStatus;
 import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
@@ -68,25 +63,22 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final IdleMode KIdleMode = IdleMode.kBrake;
   final double Kgyro = -1.0; // ccw is positive, just like geometry class
 
+  public static class DriveSetPoints {
+    public double left;
+    public double right;
+  }
+
   private NetworkTable table;
   private NetworkTableEntry nt_velLeft;
   private NetworkTableEntry nt_velRight;
   private NetworkTableEntry nt_posLeft;
   private NetworkTableEntry nt_posRight;
-  private NetworkTableEntry nt_theta;
-  private NetworkTableEntry nt_accelX;
-  private NetworkTableEntry nt_accelY;
-  private NetworkTableEntry nt_accelZ;
+  
   private NetworkTableEntry nt_currentPoseX;
   private NetworkTableEntry nt_currentPoseY;
-  private NetworkTableEntry nt_currentPoseR;
+  private NetworkTableEntry nt_currentPoseYaw;
   private NetworkTableEntry nt_leftOutput;
   private NetworkTableEntry nt_rightOutput;
-  private NetworkTableEntry nt_canUtilization;
-  private NetworkTableEntry nt_canTxError;
-  private NetworkTableEntry nt_canRxError;
-  
-  private CANStatus canStatus = new CANStatus();
 
   //Field position
   Field2d m_field = new Field2d();
@@ -154,7 +146,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   // Save our commanded wheelspeeds and current speeds
   final DifferentialDriveWheelSpeeds m_commandedWheelSpeeds = new DifferentialDriveWheelSpeeds();
-  final DifferentialDriveWheelSpeeds m_currentWheelSpeeds = new DifferentialDriveWheelSpeeds();
+  final DifferentialDriveWheelSpeeds m_measuredWheelSpeeds = new DifferentialDriveWheelSpeeds();
 
   // measurements, taken in periodic(), robot coordinates
   double m_velLeft = 0.0; // fps, positive moves robot forward
@@ -162,16 +154,20 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   double m_posLeft = 0.0; // feet, positive is forward distance, since encoder reset
   double m_posRight = 0.0; // feet, positive is forward distance, since encoder reset
   Gear m_currentGear; // high/low
-  double m_theta; // heading
+  
   double m_voltleft; // save voltages that we send to motor
   double m_voltright;
   Supplier<Double> m_heading_compensator;
 
+  //setpoint
+  DriveSetPoints sp_rpm = new DriveSetPoints();
+
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
 
-  // The gyro sensor
-  private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
+
+  //nav sensors
+  Sensors_Subsystem nav;
 
   // Simulation - these classes help us simulate our drivetrain
   public DifferentialDrivetrainSim m_drivetrainSimulator;
@@ -185,6 +181,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // save scaling factors, they are required to use SparkMax in Vel mode
     gearbox = gear;
     requestedGear = gearbox.getCurrentGear();
+    
+    // get the nav sensor subsystem for odometry reporting
+    nav = RobotContainer.getInstance().sensors;
     setHeadingCompensator(null);
 
    //direct networktables logging
@@ -193,19 +192,12 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_velRight = table.getEntry("VelRight/value");
     nt_posLeft = table.getEntry("PosLeft");
     nt_posRight = table.getEntry("PosRight");
-    nt_theta = table.getEntry("Theta");
-    nt_accelX = table.getEntry("x");
-    nt_accelY = table.getEntry("y");
-    nt_accelZ = table.getEntry("z");
+    
     nt_currentPoseX = table.getEntry("CurrentX");
     nt_currentPoseY = table.getEntry("CurrentY");
-    nt_currentPoseR = table.getEntry("CurrentR");
+    nt_currentPoseYaw = table.getEntry("CurrentYaw");
     nt_rightOutput = table.getEntry("Right Motor Speed");
     nt_leftOutput = table.getEntry("Left Motor Speed");
-    nt_canUtilization = table.getEntry("CanUtilization");
-    nt_canRxError = table.getEntry("CanRxError");
-    nt_canTxError = table.getEntry("CanTxError");
-    
 
     SmartDashboard.putData("Field", m_field);
 
@@ -223,27 +215,13 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     dDrive = new DifferentialDrive(leftController, rightController);
     dDrive.setSafetyEnabled(DriveTrain.safetyEnabled);
 
-    // this may cause a 1-2 second delay - robot can't move during period
-    m_gyro.enableBoardlevelYawReset(true);
-    m_gyro.calibrate();
-    while (m_gyro.isCalibrating()) { // wait to zero yaw if calibration is still running
-      try {
-        Thread.sleep(250);
-        System.out.println("calibrating gyro");
-      } catch (InterruptedException e) {
-        /* do nothing */ }
-    }
-    System.out.println("Pre-Zero yaw:" + m_gyro.getYaw());
-    m_gyro.reset(); // should zero yaw but not working.
-    System.out.println("Post-Zero yaw:" + m_gyro.getYaw());
-
     // init simulation iff needed
     if (RobotBase.isSimulation())
       setupSimulation();
 
     // clear our starting position.
     resetPosition();
-    m_odometry = new DifferentialDriveOdometry(readGyro());
+    m_odometry = new DifferentialDriveOdometry(nav.getRotation2d() );
     savedPose = m_odometry.getPoseMeters(); //set savedPose to starting position initally
   }
 
@@ -303,7 +281,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   @Override
   public void monitored_periodic() {
     m_currentGear = gearbox.getCurrentGear();
-    m_theta = Kgyro * m_gyro.getYaw();
     double kGR = gearbox.getGearRatio();
     
     /**
@@ -324,11 +301,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     m_velLeft = (Kleft * K_ft_per_rev * WheelWearLeft * kGR / 60.0) * leftEncoder.getVelocity();
     m_velRight = (Kright * K_ft_per_rev * WheelWearRight * kGR / 60.0) * rightEncoder.getVelocity();
 
-    m_currentWheelSpeeds.leftMetersPerSecond = m_velLeft;
-    m_currentWheelSpeeds.rightMetersPerSecond = m_velRight;
+    m_measuredWheelSpeeds.leftMetersPerSecond = m_velLeft;
+    m_measuredWheelSpeeds.rightMetersPerSecond = m_velRight;
 
     // Update the odometry in the periodic block, physical units, update field
-    m_odometry.update(readGyro(), m_posLeft, m_posRight);
+    m_odometry.update(nav.getRotation2d(), m_posLeft, m_posRight);
     m_field.setRobotPose(m_odometry.getPoseMeters());
   }
 
@@ -457,7 +434,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     double vr_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ); // turn left, +CCW, speeds right wheel
 
     // issue all commands to the hardware
-    output(vl_rpm, vr_rpm, coastMode);
+    output(vl_rpm, vr_rpm, coastMode, kGR);
   }
 
   /**
@@ -471,10 +448,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @param velRight [length/s] positive movee forward
    */
   public void velocityTankDrive(double velLeft, double velRight) {
-    // save commanded speeds
-    m_commandedWheelSpeeds.leftMetersPerSecond = velLeft;         // not meters, we use ft/s
-    m_commandedWheelSpeeds.rightMetersPerSecond = velRight;
-
     // Spark Max uses RPM for velocity closed loop mode
     // so we need to convert ft/s to RPM command which is dependent
     // on the gear ratio.
@@ -487,7 +460,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     double rpm_l = kGR * (velLeft - vturn_rpm);  
     double rpm_r = kGR * (velRight + vturn_rpm); 
     // scale to rpm and ouput to contollers, no coast mode
-    output(rpm_l, rpm_r, false);
+    output(rpm_l, rpm_r, false, kGR);
   }
 
   /**
@@ -514,8 +487,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @param l_rpm     positive left side moves forward
    * @param r_rpm     positive right side moves forward
    * @param coastMode zero output, no breaks, let it roll
+   * @param kGR       gearRatio [mo-rpm / ft/s]
    */
-  private void output(double l_rpm, double r_rpm, boolean coastMode) {
+  private void output(double l_rpm, double r_rpm, boolean coastMode, double kGR) {
     if (coastMode) {
       // command doesn't need power, ok to coast, use PWM to zero power
       // with the controller setup to coast mode by default.
@@ -524,8 +498,15 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     } else {
       // command the velocity to the wheels, correct for wheelwear
       // also correct for any left/right motor conventions
-      setReference(l_rpm * (Kleft / WheelWearLeft), leftPID);
-      setReference(r_rpm * (Kright / WheelWearRight), rightPID);
+      sp_rpm.left =  l_rpm * (Kleft / WheelWearLeft);
+      sp_rpm.right = r_rpm * (Kright / WheelWearRight);
+
+      //save commanded wheel speeds
+      m_commandedWheelSpeeds.leftMetersPerSecond = sp_rpm.left/kGR;         // not meters, we use ft/s
+      m_commandedWheelSpeeds.rightMetersPerSecond = sp_rpm.right/kGR;
+
+      setReference(sp_rpm.left, leftPID);
+      setReference(sp_rpm.right, rightPID);
     }
 
     shiftGears();
@@ -571,6 +552,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   public double getAvgVelocity(final boolean normalized) {
     double vel = 0.5*(m_velLeft + m_velRight);
     return (normalized) ? (vel/maxFPS_High) : vel;
+  }
+
+  public DriveSetPoints getVelocitySetpoints() {
+    return sp_rpm;
   }
 
   public void resetPosition() {
@@ -632,23 +617,19 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
      * gearbox.getCurrentGear().toString());
      */
 
-    CANJNI.GetCANStatus(canStatus);
+    // encoder vel and positions
     nt_velLeft.setDouble(m_velLeft);
     nt_velRight.setDouble(m_velRight);
     nt_posLeft.setDouble(m_posLeft);
     nt_posRight.setDouble(m_posRight);
-    nt_theta.setDouble(m_theta);
-    nt_accelX.setDouble(m_gyro.getWorldLinearAccelX());
-    nt_accelY.setDouble(m_gyro.getWorldLinearAccelY());
-    nt_accelZ.setDouble(m_gyro.getWorldLinearAccelZ());
+    // pose
     nt_currentPoseX.setDouble(m_odometry.getPoseMeters().getX());
     nt_currentPoseY.setDouble(m_odometry.getPoseMeters().getY());
-    nt_currentPoseR.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());
+    nt_currentPoseYaw.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());
+    
+    // motor outputs
     nt_leftOutput.setDouble(backLeft.getAppliedOutput());
     nt_rightOutput.setDouble(backRight.getAppliedOutput());
-    nt_canUtilization.setDouble(canStatus.percentBusUtilization);
-    nt_canRxError.setNumber(canStatus.receiveErrorCount);
-    nt_canTxError.setNumber(canStatus.transmitErrorCount);
   }
 
   /**
@@ -685,8 +666,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     layout.addNumber("DT/Vel/right", () -> m_velRight);
     layout.addNumber("DT/pos/left", () -> m_posLeft);
     layout.addNumber("DT/pos/right", () -> m_posRight);
-    layout.addNumber("DT/pos/theta", () -> m_theta);
-    layout.addNumber("DT/HeadingDot", () -> getTurnRate());
+
     layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
     layout.addNumber("DT/POSE/X", () -> getPose().getX());
     layout.addNumber("DT/POSE/Y", () -> getPose().getY());
@@ -728,7 +708,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return The current wheel speeds.
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return m_currentWheelSpeeds; 
+    return m_measuredWheelSpeeds; 
     //was new DifferentialDriveWheelSpeeds(m_velLeft, m_velRight);
   }
 
@@ -753,14 +733,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   public Pose2d getSavedPose(){
-    System.out.println("Saved X:" + savedPose.getX());
-    System.out.println("Saved Y:" + savedPose.getY());
+    //System.out.println("Saved X:" + savedPose.getX());
+    //System.out.println("Saved Y:" + savedPose.getY());
     return savedPose;
-  }
-
-  // Need to use getYaw to get -180 to 180 as expected.
-  Rotation2d readGyro() {
-    return Rotation2d.fromDegrees(m_theta);
   }
 
   /**
@@ -771,17 +746,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    */
   public void resetOdometry(Pose2d pose) {
     resetPosition();
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d()); // has a -1 in the interface for they gyro
-  }
-
-  /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   */
-  public double getTurnRate() {
-    double heading = Kgyro * m_gyro.getRate();
-    return heading;
+    nav.reset();
+    m_odometry.resetPosition(pose, nav.getRotation2d()); 
   }
 
   void setupSimulation() {
@@ -804,7 +770,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // The encoder and gyro angle sims let us set simulated sensor readings
     m_leftEncoderSim = new EncoderSim2(leftController);
     m_rightEncoderSim = new EncoderSim2(rightController);
-    m_gyroSim = new AHRS_GyroSim(m_gyro);
   }
 
   @Override

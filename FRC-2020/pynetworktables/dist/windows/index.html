@@ -126,7 +126,8 @@
         <div class="row">
           <div class="col-sm-6 bg-light">
             <frc-differential-drivebase source-key="/Drivetrain" style="margin-top: 20px;"></frc-differential-drivebase>
-            <frc-gyro source-key="/Drivetrain/Theta" precision="2" style="margin-bottom: 20px;"></frc-gyro>
+            <frc-gyro source-key="/Sensors/yaw0" precision="2" style="margin-bottom: 20px;"></frc-gyro>
+            <frc-gyro source-key="/Sensors/yaw1" precision="2" style="margin-bottom: 20px;"></frc-gyro>
           </div>
           <div class="col-sm-3">
             <div>
@@ -135,12 +136,14 @@
               <p>Odometer right: <frc-number-label source-key="/Drivetrain/PosRight"></frc-number-label></p>
               <p>Velocity left: <frc-number-label source-key="/Drivetrain/VelLeft/value"></frc-number-label></p>
               <p>Velocity right: <frc-number-label source-key="/Drivetrain/VelRight/value"></frc-number-label></p>
-              <p>Current Position X: <frc-number-label source-key="/Drivetrain/currentX"></frc-number-label></p>
-              <p>Current Position Y: <frc-number-label source-key="/Drivetrain/currentY"></frc-number-label></p>
-              <p>Current Position Rot: <frc-number-label source-key="/Drivetrain/currentR"></frc-number-label></p>
+              <p>Current Position X: <frc-number-label source-key="/Drivetrain/CurrentX"></frc-number-label></p>
+              <p>Current Position Y: <frc-number-label source-key="/Drivetrain/CurrentY"></frc-number-label></p>
+              <p>Current Position Rot: <frc-number-label source-key="/Drivetrain/CurrentYaw"></frc-number-label></p>
+ <!-- 
               <p>Saved Position X: <frc-number-label source-key="/Drivetrain/savedX"></frc-number-label></p>
               <p>Saved Position Y: <frc-number-label source-key="/Drivetrain/savedY"></frc-number-label></p>
               <p>Saved Position Rot: <frc-number-label source-key="/Drivetrain/savedR"></frc-number-label></p>
+  -->          
             </div>
           </div>
           <div class="col-sm-3">
@@ -191,11 +194,10 @@
             <nt-string key="/Shooter/LowerRPM/label" value="Upper RPM"></nt-string>
             <nt-string key="/Shooter/UpperRPM/color" value="green"></nt-string>
             <nt-string key="/Shooter/LowerRPM/color" value="red"></nt-string>
-            <frc-line-chart
-            source-key="/Shooter">
+            <frc-line-chart source-key="/Shooter">
               <frc-chart-data source-key="/Shooter/UpperRPM"></frc-chart-data>
               <frc-chart-data source-key="/Shooter/LowerRPM"></frc-chart-data>
-        </frc-line-chart></p>
+            </frc-line-chart></p>
           </div>
           <div class="col-sm-4">
             <nt-string key="/Drivetrain/title" value="Velocity"></nt-string>
@@ -208,18 +210,18 @@
             <nt-string key="/Drivetrain/VelLeft/color" value="green"></nt-string>
             <nt-string key="/Drivetrain/VelRight/color" value="red"></nt-string>
             <frc-line-chart
-            source-key="/Drivetrain">
+              source-key="/Drivetrain">
               <frc-chart-data source-key="/Drivetrain/VelLeft"></frc-chart-data>
               <frc-chart-data source-key="/Drivetrain/VelRight"></frc-chart-data>
-        </frc-line-chart></p>
+            </frc-line-chart></p>
           </div>
         </div>
         <div class="row">   
           <div class="col-sm-3">
-            <h4>CAN</h4>
-            <p>CAN Utilization: <frc-number-label source-key="/Drivetrain/CanUtilization"></frc-number-label></p>
-            <p>CAN Tx Errors: <frc-number-label source-key="/Drivetrain/CanTxError"></frc-number-label></p>
-            <p>CAN Rx Errors: <frc-number-label source-key="/Drivetrain/CanRxError"></frc-number-label></p>
+            <h4>CAN Bus</h4>
+            <p>CAN Utilization: <frc-number-label source-key="/Sensors/CanUtilization"></frc-number-label></p>
+            <p>CAN Tx Errors: <frc-number-label source-key="/Sensors/CanTxError"></frc-number-label></p>
+            <p>CAN Rx Errors: <frc-number-label source-key="/Sensors/CanRxError"></frc-number-label></p>
          </div>
         </div>
       </div>

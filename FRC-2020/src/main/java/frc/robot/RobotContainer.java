@@ -52,6 +52,7 @@ import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Log_Subsystem;
 import frc.robot.subsystems.Magazine_Subsystem;
 import frc.robot.subsystems.Pdp_subsystem;
+import frc.robot.subsystems.Sensors_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.subsystems.hid.HID_Xbox_Subsystem;
 import frc.robot.subsystems.hid.SideboardController.SBButton;
@@ -80,6 +81,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   // public final CameraSubsystem cameraSubsystem;
   public final HID_Xbox_Subsystem driverControls;
+  public final Sensors_Subsystem sensors;
   public final GearShifter gearShifter;
   public final VelocityDifferentialDrive_Subsystem driveTrain;
   public final Intake_Subsystem intake;
@@ -97,7 +99,9 @@ public class RobotContainer {
    */
   public RobotContainer() {
     RobotContainer.instance = this;
-    // put driver controls first so its periodic() is called first.
+    
+    //order based on desired periodic() calls
+    sensors = new Sensors_Subsystem();
     driverControls = new HID_Xbox_Subsystem(DriverPrefs.VelExpo, DriverPrefs.RotationExpo, DriverPrefs.StickDeadzone); 
     gearShifter = new GearShifter();
     driveTrain = new VelocityDifferentialDrive_Subsystem(gearShifter); 

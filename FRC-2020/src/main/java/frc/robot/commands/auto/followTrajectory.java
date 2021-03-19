@@ -1,10 +1,15 @@
 package frc.robot.commands.auto;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.EntryNotification;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -15,6 +20,12 @@ public class followTrajectory extends CommandBase {
 
   static Trajectory s_currentTrajectory;
   static long s_startTime;
+  static boolean closedLoop = true;
+  static NetworkTableEntry nt_closedLoop=null;
+  
+  static {
+    initSmartDashboard();
+  }
 
   final VelocityDrive drive;
   SendableChooser<Trajectory> chooser = null;
@@ -74,6 +85,8 @@ public class followTrajectory extends CommandBase {
           drive::velocityTankDrive // vel output
       /* no further requirements */);
 
+      rsController.setEnabled(followTrajectory.closedLoop);
+
       // initize ramsete
       ramsete.initialize();
       startTime = RobotController.getFPGATime(); 
@@ -109,4 +122,18 @@ public class followTrajectory extends CommandBase {
   // for logging in PositionRecorder
   public static long getStartTime() {return s_startTime; }
   public static Trajectory getCurrentTrajectory() { return s_currentTrajectory;}
+
+  public static void setClosedLoop(boolean cl) {
+    closedLoop = cl;
+  }
+
+  static void initSmartDashboard() {
+    if (nt_closedLoop != null) return;
+    ShuffleboardTab tab = Shuffleboard.getTab("Position Recorder");
+    nt_closedLoop = tab.add("ClosedLoop Traj", closedLoop).withWidget("Toggle Button").getEntry();
+    nt_closedLoop.addListener((EntryNotification e)-> setClosedLoop(e.value.getBoolean()), EntryListenerFlags.kUpdate|EntryListenerFlags.kNew);
+  }
+
+
+
 }

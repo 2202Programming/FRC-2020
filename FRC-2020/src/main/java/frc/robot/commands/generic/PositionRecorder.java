@@ -12,13 +12,13 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.subsystems.ifx.Odometry;
-
 
 public class PositionRecorder extends CommandBase {
   /**
@@ -39,11 +39,18 @@ public class PositionRecorder extends CommandBase {
 
   NetworkTableEntry directoryNameEntry;
   NetworkTableEntry isRunningEntry;
-  
+  final DifferentialDriveWheelSpeeds m_cmd_wheels;
+  final DifferentialDriveWheelSpeeds m_meas_wheels;
+
+
   public PositionRecorder(Odometry drivetrain) {
     // Use addRequirements() here to declare subsystem dependencies.
     initSmartDashboard();
     this.drivetrain = drivetrain;
+
+    // get structs for wheel speeds
+    m_cmd_wheels = drivetrain.getCommandedWheelSpeeds();
+    m_meas_wheels = drivetrain.getWheelSpeeds();
   }
   
   public void initSmartDashboard(){
@@ -84,7 +91,7 @@ public class PositionRecorder extends CommandBase {
       File f = new File(workingDir, filename);
       f.createNewFile();
       writer = new PrintWriter(f); // PrintWriter is buffered
-      writer.println("elapsed-uS, x, y, rotation, traj-time, traj-x, traj-y, traj-rot");
+      writer.println("elapsed-uS, x, y, rotation,  meas-left, meas-right, cmd-left, cmd-right, traj-time, traj-x, traj-y, traj-rot,");
 
       start= RobotController.getFPGATime(); 
 
@@ -105,7 +112,12 @@ public class PositionRecorder extends CommandBase {
       writer.print((now - start)/1000000.0 + ","
           +currentPosition.getX() + ","
           +currentPosition.getY() + ","
-          +currentPosition.getRotation().getRadians());
+          +currentPosition.getRotation().getDegrees() + ","
+          + m_meas_wheels.leftMetersPerSecond + ","
+          + m_meas_wheels.rightMetersPerSecond + ","
+          + m_cmd_wheels.leftMetersPerSecond + ","
+          + m_cmd_wheels.rightMetersPerSecond
+      );
 
       // log any trajectory we may be running
       Trajectory traj = followTrajectory.getCurrentTrajectory();
@@ -116,7 +128,7 @@ public class PositionRecorder extends CommandBase {
         writer.println("," + traj_time + ","
           +traj_pose.getX()+","
           +traj_pose.getY()+","
-          +traj_pose.getRotation().getRadians() );
+          +traj_pose.getRotation().getDegrees() );
       }
       else {
         // nothing running - zeros

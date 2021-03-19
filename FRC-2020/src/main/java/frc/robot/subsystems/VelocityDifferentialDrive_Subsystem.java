@@ -146,11 +146,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   // Save our commanded wheelspeeds and current speeds
   final DifferentialDriveWheelSpeeds m_commandedWheelSpeeds = new DifferentialDriveWheelSpeeds();
-  final DifferentialDriveWheelSpeeds m_measuredWheelSpeeds = new DifferentialDriveWheelSpeeds();
-
+  
   // measurements, taken in periodic(), robot coordinates
-  double m_velLeft = 0.0; // fps, positive moves robot forward
-  double m_velRight = 0.0; // fps, positive moves robot forward
+  final DifferentialDriveWheelSpeeds m_wheelSpeeds = new DifferentialDriveWheelSpeeds();
   double m_posLeft = 0.0; // feet, positive is forward distance, since encoder reset
   double m_posRight = 0.0; // feet, positive is forward distance, since encoder reset
   Gear m_currentGear; // high/low
@@ -298,11 +296,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
      * encoder.getVelocity() - motor turn in RPM ; rps = rpm/60
      *
      **/
-    m_velLeft = (Kleft * K_ft_per_rev * WheelWearLeft * kGR / 60.0) * leftEncoder.getVelocity();
-    m_velRight = (Kright * K_ft_per_rev * WheelWearRight * kGR / 60.0) * rightEncoder.getVelocity();
-
-    m_measuredWheelSpeeds.leftMetersPerSecond = m_velLeft;
-    m_measuredWheelSpeeds.rightMetersPerSecond = m_velRight;
+    m_wheelSpeeds.leftMetersPerSecond = (Kleft * K_ft_per_rev * WheelWearLeft * kGR / 60.0) * leftEncoder.getVelocity();
+    m_wheelSpeeds.rightMetersPerSecond = (Kright * K_ft_per_rev * WheelWearRight * kGR / 60.0) * rightEncoder.getVelocity();
 
     // Update the odometry in the periodic block, physical units, update field
     m_odometry.update(nav.getRotation2d(), m_posLeft, m_posRight);
@@ -320,8 +315,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    */
   public double adjustFeedForward(final double deltaFF) {
     arbFeedFwd = MathUtil.limit((arbFeedFwd + deltaFF), 0.0, ARBIT_FEEDFWD_MAX_VOLT);
-
-    //SmartDashboard.putNumber("/DT/limits/arbFF", arbFeedFwd);
     return arbFeedFwd;
   }
 
@@ -341,8 +334,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // Use same rate limit on closed loop too
     leftController.setClosedLoopRampRate(slewRateLimit);
     rightController.setClosedLoopRampRate(slewRateLimit);
-
-    //SmartDashboard.putNumber("/DT/limits/slewRate", slewRateLimit);
     return slewRateLimit;
   }
 
@@ -355,13 +346,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    */
   public int adjustCurrentLimit(final int deltaCurrent) {
     smartCurrentLimit = MathUtil.limit(smartCurrentLimit + deltaCurrent, 0, DriveTrain.smartCurrentMax);
-    // final double secondaryCurrent = smartCurrentLimit * KSecondaryCurrent;
-
     for (final CANSparkMax c : controllers) {
       // smart current limit
       c.setSmartCurrentLimit(smartCurrentLimit);
     }
-    //SmartDashboard.putNumber("DT/limits/smart_I", smartCurrentLimit);
     return smartCurrentLimit;
   }
 
@@ -542,15 +530,18 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   public double getLeftVel(final boolean normalized) {
-    return (normalized) ? (m_velLeft/ maxFPS_High) : m_velLeft;
+    return (normalized) ? (m_wheelSpeeds.leftMetersPerSecond / maxFPS_High) :
+                           m_wheelSpeeds.leftMetersPerSecond;
   }
 
   public double getRightVel(final boolean normalized) {
-    return (normalized) ? (m_velRight / maxFPS_High) : m_velRight;
+    return (normalized) ? (m_wheelSpeeds.rightMetersPerSecond / maxFPS_High) :
+                          m_wheelSpeeds.rightMetersPerSecond;
   }
 
   public double getAvgVelocity(final boolean normalized) {
-    double vel = 0.5*(m_velLeft + m_velRight);
+    double vel = 0.5*(m_wheelSpeeds.leftMetersPerSecond + 
+                      m_wheelSpeeds.rightMetersPerSecond);
     return (normalized) ? (vel/maxFPS_High) : vel;
   }
 
@@ -618,8 +609,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
      */
 
     // encoder vel and positions
-    nt_velLeft.setDouble(m_velLeft);
-    nt_velRight.setDouble(m_velRight);
+    nt_velLeft.setDouble(m_wheelSpeeds.leftMetersPerSecond);   //ft/s
+    nt_velRight.setDouble(m_wheelSpeeds.rightMetersPerSecond); //ft/s
     nt_posLeft.setDouble(m_posLeft);
     nt_posRight.setDouble(m_posRight);
     // pose
@@ -628,8 +619,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_currentPoseYaw.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());
     
     // motor outputs
-    nt_leftOutput.setDouble(backLeft.getAppliedOutput());
-    nt_rightOutput.setDouble(backRight.getAppliedOutput());
+    nt_leftOutput.setDouble(leftController.getAppliedOutput());
+    nt_rightOutput.setDouble(rightController.getAppliedOutput());
   }
 
   /**
@@ -708,8 +699,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return The current wheel speeds.
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return m_measuredWheelSpeeds; 
-    //was new DifferentialDriveWheelSpeeds(m_velLeft, m_velRight);
+    return m_wheelSpeeds; 
   }
 
   public DifferentialDriveWheelSpeeds getCommandedWheelSpeeds() {
@@ -789,7 +779,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
     m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
-    m_gyroSim.setAngle(-m_drivetrainSimulator.getHeading().getDegrees());
   }
 
   /**

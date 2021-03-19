@@ -126,8 +126,8 @@
         <div class="row">
           <div class="col-sm-6 bg-light">
             <frc-differential-drivebase source-key="/Drivetrain" style="margin-top: 20px;"></frc-differential-drivebase>
-            <frc-gyro source-key="/Sensors/yaw0" precision="2" style="margin-bottom: 20px;"></frc-gyro>
-            <frc-gyro source-key="/Sensors/yaw1" precision="2" style="margin-bottom: 20px;"></frc-gyro>
+            <frc-gyro source-key="/Sensors/yaw_navx" precision="2" style="margin-bottom: 20px;"></frc-gyro>
+            <frc-gyro source-key="/Sensors/yaw_xrs450" precision="2" style="margin-bottom: 20px;"></frc-gyro>
           </div>
           <div class="col-sm-3">
             <div>
@@ -185,6 +185,7 @@
             <frc-number-bar source-key="/PDP/Voltage" style="margin-left: 20px; color: black;"></frc-number-bar>
           </div>
           <div class="col-sm-4">
+            <h5>Shooter</h5>
             <nt-string key="/Shooter/title" value="Shooter RPM"></nt-string>
             <nt-number key="/Shooter/minY" value="0"></nt-number>
             <nt-number key="/Shooter/maxY" value="4000"></nt-number>
@@ -197,9 +198,10 @@
             <frc-line-chart source-key="/Shooter">
               <frc-chart-data source-key="/Shooter/UpperRPM"></frc-chart-data>
               <frc-chart-data source-key="/Shooter/LowerRPM"></frc-chart-data>
-            </frc-line-chart></p>
+            </frc-line-chart><p/>
           </div>
           <div class="col-sm-4">
+            <h5>Velocity</h5>
             <nt-string key="/Drivetrain/title" value="Velocity"></nt-string>
             <nt-number key="/Drivetrain/minY" value="-10"></nt-number>
             <nt-number key="/Drivetrain/maxY" value="10"></nt-number>
@@ -213,7 +215,7 @@
               source-key="/Drivetrain">
               <frc-chart-data source-key="/Drivetrain/VelLeft"></frc-chart-data>
               <frc-chart-data source-key="/Drivetrain/VelRight"></frc-chart-data>
-            </frc-line-chart></p>
+            </frc-line-chart>
           </div>
         </div>
         <div class="row">   

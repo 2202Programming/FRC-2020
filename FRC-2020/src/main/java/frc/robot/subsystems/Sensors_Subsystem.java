@@ -46,10 +46,10 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
   private NetworkTableEntry nt_accelX;
   private NetworkTableEntry nt_accelY;
   private NetworkTableEntry nt_accelZ;
-  private NetworkTableEntry nt_yaw0;
-  private NetworkTableEntry nt_yaw0_dot;
-  private NetworkTableEntry nt_yaw1;
-  private NetworkTableEntry nt_yaw1_dot;
+  private NetworkTableEntry nt_yaw_navx;
+  private NetworkTableEntry nt_yaw_navx_dot;
+  private NetworkTableEntry nt_yaw_xrs450;
+  private NetworkTableEntry nt_yaw_xrs450_dot;
   private NetworkTableEntry nt_yaw_blend;
 
   private NetworkTableEntry nt_canUtilization;
@@ -70,10 +70,10 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
   AHRS_GyroSim m_gyroSim;
 
   //measured values
-  double m_yaw0;
-  double m_yaw0_d;
-  double m_yaw1; 
-  double m_yaw1_d;
+  double m_yaw_navx;
+  double m_yaw_navx_d;
+  double m_yaw_xrs450; 
+  double m_yaw_xrs450_d;
   double m_yaw_blend;
 
   // configurion setting
@@ -94,10 +94,10 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
     nt_accelY = table.getEntry("y_dd");
     nt_accelZ = table.getEntry("z_dd");
     
-    nt_yaw0 = table.getEntry("yaw0");
-    nt_yaw0_dot = table.getEntry("yaw0_d");
-    nt_yaw1 = table.getEntry("yaw1");
-    nt_yaw1_dot = table.getEntry("yaw1_d");
+    nt_yaw_navx = table.getEntry("yaw_navx");
+    nt_yaw_navx_dot = table.getEntry("yaw_navx_d");
+    nt_yaw_xrs450 = table.getEntry("yaw_xrs450");
+    nt_yaw_xrs450_dot = table.getEntry("yaw_xrs450_d");
     nt_yaw_blend = table.getEntry("yaw_blend");
 
     nt_canUtilization = table.getEntry("CanUtilization");
@@ -139,14 +139,14 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
   @Override
   public void monitored_periodic() {
     // This method will be called once per scheduler run
-    m_yaw0 = m_ahrs.getYaw();
-    m_yaw0_d = m_ahrs.getRate();
+    m_yaw_navx = m_ahrs.getYaw();
+    m_yaw_navx_d = m_ahrs.getRate();
 
-    m_yaw1 = m_gyro450.getAngle();
-    m_yaw1_d = m_gyro450.getRate();
+    m_yaw_xrs450 = m_gyro450.getAngle();
+    m_yaw_xrs450_d = m_gyro450.getRate();
 
     // simple average, but could become weighted estimator.
-    m_yaw_blend = 0.5*(m_yaw0 + m_yaw1);
+    m_yaw_blend = 0.5*(m_yaw_navx + m_yaw_xrs450);
 
     log();
   }
@@ -166,11 +166,11 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
     nt_accelY.setDouble(m_ahrs.getWorldLinearAccelY());
     nt_accelZ.setDouble(m_ahrs.getWorldLinearAccelZ());
 
-    nt_yaw0.setDouble(m_yaw0);
-    nt_yaw0_dot.setDouble(m_yaw0_d);
+    nt_yaw_navx.setDouble(m_yaw_navx);
+    nt_yaw_navx_dot.setDouble(m_yaw_navx_d);
 
-    nt_yaw1.setDouble(m_yaw1);
-    nt_yaw1_dot.setDouble(m_yaw1_d);
+    nt_yaw_xrs450.setDouble(m_yaw_xrs450);
+    nt_yaw_xrs450_dot.setDouble(m_yaw_xrs450_d);
 
     nt_yaw_blend.setDouble(m_yaw_blend);
 
@@ -194,10 +194,10 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
   public double getYaw() {
     switch (c_yaw_type) {
       case kNavX:
-        return m_yaw0;
+        return m_yaw_navx;
 
       case kADXRS450:
-        return m_yaw1;
+        return m_yaw_xrs450;
 
       case kBlended:
       default:
@@ -246,14 +246,14 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
   public double getRate() {
     switch (c_yaw_type) {
       case kNavX:
-        return m_yaw0_d;
+        return m_yaw_navx_d;
 
       case kADXRS450:
-        return m_yaw1_d;
+        return m_yaw_xrs450_d;
 
       case kBlended:
       default:
-        return 0.5*( m_yaw0_d +  m_yaw1_d);
+        return 0.5*( m_yaw_navx_d +  m_yaw_xrs450_d);
     }
   }
 

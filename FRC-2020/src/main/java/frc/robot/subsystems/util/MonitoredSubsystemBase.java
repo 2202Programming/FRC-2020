@@ -26,7 +26,7 @@ public abstract class MonitoredSubsystemBase extends SubsystemBase {
    public MonitoredSubsystemBase() {
     super();
     s_map.put(getName(), this);
-    reset();
+    resetStats();
   }
 
   public abstract void monitored_periodic();
@@ -49,7 +49,7 @@ public abstract class MonitoredSubsystemBase extends SubsystemBase {
     max = Math.max(max, time);
   }
 
-  public void reset() {
+  void resetStats() {
     count = max = total = 0L;
     min = 999999999L;
   }
@@ -87,7 +87,7 @@ public abstract class MonitoredSubsystemBase extends SubsystemBase {
 
   public static void resetAllStats() {
     for (String k : s_map.keySet()) { 
-     s_map.get(k).reset();
+     s_map.get(k).resetStats();
     }
     s_resetTime = RobotController.getFPGATime();
   }

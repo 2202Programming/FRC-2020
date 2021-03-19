@@ -56,7 +56,7 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
   private NetworkTableEntry nt_canTxError;
   private NetworkTableEntry nt_canRxError;
 
-  static final byte update_hz = 50;
+  static final byte update_hz = 100;
   // Sensors
   AHRS m_ahrs;
   Gyro m_gyro_ahrs;
@@ -87,6 +87,7 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
     // create devices and interface access, use interface where possible
     m_gyro = m_gyro450 = new ADXRS450_Gyro(SPI.Port.kOnboardCS0); 
     m_gyro_ahrs = m_ahrs = new AHRS(SPI.Port.kMXP, update_hz);
+    m_ahrs.enableLogging(true);
 
     // setup network table
     table = NetworkTableInstance.getDefault().getTable("Sensors");

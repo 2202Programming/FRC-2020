@@ -41,7 +41,6 @@ import frc.robot.Constants.DriveTrain;
 import frc.robot.Constants.RamseteProfile;
 import frc.robot.Constants.RobotPhysical;
 import frc.robot.RobotContainer;
-import frc.robot.sim.AHRS_GyroSim;
 import frc.robot.sim.EncoderSim2;
 import frc.robot.subsystems.ifx.DashboardUpdate;
 import frc.robot.subsystems.ifx.DualDrive;
@@ -155,7 +154,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   
   double m_voltleft; // save voltages that we send to motor
   double m_voltright;
-  Supplier<Double> m_heading_compensator;
+  Supplier<Double> m_heading_compensator;  //radians/s 
 
   //setpoint
   DriveSetPoints sp_rpm = new DriveSetPoints();
@@ -171,9 +170,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   public DifferentialDrivetrainSim m_drivetrainSimulator;
   private EncoderSim2 m_leftEncoderSim;
   private EncoderSim2 m_rightEncoderSim;
-
-  // The Field2d class shows the field in the sim GUI
-  private AHRS_GyroSim m_gyroSim;
 
   public VelocityDifferentialDrive_Subsystem(final Shifter gear) {
     // save scaling factors, they are required to use SparkMax in Vel mode

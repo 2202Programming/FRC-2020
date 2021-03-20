@@ -1,5 +1,5 @@
 
-h1, h2, h3, h4, h5, p, a, label, input, img, iframe{
+h1, h2, h3, h4, h5, p, a, label, input, iframe{
     margin-left: 15px;
   }
   input, label { 
@@ -31,8 +31,9 @@ fieldset.scheduler-border {
       padding:0 10px;
       border-bottom:none;
   }
+
   nav .navbar-nav li a{
-    color: #4c4444 !important;
+    color: white !important;
   }
   nav .navbar-nav li a:hover{
     color: #FF7100 !important;
@@ -194,4 +195,13 @@ background-repeat: no-repeat;
 -moz-background-size: cover;
 -o-background-size: cover;
 background-size: cover;
+}
+
+.static {
+  position:absolute;
+  background: white;
+}
+
+.static:hover {
+  opacity:0;
 }

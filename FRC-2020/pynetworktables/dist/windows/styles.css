@@ -205,3 +205,7 @@ background-size: cover;
 .static:hover {
   opacity:0;
 }
+
+.relative {
+  position: relative;
+}

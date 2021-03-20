@@ -178,8 +178,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   //list of positions for recording path
   public List<Translation2d> PositionList = new ArrayList<Translation2d>();
   private boolean recordPositionOn = false;
-  private Pose2d recordingPoseStart;
-  private Pose2d recordingPoseEnd;
+  public Pose2d recordingPoseStart;
+  public Pose2d recordingPoseEnd;
 
   public VelocityDifferentialDrive_Subsystem(final Shifter gear) {
     // save scaling factors, they are required to use SparkMax in Vel mode

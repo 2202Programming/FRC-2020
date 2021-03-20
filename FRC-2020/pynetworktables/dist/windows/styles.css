@@ -206,6 +206,6 @@ background-size: cover;
   opacity:0;
 }
 
-.relative {
-  position: relative;
+.wider-button {
+  width: 120px;
 }

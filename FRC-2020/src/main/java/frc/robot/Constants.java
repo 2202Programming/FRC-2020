@@ -182,7 +182,9 @@ public final class Constants {
         // for initializing the hardware. The PID object not run on RIO.
         public static final PIDFController pidValues =
              new PIDFController(0.000075, 0.0, 320.0, 0.00016666); // P, I, D, FF
-             //jr 3/20 settings 0.000155, 0.0, 2.0, 0.00016666; 20 improved turn oscillation; 80 starting to feel slow
+             //jr 3/20 settings 0.000155, 0.0, 2.0, 0.00016666; 
+             //20 improved turn oscillation; 80 starting to feel slow
+             //Kp 0.000075 maybe less turn oscillations
              //JR 3/17 settings 0.000155, 0.0, 0.0, 0.00016666
 
 
@@ -264,8 +266,8 @@ public final class Constants {
     public static final class InterstellarSettings {
       public static final double VEL_TOL = 0.0025; 
       public static ShooterSettings ssZone1 = new ShooterSettings(32.0, 5, 48.7, VEL_TOL);  //vel, rps, angle, tol
-      public static ShooterSettings ssZone2 = new ShooterSettings(36.0, 0, 40.5, VEL_TOL);  //vel, rps, angle
-      public static ShooterSettings ssZone3 = new ShooterSettings(36.0, 5, 37.0, VEL_TOL);  //vel, rps, angle
+      public static ShooterSettings ssZone2 = new ShooterSettings(36.0, 5, 40.5, VEL_TOL);  //vel, rps, angle
+      public static ShooterSettings ssZone3 = new ShooterSettings(38.0, 5, 37.5, VEL_TOL);  //vel, rps, angle
       public static ShooterSettings ssZone4 = new ShooterSettings(39.0, 5, 40.0, VEL_TOL);  //vel, rps, angle
     }
     

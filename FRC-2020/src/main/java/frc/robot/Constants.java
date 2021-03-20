@@ -181,7 +181,8 @@ public final class Constants {
         // PIDS are in the SparkMax, PIDFControler is used to hold the values
         // for initializing the hardware. The PID object not run on RIO.
         public static final PIDFController pidValues =
-             new PIDFController(0.000075, 0.0, 320.0, 0.00016666); // P, I, D, FF
+             new PIDFController(0.000155, 0.0, 100.0, 0.00016666); // P, I, D, FF
+             // DL/Dustion - kD=100 was good compromise for damping.  200 deg/sec rot was good too
              //jr 3/20 settings 0.000155, 0.0, 2.0, 0.00016666; 
              //20 improved turn oscillation; 80 starting to feel slow
              //Kp 0.000075 maybe less turn oscillations

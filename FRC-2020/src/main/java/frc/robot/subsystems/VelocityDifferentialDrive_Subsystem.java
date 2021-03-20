@@ -6,6 +6,8 @@ import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 import static frc.robot.Constants.RobotPhysical.WheelWearLeft;
 import static frc.robot.Constants.RobotPhysical.WheelWearRight;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.revrobotics.CANEncoder;
@@ -24,6 +26,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
@@ -171,6 +174,13 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private EncoderSim2 m_leftEncoderSim;
   private EncoderSim2 m_rightEncoderSim;
 
+
+  //list of positions for recording path
+  public List<Translation2d> PositionList = new ArrayList<Translation2d>();
+  private boolean recordPositionOn = false;
+  private Pose2d recordingPoseStart;
+  private Pose2d recordingPoseEnd;
+
   public VelocityDifferentialDrive_Subsystem(final Shifter gear) {
     // save scaling factors, they are required to use SparkMax in Vel mode
     gearbox = gear;
@@ -298,6 +308,22 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // Update the odometry in the periodic block, physical units, update field
     m_odometry.update(nav.getRotation2d(), m_posLeft, m_posRight);
     m_field.setRobotPose(m_odometry.getPoseMeters());
+  }
+
+  
+  //Record position
+  public void addPosition(){
+    PositionList.add(new Translation2d(m_odometry.getPoseMeters().getX(), m_odometry.getPoseMeters().getY()));
+  }
+
+  public void turnPositionRecordingOn(){
+    recordPositionOn = true;
+    recordingPoseStart = m_odometry.getPoseMeters();
+  }
+
+  public void turnPositionRecordingOff(){
+    recordPositionOn = false;
+    recordingPoseEnd = m_odometry.getPoseMeters();
   }
 
   /**
@@ -617,6 +643,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // motor outputs
     nt_leftOutput.setDouble(leftController.getAppliedOutput());
     nt_rightOutput.setDouble(rightController.getAppliedOutput());
+
+    if (recordPositionOn) addPosition();
   }
 
   /**

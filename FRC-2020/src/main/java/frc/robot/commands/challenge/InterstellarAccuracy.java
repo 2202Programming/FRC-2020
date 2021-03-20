@@ -106,8 +106,8 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
       // Build the Shoot and return to Introduction zone sequence 
       new InstantCommand(limelight::enableLED),
       new ParallelRaceGroup(
-            new LimeLightTargetCompensator(),       // never finishes 
-            new Shoot(ss)).withTimeout(6.0),        // finishes when mag is empty, or timeout
+            //new LimeLightTargetCompensator(),       // never finishes 
+            new Shoot(ss)).withTimeout(3.0),        // finishes when mag is empty, or timeout
       new IntakePower(intake, Power.On, 0.5),
       new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)),
       new WaitUntilCommand( magazine::isMagFull).withTimeout(10.0));

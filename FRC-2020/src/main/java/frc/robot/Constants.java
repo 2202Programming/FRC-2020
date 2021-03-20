@@ -144,7 +144,7 @@ public final class Constants {
 
         //chassis  
         public static final double WheelDiameter = 6.0; // inches, nominal
-        public static final double WheelAxleDistance = 25.5/12.0; // feet 25.5 mid-wheel, 26.75 outer wheel
+        public static final double WheelAxleDistance = 2.22418; //(robot char 3/20/21)    //25.5/12.0; // feet 25.5 mid-wheel, 26.75 outer wheel
 
         //wheel wear compensation - adjust when distance is off by small amount
         public static final double WheelWearLeft = 0.99;   //[percent] of nominal
@@ -273,18 +273,18 @@ public final class Constants {
       // theoretically for *your* robot's drive.
       // The Robot Characterization Toolsuite provides a convenient tool for obtaining
       // these values for your robot.
+      //3.20.21 updated robo char 
+      public static final double ksVolts = 0.203;   //0.123; 
+      public static final double kvVoltSecondsPerFoot= 1.49;   //1.48; 
+      public static final double kaVoltSecondsSquaredPerFoot = 0.1; // 0.15; 
 
-      public static final double ksVolts = 0.123; 
-      public static final double kvVoltSecondsPerFoot= 1.48; 
-      public static final double kaVoltSecondsSquaredPerFoot = 0.15; 
-
-      public static final double kPDriveVel = 2.44; 
+      public static final double kPDriveVel =2.05;  /// 2.44; 
 
       // Change these to go faster/slower for commands using ramsete and VoltageDrive
 
       // Reasonable baseline values for a RAMSETE follower in units of meters and
       // seconds - DPL not sure about how to convert to feet.
-      public static final double kRamseteB = .35;
+      public static final double kRamseteB = .18;
       public static final double kRamseteZeta = 0.9;
       //public static final double kTrackwidthFeet = 2.135; //2.08333;   // from char=1.4348; //updated2
 

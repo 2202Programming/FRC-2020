@@ -24,6 +24,7 @@ import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.InterstellarSettings;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_cmd_group;
+import frc.robot.commands.auto.auto_drivePath_cmd;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.challenge.GalacticSearch;
@@ -174,8 +175,11 @@ public class RobotContainer {
 
     //auto path testing
     //dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getPath()));
-    dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
-    dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
+   //dpl -keep dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
+    dc.bind(Id.Driver, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
+   
+   
+     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
     
     //go from current position to stored position
     dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));

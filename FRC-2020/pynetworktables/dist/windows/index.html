@@ -275,6 +275,8 @@
   <script src="/networktables/utils.js"></script>
   <script>
 
+NetworkTables.addRobotConnectionListener(connected => console.log('is connected:', connected), true);
+
 class BooleanLabel extends webbit.LitElement {
  
  static get styles() {

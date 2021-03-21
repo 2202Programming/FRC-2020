@@ -54,7 +54,6 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
   final Limelight_Subsystem limelight;
   final TrajectoryConfig config;
   final TrajectoryConfig reverse_config;
-  final Command LLComp = new LimeLightTargetCompensator();
 
   /** Creates a new InterstellarAccuacy. */
   public InterstellarAccuracy(double maxVel, double maxAccel) {

@@ -69,8 +69,6 @@ public class DriverPreferences {
     maxRotationNTE.addListener(event -> 
       {rc.driveTrain.processDashboard(event); },
       EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-		
 	}
 
   // Accessors for getting values

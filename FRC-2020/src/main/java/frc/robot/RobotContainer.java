@@ -158,10 +158,8 @@ public class RobotContainer {
     PositionRecorder recorder = new PositionRecorder(driveTrain);
     recorder.setIsRunning(false);
 
-    // Shuffleboard runnable Commands - Soft buttons
-     // SmartDashboard.putData("Match Ready", new MatchReadyCmd());
-    //SmartDashboard.putData("Zero PC", new InstantCommand(() -> magazine.setPC(0)));
-    //SmartDashboard.putData("Three PC", new InstantCommand(() -> magazine.setPC(0)));
+     // force drivetrain to look as dashboard settings, fake an event
+     driveTrain.processDashboard(null);
   }
 
   private void configureButtonBindings(DriverControls dc) {
@@ -220,7 +218,11 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
     dc.bind(Id.Driver,    XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
     dc.bind(Id.Assistant, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
-    
+
+    //auto path testing on sideboard  row 3
+    dc.bind(Id.SwitchBoard, SBButton.Sw32).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
+    dc.bind(Id.SwitchBoard, SBButton.Sw33).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
+    dc.bind(Id.SwitchBoard, SBButton.Sw34).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
   }
 
   /**

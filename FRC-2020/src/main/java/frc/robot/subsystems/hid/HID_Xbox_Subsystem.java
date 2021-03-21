@@ -47,7 +47,7 @@ public class HID_Xbox_Subsystem extends MonitoredSubsystemBase implements Driver
    */
   private final XboxController driver;
   private final XboxController assistant;
-  private final XboxController switchBoard;
+  private final SideboardController switchBoard;
   // private final XboxController phantom = new XboxController(3);
 
   // Buttons onStartup - in case you want to do something based on controls
@@ -85,7 +85,7 @@ public class HID_Xbox_Subsystem extends MonitoredSubsystemBase implements Driver
     // register the devices
     driver = (XboxController) registerController(Id.Driver, new XboxController(Id.Driver.value));
     assistant = (XboxController) registerController(Id.Assistant, new XboxController(Id.Assistant.value));
-    switchBoard = (XboxController) registerController(Id.SwitchBoard, new XboxController(Id.SwitchBoard.value));
+    switchBoard = (SideboardController) registerController(Id.SwitchBoard, new SideboardController(Id.SwitchBoard.value));
 
     /**
      * All Joysticks are read and shaped without sign conventions.

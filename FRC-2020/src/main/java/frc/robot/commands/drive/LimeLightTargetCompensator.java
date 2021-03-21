@@ -57,9 +57,6 @@ public class LimeLightTargetCompensator extends CommandBase {
     m_target_angle = limelight.getX();
     double angleCmd = anglePIDController.calculate(m_target_angle);
     m_correction = MathUtil.clamp(angleCmd, -max_rotation, max_rotation);
-
-    // continue to call drive, but no command, compensator function will add rotation
-    drive.velocityArcadeDrive(0.0, 0.0);
   }
 
   // Called once the command ends or is interrupted.

@@ -53,32 +53,27 @@ public interface DriverControls extends Subsystem {
   public HashMap<Id, GenericHID> deviceMap = new HashMap<Id, GenericHID>();
 
   // mech & field relative
-  public double getVelocityX();
-
-  public double getVelocityY();
-
-  public double getXYRotation();
+  default public double getVelocityX()  { return 0.0; }
+  default public double getVelocityY()  { return 0.0; }
+  default public double getXYRotation() { return 0.0; }
 
   // tank
-  public double getVelocityLeft();
-
-  public double getVelocityRight();
+  default public double getVelocityLeft()  { return 0.0; }
+  default public double getVelocityRight() { return 0.0; }
 
   // arcade drive
-  public double getVelocity();
-
-  public double getRotation();
+  default public double getVelocity() { return 0.0; }
+  default public double getRotation() { return 0.0; }
 
   // physical or normalize (-1.0, 1.0) values
-  public boolean isNormalized();
+  default public boolean isNormalized(){return true;}
 
-  // Invert controls is a common need - force it
-  public void setInvertControls(boolean invert);
-
-  public boolean isControlInverted();
+  // Invert controls - defaults doesn't allow inversion
+  default public void setInvertControls(boolean invert) {  }
+  default public boolean isControlInverted() { return false; }
 
   // Buttons set at powerup -saved for later use.
-  public int getInitialButtons(Id id);
+  default public int getInitialButtons(Id id) { return 0;}
 
   /**
    * SideBoard low level access or just fixed configuration for a controls set

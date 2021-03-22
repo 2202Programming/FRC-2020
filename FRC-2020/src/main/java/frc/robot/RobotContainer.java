@@ -62,6 +62,7 @@ import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.hid.XboxPOV;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
+import frc.robot.subsystems.util.WebCommands;
 import frc.robot.util.misc.StateMemory;
 import frc.robot.ux.Dashboard;
 import frc.robot.ux.DriverPreferences;
@@ -93,7 +94,7 @@ public class RobotContainer {
   public final Dashboard dashboard;
   public final Pdp_subsystem pdp;
   public StateMemory state;
-  
+  final WebCommands webCommands;
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -114,7 +115,9 @@ public class RobotContainer {
     lidar = new Lidar_Subsystem(); 
     pdp = new Pdp_subsystem();
     state = new StateMemory(driveTrain, intake);
-    
+
+    webCommands = new WebCommands();
+
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
     //climber = new ClimberSubsystem();
@@ -157,6 +160,7 @@ public class RobotContainer {
 
     PositionRecorder recorder = new PositionRecorder(driveTrain);
     recorder.setIsRunning(false);
+  
 
      // force drivetrain to look as dashboard settings, fake an event
      driveTrain.processDashboard(null);

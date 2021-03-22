@@ -184,6 +184,9 @@ public class RobotContainer {
     //toggle auto shooting mode
     dc.bind(Id.Driver, XboxButton.R3).whenPressed(new InstantCommand(intake::toggleAutoShootingMode));
     
+    //auto path testing
+    dc.bind(Id.Driver,  XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
+    dc.bind(Id.Driver,    XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
 
     // Assistant's buttons
     dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineBeltAdjust(magazine, false, 0.0)); 
@@ -195,8 +198,7 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new Shoot()); 
     //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenHeld(new auto_shooting_cmd(intake, ShooterOnCmd.data, driveTrain, limelight, 1.0)); 
     //dc.bind(Id.Assistant, XboxAxis.TRIGGER_RIGHT).whenPressed(new auto_limelightTurnToShoot_cmd(driveTrain, limelight, 1)); 
-    
-
+  
     //Magazine Angle - POV hat
     dc.bind(Id.Assistant, XboxPOV.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));
     dc.bind(Id.Assistant, XboxPOV.POV_DOWN).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Down));
@@ -211,17 +213,15 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));   
 
+    //auto path testing
+    dc.bind(Id.Assistant, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
+    dc.bind(Id.Assistant, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
+
     // Switchboard
     dc.bind(Id.SwitchBoard, SBButton.Sw21).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone1));
     dc.bind(Id.SwitchBoard, SBButton.Sw22).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone2));
     dc.bind(Id.SwitchBoard, SBButton.Sw23).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
     dc.bind(Id.SwitchBoard, SBButton.Sw24).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
-
-    //auto path testing
-    dc.bind(Id.Driver,  XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
-    dc.bind(Id.Assistant, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
-    dc.bind(Id.Driver,    XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
-    dc.bind(Id.Assistant, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
 
     //auto path testing on sideboard  row 3
     dc.bind(Id.SwitchBoard, SBButton.Sw32).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));

@@ -33,6 +33,7 @@ public class WebCommands {
     table.addEntryListener(entryName, (table, key, entry, value, flags)  -> 
       {
         if (value.getBoolean()) {
+          System.out.println("***Web Command - Executing " + entryName);
           CommandScheduler.getInstance().schedule(cmd);
           // just ack the scheduling, in perfect world the cmd would handle this 
           // by taking an NTE or entry string

@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -409,7 +410,9 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
       // monitor analog pot getting too close to limit. Just kill it
       if (m_unlock_confirmed == false && m_apv < VSafety) {
         zeroPower(false);
-        DriverStation.reportWarning("Mag Angle too close to limit during burp - shutting down. Check pawl.", false);
+        if (!RobotBase.isSimulation()) {  //supress this warning if in simulation mode
+          DriverStation.reportWarning("Mag Angle too close to limit during burp - shutting down. Check pawl.", false);
+        }
       }
     }
 

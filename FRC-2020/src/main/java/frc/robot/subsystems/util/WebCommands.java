@@ -38,7 +38,7 @@ public class WebCommands {
           CommandScheduler.getInstance().schedule(cmd);
           // just ack the scheduling, in perfect world the cmd would handle this 
           // by taking an NTE or entry string
-         nte.setBoolean(false);    // DPL - I didn't see a problem with this on the webpage.
+         nte.setBoolean(false);    
         }
       }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
   }

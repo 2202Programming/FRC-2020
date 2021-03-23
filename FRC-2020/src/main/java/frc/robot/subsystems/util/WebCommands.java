@@ -50,7 +50,7 @@ public class WebCommands {
           CommandScheduler.getInstance().schedule(cmd);
           // just ack the scheduling, in perfect world the cmd would handle this 
           // by taking an NTE or entry string
-          table.getEntry(entryName).setBoolean(false);
+         nte.setBoolean(false);
         }
       }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
   }

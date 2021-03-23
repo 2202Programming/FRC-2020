@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.InterstellarSettings;
 import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_drivePath_cmd;
@@ -55,7 +56,10 @@ public class WebCommands {
     ListenerCmdOnTrue("LimelightToggle", new toggleLED(limelight));
     ListenerCmdOnTrue("MagLock", new InstantCommand( intake.getMagazine().getMagPositioner()::lock));
     ListenerCmdOnTrue("MagCalibrate", new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));
-
+    ListenerCmdOnTrue("MagZone1", new MagazineAngle(intake, InterstellarSettings.ssZone1));
+    ListenerCmdOnTrue("MagZone2", new MagazineAngle(intake, InterstellarSettings.ssZone2));
+    ListenerCmdOnTrue("MagZone3", new MagazineAngle(intake, InterstellarSettings.ssZone3));
+    ListenerCmdOnTrue("MagZone4", new MagazineAngle(intake, InterstellarSettings.ssZone4));
 
   }
 

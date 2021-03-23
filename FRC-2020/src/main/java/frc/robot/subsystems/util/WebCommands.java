@@ -22,6 +22,19 @@ public class WebCommands {
     ListenerCmdOnTrue("runZeroPC", new SetPowerCellCount(0) );
     ListenerCmdOnTrue("runThreePC", new SetPowerCellCount(3) );
     ListenerCmdOnTrue("runMagCalibrate", new MagazineCalibrate() );
+
+
+
+    NetworkTableEntry print = table.getEntry("Print");
+    print.setBoolean(false);
+
+    // now construct the command listener, lambda called on value changes 
+    table.addEntryListener("Print", (table, key, entry, value, flags)  -> 
+      {
+          System.out.println("***Web Command - Printing Boolean value = " + value.getBoolean());
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+
   }
 
   void  ListenerCmdOnTrue(String entryName, Command cmd) {

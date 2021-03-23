@@ -13,6 +13,7 @@ import static frc.robot.Constants.ShooterOnCmd.dataLow;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -217,16 +218,18 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
     dc.bind(Id.Assistant, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
 
+    if (!RobotBase.isSimulation()){
     // Switchboard
-    dc.bind(Id.SwitchBoard, SBButton.Sw21).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone1));
-    dc.bind(Id.SwitchBoard, SBButton.Sw22).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone2));
-    dc.bind(Id.SwitchBoard, SBButton.Sw23).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
-    dc.bind(Id.SwitchBoard, SBButton.Sw24).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
+      dc.bind(Id.SwitchBoard, SBButton.Sw21).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone1));
+      dc.bind(Id.SwitchBoard, SBButton.Sw22).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone2));
+      dc.bind(Id.SwitchBoard, SBButton.Sw23).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
+      dc.bind(Id.SwitchBoard, SBButton.Sw24).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
 
-    //auto path testing on sideboard  row 3
-    dc.bind(Id.SwitchBoard, SBButton.Sw32).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
-    dc.bind(Id.SwitchBoard, SBButton.Sw33).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
-    dc.bind(Id.SwitchBoard, SBButton.Sw34).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
+      //auto path testing on sideboard  row 3
+      dc.bind(Id.SwitchBoard, SBButton.Sw32).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
+      dc.bind(Id.SwitchBoard, SBButton.Sw33).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
+      dc.bind(Id.SwitchBoard, SBButton.Sw34).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
+    }
   }
 
   /**

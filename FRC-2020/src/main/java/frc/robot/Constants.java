@@ -65,9 +65,14 @@ public final class Constants {
     
     // Digital IO on the RIO
     public static final class DigitalIO {
+      public static final int LEFT_CHASSIS_ENCODER_A = 0;
+      public static final int LEFT_CHASSIS_ENCODER_B = 1;
       public static final int MAGAZINE_GATE = 2;  
       public static final int MAGAZINE_GATE_PWR = 4;  
+      public static final int RIGHT_CHASSIS_ENCODER_A = 5;
+      public static final int RIGHT_CHASSIS_ENCODER_B = 6;
     }
+
 
     // Analog IO on the RIO
     public static final class AnalogIn {

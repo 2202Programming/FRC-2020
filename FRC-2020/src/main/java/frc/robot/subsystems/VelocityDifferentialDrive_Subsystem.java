@@ -22,6 +22,7 @@ import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -40,6 +41,7 @@ import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.Constants.CAN;
+import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.DriveTrain;
 import frc.robot.Constants.RamseteProfile;
 import frc.robot.Constants.RobotPhysical;
@@ -65,6 +67,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final IdleMode KIdleMode = IdleMode.kBrake;
   final double Kgyro = -1.0; // ccw is positive, just like geometry class
 
+  //Chassis Encoder
+  final double kFeetPerPulse = .001;
+
   public static class DriveSetPoints {
     public double left;
     public double right;
@@ -75,7 +80,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private NetworkTableEntry nt_velRight;
   private NetworkTableEntry nt_posLeft;
   private NetworkTableEntry nt_posRight;
-  
+  private NetworkTableEntry nt_posChassisLeft;
+  private NetworkTableEntry nt_posChassisRight;
   private NetworkTableEntry nt_currentPoseX;
   private NetworkTableEntry nt_currentPoseY;
   private NetworkTableEntry nt_currentPoseYaw;
@@ -127,6 +133,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final CANEncoder rightEncoder = rightController.getEncoder();
   final CANPIDController leftPID = leftController.getPIDController();
   final CANPIDController rightPID = rightController.getPIDController();
+  
+  private final Encoder leftChassisEncoder = new Encoder(DigitalIO.LEFT_CHASSIS_ENCODER_A, DigitalIO.LEFT_CHASSIS_ENCODER_B);
+  private final Encoder rightChassisEncoder = new Encoder(DigitalIO.RIGHT_CHASSIS_ENCODER_A, DigitalIO.RIGHT_CHASSIS_ENCODER_B);
 
   // Voltage to get robot to move.
   // kS - taken from the Drive Characterization
@@ -154,6 +163,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   double m_posLeft = 0.0; // feet, positive is forward distance, since encoder reset
   double m_posRight = 0.0; // feet, positive is forward distance, since encoder reset
   Gear m_currentGear; // high/low
+  double m_posChassisLeft = 0.0;  //feet, positive forward, since encoder reset
+  double m_posChassisRight = 0.0; //feet, positive forward, since encoder reset
   
   double m_voltleft; // save voltages that we send to motor
   double m_voltright;
@@ -196,7 +207,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_velRight = table.getEntry("VelRight/value");
     nt_posLeft = table.getEntry("PosLeft");
     nt_posRight = table.getEntry("PosRight");
-    
+    nt_posChassisLeft = table.getEntry("PosChassisLeft");
+    nt_posChassisRight = table.getEntry("PosChassisRight");
+
     nt_currentPoseX = table.getEntry("CurrentX");
     nt_currentPoseY = table.getEntry("CurrentY");
     nt_currentPoseYaw = table.getEntry("CurrentYaw");
@@ -208,6 +221,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // setup physical units - chassis * gearbox (rev per minute)
     K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60; // rpm/60 rps
     K_high_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.HIGH) / 60;
+
+    leftChassisEncoder.setDistancePerPulse(kFeetPerPulse);
+    rightChassisEncoder.setDistancePerPulse(kFeetPerPulse);
 
     //Speed setting may be updated via UX, but set defaults
     calcSpeedSettings();
@@ -286,7 +302,12 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   public void monitored_periodic() {
     m_currentGear = gearbox.getCurrentGear();
     double kGR = gearbox.getGearRatio();
-    
+    /**
+     * Chassis encoders
+     */
+    m_posChassisLeft = leftChassisEncoder.getDistance();
+    m_posChassisRight = rightChassisEncoder.getDistance();
+
     /**
      * Encoder.getPostion() is in units of revs of motor shaft K_ft_per_rev -
      * pi*wheeldiam - distance per rev of wheel shaft
@@ -635,6 +656,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_velRight.setDouble(m_wheelSpeeds.rightMetersPerSecond); //ft/s
     nt_posLeft.setDouble(m_posLeft);
     nt_posRight.setDouble(m_posRight);
+
+    nt_posChassisLeft.setDouble(m_posChassisLeft);
+    nt_posChassisRight.setDouble(m_posChassisRight);
     // pose
     nt_currentPoseX.setDouble(m_odometry.getPoseMeters().getX());
     nt_currentPoseY.setDouble(m_odometry.getPoseMeters().getY());

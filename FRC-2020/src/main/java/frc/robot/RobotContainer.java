@@ -117,7 +117,10 @@ public class RobotContainer {
     pdp = new Pdp_subsystem();
     state = new StateMemory(driveTrain, intake);
 
-    webCommands = new WebCommands();
+    //setup the dashboard programatically, creates any choosers, screens
+    dashboard = new Dashboard(this);
+
+    webCommands = new WebCommands(driveTrain, dashboard, intake);
 
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
@@ -137,8 +140,7 @@ public class RobotContainer {
     deviceMap.put("intake", intake);
     deviceMap.put("limelight", limelight);
 
-    //setup the dashboard programatically, creates any choosers, screens
-    dashboard = new Dashboard(this);
+
 
     // Configure the button bindings
     configureButtonBindings(driverControls);

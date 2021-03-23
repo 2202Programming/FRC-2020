@@ -120,7 +120,7 @@ public class RobotContainer {
     //setup the dashboard programatically, creates any choosers, screens
     dashboard = new Dashboard(this);
 
-    webCommands = new WebCommands(driveTrain, dashboard, intake);
+    webCommands = new WebCommands(driveTrain, dashboard, intake, state, magazine);
 
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();

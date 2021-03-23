@@ -8,23 +8,29 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
 import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.auto.auto_drivePath_cmd;
+import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.intake.IntakePosition;
+import frc.robot.commands.intake.IntakePower;
 import frc.robot.commands.intake.MagazineAngle;
+import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCalibrate;
 import frc.robot.commands.intake.SetPowerCellCount;
 import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Magazine_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
+import frc.robot.util.misc.StateMemory;
 import frc.robot.ux.Dashboard;
 
 public class WebCommands {
 
   private NetworkTable table;
   
-  public WebCommands(VelocityDifferentialDrive_Subsystem driveTrain, Dashboard dashboard, Intake_Subsystem intake){
+  public WebCommands(VelocityDifferentialDrive_Subsystem driveTrain, Dashboard dashboard, Intake_Subsystem intake, StateMemory state, Magazine_Subsystem magazine){
 
     table = NetworkTableInstance.getDefault().getTable("Commands");
 
@@ -37,6 +43,14 @@ public class WebCommands {
     ListenerCmdOnTrue("MagLow", new MagazineAngle(intake, Constants.ShooterOnCmd.dataLow));
     ListenerCmdOnTrue("MagHigh", new MagazineAngle(intake, Constants.ShooterOnCmd.dataHigh));
     ListenerCmdOnTrue("ToggleIntakePose", new IntakePosition(intake, IntakePosition.Direction.Toggle));
+    ListenerCmdOnTrue("GoToPose", new goToPose(driveTrain, state));
+    ListenerCmdOnTrue("SavePose", new InstantCommand(state::saveRobotState));
+    ListenerCmdOnTrue("ToggleAutoShoot", new InstantCommand(intake::toggleAutoShootingMode));
+    ListenerCmdOnTrue("MagOff", new MagazineBeltAdjust(magazine, false, 0.0));
+    ListenerCmdOnTrue("MagOn", new MagazineBeltAdjust(magazine, true, 0.4));
+    ListenerCmdOnTrue("IntakeRev", new IntakePower(intake, IntakePower.Power.ReverseOn, 0.5));
+    ListenerCmdOnTrue("IntakeToggle", new IntakePower(intake, IntakePower.Power.Toggle, 0.5));
+
   }
 
   void  ListenerCmdOnTrue(String entryName, Command cmd) {

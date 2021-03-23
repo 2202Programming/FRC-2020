@@ -23,18 +23,6 @@ public class WebCommands {
     ListenerCmdOnTrue("runThreePC", new SetPowerCellCount(3) );
     ListenerCmdOnTrue("runMagCalibrate", new MagazineCalibrate() );
 
-
-
-    NetworkTableEntry print = table.getEntry("Print");
-    print.setBoolean(false);
-
-    // now construct the command listener, lambda called on value changes 
-    table.addEntryListener("Print", (table, key, entry, value, flags)  -> 
-      {
-          System.out.println("***Web Command - Printing Boolean value = " + value.getBoolean());
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-
   }
 
   void  ListenerCmdOnTrue(String entryName, Command cmd) {
@@ -50,7 +38,7 @@ public class WebCommands {
           CommandScheduler.getInstance().schedule(cmd);
           // just ack the scheduling, in perfect world the cmd would handle this 
           // by taking an NTE or entry string
-          //table.getEntry(entryName).setBoolean(false);
+          //table.getEntry(entryName).setBoolean(false); //this breaks the webpage
         }
       }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
   }

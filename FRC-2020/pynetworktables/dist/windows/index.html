@@ -67,7 +67,6 @@
             <frc-toggle-button label="Zero PC" class="wider-button" source-key="/Commands/runZeroPC"></frc-toggle-button>
             <frc-toggle-button label="Match Ready" class="wider-button" source-key="/Commands/runMatchReady"></frc-toggle-button>
             <frc-toggle-button label="Mag Calibrate" class="wider-button" source-key="/Commands/runMagCalibrate"></frc-toggle-button>
-            <frc-toggle-button label="Print" class="wider-button" source-key="/Commands/Print"></frc-toggle-button>
           </fieldset>
           <fieldset class="scheduler-border">
             <legend class="scheduler-border" id="intake">Intake</legend>
@@ -126,8 +125,13 @@
           <div class="col-sm-3">
             <div>
               <h4>Choose Path</h4>
-              <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/selected" value="do nothing"></nt-string>
               <frc-combo-box source-key="/Shuffleboard/Match/AutoPath/PathChooser"></frc-combo-box>
+              <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/selected/label" value="Selected Path"></nt-string>
+              <frc-text-area source-key="/Shuffleboard/Match/AutoPath/PathChooser/selected"></frc-text-area>
+
+              <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/active/label" value="Active Path"></nt-string>
+              <frc-text-area source-key="/Shuffleboard/Match/AutoPath/PathChooser/active"></frc-text-area>
+
             </div>
           </div>
           <div class="col-sm-9">

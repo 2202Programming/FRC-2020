@@ -43,7 +43,7 @@ public class WebCommands {
     ListenerCmdOnTrue("runMatchReady", new MatchReadyCmd() );
     ListenerCmdOnTrue("runZeroPC", new SetPowerCellCount(0) );
     ListenerCmdOnTrue("runThreePC", new SetPowerCellCount(3) );
-    ListenerCmdOnTrue("runMagCalibrate", new MagazineCalibrate() );
+   
     ListenerCmdOnTrue("ResetPose", new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
     ListenerCmdOnTrue("DrivePath", new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
     ListenerCmdOnTrue("MagLow", new MagazineAngle(intake, Constants.ShooterOnCmd.dataLow));
@@ -58,7 +58,10 @@ public class WebCommands {
     ListenerCmdOnTrue("IntakeToggle", new IntakePower(intake, IntakePower.Power.Toggle, 0.5));
     ListenerCmdOnTrue("LimelightToggle", new toggleLED(limelight));
     ListenerCmdOnTrue("MagLock", new InstantCommand( intake.getMagazine().getMagPositioner()::lock));
-    ListenerCmdOnTrue("MagCalibrate", new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));
+    
+    //dpl favor the command, because it can run when disabled.
+    //ListenerCmdOnTrue("MagCalibrate", new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));
+    ListenerCmdOnTrue("MagCalibrate", new MagazineCalibrate() );
     ListenerCmdOnTrue("MagZone1", new MagazineAngle(intake, InterstellarSettings.ssZone1));
     ListenerCmdOnTrue("MagZone2", new MagazineAngle(intake, InterstellarSettings.ssZone2));
     ListenerCmdOnTrue("MagZone3", new MagazineAngle(intake, InterstellarSettings.ssZone3));
@@ -66,6 +69,9 @@ public class WebCommands {
 
     // these use the button state and call a setter function
     ListenerBoolean("setUseChassisEncoders", false, driveTrain::useChassisEncoders);
+
+    // dpl - we could change the toggles above to stateful Booleans, then the dash would reflect the status
+
 
   }
 

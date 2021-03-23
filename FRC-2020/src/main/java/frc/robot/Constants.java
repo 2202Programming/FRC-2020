@@ -205,7 +205,7 @@ public final class Constants {
 
         // Acceleration limits
         public static final double slewRateMax = 2;      //sec limits adjusting slewrate 
-        public static final double slewRateLimit = 0.9;  //sec to max power <default>
+        public static final double slewRateLimit = 0.5;  //sec to max power <default>
 
         public static final boolean safetyEnabled = true; 
     }

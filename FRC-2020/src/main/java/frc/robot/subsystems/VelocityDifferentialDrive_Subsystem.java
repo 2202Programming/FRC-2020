@@ -68,7 +68,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final double Kgyro = -1.0; // ccw is positive, just like geometry class
 
   //Chassis Encoder
-  final double kFeetPerPulse = .001;
+  final double kFeetPerPulse = .00057558;
+  final boolean kInvertChassisLeft = true;
+  final boolean kInvertChassisRight = false;
 
   public static class DriveSetPoints {
     public double left;
@@ -78,6 +80,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private NetworkTable table;
   private NetworkTableEntry nt_velLeft;
   private NetworkTableEntry nt_velRight;
+  private NetworkTableEntry nt_velChassisLeft;
+  private NetworkTableEntry nt_velChassisRight;
   private NetworkTableEntry nt_posLeft;
   private NetworkTableEntry nt_posRight;
   private NetworkTableEntry nt_posChassisLeft;
@@ -165,7 +169,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   Gear m_currentGear; // high/low
   double m_posChassisLeft = 0.0;  //feet, positive forward, since encoder reset
   double m_posChassisRight = 0.0; //feet, positive forward, since encoder reset
-  
+  double m_velChassisLeft;
+  double m_velChassisRight;
+
   double m_voltleft; // save voltages that we send to motor
   double m_voltright;
   Supplier<Double> m_heading_compensator;  //radians/s 
@@ -175,7 +181,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
-
+  private final DifferentialDriveOdometry m_odometry_chassis;
 
   //nav sensors
   Sensors_Subsystem nav;
@@ -205,6 +211,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     table = NetworkTableInstance.getDefault().getTable("Drivetrain");
     nt_velLeft = table.getEntry("VelLeft/value");
     nt_velRight = table.getEntry("VelRight/value");
+    nt_velChassisLeft = table.getEntry("VelChassisLeft");
+    nt_velChassisRight  = table.getEntry("VelChassisRight");
     nt_posLeft = table.getEntry("PosLeft");
     nt_posRight = table.getEntry("PosRight");
     nt_posChassisLeft = table.getEntry("PosChassisLeft");
@@ -213,8 +221,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_currentPoseX = table.getEntry("CurrentX");
     nt_currentPoseY = table.getEntry("CurrentY");
     nt_currentPoseYaw = table.getEntry("CurrentYaw");
-    nt_rightOutput = table.getEntry("Right Motor Speed");
-    nt_leftOutput = table.getEntry("Left Motor Speed");
+    nt_rightOutput = table.getEntry("MotorOutRight");
+    nt_leftOutput = table.getEntry("MotorOutLeft");
 
     SmartDashboard.putData("Field", m_field);
 
@@ -223,7 +231,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     K_high_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.HIGH) / 60;
 
     leftChassisEncoder.setDistancePerPulse(kFeetPerPulse);
+    leftChassisEncoder.setReverseDirection(kInvertChassisLeft);
     rightChassisEncoder.setDistancePerPulse(kFeetPerPulse);
+    rightChassisEncoder.setReverseDirection(kInvertChassisRight);
 
     //Speed setting may be updated via UX, but set defaults
     calcSpeedSettings();
@@ -242,6 +252,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // clear our starting position.
     resetPosition();
     m_odometry = new DifferentialDriveOdometry(nav.getRotation2d() );
+    m_odometry_chassis = new DifferentialDriveOdometry(nav.getRotation2d() );
+
     savedPose = m_odometry.getPoseMeters(); //set savedPose to starting position initally
   }
 
@@ -307,6 +319,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
      */
     m_posChassisLeft = leftChassisEncoder.getDistance();
     m_posChassisRight = rightChassisEncoder.getDistance();
+    m_velChassisLeft = leftChassisEncoder.getRate();
+    m_velChassisRight = rightChassisEncoder.getRate();
 
     /**
      * Encoder.getPostion() is in units of revs of motor shaft K_ft_per_rev -
@@ -328,6 +342,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
     // Update the odometry in the periodic block, physical units, update field
     m_odometry.update(nav.getRotation2d(), m_posLeft, m_posRight);
+    m_odometry_chassis.update(nav.getRotation2d(), m_posChassisLeft, m_posChassisRight);
     m_field.setRobotPose(m_odometry.getPoseMeters());
   }
 
@@ -593,8 +608,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   public void resetPosition() {
-    rightController.getEncoder().setPosition(0);
-    leftController.getEncoder().setPosition(0);
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+    leftChassisEncoder.reset();
+    rightChassisEncoder.reset();
   }
 
   /**
@@ -659,6 +676,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
     nt_posChassisLeft.setDouble(m_posChassisLeft);
     nt_posChassisRight.setDouble(m_posChassisRight);
+
+    nt_velChassisLeft.setDouble(m_velChassisLeft);
+    nt_velChassisRight.setDouble(m_velChassisRight);
     // pose
     nt_currentPoseX.setDouble(m_odometry.getPoseMeters().getX());
     nt_currentPoseY.setDouble(m_odometry.getPoseMeters().getY());

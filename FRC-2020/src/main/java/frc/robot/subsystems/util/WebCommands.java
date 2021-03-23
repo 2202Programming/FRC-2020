@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
 import frc.robot.commands.MatchReadyCmd;
+import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_drivePath_cmd;
 import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.drive.ResetPosition;
@@ -21,6 +22,7 @@ import frc.robot.commands.intake.MagazineBeltAdjust;
 import frc.robot.commands.intake.MagazineCalibrate;
 import frc.robot.commands.intake.SetPowerCellCount;
 import frc.robot.subsystems.Intake_Subsystem;
+import frc.robot.subsystems.Limelight_Subsystem;
 import frc.robot.subsystems.Magazine_Subsystem;
 import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 import frc.robot.util.misc.StateMemory;
@@ -30,7 +32,7 @@ public class WebCommands {
 
   private NetworkTable table;
   
-  public WebCommands(VelocityDifferentialDrive_Subsystem driveTrain, Dashboard dashboard, Intake_Subsystem intake, StateMemory state, Magazine_Subsystem magazine){
+  public WebCommands(VelocityDifferentialDrive_Subsystem driveTrain, Dashboard dashboard, Intake_Subsystem intake, StateMemory state, Magazine_Subsystem magazine, Limelight_Subsystem limelight){
 
     table = NetworkTableInstance.getDefault().getTable("Commands");
 
@@ -50,6 +52,10 @@ public class WebCommands {
     ListenerCmdOnTrue("MagOn", new MagazineBeltAdjust(magazine, true, 0.4));
     ListenerCmdOnTrue("IntakeRev", new IntakePower(intake, IntakePower.Power.ReverseOn, 0.5));
     ListenerCmdOnTrue("IntakeToggle", new IntakePower(intake, IntakePower.Power.Toggle, 0.5));
+    ListenerCmdOnTrue("LimelightToggle", new toggleLED(limelight));
+    ListenerCmdOnTrue("MagLock", new InstantCommand( intake.getMagazine().getMagPositioner()::lock));
+    ListenerCmdOnTrue("MagCalibrate", new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));
+
 
   }
 

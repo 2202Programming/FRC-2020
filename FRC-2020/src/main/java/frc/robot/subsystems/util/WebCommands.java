@@ -1,5 +1,7 @@
 package frc.robot.subsystems.util;
 
+import java.util.function.Consumer;
+
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -11,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.InterstellarSettings;
+import frc.robot.RobotContainer;
 import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_drivePath_cmd;
@@ -37,6 +40,7 @@ public class WebCommands {
 
     table = NetworkTableInstance.getDefault().getTable("Commands");
 
+    // These scheule  a command and flip after scheduling
     ListenerCmdOnTrue("runMatchReady", new MatchReadyCmd() );
     ListenerCmdOnTrue("runZeroPC", new SetPowerCellCount(0) );
     ListenerCmdOnTrue("runThreePC", new SetPowerCellCount(3) );
@@ -61,7 +65,27 @@ public class WebCommands {
     ListenerCmdOnTrue("MagZone3", new MagazineAngle(intake, InterstellarSettings.ssZone3));
     ListenerCmdOnTrue("MagZone4", new MagazineAngle(intake, InterstellarSettings.ssZone4));
 
+    // these use the button state and call a setter function
+    ListenerBoolean("setUseChassisEncoders", false, RobotContainer.getInstance().driveTrain::useChassisEncoders);
+
   }
+
+  void  ListenerBoolean(String entryName, boolean init_value, Consumer<Boolean> cmd) {
+    //create entry in our table and set initial value to false
+    NetworkTableEntry nte = table.getEntry(entryName);
+    nte.setBoolean(init_value);
+
+    // now construct the command listener, lambda called on value changes 
+    table.addEntryListener(entryName, (table, key, entry, value, flags)  -> 
+      {
+        boolean b = value.getBoolean();
+        cmd.accept(b);
+        System.out.println("***Web Boolean " + entryName + " = " + b);
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+  }
+
+
+
 
   void  ListenerCmdOnTrue(String entryName, Command cmd) {
     //create entry in our table and set initial value to false

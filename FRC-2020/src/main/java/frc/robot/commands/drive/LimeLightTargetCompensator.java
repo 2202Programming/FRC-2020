@@ -15,7 +15,7 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 public class LimeLightTargetCompensator extends CommandBase {
   
   // code stolen from auto_limelightTurnToShoot
-  final double max_rotation = 5.0; // [deg/sec]
+  final double max_rot_rate = 5.0; // [deg/sec]
   final double Kap = 0.015, Kai = 0.00001, Kad = 3.0; //angle drive PIDs
   final double angleToleranceDeg = 1.0;
 
@@ -52,11 +52,17 @@ public class LimeLightTargetCompensator extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
+  public void execute() { 
+    double angleRateCmd = 0.0;   // [deg/s]
     // run PID on Limelight
-    m_target_angle = limelight.getX();
-    double angleCmd = anglePIDController.calculate(m_target_angle);
-    m_correction = MathUtil.clamp(angleCmd, -max_rotation, max_rotation);
+    if (limelight.valid()) {
+      m_target_angle = limelight.getX();    //goes to zero (our setpoint) when aligned
+      angleRateCmd = anglePIDController.calculate(m_target_angle);
+    }
+    else {
+      anglePIDController.reset();
+    }
+    m_correction = MathUtil.clamp(angleRateCmd, -max_rot_rate, max_rot_rate);
   }
 
   // Called once the command ends or is interrupted.

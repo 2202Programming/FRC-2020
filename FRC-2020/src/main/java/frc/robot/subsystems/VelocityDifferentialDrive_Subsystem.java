@@ -67,7 +67,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final IdleMode KIdleMode = IdleMode.kBrake;
   final double Kgyro = -1.0; // ccw is positive, just like geometry class
 
-  //Chassis Encoder
+  // Chassis Encoder
   final double kFeetPerPulse = .00057558;
   final boolean kInvertChassisLeft = true;
   final boolean kInvertChassisRight = false;
@@ -92,10 +92,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private NetworkTableEntry nt_leftOutput;
   private NetworkTableEntry nt_rightOutput;
 
-  //Field position
+  // Field position
   Field2d m_field = new Field2d();
 
-  //save a pose
+  // save a pose
   Pose2d savedPose;
 
   // we only use this one PID slot for the drive lead controllers
@@ -125,10 +125,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private final CANSparkMax middleRight = new CANSparkMax(CAN.MR_SMAX, kBrushless);
   private final CANSparkMax middleLeft = new CANSparkMax(CAN.ML_SMAX, kBrushless);
 
-  private final CANSparkMax[] controllers = new CANSparkMax[] {
-     frontRight, frontLeft, 
-     backRight,  backLeft, 
-     middleRight, middleLeft };
+  private final CANSparkMax[] controllers = new CANSparkMax[] { frontRight, frontLeft, backRight, backLeft, middleRight,
+      middleLeft };
 
   // split left/right sides controller/encoder/pid
   final CANSparkMax leftController = backLeft;
@@ -137,9 +135,12 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final CANEncoder rightEncoder = rightController.getEncoder();
   final CANPIDController leftPID = leftController.getPIDController();
   final CANPIDController rightPID = rightController.getPIDController();
-  
-  private final Encoder leftChassisEncoder = new Encoder(DigitalIO.LEFT_CHASSIS_ENCODER_A, DigitalIO.LEFT_CHASSIS_ENCODER_B);
-  private final Encoder rightChassisEncoder = new Encoder(DigitalIO.RIGHT_CHASSIS_ENCODER_A, DigitalIO.RIGHT_CHASSIS_ENCODER_B);
+
+  final Encoder leftChassisEncoder = new Encoder(DigitalIO.LEFT_CHASSIS_ENCODER_A, DigitalIO.LEFT_CHASSIS_ENCODER_B);
+  final Encoder rightChassisEncoder = new Encoder(DigitalIO.RIGHT_CHASSIS_ENCODER_A, DigitalIO.RIGHT_CHASSIS_ENCODER_B);
+
+  // controls which encoders to use for position estimates on field in getPose()
+  boolean m_useChassisEncoders = false;
 
   // Voltage to get robot to move.
   // kS - taken from the Drive Characterization
@@ -147,7 +148,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private final double ARBIT_FEEDFWD_MAX_VOLT = 1.5; // volts max allowed
   private double arbFeedFwd = RamseteProfile.ksVolts; // current value
 
-  // Calculated based on desired low-gear max ft/s - UX may update 
+  // Calculated based on desired low-gear max ft/s - UX may update
   double maxFPS_High; // <input>
   double maxFPS_Low; // using HIGH gear max RPM
   double maxRPM_High; // max motor RPM low & high
@@ -155,35 +156,35 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   // drivetrain & gear objects
   final DifferentialDrive dDrive;
-  Shifter gearbox;
+  final Shifter gearbox;
   Gear requestedGear; // where driver or external logic wants the gear
   boolean coastMode = false; // attempt to coast when Vcmd > Vrequest
 
   // Save our commanded wheelspeeds and current speeds
   final DifferentialDriveWheelSpeeds m_commandedWheelSpeeds = new DifferentialDriveWheelSpeeds();
-  
+
   // measurements, taken in periodic(), robot coordinates
   final DifferentialDriveWheelSpeeds m_wheelSpeeds = new DifferentialDriveWheelSpeeds();
   double m_posLeft = 0.0; // feet, positive is forward distance, since encoder reset
   double m_posRight = 0.0; // feet, positive is forward distance, since encoder reset
   Gear m_currentGear; // high/low
-  double m_posChassisLeft = 0.0;  //feet, positive forward, since encoder reset
-  double m_posChassisRight = 0.0; //feet, positive forward, since encoder reset
+  double m_posChassisLeft = 0.0; // feet, positive forward, since encoder reset
+  double m_posChassisRight = 0.0; // feet, positive forward, since encoder reset
   double m_velChassisLeft;
   double m_velChassisRight;
 
   double m_voltleft; // save voltages that we send to motor
   double m_voltright;
-  Supplier<Double> m_heading_compensator;  //radians/s 
+  Supplier<Double> m_heading_compensator; // radians/s
 
-  //setpoint
-  DriveSetPoints sp_rpm = new DriveSetPoints();
+  // setpoints for left/right wheel speeds [rpm] Sparkmax
+  final DriveSetPoints sp_rpm = new DriveSetPoints();
 
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
   private final DifferentialDriveOdometry m_odometry_chassis;
 
-  //nav sensors
+  // nav sensors
   Sensors_Subsystem nav;
 
   // Simulation - these classes help us simulate our drivetrain
@@ -191,8 +192,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private EncoderSim2 m_leftEncoderSim;
   private EncoderSim2 m_rightEncoderSim;
 
-
-  //list of positions for recording path
+  // list of positions for recording path
   public List<Translation2d> PositionList = new ArrayList<Translation2d>();
   private boolean recordPositionOn = false;
   public Pose2d recordingPoseStart;
@@ -202,17 +202,17 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // save scaling factors, they are required to use SparkMax in Vel mode
     gearbox = gear;
     requestedGear = gearbox.getCurrentGear();
-    
+
     // get the nav sensor subsystem for odometry reporting
     nav = RobotContainer.getInstance().sensors;
     setHeadingCompensator(null);
 
-   //direct networktables logging
+    // direct networktables logging
     table = NetworkTableInstance.getDefault().getTable("Drivetrain");
     nt_velLeft = table.getEntry("VelLeft/value");
     nt_velRight = table.getEntry("VelRight/value");
     nt_velChassisLeft = table.getEntry("VelChassisLeft");
-    nt_velChassisRight  = table.getEntry("VelChassisRight");
+    nt_velChassisRight = table.getEntry("VelChassisRight");
     nt_posLeft = table.getEntry("PosLeft");
     nt_posRight = table.getEntry("PosRight");
     nt_posChassisLeft = table.getEntry("PosChassisLeft");
@@ -235,7 +235,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     rightChassisEncoder.setDistancePerPulse(kFeetPerPulse);
     rightChassisEncoder.setReverseDirection(kInvertChassisRight);
 
-    //Speed setting may be updated via UX, but set defaults
+    // Speed setting may be updated via UX, but set defaults
     calcSpeedSettings();
 
     // setup SparkMax controllers, sets left and right masters
@@ -251,10 +251,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
     // clear our starting position.
     resetPosition();
-    m_odometry = new DifferentialDriveOdometry(nav.getRotation2d() );
-    m_odometry_chassis = new DifferentialDriveOdometry(nav.getRotation2d() );
+    m_odometry = new DifferentialDriveOdometry(nav.getRotation2d());
+    m_odometry_chassis = new DifferentialDriveOdometry(nav.getRotation2d());
 
-    savedPose = m_odometry.getPoseMeters(); //set savedPose to starting position initally
+    savedPose = m_odometry.getPoseMeters(); // set savedPose to starting position initally
   }
 
   void calcSpeedSettings() {
@@ -315,12 +315,12 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     m_currentGear = gearbox.getCurrentGear();
     double kGR = gearbox.getGearRatio();
     /**
-     * Chassis encoders
+     * Chassis encoders - gear and wheeldiam set in scaler for getDistance()
      */
-    m_posChassisLeft = leftChassisEncoder.getDistance();
-    m_posChassisRight = rightChassisEncoder.getDistance();
-    m_velChassisLeft = leftChassisEncoder.getRate();
-    m_velChassisRight = rightChassisEncoder.getRate();
+    m_posChassisLeft = WheelWearLeft * leftChassisEncoder.getDistance();
+    m_posChassisRight = WheelWearRight * rightChassisEncoder.getDistance();
+    m_velChassisLeft = WheelWearLeft * leftChassisEncoder.getRate();
+    m_velChassisRight = WheelWearRight * rightChassisEncoder.getRate();
 
     /**
      * Encoder.getPostion() is in units of revs of motor shaft K_ft_per_rev -
@@ -338,7 +338,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
      *
      **/
     m_wheelSpeeds.leftMetersPerSecond = (Kleft * K_ft_per_rev * WheelWearLeft * kGR / 60.0) * leftEncoder.getVelocity();
-    m_wheelSpeeds.rightMetersPerSecond = (Kright * K_ft_per_rev * WheelWearRight * kGR / 60.0) * rightEncoder.getVelocity();
+    m_wheelSpeeds.rightMetersPerSecond = (Kright * K_ft_per_rev * WheelWearRight * kGR / 60.0)  * rightEncoder.getVelocity();
 
     // Update the odometry in the periodic block, physical units, update field
     m_odometry.update(nav.getRotation2d(), m_posLeft, m_posRight);
@@ -346,18 +346,17 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     m_field.setRobotPose(m_odometry.getPoseMeters());
   }
 
-  
-  //Record position
-  public void addPosition(){
+  // Record position
+  public void addPosition() {
     PositionList.add(new Translation2d(m_odometry.getPoseMeters().getX(), m_odometry.getPoseMeters().getY()));
   }
 
-  public void turnPositionRecordingOn(){
+  public void turnPositionRecordingOn() {
     recordPositionOn = true;
     recordingPoseStart = m_odometry.getPoseMeters();
   }
 
-  public void turnPositionRecordingOff(){
+  public void turnPositionRecordingOff() {
     recordPositionOn = false;
     recordingPoseEnd = m_odometry.getPoseMeters();
   }
@@ -421,18 +420,19 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
       // lower CAN message rates, for everyone. Masters will get set higher later
       c.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 200); // applied output (norm 10ms)
-      c.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 500); // motor Vel,T, Volt  (norm 20ms)
+      c.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 500); // motor Vel,T, Volt (norm 20ms)
       c.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500); // motor pos (norm 20ms)
     }
   }
 
   /**
    * Master controllers need to report back faster or at normal rate
+   * 
    * @param c SparkMax controller used as a master
    */
   private void setMasterControlerTiming(CANSparkMax c) {
     c.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // applied output (norm 10ms)
-    c.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10); // motor Vel,T, Volt  (norm 20ms)
+    c.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10); // motor Vel,T, Volt (norm 20ms)
     c.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20); // motor pos (norm 20ms)
   }
 
@@ -456,14 +456,14 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // Spark Max uses RPM for velocity closed loop mode
     // so we need to convert ft/s to RPM command which is dependent
     // on the gear ratio.
-    
+
     // [s/min] / [ft /wheel-rev] / [motor-rev / wheel-rev] = [motor-rpm / ft/s]
-    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();  
+    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();
     double maxSpeed = getMaxSpeed(m_currentGear);
 
     // limit vel to max for the gear ratio
     double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
-    double rpm = kGR * vcmd;  // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
+    double rpm = kGR * vcmd; // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
 
     /**
      * Rotation controls
@@ -472,8 +472,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
     rps = rps + m_heading_compensator.get();
 
-    //     [mo-rpm/ ft/s]  [rad/deg] [ft] [deg/s] =  [mo-rpm/ ft/s] * [ft/s] = mo-rpm
-    double vturn_rpm = kGR * (Math.PI / 180.0)*(0.5*WheelAxleDistance) * rps;
+    // [mo-rpm/ ft/s] [rad/deg] [ft] [deg/s] = [mo-rpm/ ft/s] * [ft/s] = mo-rpm
+    double vturn_rpm = kGR * (Math.PI / 180.0) * (0.5 * WheelAxleDistance) * rps;
 
     // compute each wheel, pos rpm moves forward, pos turn is CCW
     double vl_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ); // turn left, +CCW, slows left wheel
@@ -497,14 +497,15 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // Spark Max uses RPM for velocity closed loop mode
     // so we need to convert ft/s to RPM command which is dependent
     // on the gear ratio.
-    // [s/min] / [ft/wheel-rev] / [wheel-rev / motor-rev] = [mo-rev / min] / [ft/s] = [mo-rpm / ft/s]
-    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio(); 
+    // [s/min] / [ft/wheel-rev] / [wheel-rev / motor-rev] = [mo-rev / min] / [ft/s]
+    // = [mo-rpm / ft/s]
+    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();
     double rps = m_heading_compensator.get();
-    double vturn_rpm = (Math.PI / 180.0)*(0.5*WheelAxleDistance) * rps;
-  
-    // [mo-rpm / ft/s] * [ft/s]  = [rpm-mo]
-    double rpm_l = kGR * (velLeft - vturn_rpm);  
-    double rpm_r = kGR * (velRight + vturn_rpm); 
+    double vturn_rpm = (Math.PI / 180.0) * (0.5 * WheelAxleDistance) * rps;
+
+    // [mo-rpm / ft/s] * [ft/s] = [rpm-mo]
+    double rpm_l = kGR * (velLeft - vturn_rpm);
+    double rpm_r = kGR * (velRight + vturn_rpm);
     // scale to rpm and ouput to contollers, no coast mode
     output(rpm_l, rpm_r, false, kGR);
   }
@@ -513,18 +514,23 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * 
    * sets supplier for heading compensation in degs/sec
    * 
-   * @param headingDotComp  degs/sec to turn based on external system like limelight or gyro
+   * @param headingDotComp degs/sec to turn based on external system like
+   *                       limelight or gyro
    */
   public void setHeadingCompensator(Supplier<Double> headingDotComp) {
     if (null == headingDotComp) {
       m_heading_compensator = this::defaultHeadingCompensator;
     }
   }
+
   /**
    * No heading compensation - use by default
+   * 
    * @return 0.0
    */
-  double defaultHeadingCompensator() {return 0.0;}
+  double defaultHeadingCompensator() {
+    return 0.0;
+  }
 
   /**
    * Issues all the output changes to the motor controller and gear shifter when
@@ -544,17 +550,25 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     } else {
       // command the velocity to the wheels, correct for wheelwear
       // also correct for any left/right motor conventions
-      sp_rpm.left =  l_rpm * (Kleft / WheelWearLeft);
+      sp_rpm.left = l_rpm * (Kleft / WheelWearLeft);
       sp_rpm.right = r_rpm * (Kright / WheelWearRight);
 
-      //save commanded wheel speeds
-      m_commandedWheelSpeeds.leftMetersPerSecond = sp_rpm.left/kGR;         // not meters, we use ft/s
-      m_commandedWheelSpeeds.rightMetersPerSecond = sp_rpm.right/kGR;
+      // save commanded wheel speeds - [ft/s]
+      m_commandedWheelSpeeds.leftMetersPerSecond = sp_rpm.left / kGR; // not meters, we use ft/s
+      m_commandedWheelSpeeds.rightMetersPerSecond = sp_rpm.right / kGR;
 
-      setReference(sp_rpm.left, leftPID);
-      setReference(sp_rpm.right, rightPID);
+      // arbff compensates for min voltage needed to make robot move
+      // +V moves forward, -V moves backwards
+      double arbffVoltsLeft = (sp_rpm.left > 0) ? arbFeedFwd : -arbFeedFwd;
+      double arbffVoltsRight = (sp_rpm.right > 0) ? arbFeedFwd : -arbFeedFwd;
+
+      // rpm haz a deadzone so rpm == 0.0 is a fair test.
+      if (sp_rpm.left == 0.0)   arbffVoltsLeft = 0.0;
+      if (sp_rpm.right == 0.0)  arbffVoltsRight = 0.0;
+
+      leftPID.setReference(sp_rpm.left, ControlType.kVelocity, KpidSlot, arbffVoltsLeft, ArbFFUnits.kVoltage);
+      rightPID.setReference(sp_rpm.right, ControlType.kVelocity, KpidSlot, arbffVoltsRight, ArbFFUnits.kVoltage);
     }
-
     shiftGears();
     dDrive.feed();
   }
@@ -588,19 +602,16 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   public double getLeftVel(final boolean normalized) {
-    return (normalized) ? (m_wheelSpeeds.leftMetersPerSecond / maxFPS_High) :
-                           m_wheelSpeeds.leftMetersPerSecond;
+    return (normalized) ? (m_wheelSpeeds.leftMetersPerSecond / maxFPS_High) : m_wheelSpeeds.leftMetersPerSecond;
   }
 
   public double getRightVel(final boolean normalized) {
-    return (normalized) ? (m_wheelSpeeds.rightMetersPerSecond / maxFPS_High) :
-                          m_wheelSpeeds.rightMetersPerSecond;
+    return (normalized) ? (m_wheelSpeeds.rightMetersPerSecond / maxFPS_High) : m_wheelSpeeds.rightMetersPerSecond;
   }
 
   public double getAvgVelocity(final boolean normalized) {
-    double vel = 0.5*(m_wheelSpeeds.leftMetersPerSecond + 
-                      m_wheelSpeeds.rightMetersPerSecond);
-    return (normalized) ? (vel/maxFPS_High) : vel;
+    double vel = 0.5 * (m_wheelSpeeds.leftMetersPerSecond + m_wheelSpeeds.rightMetersPerSecond);
+    return (normalized) ? (vel / maxFPS_High) : vel;
   }
 
   public DriveSetPoints getVelocitySetpoints() {
@@ -608,8 +619,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   public void resetPosition() {
+    // SparkMax encoders
     leftEncoder.setPosition(0);
     rightEncoder.setPosition(0);
+
+    // Chassis encoders
     leftChassisEncoder.reset();
     rightChassisEncoder.reset();
   }
@@ -669,8 +683,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
      */
 
     // encoder vel and positions
-    nt_velLeft.setDouble(m_wheelSpeeds.leftMetersPerSecond);   //ft/s
-    nt_velRight.setDouble(m_wheelSpeeds.rightMetersPerSecond); //ft/s
+    nt_velLeft.setDouble(m_wheelSpeeds.leftMetersPerSecond); // ft/s
+    nt_velRight.setDouble(m_wheelSpeeds.rightMetersPerSecond); // ft/s
     nt_posLeft.setDouble(m_posLeft);
     nt_posRight.setDouble(m_posRight);
 
@@ -683,29 +697,13 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_currentPoseX.setDouble(m_odometry.getPoseMeters().getX());
     nt_currentPoseY.setDouble(m_odometry.getPoseMeters().getY());
     nt_currentPoseYaw.setDouble(m_odometry.getPoseMeters().getRotation().getDegrees());
-    
+
     // motor outputs
     nt_leftOutput.setDouble(leftController.getAppliedOutput());
     nt_rightOutput.setDouble(rightController.getAppliedOutput());
 
-    if (recordPositionOn) addPosition();
-  }
-
-  /**
-   * setReference - uses physical units (rpm) for speed - volts for arbitrary feed
-   * forward
-   * 
-   * @param rpm - revs per minute for desired
-   */
-  public void setReference(double rpm, CANPIDController pid) {
-    // arbff compensates for min voltage needed to make robot move
-    // +V moves forward, -V moves backwards
-    double arbffVolts = (rpm >= 0) ? arbFeedFwd : -arbFeedFwd;
-
-    // rpm haz a deadzone so == 0.0 is a fair test.
-    if (rpm == 0.0)
-      arbffVolts = 0.0;
-    pid.setReference(rpm, ControlType.kVelocity, KpidSlot, arbffVolts, ArbFFUnits.kVoltage);
+    if (recordPositionOn)
+      addPosition();
   }
 
   /**
@@ -721,20 +719,22 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   public void addDashboardWidgets(ShuffleboardLayout layout) {
-    /*layout.addNumber("DT/Vel/left", () -> m_velLeft).withSize(2, 5);
-    layout.addNumber("DT/Vel/right", () -> m_velRight);
-    layout.addNumber("DT/pos/left", () -> m_posLeft);
-    layout.addNumber("DT/pos/right", () -> m_posRight);
-
-    layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
-    layout.addNumber("DT/POSE/X", () -> getPose().getX());
-    layout.addNumber("DT/POSE/Y", () -> getPose().getY());
-    layout.addNumber("DT/POSE/The", () -> getPose().getRotation().getDegrees());
-    layout.addNumber("DT/POSE/VoltLeft", () -> m_voltleft);
-	  layout.addNumber("DT/POSE/VoltRight", () -> m_voltright);
-    layout.addBoolean("DT/Motor/RightInverted?", () -> frontRight.getInverted());
-    layout.addBoolean("DT/Motor/LeftInverted?", () -> frontLeft.getInverted()); */
-	}
+    /*
+     * layout.addNumber("DT/Vel/left", () -> m_velLeft).withSize(2, 5);
+     * layout.addNumber("DT/Vel/right", () -> m_velRight);
+     * layout.addNumber("DT/pos/left", () -> m_posLeft);
+     * layout.addNumber("DT/pos/right", () -> m_posRight);
+     * 
+     * layout.addString("DT/gear", () -> gearbox.getCurrentGear().toString());
+     * layout.addNumber("DT/POSE/X", () -> getPose().getX());
+     * layout.addNumber("DT/POSE/Y", () -> getPose().getY());
+     * layout.addNumber("DT/POSE/The", () -> getPose().getRotation().getDegrees());
+     * layout.addNumber("DT/POSE/VoltLeft", () -> m_voltleft);
+     * layout.addNumber("DT/POSE/VoltRight", () -> m_voltright);
+     * layout.addBoolean("DT/Motor/RightInverted?", () -> frontRight.getInverted());
+     * layout.addBoolean("DT/Motor/LeftInverted?", () -> frontLeft.getInverted());
+     */
+  }
 
   /**
    * Controls the left and right sides of the drive directly with voltages.
@@ -767,13 +767,21 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return The current wheel speeds.
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return m_wheelSpeeds; 
+    return m_wheelSpeeds;
   }
 
   public DifferentialDriveWheelSpeeds getCommandedWheelSpeeds() {
     return m_commandedWheelSpeeds;
   }
 
+  /**
+   * 
+   * @param chassis_enc  - true use encoders on chassis
+   *                     - false use the SparkMax off the CAN bus
+   */
+  public void useChassisEncoders(Boolean chassis_enc) {
+    m_useChassisEncoders = chassis_enc;
+  }
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -781,48 +789,43 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    return (m_useChassisEncoders) ? m_odometry_chassis.getPoseMeters() : m_odometry.getPoseMeters();
   }
 
-  //update the savedPose on demand
-  public void savePose(){
+  // update the savedPose on demand
+  public void savePose() {
     savedPose = m_odometry.getPoseMeters();
     return;
   }
 
-  public Pose2d getSavedPose(){
-    //System.out.println("Saved X:" + savedPose.getX());
-    //System.out.println("Saved Y:" + savedPose.getY());
+  public Pose2d getSavedPose() {
+    // System.out.println("Saved X:" + savedPose.getX());
+    // System.out.println("Saved Y:" + savedPose.getY());
     return savedPose;
   }
 
   /**
-   * Resets the odometry to the specified pose. X, Y are set as is the expected rotation.
-   * The gyro is sampled and used as an offset internally.
+   * Resets the odometry to the specified pose. X, Y are set as is the expected
+   * rotation. The gyro is sampled and used as an offset internally.
    *
    * @param pose The pose to which to set the odometry.
    */
   public void resetOdometry(Pose2d pose) {
     resetPosition();
-    nav.reset();
-    m_odometry.resetPosition(pose, nav.getRotation2d()); 
+    // dpl - 3/23/21 not sure if this should be here - nav.reset();
+    m_odometry.resetPosition(pose, nav.getRotation2d());
   }
 
   void setupSimulation() {
-      LinearSystem<N2, N2, N2> drivetrainPlant = 
-        LinearSystemId.identifyDrivetrainSystem(
-            RamseteProfile.kvVoltSecondsPerFoot,
-            RamseteProfile.kaVoltSecondsSquaredPerFoot,
-            1.5,  //kvVoltSecondsPerRadian,       //TODO: find real numbers
-            0.3); //kaVoltSecondsSquaredPerRadian);
+    LinearSystem<N2, N2, N2> drivetrainPlant = LinearSystemId.identifyDrivetrainSystem(
+        RamseteProfile.kvVoltSecondsPerFoot, RamseteProfile.kaVoltSecondsSquaredPerFoot, 1.5, // kvVoltSecondsPerRadian,
+                                                                                              // //TODO: find real
+                                                                                              // numbers
+        0.3); // kaVoltSecondsSquaredPerRadian);
 
     // This class simulates our drivetrain's motion around the field.
-    m_drivetrainSimulator = new DifferentialDrivetrainSim(
-        drivetrainPlant, 
-        DCMotor.getNEO(3),
-        (1.0/GearShifter.K_low), 
-        RobotPhysical.WheelAxleDistance, 
-        (RobotPhysical.WheelDiameter/2.0)/12.0,
+    m_drivetrainSimulator = new DifferentialDrivetrainSim(drivetrainPlant, DCMotor.getNEO(3), (1.0 / GearShifter.K_low),
+        RobotPhysical.WheelAxleDistance, (RobotPhysical.WheelDiameter / 2.0) / 12.0,
         VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
 
     // The encoder and gyro angle sims let us set simulated sensor readings
@@ -837,12 +840,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // gyro.
     // We negate the right side so that positive voltages make the right side
     // move forward.
-    m_drivetrainSimulator.setInputs(
-        leftController.get() * RobotController.getBatteryVoltage(),
+    m_drivetrainSimulator.setInputs(leftController.get() * RobotController.getBatteryVoltage(),
         -rightController.get() * RobotController.getBatteryVoltage());
     m_drivetrainSimulator.update(0.020);
 
-    //we are using feet, not meeters.
+    // we are using feet, not meeters.
     m_leftEncoderSim.setDistance(m_drivetrainSimulator.getLeftPositionMeters());
     m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
@@ -850,8 +852,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   /**
-   * Returns the current being drawn by the drivetrain. This works in SIMULATION ONLY! If you want
-   * it to work elsewhere, use the code in {@link DifferentialDrivetrainSim#getCurrentDrawAmps()}
+   * Returns the current being drawn by the drivetrain. This works in SIMULATION
+   * ONLY! If you want it to work elsewhere, use the code in
+   * {@link DifferentialDrivetrainSim#getCurrentDrawAmps()}
    *
    * @return The drawn current in Amps.
    */
@@ -866,7 +869,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   @Override
   public double getMaxRotation() {
-   return this.maxDPS;
+    return this.maxDPS;
   }
 
 }

@@ -209,3 +209,7 @@ background-size: cover;
 .wider-button {
   width: 120px;
 }
+
+.super-wide-button {
+  width: 180px;
+}

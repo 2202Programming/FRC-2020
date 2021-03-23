@@ -277,12 +277,36 @@
 </div>
 </div>
   </frc-dashboard>
-  <script src="./frc-web-components.js"></script>
-  <script src="/networktables/networktables.js"></script>
-  <script src="/networktables/utils.js"></script>
-  <script>
+<script src="./frc-web-components.js"></script>
+<script src="/networktables/networktables.js"></script>
+<!--<script src="/networktables/utils.js"></script>
+  <script src="/networktables/jquery_ext.js"></script> -->
 
-NetworkTables.addRobotConnectionListener(connected => console.log('is connected:', connected), true);
+<script>
+
+NetworkTables.addRobotConnectionListener(connected => console.log('2202 Robot is connected:', connected), true);
+
+function logMapElements(value, key, map) {
+  console.log(`m[${key}] = ${value}`);
+}
+
+function DPLCommands() {
+  if (NetworkTables.isRobotConnected() ) 
+  { 
+    console.log("Robot is connected");
+    const keys = NetworkTables.getKeys();
+    for (const k of keys) {
+      if (k.includes("/Commands/")) {
+        console.log(k);
+      }
+    }
+
+    
+  }
+  else {console.log("NO ROBOT"); }
+}
+
+
 
 class BooleanLabel extends webbit.LitElement {
  
@@ -316,7 +340,10 @@ class BooleanLabel extends webbit.LitElement {
    }
  }
 
- customElements.define('frc-boolean-label', BooleanLabel);
+// run a DPLCommands when the robot is connected.
+NetworkTables.addRobotConnectionListener(connected => DPLCommands() , true);
+
+customElements.define('frc-boolean-label', BooleanLabel);
 
  webbitRegistry.addExisting('frc-boolean-label', {
  displayName: 'Boolean Label',
@@ -330,6 +357,6 @@ class BooleanLabel extends webbit.LitElement {
  }
 });
 
-  </script>
+</script>
 </body>
 </html>

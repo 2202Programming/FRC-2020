@@ -144,11 +144,13 @@
         <div class="row">
           <div class="col-sm-3">
             <div>
-              <h4>Choose Path</h4>
               <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/selected" value="do nothing"></nt-string>
-              <frc-combo-box source-key="/Shuffleboard/Match/AutoPath/PathChooser"></frc-combo-box>
-              <frc-text-area source-key="/Shuffleboard/Match/AutoPath/PathChooser/selected"></frc-text-area>
-              <frc-text-area source-key="/Shuffleboard/Match/AutoPath/PathChooser/active"></frc-text-area>
+              <frc-combo-box name="Select Path:" source-key="/Shuffleboard/Match/AutoPath/PathChooser"></frc-combo-box>
+              <frc-text-area label="Active Path:" source-key="/Shuffleboard/Match/AutoPath/PathChooser/selected"></frc-text-area>
+              <h4>Commands</h4>
+              <frc-toggle-button label="DrivePath" class="wider-button" source-key="/Commands/DrivePath"></frc-toggle-button>
+              <frc-toggle-button label="GoToPose" class="wider-button" source-key="/Commands/GoToPose"></frc-toggle-button>
+              <frc-toggle-button label="SavePose" class="wider-button" source-key="/Commands/SavePose"></frc-toggle-button>
 
             </div>
           </div>

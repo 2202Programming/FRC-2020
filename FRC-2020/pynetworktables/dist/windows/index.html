@@ -35,11 +35,11 @@
         <div class="col-sm-3 bg-light" style="padding: 0 !important; margin: 0;">
           <br>
           <div>
-          <a href="#intake" ><img src="Untitled-Artwork (2).jpg" style="width: 300px; margin: 0;"></a>
-          <a href="#path"><img src="path.png" style="width: 300px; margin: 0;"></a>
-          <a href="#direction"><img src="direction.png" style="width: 300px; margin: 0;"></a>
-          <a href="#data"><img src="data.png" style="width: 300px; margin: 0;"></a>
-          <a href="#cameras"><img src="camera.png" style="width: 300px; margin: 0;"></a>
+          <a href="#intake" ><img src="./images/intake.jpg" style="width: 300px; margin: 0;"></a>
+          <a href="#path"><img src="./images/path.png" style="width: 300px; margin: 0;"></a>
+          <a href="#direction"><img src="./images/direction.png" style="width: 300px; margin: 0;"></a>
+          <a href="#data"><img src="./images/data.png" style="width: 300px; margin: 0;"></a>
+          <a href="#cameras"><img src="./images/camera.png" style="width: 300px; margin: 0;"></a>
           </div>
         </div>
         <div class="col-sm-9">
@@ -293,37 +293,17 @@
   </div>
 </div>
 </div>
-  </frc-dashboard>
-<script src="./frc-web-components.js"></script>
+</frc-dashboard>
+<script src="./libs/d3.v6.min.js"></script>
+<script src="./libs/jquery-3.6.0.min.js"></script>
+<script src="./libs/frc-web-components.js"></script>
 <script src="/networktables/networktables.js"></script>
-<!--<script src="/networktables/utils.js"></script>
-  <script src="/networktables/jquery_ext.js"></script> -->
-
+<script src="/networktables/utils.js"></script>
+<script src="/networktables/jquery_ext.js"></script>
+<script src="./js/dpl_test.js"></script>
 <script>
 
 NetworkTables.addRobotConnectionListener(connected => console.log('2202 Robot is connected:', connected), true);
-
-function logMapElements(value, key, map) {
-  console.log(`m[${key}] = ${value}`);
-}
-
-function DPLCommands() {
-  if (NetworkTables.isRobotConnected() ) 
-  { 
-    console.log("Robot is connected");
-    const keys = NetworkTables.getKeys();
-    for (const k of keys) {
-      if (k.includes("/Commands/")) {
-        console.log(k);
-      }
-    }
-
-    
-  }
-  else {console.log("NO ROBOT"); }
-}
-
-
 
 class BooleanLabel extends webbit.LitElement {
  
@@ -358,7 +338,7 @@ class BooleanLabel extends webbit.LitElement {
  }
 
 // run a DPLCommands when the robot is connected.
-NetworkTables.addRobotConnectionListener(connected => DPLCommands() , true);
+NetworkTables.addRobotConnectionListener(connected => DPLConnect() , true);
 
 customElements.define('frc-boolean-label', BooleanLabel);
 

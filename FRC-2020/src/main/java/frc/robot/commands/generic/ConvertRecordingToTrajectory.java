@@ -13,6 +13,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -21,7 +23,7 @@ import frc.robot.commands.generic.PositionRecorder.RecordLine;
 
 /** Add your docs here. */
 public class ConvertRecordingToTrajectory { 
-  final static String defaultDirectoryName="recordings";
+  final static String defaultDirectoryName="recorded_traj";
   
   
   //DifferentialDriveWheelSpeeds speed;
@@ -87,10 +89,9 @@ public class ConvertRecordingToTrajectory {
    * 
    * @param fileName  
    */
-  public void inputFile(String fileName) {
-    this.inFileName = fileName;
-    this.path = Paths.get(fileName);
-    lines.clear();
+  public void inputFile(File file) {
+    this.inFileName = file.getName();
+    Path path = Paths.get(file.getAbsolutePath());
 
     try {
         Stream<String> stream = Files.lines(path);
@@ -106,21 +107,32 @@ public class ConvertRecordingToTrajectory {
    * Saves the trajectory file in the output folder
    */
   public void saveTrajectory() {
-
-    String root = inFileName.split(".")[0];
-    String output = root + ".json";
+    // use the Jackson serializer description built into the State 
+    ObjectMapper mapper = new ObjectMapper();
+    ///mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    //String[] root = inFileName.split("\\.");
+    
+    String output = inFileName + ".json";
     try { 
       File f = new File(outputDir, output);
       f.createNewFile();
       writer = new PrintWriter(f); // PrintWriter is buffered
   
       System.out.println("Recording to: " + f.getAbsolutePath());
-
+      writer.print("[");
+      for (int i = 0; i < states.size() -1; i++ )
+      {
+        var s = states.get(i);
+        String str = mapper.writeValueAsString(s);
+        writer.println(str +",");
+      }
+      // write the last one and close the array
+      writer.println(mapper.writeValueAsString(states.get(states.size() -1))); 
+      writer.print("]");
+      writer.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
-  
-
   }
 
   /**

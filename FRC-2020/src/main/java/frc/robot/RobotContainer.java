@@ -162,9 +162,8 @@ public class RobotContainer {
     ));
 
     PositionRecorder recorder = new PositionRecorder(driveTrain);
-    recorder.setIsRunning(false);
+    recorder.setIsRunning(false).setConvertWhenDone(false);
   
-
      // force drivetrain to look as dashboard settings, fake an event
      driveTrain.processDashboard(null);
   }

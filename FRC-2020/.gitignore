@@ -159,5 +159,6 @@ imgui.ini
 
 #simulation generated recordings
 /recordings/
+/recorded_traj/
 
 # End of https://www.gitignore.io/api/c++,java,linux,macos,gradle,windows,visualstudiocode

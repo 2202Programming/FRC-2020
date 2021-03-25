@@ -30,19 +30,24 @@ public class PositionRecorder extends CommandBase {
    * 
    */
   public boolean isRunning = false;
+  public boolean convertToTrajectory = false;
 
   Odometry drivetrain;
   PrintWriter writer;
-  long start;
+  long start=0;
+  long traj_start=0;
 
   String directoryName="recordings";
   String workingDir;
   final Pose2d zeroPose = new Pose2d();
 
-  NetworkTableEntry directoryNameEntry;
-  NetworkTableEntry isRunningEntry;
+  ///.NetworkTableEntry directoryNameEntry;
+  NetworkTableEntry NTE_isCaptureRunning;
+  NetworkTableEntry NTE_convertToTrajectory;
 
   final RecordLine m_record;
+
+  File recordFile;
 
   //helper class
   public static class RecordLine {
@@ -92,7 +97,7 @@ public class PositionRecorder extends CommandBase {
 
     public String toString() {
       return String.format( CSV_FORMAT,
-          (time/1000000.0),
+          time,
           robot_pose.getX(),
           robot_pose.getY(),
           robot_pose.getRotation().getDegrees(),
@@ -102,7 +107,7 @@ public class PositionRecorder extends CommandBase {
           cmd_speed.leftMetersPerSecond,
           cmd_speed.rightMetersPerSecond,
 
-          (traj_time/1000000.0),
+          traj_time,
           traj_pose.getX(),
           traj_pose.getY(),
           traj_pose.getRotation().getDegrees()
@@ -130,19 +135,26 @@ public class PositionRecorder extends CommandBase {
     // get structs for wheel speeds
     m_record.cmd_speed = drivetrain.getCommandedWheelSpeeds();
     m_record.meas_speed = drivetrain.getWheelSpeeds();
+
+    setConvertWhenDone(false);
   }
   
   public void initSmartDashboard(){
     ShuffleboardTab tab =Shuffleboard.getTab("Position Recorder");
-    isRunningEntry=tab.add("Is running", isRunning).withWidget("Toggle Button").getEntry();
-    directoryNameEntry=tab.add("Directory Name", directoryName).getEntry();
+    NTE_isCaptureRunning=tab.add("Capture Running", isRunning).withWidget("Toggle Button").getEntry();    
+    NTE_isCaptureRunning.addListener((EntryNotification e) 
+        -> setIsRunning(e.value.getBoolean()), EntryListenerFlags.kUpdate|EntryListenerFlags.kNew);
 
-    isRunningEntry.addListener((EntryNotification e)-> setIsRunning(e.value.getBoolean()), EntryListenerFlags.kUpdate|EntryListenerFlags.kNew);
+    NTE_convertToTrajectory=tab.add("Convert When Done", isRunning).withWidget("Toggle Button").getEntry();    
+    NTE_convertToTrajectory.addListener((EntryNotification e) 
+        -> setConvertWhenDone(e.value.getBoolean()), EntryListenerFlags.kUpdate|EntryListenerFlags.kNew);
 
-    directoryNameEntry.addListener((EntryNotification e)-> directoryName=e.value.getString(), EntryListenerFlags.kUpdate|EntryListenerFlags.kNew);
+
+////directoryNameEntry=tab.add("Directory Name", directoryName).getEntry();
+    ////directoryNameEntry.addListener((EntryNotification e)-> directoryName=e.value.getString(), EntryListenerFlags.kUpdate|EntryListenerFlags.kNew);
   }
 
-  public void setIsRunning(boolean running){
+  public PositionRecorder setIsRunning(boolean running){
     System.out.println("Set is running: "+running);
     if(running!=isRunning){
       if(running){
@@ -151,10 +163,22 @@ public class PositionRecorder extends CommandBase {
         this.cancel();
       }
     }
-    if(isRunningEntry.getBoolean(false)!=running){
-      isRunningEntry.setBoolean(running);
+    if(NTE_isCaptureRunning.getBoolean(false)!=running){
+      NTE_isCaptureRunning.setBoolean(running);
     }
+    return this;
   }
+
+  public PositionRecorder setConvertWhenDone(boolean convert) {
+    convertToTrajectory = convert;
+    
+    // make sure nt reflects proper state
+    if (NTE_convertToTrajectory.getBoolean(false) != convertToTrajectory)
+      NTE_convertToTrajectory.setBoolean(convertToTrajectory);
+    return this;
+  }
+
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
@@ -167,13 +191,14 @@ public class PositionRecorder extends CommandBase {
       workingDir =  Filesystem.getOperatingDirectory().toString() + "/" +directoryName;
       new File(workingDir).mkdirs();
 
-      File f = new File(workingDir, filename);
-      f.createNewFile();
-      writer = new PrintWriter(f); // PrintWriter is buffered
+      recordFile = new File(workingDir, filename);
+      recordFile.createNewFile();
+      writer = new PrintWriter(recordFile);   // PrintWriter is buffered
       writer.println(RecordLine.toHeader());
-      start= RobotController.getFPGATime(); 
+      start= RobotController.getFPGATime();
+      traj_start = 0;
 
-      System.out.println("Recording to: " + f.getAbsolutePath());
+      System.out.println("Recording to: " + recordFile.getAbsolutePath());
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -192,7 +217,8 @@ public class PositionRecorder extends CommandBase {
     // log any trajectory we may be running
     Trajectory traj = followTrajectory.getCurrentTrajectory();
     if (traj != null) {
-        long traj_start = followTrajectory.getStartTime();
+        //save the trajectory starting time 
+        if (traj_start ==0) traj_start = followTrajectory.getStartTime();
         m_record.traj_time = (now - traj_start)/1000000.0;
         m_record.traj_pose = traj.sample(m_record.traj_time).poseMeters;    
     }
@@ -219,6 +245,12 @@ public class PositionRecorder extends CommandBase {
       writer.close();
       writer = null;
     }
+    if (convertToTrajectory) {
+      var converter = new ConvertRecordingToTrajectory();
+      converter.inputFile(recordFile);
+      converter.saveTrajectory();
+    }
+
   }
 
 

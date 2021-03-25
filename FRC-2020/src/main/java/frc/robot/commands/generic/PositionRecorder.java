@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -36,21 +37,99 @@ public class PositionRecorder extends CommandBase {
 
   String directoryName="recordings";
   String workingDir;
+  final Pose2d zeroPose = new Pose2d();
 
   NetworkTableEntry directoryNameEntry;
   NetworkTableEntry isRunningEntry;
-  final DifferentialDriveWheelSpeeds m_cmd_wheels;
-  final DifferentialDriveWheelSpeeds m_meas_wheels;
+
+  final RecordLine m_record;
+
+  //helper class
+  public static class RecordLine {
+    /* public enum Data {
+      time(0), poseX, poseY, poseRot,
+      meas_ws_l, meas_ws_r, 
+      cmd_ws_l, cmd_ws_r,
+      traj_time, traj_poseX, traj_poseY, traj_poseRot
+    } */
+
+    public double time;
+    public Pose2d robot_pose;
+    public DifferentialDriveWheelSpeeds meas_speed;
+    public DifferentialDriveWheelSpeeds cmd_speed;
+    public double traj_time;
+    public Pose2d traj_pose;
+
+    public RecordLine() {
+      time = 0.0;
+      robot_pose = new Pose2d();
+      traj_time = 0.0;
+      traj_pose = new Pose2d();
+      
+      meas_speed = new DifferentialDriveWheelSpeeds();
+      cmd_speed = new DifferentialDriveWheelSpeeds();
+    }
+
+    public RecordLine(double [] data) {
+      time = data[0];
+      robot_pose = new Pose2d(data[1], data[2], new Rotation2d(data[3]));
+      meas_speed = new DifferentialDriveWheelSpeeds(data[4], data[5]);
+      cmd_speed = new DifferentialDriveWheelSpeeds(data[6], data[7]);
+      traj_time = data[8];
+      traj_pose = new Pose2d(data[9], data[10], new Rotation2d(data[11]));
+    }
+
+    public static String toHeader() {
+      return "elapsed-uS, x, y, rot-deg, " + 
+          "meas-ws-left, meas-ws-right, cmd-ws-left, cmd-ws-right, "+
+          "traj-time, traj-x, traj-y, traj-rot-deg,";
+
+    }
+
+    public static final String CSV_FORMAT = "%05.3f , %05.3f , %05.3f , %05.3f , " + 
+                             "%05.3f , %05.3f , %05.3f , %05.3f , " + 
+                             "%05.3f , %05.3f , %05.3f , %05.3f";
+
+    public String toString() {
+      return String.format( CSV_FORMAT,
+          (time/1000000.0),
+          robot_pose.getX(),
+          robot_pose.getY(),
+          robot_pose.getRotation().getDegrees(),
+
+          meas_speed.leftMetersPerSecond,
+          meas_speed.rightMetersPerSecond,
+          cmd_speed.leftMetersPerSecond,
+          cmd_speed.rightMetersPerSecond,
+
+          (traj_time/1000000.0),
+          traj_pose.getX(),
+          traj_pose.getY(),
+          traj_pose.getRotation().getDegrees()
+        );
+    }
+  
+    public static  RecordLine fromString(String line) {
+      String[] tokens = line.split(",");
+      double[] data = new double[tokens.length];
+      for (int i=0; i < tokens.length ; i++ ) {
+        data[i] = Double.parseDouble(tokens[i]);
+      }
+      return new RecordLine(data);
+    }
+  
+  }
 
 
   public PositionRecorder(Odometry drivetrain) {
     // Use addRequirements() here to declare subsystem dependencies.
     initSmartDashboard();
     this.drivetrain = drivetrain;
+    m_record = new RecordLine();
 
     // get structs for wheel speeds
-    m_cmd_wheels = drivetrain.getCommandedWheelSpeeds();
-    m_meas_wheels = drivetrain.getWheelSpeeds();
+    m_record.cmd_speed = drivetrain.getCommandedWheelSpeeds();
+    m_record.meas_speed = drivetrain.getWheelSpeeds();
   }
   
   public void initSmartDashboard(){
@@ -91,11 +170,10 @@ public class PositionRecorder extends CommandBase {
       File f = new File(workingDir, filename);
       f.createNewFile();
       writer = new PrintWriter(f); // PrintWriter is buffered
-      writer.println("elapsed-uS, x, y, rotation,  meas-left, meas-right, cmd-left, cmd-right, traj-time, traj-x, traj-y, traj-rot,");
-
+      writer.println(RecordLine.toHeader());
       start= RobotController.getFPGATime(); 
 
-      System.out.println("Writing to: " + f.getAbsolutePath());
+      System.out.println("Recording to: " + f.getAbsolutePath());
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -105,36 +183,26 @@ public class PositionRecorder extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(writer==null)return;
-    Pose2d currentPosition=drivetrain.getPose();
-    try{
-      long now = RobotController.getFPGATime();
-      writer.print((now - start)/1000000.0 + ","
-          +currentPosition.getX() + ","
-          +currentPosition.getY() + ","
-          +currentPosition.getRotation().getDegrees() + ","
-          + m_meas_wheels.leftMetersPerSecond + ","
-          + m_meas_wheels.rightMetersPerSecond + ","
-          + m_cmd_wheels.leftMetersPerSecond + ","
-          + m_cmd_wheels.rightMetersPerSecond
-      );
+    if (writer==null) return;
 
-      // log any trajectory we may be running
-      Trajectory traj = followTrajectory.getCurrentTrajectory();
-      if (traj != null) {
+    m_record.robot_pose = drivetrain.getPose();
+    long now = RobotController.getFPGATime();
+    m_record.time = (now - start)/1000000.0;
+
+    // log any trajectory we may be running
+    Trajectory traj = followTrajectory.getCurrentTrajectory();
+    if (traj != null) {
         long traj_start = followTrajectory.getStartTime();
-        double traj_time = (now - traj_start)/1000000.0;
-        Pose2d traj_pose = traj.sample(traj_time).poseMeters;
-        writer.println("," + traj_time + ","
-          +traj_pose.getX()+","
-          +traj_pose.getY()+","
-          +traj_pose.getRotation().getDegrees() );
-      }
-      else {
-        // nothing running - zeros
-        writer.println(", 0.0, 0.0, 0.0, 0.0");
-      }
-
+        m_record.traj_time = (now - traj_start)/1000000.0;
+        m_record.traj_pose = traj.sample(m_record.traj_time).poseMeters;    
+    }
+    else {
+      m_record.traj_time = 0.0;
+      m_record.traj_pose = zeroPose;
+    }
+    // write it out
+    try {
+      writer.println(m_record.toString());
     }catch(Exception e){
       e.printStackTrace();
       writer.close();

@@ -295,9 +295,8 @@
       </div>
     </div>
   </div>
-</div>
-</div>
 </frc-dashboard>
+
 <script src="./libs/d3.v6.min.js"></script>
 <script src="./libs/jquery-3.6.0.min.js"></script>
 <script src="./libs/frc-web-components.js"></script>
@@ -342,7 +341,7 @@ class BooleanLabel extends webbit.LitElement {
  }
 
 // run a DPLCommands when the robot is connected.
-NetworkTables.addRobotConnectionListener(connected => DPLConnect() , true);
+NetworkTables.addRobotConnectionListener(connected => DPLConnect() , false);
 
 customElements.define('frc-boolean-label', BooleanLabel);
 

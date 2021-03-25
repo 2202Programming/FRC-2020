@@ -1,7 +1,8 @@
 function DPLConnect() {
   if (NetworkTables.isRobotConnected() ) 
   { 
-    console.log("Robot is connected");
+    console.log("DPL Connect: Robot is connected");
+    
     const keys = NetworkTables.getKeys();
     for (const k of keys) {
       if (k.includes("/Commands/")) {

@@ -814,6 +814,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     resetPosition();
     // dpl - 3/23/21 not sure if this should be here - nav.reset();
     m_odometry.resetPosition(pose, nav.getRotation2d());
+    m_odometry_chassis.resetPosition(pose, nav.getRotation2d());
   }
 
   void setupSimulation() {

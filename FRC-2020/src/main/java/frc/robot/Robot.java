@@ -10,8 +10,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.util.MonitoredSubsystemBase;
@@ -54,9 +52,12 @@ public class Robot extends TimedRobot {
     // As our robot draws more power from the battery its voltage drops.
     // The estimated voltage is highly dependent on the battery's internal
     // resistance.
+    /***
     double drawCurrent = m_robotContainer.driveTrain.getDrawnCurrentAmps();
     double loadedVoltage = BatterySim.calculateDefaultBatteryLoadedVoltage(drawCurrent);
     RoboRioSim.setVInVoltage(loadedVoltage);
+
+    ***/
   }
 
   /**

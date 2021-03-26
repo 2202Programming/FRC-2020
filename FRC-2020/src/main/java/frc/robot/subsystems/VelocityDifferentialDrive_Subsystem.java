@@ -24,7 +24,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -35,18 +34,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpiutil.math.VecBuilder;
-import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.DriveTrain;
 import frc.robot.Constants.RamseteProfile;
 import frc.robot.Constants.RobotPhysical;
 import frc.robot.RobotContainer;
-import frc.robot.sim.EncoderSim2;
 import frc.robot.subsystems.ifx.DashboardUpdate;
 import frc.robot.subsystems.ifx.DualDrive;
 import frc.robot.subsystems.ifx.Logger;
@@ -188,10 +181,12 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   Sensors_Subsystem nav;
 
   // Simulation - these classes help us simulate our drivetrain
+  /***
   public DifferentialDrivetrainSim m_drivetrainSimulator;
   private EncoderSim2 m_leftEncoderSim;
   private EncoderSim2 m_rightEncoderSim;
-
+    ***/
+    
   // list of positions for recording path
   public List<Translation2d> PositionList = new ArrayList<Translation2d>();
   private boolean recordPositionOn = false;
@@ -818,6 +813,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   void setupSimulation() {
+    /***
     LinearSystem<N2, N2, N2> drivetrainPlant = LinearSystemId.identifyDrivetrainSystem(
         RamseteProfile.kvVoltSecondsPerFoot, RamseteProfile.kaVoltSecondsSquaredPerFoot, 1.5, // kvVoltSecondsPerRadian,
                                                                                               // //TODO: find real
@@ -832,6 +828,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // The encoder and gyro angle sims let us set simulated sensor readings
     m_leftEncoderSim = new EncoderSim2(leftController);
     m_rightEncoderSim = new EncoderSim2(rightController);
+
+    DPL - removed simulation to hunt overruns during simulationPeriodic
+    **/
   }
 
   @Override
@@ -841,6 +840,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // gyro.
     // We negate the right side so that positive voltages make the right side
     // move forward.
+    /***
     m_drivetrainSimulator.setInputs(leftController.get() * RobotController.getBatteryVoltage(),
         -rightController.get() * RobotController.getBatteryVoltage());
     m_drivetrainSimulator.update(0.020);
@@ -850,6 +850,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     m_leftEncoderSim.setRate(m_drivetrainSimulator.getLeftVelocityMetersPerSecond());
     m_rightEncoderSim.setDistance(m_drivetrainSimulator.getRightPositionMeters());
     m_rightEncoderSim.setRate(m_drivetrainSimulator.getRightVelocityMetersPerSecond());
+    ***/
   }
 
   /**
@@ -860,7 +861,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return The drawn current in Amps.
    */
   public double getDrawnCurrentAmps() {
-    return m_drivetrainSimulator.getCurrentDrawAmps();
+    return 0.0; //m_drivetrainSimulator.getCurrentDrawAmps();
   }
 
   @Override

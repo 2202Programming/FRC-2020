@@ -31,7 +31,6 @@ import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.challenge.GalacticSearch;
 import frc.robot.commands.challenge.InterstellarAccuracy;
 import frc.robot.commands.drive.GyroHeadingCompensator;
-import frc.robot.commands.drive.InvertDriveControls;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
@@ -170,7 +169,7 @@ public class RobotContainer {
 
   private void configureButtonBindings(DriverControls dc) {
     // Drivers buttons
-    dc.bind(Id.Driver, XboxButton.A).whenPressed(new InvertDriveControls(dc)); 
+    ///dc.bind(Id.Driver, XboxButton.A).whenPressed(new InvertDriveControls(dc)); 
     dc.bind(Id.Driver, XboxButton.B).whenPressed(new auto_cmd_group(dc, driveTrain, intake, limelight, lidar));
     dc.bind(Id.Driver, XboxButton.X).whenPressed(new toggleLED(limelight));
     dc.bind(Id.Driver, XboxButton.Y).whenPressed(new ToggleAutoShiftCmd(gearShifter));

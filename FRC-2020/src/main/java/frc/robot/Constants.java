@@ -187,7 +187,7 @@ public final class Constants {
         // for initializing the hardware. The PID object not run on RIO.
         public static final PIDFController pidValues =
              new PIDFController(0.000155, 0.0, 100.0, 0.00016666); // P, I, D, FF
-             // DL/Dustion - kD=100 was good compromise for damping.  200 deg/sec rot was good too
+             // DL/Dustin - kD=100 was good compromise for damping.  200 deg/sec rot was good too
              //jr 3/20 settings 0.000155, 0.0, 2.0, 0.00016666; 
              //20 improved turn oscillation; 80 starting to feel slow
              //Kp 0.000075 maybe less turn oscillations
@@ -205,7 +205,7 @@ public final class Constants {
 
         // Acceleration limits
         public static final double slewRateMax = 2;      //sec limits adjusting slewrate 
-        public static final double slewRateLimit = 0.2;  //sec to max power <default>
+        public static final double slewRateLimit = 0.6;  //sec to max power <default>
 
         public static final boolean safetyEnabled = true; 
     }

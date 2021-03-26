@@ -67,13 +67,16 @@ public class ConvertRecordingToTrajectory {
     prev_time = 0.0;
     lines.forEach(r ->
     {
-      double time = r.time;
+      double time = round4(r.time);
       double dt = time - prev_time;
       var chassis = kinematics.toChassisSpeeds(r.meas_speed);
       double vel = chassis.vxMetersPerSecond; 
       double accel = (dt > 0.001) ? (vel -prev_vel)/dt : 0.0;
       double curv = chassis.omegaRadiansPerSecond / chassis.vxMetersPerSecond;
-      states.add(new Trajectory.State(time, vel, accel, r.robot_pose, curv));
+      states.add(new Trajectory.State(round4(time), 
+          round4(vel), 
+          round4(accel), r.robot_pose, 
+          round4(curv)));
 
       prev_time = time;
       prev_vel = vel;
@@ -110,9 +113,9 @@ public class ConvertRecordingToTrajectory {
     // use the Jackson serializer description built into the State 
     ObjectMapper mapper = new ObjectMapper();
     ///mapper.enable(SerializationFeature.INDENT_OUTPUT);
-    //String[] root = inFileName.split("\\.");
+    String[] root = inFileName.split("\\.");
     
-    String output = inFileName + ".json";
+    String output = root[0] + ".wpilib.json";
     try { 
       File f = new File(outputDir, output);
       f.createNewFile();
@@ -141,6 +144,10 @@ public class ConvertRecordingToTrajectory {
    */
   public Trajectory getTrajectory() {
     return trajectory;
+  }
+
+  double round4(double v) {
+   return  (double)Math.round(v * 10000d) / 10000d;
   }
 
 }

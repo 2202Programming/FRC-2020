@@ -1,6 +1,7 @@
 package frc.robot.subsystems.hid;
 
 import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpiutil.math.MathUtil;
 
 public class ExpoShaper {
@@ -21,13 +22,15 @@ public class ExpoShaper {
         this(kExpo, null);
     }
 
-    public void setExpo(final double a) {
+    public ExpoShaper setExpo(final double a) {
         kExpo = MathUtil.clamp(a, 0.0, 1.0);
         kCexpo = 1.0 - kExpo;
+        return this;
     }
 
-    public void setDeadzone(final double dz) {
-        deadband = MathUtil.clamp(dz, -1.0, 1.0);
+    public ExpoShaper setDeadzone(final double dz) {
+        deadband = MathUtil.clamp(dz, 0.0, 0.10);
+        return this;
     }
 
     // use Gord W's expo function

@@ -129,8 +129,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final CANPIDController leftPID = leftController.getPIDController();
   final CANPIDController rightPID = rightController.getPIDController();
 
-  final Encoder leftChassisEncoder = new Encoder(DigitalIO.LEFT_CHASSIS_ENCODER_A, DigitalIO.LEFT_CHASSIS_ENCODER_B);
-  final Encoder rightChassisEncoder = new Encoder(DigitalIO.RIGHT_CHASSIS_ENCODER_A, DigitalIO.RIGHT_CHASSIS_ENCODER_B);
+  final Encoder leftChassisEncoder = new Encoder(DigitalIO.LEFT_CHASSIS_ENCODER_A, 
+                                                 DigitalIO.LEFT_CHASSIS_ENCODER_B, kInvertChassisLeft);
+  final Encoder rightChassisEncoder = new Encoder(DigitalIO.RIGHT_CHASSIS_ENCODER_A, 
+                                                  DigitalIO.RIGHT_CHASSIS_ENCODER_B, kInvertChassisRight);
 
   // controls which encoders to use for position estimates on field in getPose()
   boolean m_useChassisEncoders = false;
@@ -226,9 +228,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     K_high_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.HIGH) / 60;
 
     leftChassisEncoder.setDistancePerPulse(kFeetPerPulse);
-    leftChassisEncoder.setReverseDirection(kInvertChassisLeft);
     rightChassisEncoder.setDistancePerPulse(kFeetPerPulse);
-    rightChassisEncoder.setReverseDirection(kInvertChassisRight);
 
     // Speed setting may be updated via UX, but set defaults
     calcSpeedSettings();
@@ -427,8 +427,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    */
   private void setMasterControlerTiming(CANSparkMax c) {
     c.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 10); // applied output (norm 10ms)
-    c.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 10); // motor Vel,T, Volt (norm 20ms)
-    c.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 20); // motor pos (norm 20ms)
+    c.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 20); // motor Vel,T, Volt (norm 20ms)
+    c.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 10); // motor pos (norm 20ms)
   }
 
   private void saveControllers() {

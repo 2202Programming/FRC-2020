@@ -77,11 +77,11 @@ public class PositionRecorder extends CommandBase {
 
     public RecordLine(double [] data) {
       time = data[0];
-      robot_pose = new Pose2d(data[1], data[2], new Rotation2d(data[3]));
+      robot_pose = new Pose2d(data[1], data[2], Rotation2d.fromDegrees(data[3]));
       meas_speed = new DifferentialDriveWheelSpeeds(data[4], data[5]);
       cmd_speed = new DifferentialDriveWheelSpeeds(data[6], data[7]);
       traj_time = data[8];
-      traj_pose = new Pose2d(data[9], data[10], new Rotation2d(data[11]));
+      traj_pose = new Pose2d(data[9], data[10], Rotation2d.fromDegrees(data[11]));
     }
 
     public static String toHeader() {

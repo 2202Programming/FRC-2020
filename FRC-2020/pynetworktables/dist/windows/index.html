@@ -51,19 +51,8 @@
               Team 2202
               <frc-model-viewer src="./images/ROBOT.glb"></frc-model-viewer>
             </h1>
-            <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
-          </div>
-          <div class="container-fluid row bg-light" style="margin-top: 30px;">
-            <div class="col-sm-3">
-              <frc-sim-robot-state style="margin-left: 50px;"></frc-sim-robot-state>
             </div>
-            <div class="col-sm-4">
-              <frc-sim-joystick></frc-sim-joystick>
-            </div>
-            <div class="col-sm-4">
-              <frc-sim-joystick source-key="joystick/1" gamepad="1"></frc-sim-joystick>
-            </div>
-          </div>
+
           <fieldset class="scheduler-border">
             <legend class="scheduler-border" id="intake">Driving Commands</legend>
             <frc-toggle-button label="runMatchReady" class="super-wide-button" source-key="/Commands/runMatchReady"></frc-toggle-button>
@@ -270,6 +259,20 @@
       <legend class="scheduler-border" id="data">Data</legend>
       <div class="container-fluid" style="margin-top: 50px;">
         <div class="row bg-light">
+          <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
+        </div>
+        <div class="container-fluid row bg-light" style="margin-top: 30px;">
+          <div class="col-sm-3">
+            <frc-sim-robot-state style="margin-left: 50px;"></frc-sim-robot-state>
+          </div>
+          <div class="col-sm-4">
+            <frc-sim-joystick></frc-sim-joystick>
+          </div>
+          <div class="col-sm-4">
+            <frc-sim-joystick source-key="joystick/1" gamepad="1"></frc-sim-joystick>
+          </div>
+        </div>
+
           <div class="col-sm-3">
             <nt-number key="/Drivetrain/min" value="-2"></nt-number>
             <nt-number key="/Drivetrain/max" value="2"></nt-number>

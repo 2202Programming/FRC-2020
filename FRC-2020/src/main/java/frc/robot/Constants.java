@@ -273,8 +273,8 @@ public final class Constants {
       public static final double VEL_TOL = 0.0025; 
       public static ShooterSettings ssZone1 = new ShooterSettings(32.0, 5, 48.7, VEL_TOL);  //vel, rps, angle, tol
       public static ShooterSettings ssZone2 = new ShooterSettings(36.0, 5, 40.5, VEL_TOL);  //vel, rps, angle
-      public static ShooterSettings ssZone3 = new ShooterSettings(38.0, 5, 37.5, VEL_TOL);  //vel, rps, angle
-      public static ShooterSettings ssZone4 = new ShooterSettings(39.0, 5, 40.0, VEL_TOL);  //vel, rps, angle
+      public static ShooterSettings ssZone3 = new ShooterSettings(38.0, 5, 38.0, VEL_TOL);  //vel, rps, angle
+      public static ShooterSettings ssZone4 = new ShooterSettings(43.0, 5, 37.5, VEL_TOL);  //vel, rps, angle
     }
     
     public static final class RamseteProfile {

@@ -16,6 +16,7 @@ import frc.robot.Constants.InterstellarSettings;
 import frc.robot.RobotContainer;
 import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.toggleLED;
+import frc.robot.commands.auto.auto_drivePath_cmd;
 import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.intake.IntakePosition;
@@ -75,7 +76,7 @@ public class Dashboard {
      matchTab.add("Three PC", new SetPowerCellCount(3) );
      matchTab.add("Calibrate MagAngle", new MagazineCalibrate());
      matchTab.add("ResetPose", new ResetPosition(rc.driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
-     //matchTab.add("DrivePath", new auto_drivePath_cmd(rc.driveTrain, rc.dashboard.getTrajectoryChooser()));
+     matchTab.add("DrivePath", new auto_drivePath_cmd(rc.driveTrain, m_autopaths.getChooser()));
      matchTab.add("MagLow", new MagazineAngle(rc.intake, Constants.ShooterOnCmd.dataLow));
      matchTab.add("MagHigh", new MagazineAngle(rc.intake, Constants.ShooterOnCmd.dataHigh));
      matchTab.add("ToggleIntakePose", new IntakePosition(rc.intake, IntakePosition.Direction.Toggle));

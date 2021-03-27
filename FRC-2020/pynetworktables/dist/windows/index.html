@@ -284,47 +284,79 @@
           </div>
         </div>
 
-          <div class="col-sm-3">
-            <nt-number key="/Drivetrain/min" value="-2"></nt-number>
-            <nt-number key="/Drivetrain/max" value="2"></nt-number>
-            <frc-3-axis-accelerometer source-key="/Drivetrain" style="margin-left: 20px; margin-top: 40px; color: black;"></frc-3-axis-accelerometer>
-            <h4>Voltage</h4>
-            <nt-number key="/PDP/Voltage/min" value="10"></nt-number>
-            <nt-number key="/PDP/Voltage/max" value="13"></nt-number>
-            <frc-number-bar source-key="/PDP/Voltage" style="margin-left: 20px; color: black;"></frc-number-bar>
-          </div>
-          <div class="col-sm-4">
-            <h5>Shooter</h5>
-            <nt-string key="/Shooter/title" value="Shooter RPM"></nt-string>
-            <nt-number key="/Shooter/minY" value="0"></nt-number>
-            <nt-number key="/Shooter/maxY" value="4000"></nt-number>
-            <nt-string key="/Shooter/xAxisLabel" value="Time"></nt-string>
-            <nt-string key="/Shooter/yAxisLabel" value="RPM"></nt-string>
-            <nt-string key="/Shooter/UpperRPM/label" value="Upper RPM"></nt-string>
-            <nt-string key="/Shooter/LowerRPM/label" value="Upper RPM"></nt-string>
-            <nt-string key="/Shooter/UpperRPM/color" value="green"></nt-string>
-            <nt-string key="/Shooter/LowerRPM/color" value="red"></nt-string>
-            <frc-line-chart source-key="/Shooter">
-              <frc-chart-data source-key="/Shooter/UpperRPM"></frc-chart-data>
-              <frc-chart-data source-key="/Shooter/LowerRPM"></frc-chart-data>
-            </frc-line-chart><p/>
-          </div>
-          <div class="col-sm-4">
-            <h5>Velocity</h5>
-            <nt-string key="/Drivetrain/title" value="Velocity"></nt-string>
-            <nt-number key="/Drivetrain/minY" value="-10"></nt-number>
-            <nt-number key="/Drivetrain/maxY" value="10"></nt-number>
-            <nt-string key="/Drivetrain/xAxisLabel" value="Time"></nt-string>
-            <nt-string key="/Drivetrain/yAxisLabel" value="ft/s"></nt-string>
-            <nt-string key="/Drivetrain/VelLeft/label" value="Velocity Left"></nt-string>
-            <nt-string key="/Drivetrain/VelRight/label" value="Velocity Right"></nt-string>
-            <nt-string key="/Drivetrain/VelLeft/color" value="green"></nt-string>
-            <nt-string key="/Drivetrain/VelRight/color" value="red"></nt-string>
-            <frc-line-chart
-              source-key="/Drivetrain">
-              <frc-chart-data source-key="/Drivetrain/VelLeft"></frc-chart-data>
-              <frc-chart-data source-key="/Drivetrain/VelRight"></frc-chart-data>
-            </frc-line-chart>
+           <div class="col-sm-4">
+            <frc-line-chart title="Shooter"
+            source-provider="NetworkTables"
+            x-axis-label="Time (seconds)"
+            tracked-time="60"
+            time-step="0.1">
+            <frc-chart-axis
+                slot="axes"
+                source-provider="NetworkTables"
+                axis-id="Axis 1"
+                scale-type="linear"
+                min="-10"
+                max="10"
+                label="Velocity"
+                tick-values="[]"
+                position="left"
+            ></frc-chart-axis>
+            <frc-chart-data
+                slot="data"
+                label="Upper"
+                color="#00aa00"
+                source-provider="NetworkTables"
+                value="0"
+                axis-id="Axis 1"
+                source-key="/Shooter/UpperRPM"
+            ></frc-chart-data>
+            <frc-chart-data
+            slot="data"
+            label="Lower"
+            color="#a80000"
+            source-provider="NetworkTables"
+            value="0"
+            axis-id="Axis 1"
+            source-key="/Shooter/LowerRPM"
+        ></frc-chart-data>
+        </frc-line-chart>
+
+        <frc-line-chart title="Velocity"
+            source-provider="NetworkTables"
+            x-axis-label="Time (seconds)"
+            tracked-time="60"
+            time-step="0.1">
+            <frc-chart-axis
+                slot="axes"
+                source-provider="NetworkTables"
+                axis-id="Axis 1"
+                scale-type="linear"
+                min="-10"
+                max="10"
+                label="Velocity"
+                tick-values="[]"
+                position="left"
+            ></frc-chart-axis>
+            <frc-chart-data
+                slot="data"
+                label="Right"
+                color="#00aa00"
+                source-provider="NetworkTables"
+                value="0"
+                axis-id="Axis 1"
+                source-key="/drivetrain/velRight"
+            ></frc-chart-data>
+            <frc-chart-data
+            slot="data"
+            label="Left"
+            color="#a80000"
+            source-provider="NetworkTables"
+            value="0"
+            axis-id="Axis 1"
+            source-key="/drivetrain/velLeft"
+        ></frc-chart-data>
+        </frc-line-chart>
+        
           </div>
         </div>
         <div class="row">   
@@ -335,18 +367,32 @@
             <p>CAN Rx Errors: <frc-number-label source-key="/Sensors/CanRxError"></frc-number-label></p>
          </div>
          <div class="col-sm-4">
-          <h5>Can Utilization</h5>
-          <nt-string key="/Sensors/CanUtilization/title" value="Can Utilization"></nt-string>
-          <nt-number key="/Sensors/CanUtilization/minY" value="0"></nt-number>
-          <nt-number key="/Sensors/CanUtilization/maxY" value="100"></nt-number>
-          <nt-string key="/Sensors/CanUtilization/xAxisLabel" value="Time"></nt-string>
-          <nt-string key="/Sensors/CanUtilization/yAxisLabel" value="%"></nt-string>
-          <nt-string key="/Sensors/CanUtilization/label" value="Can Utilization"></nt-string>
-          <nt-string key="/Sensors/CanUtilization/color" value="green"></nt-string>
-          <frc-line-chart
-            source-key="/Sensors/CanUtilization">
-            <frc-chart-data source-key="/Sensors/CanUtilization"></frc-chart-data>
-          </frc-line-chart>
+          <frc-line-chart title="Can Utilization"
+          source-provider="NetworkTables"
+          x-axis-label="%"
+          tracked-time="240"
+          time-step="0.1">
+          <frc-chart-axis
+              slot="axes"
+              source-provider="NetworkTables"
+              axis-id="Axis 1"
+              scale-type="linear"
+              min="0"
+              max="100"
+              label="%"
+              tick-values="[]"
+              position="left"
+          ></frc-chart-axis>
+          <frc-chart-data
+              slot="data"
+              label="Can"
+              color="#00aa00"
+              source-provider="NetworkTables"
+              value="0"
+              axis-id="Axis 1"
+              source-key="/Sensors/CanUtilization/"
+          ></frc-chart-data>
+      </frc-line-chart>
         </div>
         </div>
       </div>

@@ -101,7 +101,7 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
     nt_yaw_xrs450_dot = table.getEntry("yaw_xrs450_d");
     nt_yaw_blend = table.getEntry("yaw_blend");
 
-    nt_canUtilization = table.getEntry("CanUtilization");
+    nt_canUtilization = table.getEntry("CanUtilization/value");
     nt_canRxError = table.getEntry("CanRxError");
     nt_canTxError = table.getEntry("CanTxError");
 

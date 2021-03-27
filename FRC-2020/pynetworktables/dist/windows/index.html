@@ -51,21 +51,19 @@
               Team 2202
               <frc-model-viewer src="./images/ROBOT.glb"></frc-model-viewer>
             </h1>
-            <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
-          </div>
-          <div class="container-fluid row bg-light" style="margin-top: 30px;">
-            <div class="col-sm-3">
-              <frc-sim-robot-state style="margin-left: 50px;"></frc-sim-robot-state>
             </div>
-            <div class="col-sm-4">
-              <frc-sim-joystick></frc-sim-joystick>
-            </div>
-            <div class="col-sm-4">
-              <frc-sim-joystick source-key="joystick/1" gamepad="1"></frc-sim-joystick>
-            </div>
-          </div>
+
           <fieldset class="scheduler-border">
-            <legend class="scheduler-border" id="intake">Commands</legend>
+            <legend class="scheduler-border" id="intake">Driving Commands</legend>
+            <frc-toggle-button label="runMatchReady" class="super-wide-button" source-key="/Commands/runMatchReady"></frc-toggle-button>
+            <frc-toggle-button label="Mag Calibrate" class="super-wide-button" source-key="/Commands/MagCalibrate"></frc-toggle-button> 
+            <frc-toggle-button label="MagZone1" class="wider-button" source-key="/Commands/MagZone1"></frc-toggle-button>
+            <frc-toggle-button label="MagZone2" class="wider-button" source-key="/Commands/MagZone2"></frc-toggle-button>
+            <frc-toggle-button label="MagZone3" class="wider-button" source-key="/Commands/MagZone3"></frc-toggle-button>
+            <frc-toggle-button label="MagZone4" class="wider-button" source-key="/Commands/MagZone4"></frc-toggle-button>
+          </fieldset>
+          <fieldset class="scheduler-border">
+            <legend class="scheduler-border" id="intake">All Commands</legend>
             <frc-toggle-button label="runMatchReady" class="wider-button" source-key="/Commands/runMatchReady"></frc-toggle-button>
             <frc-toggle-button label="Three PC" class="wider-button" source-key="/Commands/runThreePC"></frc-toggle-button>
             <frc-toggle-button label="Zero PC" class="wider-button" source-key="/Commands/runZeroPC"></frc-toggle-button>
@@ -90,7 +88,79 @@
             <frc-toggle-button label="MagZone3" class="wider-button" source-key="/Commands/MagZone3"></frc-toggle-button>
             <frc-toggle-button label="MagZone4" class="wider-button" source-key="/Commands/MagZone4"></frc-toggle-button>
            </fieldset>
-            
+           <fieldset class="scheduler-border">
+            <legend class="scheduler-border" id="intake">Testing Area</legend>
+            <!-- <frc-robot-subsystem source-key="/LiveWindow/VelocityDifferentialDrive_Subsystem" name="VelocityDifferentialDrive_Subsystem"></frc-robot-subsystem>
+             -->
+            <p><frc-networktables-connection></frc-networktables-connection></p>
+
+
+          <p>
+            <frc-robot-command label="ResetPose" class="wider-button"  source-key="/Shuffleboard/Match/ResetPose"></frc-robot-command>
+            <frc-robot-command label="DrivePath" class="wider-button"  source-key="/Shuffleboard/Match/DrivePath"></frc-robot-command>
+            <frc-robot-command label="GoToPose" class="wider-button"  source-key="/Shuffleboard/Match/GoToPose"></frc-robot-command>
+            <frc-robot-command label="SavePose" class="wider-button"  source-key="/Shuffleboard/Match/SavePose"></frc-robot-command>
+            <frc-robot-command label="ToggleAutoShoot" class="super-wide-button"  source-key="/Shuffleboard/Match/ToggleAutoShoot"></frc-robot-command>
+          </p>
+          <p>
+            <frc-robot-command label="LimelightToggle" class="super-wide-button"  source-key="/Shuffleboard/Match/LimelightToggle"></frc-robot-command>
+          </p>
+          <p>
+            <frc-robot-command label="IntakeToggle" class="super-wide-button"  source-key="/Shuffleboard/Match/IntakeToggle"></frc-robot-command>
+            <frc-robot-command label="IntakeRev" class="super-wide-button"  source-key="/Shuffleboard/Match/IntakeRev"></frc-robot-command>
+            <frc-robot-command label="ToggleIntakePose" class="super-wide-button"  source-key="/Shuffleboard/Match/ToggleIntakePose"></frc-robot-command>
+            <frc-robot-command label="runMatchReady" class="super-wide-button" source-key="/Shuffleboard/Match/Match Ready"></frc-robot-command>
+            <frc-robot-command label="Zero PC" class="wider-button"  source-key="/Shuffleboard/Match/Zero PC"></frc-robot-command>
+            <frc-robot-command label="Three PC" class="wider-button" source-key="/Shuffleboard/Match/Three PC"></frc-robot-command>
+          </p>
+          <p>
+            <frc-robot-command label="Mag Calibrate" class="super-wide-button" source-key="/Shuffleboard/Match/Calibrate MagAngle"></frc-robot-command>
+            <frc-robot-command label="MagLow" class="wider-button"  source-key="/Shuffleboard/Match/MagLow"></frc-robot-command>
+            <frc-robot-command label="MagHigh" class="wider-button"  source-key="/Shuffleboard/Match/MagHigh"></frc-robot-command>
+            <frc-robot-command label="MagOff" class="wider-button"  source-key="/Shuffleboard/Match/MagOff"></frc-robot-command>
+            <frc-robot-command label="MagOn" class="wider-button"  source-key="/Shuffleboard/Match/MagOn"></frc-robot-command>
+            <frc-robot-command label="MagLock" class="wider-button"  source-key="/Shuffleboard/Match/MagLock"></frc-robot-command>
+            <frc-robot-command label="MagZone1" class="wider-button"  source-key="/Shuffleboard/Match/MagZone1"></frc-robot-command>
+            <frc-robot-command label="MagZone2" class="wider-button"  source-key="/Shuffleboard/Match/MagZone2"></frc-robot-command>
+            <frc-robot-command label="MagZone3" class="wider-button"  source-key="/Shuffleboard/Match/MagZone3"></frc-robot-command>
+            <frc-robot-command label="MagZone4" class="wider-button"  source-key="/Shuffleboard/Match/MagZone4"></frc-robot-command>
+          </p>
+          <p>
+            <nt-string key="/Shuffleboard/Match/Autonomous Command/AutoChooser/selected" value="do nothing"></nt-string>
+            <frc-combo-box name="Select AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser"></frc-combo-box>
+            <frc-text-area label="Active AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser/active"></frc-text-area>
+          </p>
+          <p>
+            <frc-number-field label="Deg-per-sec Max" source-key="/Shuffleboard/DriversChoice/Robot Speeds/deg-per-sec"></frc-number-field>
+          </p>
+          </fieldset>
+
+          <fieldset class="scheduler-border">
+            <legend class="scheduler-border" id="path">Path</legend>
+            <div class="container-fluid" style="margin-top: 50px;">
+              <div class="row">
+                <div class="col-sm-3">
+                  <div>
+                    <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/selected" value="do nothing"></nt-string>
+                    <frc-combo-box name="Select Path:" source-key="/Shuffleboard/Match/AutoPath/PathChooser"></frc-combo-box>
+                    <frc-text-area label="Active Path:" source-key="/Shuffleboard/Match/AutoPath/PathChooser/selected"></frc-text-area>
+                    <h4>Commands</h4>
+                    <frc-toggle-button label="DrivePath" class="wider-button" source-key="/Commands/DrivePath"></frc-toggle-button>
+                    <frc-toggle-button label="GoToPose" class="wider-button" source-key="/Commands/GoToPose"></frc-toggle-button>
+                    <frc-toggle-button label="SavePose" class="wider-button" source-key="/Commands/SavePose"></frc-toggle-button>
+      
+                  </div>
+                </div>
+                <div class="col-sm-9">
+                    <frc-field game="Slalom Path" style="width: 800px">
+                      <frc-field-robot unit="ft"></frc-field-robot>
+                  </frc-field>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+
           <fieldset class="scheduler-border">
             <legend class="scheduler-border" id="intake">Intake</legend>
             <div class="container-fluid" style="margin-top: 20px;">
@@ -141,30 +211,7 @@
               </div>
             </div>
           </fieldset>
-    <fieldset class="scheduler-border">
-      <legend class="scheduler-border" id="path">Path</legend>
-      <div class="container-fluid" style="margin-top: 50px;">
-        <div class="row">
-          <div class="col-sm-3">
-            <div>
-              <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/selected" value="do nothing"></nt-string>
-              <frc-combo-box name="Select Path:" source-key="/Shuffleboard/Match/AutoPath/PathChooser"></frc-combo-box>
-              <frc-text-area label="Active Path:" source-key="/Shuffleboard/Match/AutoPath/PathChooser/selected"></frc-text-area>
-              <h4>Commands</h4>
-              <frc-toggle-button label="DrivePath" class="wider-button" source-key="/Commands/DrivePath"></frc-toggle-button>
-              <frc-toggle-button label="GoToPose" class="wider-button" source-key="/Commands/GoToPose"></frc-toggle-button>
-              <frc-toggle-button label="SavePose" class="wider-button" source-key="/Commands/SavePose"></frc-toggle-button>
 
-            </div>
-          </div>
-          <div class="col-sm-9">
-              <frc-field game="Slalom Path" style="width: 800px">
-                <frc-field-robot unit="ft"></frc-field-robot>
-            </frc-field>
-          </div>
-        </div>
-      </div>
-    </fieldset>
     <fieldset class="scheduler-border">
       <legend class="scheduler-border" id="direction">Direction</legend>
       <div class="container-fluid" style="margin-top: 50px;">
@@ -219,7 +266,23 @@
     <fieldset class="scheduler-border">
       <legend class="scheduler-border" id="data">Data</legend>
       <div class="container-fluid" style="margin-top: 50px;">
+
         <div class="row bg-light">
+          <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
+        </div>
+
+        <div class="container-fluid row bg-light" style="margin-top: 30px;">
+          <div class="col-sm-3">
+            <frc-sim-robot-state style="margin-left: 50px;"></frc-sim-robot-state>
+          </div>
+          <div class="col-sm-4">
+            <frc-sim-joystick></frc-sim-joystick>
+          </div>
+          <div class="col-sm-4">
+            <frc-sim-joystick source-key="joystick/1" gamepad="1"></frc-sim-joystick>
+          </div>
+        </div>
+
           <div class="col-sm-3">
             <nt-number key="/Drivetrain/min" value="-2"></nt-number>
             <nt-number key="/Drivetrain/max" value="2"></nt-number>
@@ -266,10 +329,24 @@
         <div class="row">   
           <div class="col-sm-3">
             <h4>CAN Bus</h4>
-            <p>CAN Utilization: <frc-number-label source-key="/Sensors/CanUtilization"></frc-number-label></p>
+            <p>CAN Utilization: <frc-number-label source-key="/Sensors/CanUtilization/value"></frc-number-label></p>
             <p>CAN Tx Errors: <frc-number-label source-key="/Sensors/CanTxError"></frc-number-label></p>
             <p>CAN Rx Errors: <frc-number-label source-key="/Sensors/CanRxError"></frc-number-label></p>
          </div>
+         <div class="col-sm-4">
+          <h5>Can Utilization</h5>
+          <nt-string key="/Sensors/CanUtilization/title" value="Can Utilization"></nt-string>
+          <nt-number key="/Sensors/CanUtilization/minY" value="0"></nt-number>
+          <nt-number key="/Sensors/CanUtilization/maxY" value="100"></nt-number>
+          <nt-string key="/Sensors/CanUtilization/xAxisLabel" value="Time"></nt-string>
+          <nt-string key="/Sensors/CanUtilization/yAxisLabel" value="%"></nt-string>
+          <nt-string key="/Sensors/CanUtilization/label" value="Can Utilization"></nt-string>
+          <nt-string key="/Sensors/CanUtilization/color" value="green"></nt-string>
+          <frc-line-chart
+            source-key="/Sensors/CanUtilization">
+            <frc-chart-data source-key="/Sensors/CanUtilization"></frc-chart-data>
+          </frc-line-chart>
+        </div>
         </div>
       </div>
     </fieldset>

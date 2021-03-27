@@ -90,6 +90,7 @@ public class MagazineCaptureCmd extends CommandBase {
     if (interrupted) {
       
     }
+    System.out.println("***Magazine AUto-Capture Disabled.");
   }
 
   // This is a default command, it shouldn't end but could get pre-empted

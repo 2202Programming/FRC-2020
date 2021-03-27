@@ -41,8 +41,8 @@ import frc.robot.subsystems.ifx.VelocityDrive;
 public class InterstellarAccuracy extends SequentialCommandGroup {
   // X Y Heading
   final Pose2d StartPose = new Pose2d(2.0, 7.5, new Rotation2d(0.0));
-  final Pose2d Zone1Pose = new Pose2d(5.5, 7.5, new Rotation2d(0.0));
-  final Pose2d Zone2Pose = new Pose2d(10.0, 7.5, new Rotation2d(0.0));
+  final Pose2d Zone1Pose = new Pose2d(6.8, 7.5, new Rotation2d(0.0)); //jr measured
+  final Pose2d Zone2Pose = new Pose2d(9.0, 7.5, new Rotation2d(0.0)); //jr measured
   final Pose2d Zone3Pose = new Pose2d(15.0, 7.5, new Rotation2d(0.0));
   final Pose2d Zone4Pose = new Pose2d(20.0, 7.5, new Rotation2d(0.0));
   final Pose2d IntroPose = new Pose2d(24.0, 7.5, new Rotation2d(0.0));
@@ -93,13 +93,13 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     var cmd = new SequentialCommandGroup();
     var cfg = (start) ? config : reverse_config; // start goes forward, others are reverse on traj #1
     cmd.addCommands(
+      new InstantCommand(limelight::enableLED), 
       // ready the shooter
       new ShooterWarmUp(ss), 
       new MagazineAngle(intake, ss),
       //drive to the shoot position
       new followTrajectory(drive, computeTrajectory(startpose, shootpose, cfg)),
       // Build the Shoot and return to Introduction zone sequence
-      new InstantCommand(limelight::enableLED), 
       new ParallelDeadlineGroup(
             new Shoot(ss).withTimeout(6.0),        // deadline on shoot, times out just in case
             new MagazineAngle(intake, ss),         // adjust if not there
@@ -108,7 +108,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
       ),
       
       //head back and get more power cells
-      new InstantCommand(limelight::disableLED), 
+      //new InstantCommand(limelight::disableLED), 
       new IntakePower(intake, Power.On, 0.5),
       new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)),
       new WaitUntilCommand( magazine::isMagFull).withTimeout(10.0));

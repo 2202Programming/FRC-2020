@@ -69,6 +69,7 @@ public class LimeLightTargetCompensator extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     limelight.disableLED();
+    m_correction=0.0;
     drive.setHeadingCompensator(null);
   }
 

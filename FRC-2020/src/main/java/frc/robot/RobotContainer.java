@@ -7,9 +7,6 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.ShooterOnCmd.dataHigh;
-import static frc.robot.Constants.ShooterOnCmd.dataLow;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -180,14 +177,14 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));
 
     //store current position
-    dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState));
+    dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState).withName("Save State"));
 
     //toggle auto shooting mode
-    dc.bind(Id.Driver, XboxButton.R3).whenPressed(new InstantCommand(intake::toggleAutoShootingMode));
+    dc.bind(Id.Driver, XboxButton.R3).whenPressed(new InstantCommand(intake::toggleAutoShootingMode).withName("AS-Mode-WIP") );
     
     //auto path testing
-    dc.bind(Id.Driver,  XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
-    dc.bind(Id.Driver,    XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
+    dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
+    dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
 
     // Assistant's buttons
     dc.bind(Id.Assistant, XboxButton.A).whileHeld(new MagazineBeltAdjust(magazine, false, 0.0)); 
@@ -203,12 +200,6 @@ public class RobotContainer {
     //Magazine Angle - POV hat
     dc.bind(Id.Assistant, XboxPOV.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));
     dc.bind(Id.Assistant, XboxPOV.POV_DOWN).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Down));
-    dc.bind(Id.Assistant, XboxPOV.POV_LEFT).whenPressed(new MagazineAngle(intake, dataLow)
-      //.andThen(new ShooterWarmUp())  //uncomment for fulltime flywheels
-    );
-    dc.bind(Id.Assistant, XboxPOV.POV_RIGHT).whenPressed(new MagazineAngle(intake, dataHigh)
-      //.andThen(new ShooterWarmUp()) //uncomment for fulltime flywheels
-    );
 
     //allow a manual lock on the positioner
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
@@ -227,7 +218,6 @@ public class RobotContainer {
 
       //auto path testing on sideboard  row 3
       dc.bind(Id.SwitchBoard, SBButton.Sw11).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
-      dc.bind(Id.SwitchBoard, SBButton.Sw12).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
       dc.bind(Id.SwitchBoard, SBButton.Sw13).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
     }
   }

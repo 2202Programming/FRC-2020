@@ -515,7 +515,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     var ws = new DifferentialDriveWheelSpeeds(velLeft, velRight);
     var cs = drive_kinematics.toChassisSpeeds(ws);
     cs.omegaRadiansPerSecond += (Math.PI / 180.0) * rps;  //
-    cs.omegaRadiansPerSecond = Math.copySign(MathUtil.limit(Math.abs(cs.omegaRadiansPerSecond), 0.0, maxDPS), cs.omegaRadiansPerSecond);
+    cs.omegaRadiansPerSecond = Math.copySign(MathUtil.limit(Math.abs(cs.omegaRadiansPerSecond), 0.0, 
+                  (maxDPS*Math.PI/180.0)), cs.omegaRadiansPerSecond);
+    cs.vxMetersPerSecond = Math.copySign(
+          MathUtil.limit(Math.abs(cs.vxMetersPerSecond), 0.0, getMaxSpeed(m_currentGear)),  cs.vxMetersPerSecond);
+
     ws = drive_kinematics.toWheelSpeeds(cs);
     
     // save commanded wheel speeds - [ft/s]

@@ -16,6 +16,7 @@ import frc.robot.Constants.InterstellarSettings;
 import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_drivePath_cmd;
+import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.intake.IntakePosition;
@@ -45,7 +46,9 @@ public class WebCommands {
     ListenerCmdOnTrue("runThreePC", new SetPowerCellCount(3) );
    
     ListenerCmdOnTrue("ResetPose", new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
-    ListenerCmdOnTrue("DrivePath", new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
+    ListenerCmdOnTrue("VoltDrivePath", new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
+    ListenerCmdOnTrue("DrivePath", new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
+
     ListenerCmdOnTrue("MagLow", new MagazineAngle(intake, Constants.ShooterOnCmd.dataLow));
     ListenerCmdOnTrue("MagHigh", new MagazineAngle(intake, Constants.ShooterOnCmd.dataHigh));
     ListenerCmdOnTrue("ToggleIntakePose", new IntakePosition(intake, IntakePosition.Direction.Toggle));

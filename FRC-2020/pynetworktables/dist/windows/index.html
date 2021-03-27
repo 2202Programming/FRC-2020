@@ -125,6 +125,14 @@
             <frc-robot-command label="MagZone3" class="wider-button"  source-key="/Shuffleboard/Match/MagZone3"></frc-robot-command>
             <frc-robot-command label="MagZone4" class="wider-button"  source-key="/Shuffleboard/Match/MagZone4"></frc-robot-command>
           </p>
+          <p>
+            <nt-string key="/Shuffleboard/Match/Autonomous Command/AutoChooser/selected" value="do nothing"></nt-string>
+            <frc-combo-box name="Select AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser"></frc-combo-box>
+            <frc-text-area label="Active AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser/active"></frc-text-area>
+          </p>
+          <p>
+            <frc-number-field label="Deg-per-sec Max" source-key="/Shuffleboard/DriversChoice/Robot Speeds/deg-per-sec"></frc-number-field>
+          </p>
           </fieldset>
 
           <fieldset class="scheduler-border">
@@ -258,9 +266,11 @@
     <fieldset class="scheduler-border">
       <legend class="scheduler-border" id="data">Data</legend>
       <div class="container-fluid" style="margin-top: 50px;">
+
         <div class="row bg-light">
           <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
         </div>
+
         <div class="container-fluid row bg-light" style="margin-top: 30px;">
           <div class="col-sm-3">
             <frc-sim-robot-state style="margin-left: 50px;"></frc-sim-robot-state>

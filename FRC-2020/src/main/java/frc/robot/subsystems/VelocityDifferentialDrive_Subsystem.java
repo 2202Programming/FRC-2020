@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;
@@ -86,7 +87,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private NetworkTableEntry nt_rightOutput;
 
   // Field position
-  Field2d m_field = new Field2d();
+  Field2d m_field;
+  Field2d m_field_chassis;
 
   // save a pose
   Pose2d savedPose;
@@ -178,6 +180,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   // Odometry class for tracking robot pose
   private final DifferentialDriveOdometry m_odometry;
   private final DifferentialDriveOdometry m_odometry_chassis;
+  private final DifferentialDriveKinematics drive_kinematics = new DifferentialDriveKinematics(RobotPhysical.WheelAxleDistance);
 
   // nav sensors
   Sensors_Subsystem nav;
@@ -196,6 +199,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   public Pose2d recordingPoseEnd;
 
   public VelocityDifferentialDrive_Subsystem(final Shifter gear) {
+    // Field position
+    m_field_chassis = new Field2d();
+    SendableRegistry.add(m_field_chassis, "Field_chassis");
+    m_field = new Field2d();
+
     // save scaling factors, they are required to use SparkMax in Vel mode
     gearbox = gear;
     requestedGear = gearbox.getCurrentGear();
@@ -222,6 +230,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nt_leftOutput = table.getEntry("MotorOutLeft");
 
     SmartDashboard.putData("Field", m_field);
+    SmartDashboard.putData("Field_ch", m_field_chassis);
 
     // setup physical units - chassis * gearbox (rev per minute)
     K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60; // rpm/60 rps
@@ -338,7 +347,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // Update the odometry in the periodic block, physical units, update field
     m_odometry.update(nav.getRotation2d(), m_posLeft, m_posRight);
     m_odometry_chassis.update(nav.getRotation2d(), m_posChassisLeft, m_posChassisRight);
+    
+    //track both sets of sensors for their field positions
     m_field.setRobotPose(m_odometry.getPoseMeters());
+    m_field_chassis.setRobotPose(m_odometry_chassis.getPoseMeters());
+    
   }
 
   // Record position
@@ -496,11 +509,15 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // = [mo-rpm / ft/s]
     double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();
     double rps = m_heading_compensator.get();
-    double vturn_rpm = (Math.PI / 180.0) * (0.5 * WheelAxleDistance) * rps;
+    var ws = new DifferentialDriveWheelSpeeds(velLeft, velRight);
+    var cs = drive_kinematics.toChassisSpeeds(ws);
+    cs.omegaRadiansPerSecond += (Math.PI / 180.0) * rps;  //
+    cs.omegaRadiansPerSecond = Math.copySign(MathUtil.limit(Math.abs(cs.omegaRadiansPerSecond), 0.0, maxDPS), cs.omegaRadiansPerSecond);
+    ws = drive_kinematics.toWheelSpeeds(cs);
 
     // [mo-rpm / ft/s] * [ft/s] = [rpm-mo]
-    double rpm_l = kGR * (velLeft - vturn_rpm);
-    double rpm_r = kGR * (velRight + vturn_rpm);
+    double rpm_l = kGR * ws.leftMetersPerSecond;
+    double rpm_r = kGR * ws.rightMetersPerSecond;
     // scale to rpm and ouput to contollers, no coast mode
     output(rpm_l, rpm_r, false, kGR);
   }
@@ -549,8 +566,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
       sp_rpm.right = r_rpm * (Kright / WheelWearRight);
 
       // save commanded wheel speeds - [ft/s]
-      m_commandedWheelSpeeds.leftMetersPerSecond = sp_rpm.left / kGR; // not meters, we use ft/s
-      m_commandedWheelSpeeds.rightMetersPerSecond = sp_rpm.right / kGR;
+      m_commandedWheelSpeeds.leftMetersPerSecond = Kleft * sp_rpm.left / kGR; // not meters, we use ft/s
+      m_commandedWheelSpeeds.rightMetersPerSecond = Kright * sp_rpm.right / kGR;
 
       // arbff compensates for min voltage needed to make robot move
       // +V moves forward, -V moves backwards
@@ -753,7 +770,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    */
   @Override
   public DifferentialDriveKinematics getDriveKinematics() {
-    return new DifferentialDriveKinematics(RobotPhysical.WheelAxleDistance);
+    return drive_kinematics; 
   }
 
   /**

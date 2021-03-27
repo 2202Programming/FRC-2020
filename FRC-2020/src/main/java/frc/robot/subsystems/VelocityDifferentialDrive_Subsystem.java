@@ -486,9 +486,12 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // compute each wheel, pos rpm moves forward, pos turn is CCW
     double vl_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ); // turn left, +CCW, slows left wheel
     double vr_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ); // turn left, +CCW, speeds right wheel
-
+    
+    // save commanded wheel speeds - [ft/s]
+    m_commandedWheelSpeeds.leftMetersPerSecond = vl_rpm/kGR; // not meters, we use ft/s 
+    m_commandedWheelSpeeds.rightMetersPerSecond = vr_rpm/kGR;
     // issue all commands to the hardware
-    output(vl_rpm, vr_rpm, coastMode, kGR);
+    output(vl_rpm, vr_rpm, coastMode);
   }
 
   /**
@@ -514,12 +517,16 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     cs.omegaRadiansPerSecond += (Math.PI / 180.0) * rps;  //
     cs.omegaRadiansPerSecond = Math.copySign(MathUtil.limit(Math.abs(cs.omegaRadiansPerSecond), 0.0, maxDPS), cs.omegaRadiansPerSecond);
     ws = drive_kinematics.toWheelSpeeds(cs);
+    
+    // save commanded wheel speeds - [ft/s]
+    m_commandedWheelSpeeds.leftMetersPerSecond = ws.leftMetersPerSecond; // not meters, we use ft/s
+    m_commandedWheelSpeeds.rightMetersPerSecond = ws.rightMetersPerSecond;
 
     // [mo-rpm / ft/s] * [ft/s] = [rpm-mo]
     double rpm_l = kGR * ws.leftMetersPerSecond;
     double rpm_r = kGR * ws.rightMetersPerSecond;
     // scale to rpm and ouput to contollers, no coast mode
-    output(rpm_l, rpm_r, false, kGR);
+    output(rpm_l, rpm_r, false);
   }
 
   /**
@@ -551,9 +558,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @param l_rpm     positive left side moves forward
    * @param r_rpm     positive right side moves forward
    * @param coastMode zero output, no breaks, let it roll
-   * @param kGR       gearRatio [mo-rpm / ft/s]
    */
-  private void output(double l_rpm, double r_rpm, boolean coastMode, double kGR) {
+  private void output(double l_rpm, double r_rpm, boolean coastMode) {
     if (coastMode) {
       // command doesn't need power, ok to coast, use PWM to zero power
       // with the controller setup to coast mode by default.
@@ -564,10 +570,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
       // also correct for any left/right motor conventions
       sp_rpm.left = l_rpm * (Kleft / WheelWearLeft);
       sp_rpm.right = r_rpm * (Kright / WheelWearRight);
-
-      // save commanded wheel speeds - [ft/s]
-      m_commandedWheelSpeeds.leftMetersPerSecond = Kleft * sp_rpm.left / kGR; // not meters, we use ft/s
-      m_commandedWheelSpeeds.rightMetersPerSecond = Kright * sp_rpm.right / kGR;
 
       // arbff compensates for min voltage needed to make robot move
       // +V moves forward, -V moves backwards

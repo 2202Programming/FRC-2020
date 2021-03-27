@@ -36,12 +36,12 @@
         <div class="col-sm-3 bg-light" style="padding: 0 !important; margin: 0;">
           <br>
           <div>
-          <a href="#intake" ><img src="./images/intake.jpg" style="width: 300px; margin: 0;"></a>
+          <a href="#intake" ><img src="./images/intake.jpg" style="width: 300px; margin: 0;" class="intake"></a>
           <a href="#path"><img src="./images/path.png" style="width: 300px; margin: 0;"></a>
           <a href="#direction"><img src="./images/direction.png" style="width: 300px; margin: 0;"></a>
           <a href="#data"><img src="./images/data.png" style="width: 300px; margin: 0;"></a>
-          <a href="#cameras"><img src="./images/camera.png" style="width: 300px; margin: 0;"></a>
-          </div>
+          <a href="#cameras"><img src="/images/camera.png" style="width: 300px; margin: 0;" class="camera"></a>
+        </div>
            <frc-source-tree></frc-source-tree>
         </div>
         <div class="col-sm-9">
@@ -436,6 +436,28 @@ customElements.define('frc-boolean-label', BooleanLabel);
  }
 });
 
+</script>
+<script>
+  $(function() {
+      $(".camera").hover(
+          function() {
+              $(this).attr("src", "/images/camera_shine.gif");
+          },
+          function() {
+              $(this).attr("src", "/images/camera.png");
+          }                         
+      );                  
+  });
+  $(function() {
+      $(".intake").hover(
+          function() {
+              $(this).attr("src", "/images/intake.gif");
+          },
+          function() {
+              $(this).attr("src", "/images/intake.jpg");
+          }                         
+      );                  
+  });
 </script>
 </body>
 </html>

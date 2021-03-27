@@ -197,15 +197,6 @@ background-repeat: no-repeat;
 background-size: cover;
 }
 
-.static {
-  position:absolute;
-  background: white;
-}
-
-.static:hover {
-  opacity:0;
-}
-
 .wider-button {
   width: 120px;
 }

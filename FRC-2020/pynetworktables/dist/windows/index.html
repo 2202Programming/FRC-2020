@@ -90,7 +90,7 @@
             <p>
               <nt-string key="/Shuffleboard/Match/Autonomous Command/AutoChooser/selected" value="do nothing"></nt-string>
               <frc-combo-box name="Select AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser"></frc-combo-box>
-              <frc-text-area label="Active AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser/active"></frc-text-area>
+              <frc-text-field label="Active AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser/active" readonly></frc-text-area>
             </p>
             <p>
               <frc-number-field label="Robot speed ft/s" source-key="/Shuffleboard/DriversChoice/Robot Speeds/feet-per-sec"></frc-number-field>
@@ -163,7 +163,23 @@
                   <div>
                     <nt-string key="/Shuffleboard/Match/AutoPath/PathChooser/selected" value="do nothing"></nt-string>
                     <frc-combo-box name="Select Path:" source-key="/Shuffleboard/Match/AutoPath/PathChooser"></frc-combo-box>
-                    <frc-text-area label="Active Path:" source-key="/Shuffleboard/Match/AutoPath/PathChooser/selected"></frc-text-area>
+
+                    <frc-text-field
+                        source-provider="NetworkTables"
+                        value=""
+                        label="Active Path:"
+                        placeholder=""
+                        minlength="0"
+                        maxlength="Infinity"
+                        error-message=""
+                        pattern=""
+                        theme=""
+                        source-key="/shuffleboard/match/autoPath/pathChooser/active"
+                        has-value=""
+                        readonly=""
+                        has-label=""
+                    ></frc-text-field>
+              
                     <h4>Commands</h4>
                     <frc-toggle-button label="DrivePath" class="super-wide-button" source-key="/Commands/DrivePath"></frc-toggle-button>
                     <frc-toggle-button label="GoToPose" class="super-wide-button" source-key="/Commands/GoToPose"></frc-toggle-button>

@@ -283,8 +283,8 @@
             <frc-sim-joystick source-key="joystick/1" gamepad="1"></frc-sim-joystick>
           </div>
         </div>
-
-           <div class="col-sm-4">
+        <div class="row">
+           <div class="col-sm-6">
             <frc-line-chart title="Shooter"
             source-provider="NetworkTables"
             x-axis-label="Time (seconds)"
@@ -320,7 +320,8 @@
             source-key="/Shooter/LowerRPM"
         ></frc-chart-data>
         </frc-line-chart>
-
+      </div>
+      <div class="col-sm-6">
         <frc-line-chart title="Velocity"
             source-provider="NetworkTables"
             x-axis-label="Time (seconds)"
@@ -356,9 +357,9 @@
             source-key="/drivetrain/velLeft"
         ></frc-chart-data>
         </frc-line-chart>
-        
+      </div>
+    </div>
           </div>
-        </div>
         <div class="row">   
           <div class="col-sm-3">
             <h4>CAN Bus</h4>

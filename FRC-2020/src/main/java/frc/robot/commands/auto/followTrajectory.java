@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import frc.robot.Constants.DriveTrain;
+import frc.robot.subsystems.DrivePreferences;
 import frc.robot.subsystems.ifx.VelocityDrive;
 
 public class followTrajectory extends CommandBase {
@@ -28,6 +30,8 @@ public class followTrajectory extends CommandBase {
   }
 
   final VelocityDrive drive;
+  DrivePreferences orig_prefs;
+
   SendableChooser<Trajectory> chooser = null;
 
   //
@@ -65,6 +69,9 @@ public class followTrajectory extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    orig_prefs = drive.getDrivePreferences();
+    drive.setDrivePreferences(DriveTrain.trackerPreferences);
+
     // pull a trajectory from the chooser if possible
     if (chooser != null) {
       trajectory = chooser.getSelected();
@@ -105,6 +112,8 @@ public class followTrajectory extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     s_currentTrajectory = null;
+    drive.setDrivePreferences(orig_prefs);
+
     if (ramsete != null)
       ramsete.end(interrupted);
     System.out.println("***FollowTrajectory time (ms) = " + (RobotController.getFPGATime() - startTime)/1000.0);
@@ -133,7 +142,4 @@ public class followTrajectory extends CommandBase {
     nt_closedLoop = tab.add("ClosedLoop Traj", closedLoop).withWidget("Toggle Button").getEntry();
     nt_closedLoop.addListener((EntryNotification e)-> setClosedLoop(e.value.getBoolean()), EntryListenerFlags.kUpdate|EntryListenerFlags.kNew);
   }
-
-
-
 }

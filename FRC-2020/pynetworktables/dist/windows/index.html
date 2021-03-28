@@ -93,26 +93,74 @@
               <frc-text-field label="Active AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser/active" readonly></frc-text-area>
             </p>
             <p>
-              <frc-number-field label="Robot speed ft/s" source-key="/Shuffleboard/DriversChoice/Robot Speeds/feet-per-sec"></frc-number-field>
+              <frc-number-field label="Driver speed ft/s" source-key="/DriverPrefs/Driver Speeds/feet-per-sec"></frc-number-field>
               <frc-number-slider
-              source-provider="NetworkTables"
-              label="Robot speed ft/s"
-              min="0"
-              max="20"
-              block-increment="0.1"
-              source-key="/shuffleboard/driversChoice/robotSpeeds/feet-per-sec"
-              name="Max Speed ft/s"
-          ></frc-number-slider>
-              <frc-number-field label="Robot rot deg/s" source-key="/Shuffleboard/DriversChoice/Robot Speeds/deg-per-sec"></frc-number-field>
+                  source-provider="NetworkTables"
+                  label="Robot speed ft/s"
+                  min="0"
+                  max="20"
+                  block-increment="0.1"
+                  source-key="/DriverPrefs/Driver Speeds/feet-per-sec"
+                  name="Max Speed ft/s">
+              </frc-number-slider>
+              
+              <frc-number-field label="Driver rot deg/s" source-key="/DriverPrefs/Driver Speeds/deg-per-sec"></frc-number-field>
               <frc-number-slider
-              source-provider="NetworkTables"
-              min="0"
-              max="360"
-              block-increment="0.1"
-              source-key="/shuffleboard/driversChoice/robotSpeeds/deg-per-sec"
-              name="Max Rot d/s"
-          ></frc-number-slider>
+                source-provider="NetworkTables"
+                min="0"
+                max="360"
+                block-increment="0.1"
+                source-key="/DriverPrefs/Driver Speeds/deg-per-sec"
+                name="Max Rot d/s">
+              </frc-number-slider>
+
+              <frc-number-field label="Driver slew-rate [s]" source-key="/DriverPrefs/Driver Speeds/slew-rate"></frc-number-field>
+              <frc-number-slider
+                source-provider="NetworkTables"
+                min="0"
+                max="2.0"
+                block-increment="0.1"
+                source-key="/DriverPrefs/Driver Speeds/slew-rate"
+                name="Max Rot d/s">
+              </frc-number-slider>
             </p>
+
+            <p>
+              <frc-number-field label="Tracker speed ft/s" source-key="/DriverPrefs/Tracker Speeds/feet-per-sec"></frc-number-field>
+              <frc-number-slider
+                  source-provider="NetworkTables"
+                  label="Tracker speed ft/s"
+                  min="0"
+                  max="20"
+                  block-increment="0.1"
+                  source-key="/DriverPrefs/Tracker Speeds/feet-per-sec"
+                  name="Max Speed ft/s">
+              </frc-number-slider>
+              
+              <frc-number-field label="Tracker rot deg/s" source-key="/DriverPrefs/Tracker Speeds/deg-per-sec"></frc-number-field>
+              <frc-number-slider
+                source-provider="NetworkTables"
+                min="0"
+                max="360"
+                block-increment="0.1"
+                source-key="/DriverPrefs/Tracker Speeds/deg-per-sec"
+                name="Max Rot d/s">
+              </frc-number-slider>
+
+              <frc-number-field label="Tracker slew-rate [s]" source-key="/DriverPrefs/Tracker Speeds/slew-rate"></frc-number-field>
+              <frc-number-slider
+                source-provider="NetworkTables"
+                min="0"
+                max="2.0"
+                block-increment="0.1"
+                source-key="/DriverPrefs/Tracker Speeds/slew-rate"
+                name="Max Rot d/s">
+              </frc-number-slider>
+            </p>
+
+
+
+
            </fieldset>
            <fieldset class="scheduler-border">
             <legend class="scheduler-border" id="intake">Testing Area</legend>

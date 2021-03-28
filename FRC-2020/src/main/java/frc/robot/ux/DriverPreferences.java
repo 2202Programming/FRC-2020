@@ -5,12 +5,13 @@
 package frc.robot.ux;
 
 import java.util.Map;
+import java.util.function.DoubleConsumer;
 
 import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
@@ -19,23 +20,22 @@ import frc.robot.Constants.DriveTrain;
 import frc.robot.RobotContainer;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.TankVelDriveCmd;
+import frc.robot.subsystems.DrivePreferences;
 
 /** Add your docs here. */
 public class DriverPreferences {
+
+  NetworkTable table;
 
   // Drive commands
   TankVelDriveCmd tankDriveCmd;
   ArcadeVelDriveCmd arcadeDriveCmd;
   SendableChooser<CommandBase> driveChoices = new SendableChooser<CommandBase>();
 
-  // Robot Limits
-  NetworkTableEntry maxSpeedNTE; // [ft/s]
-  NetworkTableEntry maxRotationNTE; // [deg/s]
-  // NetworkTableEntry sideAccelNTE; // [ft/s^2] - limit turn rate at speed <not
-  // implemented>
 
   DriverPreferences(ShuffleboardTab tab) {
     RobotContainer rc = RobotContainer.getInstance();
+    table = NetworkTableInstance.getDefault().getTable("DriverPrefs");
 
     // Create default commands for driver preference selection
     arcadeDriveCmd = new ArcadeVelDriveCmd(rc.driverControls, rc.driveTrain, rc.gearShifter);
@@ -51,29 +51,36 @@ public class DriverPreferences {
     tab.getLayout("DriveCmd", BuiltInLayouts.kList).withSize(3, 2)
         .withProperties(Map.of()).add(driveChoices);
 
-    ShuffleboardLayout layout = tab.getLayout("Robot Speeds", BuiltInLayouts.kList).withSize(2, 2);
-    maxSpeedNTE = layout.addPersistent("feet-per-sec", DriveTrain.maxFPS)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("Min", 0.0, "Max", 20.0, "Block Increment", 5.0))
-      .getEntry();
-  
-    maxSpeedNTE.addListener(event -> 
-      {rc.driveTrain.processDashboard(event); },
-      EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-    maxRotationNTE = layout.addPersistent("deg-per-sec", DriveTrain.maxRotDPS)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("Min", 30.0, "Max", 360.0, "Block Increment", 15 ))
-      .getEntry();
-
-    maxRotationNTE.addListener(event -> 
-      {rc.driveTrain.processDashboard(event); },
-      EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-	}
+    // create controls for drive train preferences driver and tracker
+    setup("Driver Speeds", DriveTrain.driverPreferences);
+    setup("Tracker Speeds", DriveTrain.trackerPreferences);
+  }
 
   // Accessors for getting values
   public SendableChooser<CommandBase> getCommandChooser() { return driveChoices; }
-  public double getMaxSpeed() {return maxSpeedNTE.getDouble(DriveTrain.maxFPS);  }
-  public double getMaxRotation() {return maxRotationNTE.getDouble(DriveTrain.maxRotDPS);  }
 
-}
+
+  /**
+   * helper function to create ux for DrivePreference 
+   * @param groupName
+   * @param pref
+   */
+  void setup(String groupName, DrivePreferences pref) {
+      createDoubleTableEntry(groupName+"/deg-per-sec", pref.maxRotRate, pref::setMaxRotation );
+      createDoubleTableEntry(groupName+"/feet-per-sec", pref.maxVelocity, pref::setMaxVelocity);
+      createDoubleTableEntry(groupName+"/slew-rate", pref.maxVelocity, pref::setSlewRateLimit );
+    }
+  
+  NetworkTableEntry createDoubleTableEntry(String name, double initValue, DoubleConsumer f) {
+    NetworkTableEntry nte = table.getEntry(name);
+    nte.setDouble(initValue);
+    // grab double when it changes
+    nte.addListener( event -> 
+      {
+          f.accept(event.value.getDouble());
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      return nte;
+    }
+
+  }

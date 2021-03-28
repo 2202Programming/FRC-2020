@@ -2,6 +2,9 @@ package frc.robot.util.misc;
 
 import java.util.function.DoubleSupplier;
 
+
+import edu.wpi.first.wpiutil.math.MathUtil;
+
 /**
  * LimitedIntegrator integrates input subject to rate limits
  * 
@@ -68,7 +71,7 @@ public class LimitedIntegrator {
 
   // jumps to given output, good for setting inital position
   public void setX(double pos) {
-    X = MathUtil.limit(pos, x_min, x_max);
+    X = MathUtil.clamp(pos, x_min, x_max);
     Xprev = X;
   }
 
@@ -79,14 +82,14 @@ public class LimitedIntegrator {
 
     // deadzone and rate limit the input
     double cmdDz = deadZone(in * kGain);
-    double dX = MathUtil.limit(cmdDz, dx_fall, dx_raise);
+    double dX = MathUtil.clamp(cmdDz, dx_fall, dx_raise);
 
     // integrate the dX desired rate limited X
     double x = Xprev + dX * dT;
 
     // position limit the output
     Xprev = X;
-    X = MathUtil.limit(x, x_min, x_max);
+    X = MathUtil.clamp(x, x_min, x_max);
   }
 
   // set dz values and compute correcting scales so we get max deflections

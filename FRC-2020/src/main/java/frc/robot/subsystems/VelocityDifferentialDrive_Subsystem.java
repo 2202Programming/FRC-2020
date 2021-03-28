@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
-import static frc.robot.Constants.RobotPhysical.WheelAxleDistance;
 import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 import static frc.robot.Constants.RobotPhysical.WheelWearLeft;
 import static frc.robot.Constants.RobotPhysical.WheelWearRight;
@@ -27,6 +26,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.DriveTrain;
@@ -49,7 +50,7 @@ import frc.robot.subsystems.ifx.Shifter.Gear;
 import frc.robot.subsystems.ifx.VelocityDrive;
 import frc.robot.subsystems.ifx.VoltageDrive;
 import frc.robot.subsystems.util.MonitoredSubsystemBase;
-import frc.robot.util.misc.MathUtil;
+
 
 public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     implements Logger, DualDrive, VelocityDrive, VoltageDrive, DashboardUpdate {
@@ -61,7 +62,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final IdleMode KIdleMode = IdleMode.kBrake;
   final double Kgyro = -1.0; // ccw is positive, just like geometry class
 
-  // Chassis Encoder
+  // Chassis Encoders
   final double kFeetPerPulse = .00057558;
   final boolean kInvertChassisLeft = true;
   final boolean kInvertChassisRight = false;
@@ -71,6 +72,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     public double right;
   }
 
+  // Network Tables used by drive train
   private NetworkTable table;
   private NetworkTableEntry nt_velLeft;
   private NetworkTableEntry nt_velRight;
@@ -87,25 +89,19 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private NetworkTableEntry nt_rightOutput;
 
   // Field position
-  Field2d m_field;
-  Field2d m_field_chassis;
+  final Field2d m_field;
+  final Field2d m_field_chassis;
 
   // save a pose
   Pose2d savedPose;
-
-  // we only use this one PID slot for the drive lead controllers
-  final int KpidSlot = 0;
 
   // Current Limits
   private int smartCurrentLimit = DriveTrain.smartCurrentLimit; // amps
   // private final double KSecondaryCurrent = 1.40; // set secondary current based
   // on smart current
 
-  // Phyical units deadzone
+  // Phyical units deadzone [rpm]
   private final double RPM_DZ = 2.0;
-
-  // Acceleration limits
-  private double slewRateLimit = DriveTrain.slewRateLimit; // seconds to max speed/power
 
   // Chasis details
   private final double K_ft_per_rev = Math.PI * WheelDiameter / 12.0; // feet/rev
@@ -131,6 +127,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final CANPIDController leftPID = leftController.getPIDController();
   final CANPIDController rightPID = rightController.getPIDController();
 
+  // Chassis encoders on gear box tied directly into the RIO
   final Encoder leftChassisEncoder = new Encoder(DigitalIO.LEFT_CHASSIS_ENCODER_A, 
                                                  DigitalIO.LEFT_CHASSIS_ENCODER_B, kInvertChassisLeft);
   final Encoder rightChassisEncoder = new Encoder(DigitalIO.RIGHT_CHASSIS_ENCODER_A, 
@@ -141,25 +138,22 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   // Voltage to get robot to move.
   // kS - taken from the Drive Characterization
-  // - for reference, 0.15 was enough to move 2019 arm-bot chassis
-  private final double ARBIT_FEEDFWD_MAX_VOLT = 1.5; // volts max allowed
-  private double arbFeedFwd = RamseteProfile.ksVolts; // current value
+  // For reference, 0.15 was enough to move 2019 arm-bot chassis
+  private final double arbFeedFwd = RamseteProfile.ksVolts; // current value
 
-  // Calculated based on desired low-gear max ft/s - UX may update
-  double maxFPS_High; // <input>
-  double maxFPS_Low; // using HIGH gear max RPM
-  double maxRPM_High; // max motor RPM low & high
-  double maxDPS; // max rotation in deg/sec around Z axis
+  // preferences to use, switch between driver and tracking trajectory
+  DrivePreferences m_pref;
 
   // drivetrain & gear objects
   final DifferentialDrive dDrive;
   final Shifter gearbox;
-  Gear requestedGear; // where driver or external logic wants the gear
-  boolean coastMode = false; // attempt to coast when Vcmd > Vrequest
+  Gear requestedGear;         // where driver or external logic wants the gear
+  boolean coastMode = false;  // attempt to coast when Vcmd > Vrequest
 
   // Save our commanded wheelspeeds and current speeds
-  final DifferentialDriveWheelSpeeds m_commandedWheelSpeeds = new DifferentialDriveWheelSpeeds();
-
+  final DifferentialDriveWheelSpeeds m_cmd_wheelSpeeds = new DifferentialDriveWheelSpeeds();
+  final ChassisSpeeds m_cmd_chassisSpeed = new ChassisSpeeds();
+  
   // measurements, taken in periodic(), robot coordinates
   final DifferentialDriveWheelSpeeds m_wheelSpeeds = new DifferentialDriveWheelSpeeds();
   double m_posLeft = 0.0; // feet, positive is forward distance, since encoder reset
@@ -212,6 +206,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     nav = RobotContainer.getInstance().sensors;
     setHeadingCompensator(null);
 
+   
+
     // direct networktables logging
     table = NetworkTableInstance.getDefault().getTable("Drivetrain");
     nt_velLeft = table.getEntry("VelLeft/value");
@@ -236,12 +232,13 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60; // rpm/60 rps
     K_high_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.HIGH) / 60;
 
+    //calibrate chassis encoders
     leftChassisEncoder.setDistancePerPulse(kFeetPerPulse);
     rightChassisEncoder.setDistancePerPulse(kFeetPerPulse);
 
-    // Speed setting may be updated via UX, but set defaults
-    calcSpeedSettings();
-
+    // default to Driver's preferences
+    setDrivePreferences(DriveTrain.driverPreferences);
+    
     // setup SparkMax controllers, sets left and right masters
     configureControllers();
 
@@ -261,28 +258,24 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     savedPose = m_odometry.getPoseMeters(); // set savedPose to starting position initally
   }
 
-  void calcSpeedSettings() {
-    // compute max RPM for motors for high and low gears
-    var dp = RobotContainer.getInstance().getDriverPreferences();
-    maxDPS = (dp == null) ? DriveTrain.maxRotDPS : dp.getMaxRotation();
-    maxFPS_High = (dp == null) ? DriveTrain.maxFPS : dp.getMaxSpeed();
-    maxRPM_High = (maxFPS_High / K_high_fps_rpm);
-    maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
-
+  double calcLowSpeedSetting() {   
+    double maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
     // don't allow Motor RPM to let low speed be faster than high speed
     // which could happen with a slow user choice.
-    maxFPS_Low = (maxFPS_Low > maxFPS_High) ? maxFPS_High : maxFPS_Low;
+    maxFPS_Low = (maxFPS_Low > m_pref.maxVelocity) ? m_pref.maxVelocity : maxFPS_Low;
 
-    // check we can hit max requested speed in high gear
-    if (maxRPM_High > DriveTrain.motorMaxRPM) {
-      System.out.println("Warning: maxFPS not reachable. maxFPS= " + (DriveTrain.motorMaxRPM * K_high_fps_rpm));
-    }
+    return maxFPS_Low;
   }
 
-  // Process any Dashboard events
-  public void processDashboard(EntryNotification event) {
-    // don't worry about which event, grab them all
-    calcSpeedSettings();
+  void checkMaxRPM() {
+     // compute max RPM for motors for high and low gears
+    double maxRPM_High = (m_pref.maxVelocity/ K_high_fps_rpm);
+    
+    // check we can hit max requested speed in high gear
+    if (maxRPM_High > DriveTrain.motorMaxRPM) {
+      m_pref.maxVelocity = (DriveTrain.motorMaxRPM * K_high_fps_rpm);
+      System.out.println("Warning: maxFPS not reachable. maxVelocity = " + m_pref.maxVelocity);
+    }
   }
 
   /**
@@ -297,22 +290,24 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     middleLeft.follow(leftController);
     frontLeft.follow(leftController);
 
-    // configure lead controller's pid
-    DriveTrain.pidValues.copyTo(leftPID, KpidSlot);
-    DriveTrain.pidValues.copyTo(rightPID, KpidSlot);
+    // configure lead controller's pid for driver & tracker
+    DriveTrain.driverPreferences.rpmPID.copyTo(leftPID, DriveTrain.driverPreferences.pidSlot);
+    DriveTrain.driverPreferences.rpmPID.copyTo(rightPID, DriveTrain.driverPreferences.pidSlot);
+    //tracker
+    DriveTrain.trackerPreferences.rpmPID.copyTo(leftPID, DriveTrain.trackerPreferences.pidSlot);
+    DriveTrain.trackerPreferences.rpmPID.copyTo(rightPID, DriveTrain.trackerPreferences.pidSlot);
 
     // master controller have faster CAN Timing
     setMasterControlerTiming(leftController);
     setMasterControlerTiming(rightController);
 
     // zero adjust will set the default limits for accel and currents
-    adjustAccelerationLimit(0.0);
-    adjustFeedForward(0.0);
     adjustCurrentLimit(0);
 
     // burn the default value in case of brown-out
     saveControllers();
   }
+
 
   @Override
   public void monitored_periodic() {
@@ -369,39 +364,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     recordingPoseEnd = m_odometry.getPoseMeters();
   }
 
-  /**
-   * adjust the arbitrary feedforward voltage sent to the motors. This should be
-   * positive, but sign is flipped when going backward.
-   * 
-   * Purpose is to tune to the value the motor/robot just starts to move.
-   * 
-   * @param deltaFF voltage to go up or down from current value
-   * @return
-   */
-  public double adjustFeedForward(final double deltaFF) {
-    arbFeedFwd = MathUtil.limit((arbFeedFwd + deltaFF), 0.0, ARBIT_FEEDFWD_MAX_VOLT);
-    return arbFeedFwd;
-  }
-
-  /**
-   * adjust the acceleration time - limit on how fast the output gets to max spped
-   * Should be kRampRate as shown in SparkMax Client.
-   * 
-   * @param deltaRate (seconds) amount to add to current rate
-   * @return
-   */
-  public double adjustAccelerationLimit(final double deltaRate) {
-    slewRateLimit = MathUtil.limit((slewRateLimit + deltaRate), 0.0, DriveTrain.slewRateMax);
-    // Just set the ramp limit on the masters
-    leftController.setOpenLoopRampRate(slewRateLimit);
-    rightController.setOpenLoopRampRate(slewRateLimit);
-
-    // Use same rate limit on closed loop too
-    leftController.setClosedLoopRampRate(slewRateLimit);
-    rightController.setClosedLoopRampRate(slewRateLimit);
-    return slewRateLimit;
-  }
-
+  
   /**
    * Change the default smart current limits for drive motors. Current limits
    * pushed to all controllers.
@@ -410,7 +373,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return
    */
   public int adjustCurrentLimit(final int deltaCurrent) {
-    smartCurrentLimit = MathUtil.limit(smartCurrentLimit + deltaCurrent, 0, DriveTrain.smartCurrentMax);
+    smartCurrentLimit = MathUtil.clamp(smartCurrentLimit + deltaCurrent, 0, DriveTrain.smartCurrentMax);
     for (final CANSparkMax c : controllers) {
       // smart current limit
       c.setSmartCurrentLimit(smartCurrentLimit);
@@ -467,29 +430,23 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
     // [s/min] / [ft /wheel-rev] / [motor-rev / wheel-rev] = [motor-rpm / ft/s]
     double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();
-    double maxSpeed = getMaxSpeed(m_currentGear);
-
-    // limit vel to max for the gear ratio
-    double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
-    double rpm = kGR * vcmd; // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
-
-    /**
-     * Rotation controls
-     */
-    // Convert to rad/s split between each wheel
-    double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
-    rps = rps + m_heading_compensator.get();
-
-    // [mo-rpm/ ft/s] [rad/deg] [ft] [deg/s] = [mo-rpm/ ft/s] * [ft/s] = mo-rpm
-    double vturn_rpm = kGR * (Math.PI / 180.0) * (0.5 * WheelAxleDistance) * rps;
-
-    // compute each wheel, pos rpm moves forward, pos turn is CCW
-    double vl_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ); // turn left, +CCW, slows left wheel
-    double vr_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ); // turn left, +CCW, speeds right wheel
     
-    // save commanded wheel speeds - [ft/s]
-    m_commandedWheelSpeeds.leftMetersPerSecond = vl_rpm/kGR; // not meters, we use ft/s 
-    m_commandedWheelSpeeds.rightMetersPerSecond = vr_rpm/kGR;
+    // limit vel to max for the gear ratio
+    //  Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
+    double vcmd = signed_clamp(velFps,  m_pref.maxVelocity);
+    double rps = signed_clamp(rotDps + m_heading_compensator.get(), m_pref.maxRotRate);
+    
+    // Save chassis command speeds after clamp
+    m_cmd_chassisSpeed.omegaRadiansPerSecond = rps*(Math.PI/180.0);
+    m_cmd_chassisSpeed.vxMetersPerSecond = vcmd;
+
+    // convert chassis --> wheel speeds (fts)
+    var ws = calcWheelSpeeds(m_cmd_chassisSpeed, m_cmd_wheelSpeeds);
+    
+    // compute each wheel, pos rpm moves forward, pos turn is CCW, [rpm]
+    double vl_rpm = applyDeadZone(ws.leftMetersPerSecond*kGR,  RPM_DZ); // turn left, +CCW, slows left wheel
+    double vr_rpm = applyDeadZone(ws.rightMetersPerSecond*kGR, RPM_DZ); // turn left, +CCW, speeds right wheel
+  
     // issue all commands to the hardware
     output(vl_rpm, vr_rpm, coastMode);
   }
@@ -505,32 +462,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @param velRight [length/s] positive movee forward
    */
   public void velocityTankDrive(double velLeft, double velRight) {
-    // Spark Max uses RPM for velocity closed loop mode
-    // so we need to convert ft/s to RPM command which is dependent
-    // on the gear ratio.
-    // [s/min] / [ft/wheel-rev] / [wheel-rev / motor-rev] = [mo-rev / min] / [ft/s]
-    // = [mo-rpm / ft/s]
-    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();
-    double rps = m_heading_compensator.get();
-    var ws = new DifferentialDriveWheelSpeeds(velLeft, velRight);
-    var cs = drive_kinematics.toChassisSpeeds(ws);
-    cs.omegaRadiansPerSecond += (Math.PI / 180.0) * rps;  //
-    cs.omegaRadiansPerSecond = Math.copySign(MathUtil.limit(Math.abs(cs.omegaRadiansPerSecond), 0.0, 
-                  (maxDPS*Math.PI/180.0)), cs.omegaRadiansPerSecond);
-    cs.vxMetersPerSecond = Math.copySign(
-          MathUtil.limit(Math.abs(cs.vxMetersPerSecond), 0.0, getMaxSpeed(m_currentGear)),  cs.vxMetersPerSecond);
-
-    ws = drive_kinematics.toWheelSpeeds(cs);
-    
-    // save commanded wheel speeds - [ft/s]
-    m_commandedWheelSpeeds.leftMetersPerSecond = ws.leftMetersPerSecond; // not meters, we use ft/s
-    m_commandedWheelSpeeds.rightMetersPerSecond = ws.rightMetersPerSecond;
-
-    // [mo-rpm / ft/s] * [ft/s] = [rpm-mo]
-    double rpm_l = kGR * ws.leftMetersPerSecond;
-    double rpm_r = kGR * ws.rightMetersPerSecond;
-    // scale to rpm and ouput to contollers, no coast mode
-    output(rpm_l, rpm_r, false);
+    m_cmd_wheelSpeeds.leftMetersPerSecond = velLeft; // not meters, we use ft/s
+    m_cmd_wheelSpeeds.rightMetersPerSecond = velRight;
+    var cs = calcChassisSpeeds(m_cmd_wheelSpeeds, m_cmd_chassisSpeed);
+    velocityArcadeDrive(cs.vxMetersPerSecond, cs.omegaRadiansPerSecond*(Math.PI/180));
   }
 
   /**
@@ -584,13 +519,17 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
       if (sp_rpm.left == 0.0)   arbffVoltsLeft = 0.0;
       if (sp_rpm.right == 0.0)  arbffVoltsRight = 0.0;
 
-      leftPID.setReference(sp_rpm.left, ControlType.kVelocity, KpidSlot, arbffVoltsLeft, ArbFFUnits.kVoltage);
-      rightPID.setReference(sp_rpm.right, ControlType.kVelocity, KpidSlot, arbffVoltsRight, ArbFFUnits.kVoltage);
+      leftPID.setReference(sp_rpm.left, ControlType.kVelocity, m_pref.pidSlot, arbffVoltsLeft, ArbFFUnits.kVoltage);
+      rightPID.setReference(sp_rpm.right, ControlType.kVelocity, m_pref.pidSlot, arbffVoltsRight, ArbFFUnits.kVoltage);
     }
     shiftGears();
     dDrive.feed();
   }
 
+  /**
+   * Support normalize controls with gear shifting
+   * No splicing of the commanded speed with the shift point.
+   */
   public void arcadeDrive(final double xSpeed, final double zRotation) {
     shiftGears();
     dDrive.arcadeDrive(xSpeed, zRotation, false);
@@ -608,7 +547,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return max speed in ft/s
    */
   public double getMaxSpeed(Gear gear) {
-    return (gear == Gear.HIGH) ? maxFPS_High : maxFPS_Low;
+    return (gear == Gear.HIGH) ? m_pref.maxVelocity : calcLowSpeedSetting();
   }
 
   public double getLeftPos() {
@@ -620,19 +559,19 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   public double getLeftVel(final boolean normalized) {
-    return (normalized) ? (m_wheelSpeeds.leftMetersPerSecond / maxFPS_High) : m_wheelSpeeds.leftMetersPerSecond;
+    return (normalized) ? (m_wheelSpeeds.leftMetersPerSecond / m_pref.maxVelocity) : m_wheelSpeeds.leftMetersPerSecond;
   }
 
   public double getRightVel(final boolean normalized) {
-    return (normalized) ? (m_wheelSpeeds.rightMetersPerSecond / maxFPS_High) : m_wheelSpeeds.rightMetersPerSecond;
+    return (normalized) ? (m_wheelSpeeds.rightMetersPerSecond / m_pref.maxVelocity) : m_wheelSpeeds.rightMetersPerSecond;
   }
 
   public double getAvgVelocity(final boolean normalized) {
     double vel = 0.5 * (m_wheelSpeeds.leftMetersPerSecond + m_wheelSpeeds.rightMetersPerSecond);
-    return (normalized) ? (vel / maxFPS_High) : vel;
+    return (normalized) ? (vel / m_pref.maxVelocity) : vel;
   }
 
-  public DriveSetPoints getVelocitySetpoints() {
+  public DriveSetPoints getRPMSetpoints() {
     return sp_rpm;
   }
 
@@ -789,7 +728,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   public DifferentialDriveWheelSpeeds getCommandedWheelSpeeds() {
-    return m_commandedWheelSpeeds;
+    return m_cmd_wheelSpeeds;
   }
 
   /**
@@ -812,7 +751,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   // update the savedPose on demand
   public void savePose() {
-    savedPose = m_odometry.getPoseMeters();
+    savedPose = getPose();
     return;
   }
 
@@ -887,14 +826,63 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     return 0.0; //m_drivetrainSimulator.getCurrentDrawAmps();
   }
 
+  public void setDrivePreferences( DrivePreferences prefs) {
+    m_pref = prefs;
+
+    // Just set the ramp limit on the masters
+    leftController.setOpenLoopRampRate(m_pref.slewRateLimit);
+    rightController.setOpenLoopRampRate(m_pref.slewRateLimit);
+ 
+    // Use same rate limit on closed loop too
+    leftController.setClosedLoopRampRate(m_pref.slewRateLimit);
+    rightController.setClosedLoopRampRate(m_pref.slewRateLimit);
+    
+    // check m_pref.maxVelocity
+    checkMaxRPM();
+  }
+  public DrivePreferences getDrivePreferences() {
+    return m_pref;
+  }
+
   @Override
   public double getMaxVelocity() {
-    return this.maxFPS_High;
+    return this.m_pref.maxVelocity;
   }
 
   @Override
   public double getMaxRotation() {
-    return this.maxDPS;
+    return this.m_pref.maxRotRate;
+  }
+
+  double signed_clamp(double x, double max) {
+    return Math.copySign(MathUtil.clamp(Math.abs(x), 0.0, max), x);
+  }
+
+  /**
+   * Chassis Speeds --> Wheelspeeds    
+   */
+  DifferentialDriveWheelSpeeds calcWheelSpeeds(final ChassisSpeeds cs, final DifferentialDriveWheelSpeeds ws)  {
+    double tw = drive_kinematics.trackWidthMeters; 
+    ws.leftMetersPerSecond = cs.vxMetersPerSecond - tw / 2.0 * cs.omegaRadiansPerSecond;
+    ws.rightMetersPerSecond = cs.vxMetersPerSecond + tw / 2.0 * cs.omegaRadiansPerSecond;
+    return ws;
+  }
+
+  /**
+   *  WheelSpeeds --> ChassisSpeed
+   * @return cs object given 
+   */
+  ChassisSpeeds calcChassisSpeeds(final DifferentialDriveWheelSpeeds ws, final ChassisSpeeds cs){
+    double tw = drive_kinematics.trackWidthMeters;
+    cs.vyMetersPerSecond = 0.0;
+    cs.vxMetersPerSecond = (ws.leftMetersPerSecond + ws.rightMetersPerSecond) / 2.0;
+    cs.omegaRadiansPerSecond = (ws.rightMetersPerSecond - ws.leftMetersPerSecond) / tw;
+    return cs;
+  }
+
+  @Override
+  public void processDashboard(EntryNotification event) {
+   
   }
 
 }

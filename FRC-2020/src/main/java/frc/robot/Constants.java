@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.DrivePreferences;
 import frc.robot.subsystems.Intake_Subsystem.FlyWheelConfig;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.util.misc.PIDFController;
@@ -179,20 +180,32 @@ public final class Constants {
 
     public static final class DriveTrain {
         // motor constraints
-        public static final double motorMaxRPM= 5600;    // motor limits
-        public static final double maxFPS = 14;          // max speed in feet/sec
-        public static final double maxRotDPS = 200;       // max rotation rate in deg/sec
+        public static final double motorMaxRPM= 5600;    // motor limit
         
-        // PIDS are in the SparkMax, PIDFControler is used to hold the values
-        // for initializing the hardware. The PID object not run on RIO.
-        public static final PIDFController pidValues =
-             new PIDFController(0.000155, 0.0, 100.0, 0.00016666); // P, I, D, FF
-             // DL/Dustin - kD=100 was good compromise for damping.  200 deg/sec rot was good too
-             //jr 3/20 settings 0.000155, 0.0, 2.0, 0.00016666; 
-             //20 improved turn oscillation; 80 starting to feel slow
-             //Kp 0.000075 maybe less turn oscillations
-             //JR 3/17 settings 0.000155, 0.0, 0.0, 0.00016666
+        // common Kff - based on measured open loop response 
+        public static final double Kff = 0.00016666;
+      
+        // DL/Dustin - kD=100 was good compromise for damping.  200 deg/sec rot was good too
+        public static final DrivePreferences driverPreferences = new DrivePreferences();
+        static {
+          driverPreferences.pidSlot = 0;
+          driverPreferences.rpmPID =  new PIDFController(0.000155, 0.0, 100.0, Kff);
+          driverPreferences.slewRateLimit = 0.6;   //[s]  time to max output
+          driverPreferences.maxRotRate = 150.0;    //[deg/s]
+          driverPreferences.maxVelocity = 7.5;     //[ft/s]
+        }
 
+        //20 improved turn oscillation; 80 starting to feel slow
+        //Kp 0.000075 maybe less turn oscillations
+        //JR 3/17 settings 0.000155, 0.0, 0.0, 0.00016666
+        public static final DrivePreferences trackerPreferences = new DrivePreferences();
+        static {
+          trackerPreferences.pidSlot = 1;
+          trackerPreferences.rpmPID =  new PIDFController(0.000155, 0.0, 200.0, Kff);
+          trackerPreferences.slewRateLimit = 0.1;   //[s]  time to max output
+          trackerPreferences.maxRotRate =  60.0;    //[deg/s]
+          trackerPreferences.maxVelocity = 5.0;     //[ft/s]
+        }
 
         // shifter settings
         public static final int shiftCount = 5;       // frames to wait on vel measurement
@@ -205,7 +218,6 @@ public final class Constants {
 
         // Acceleration limits
         public static final double slewRateMax = 2;      //sec limits adjusting slewrate 
-        public static final double slewRateLimit = 0.6;  //sec to max power <default>
 
         public static final boolean safetyEnabled = true; 
     }

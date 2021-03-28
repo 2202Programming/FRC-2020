@@ -4,11 +4,11 @@ package frc.robot.util.misc;
  * Common helper functions
  */
 public class MathUtil {
-
+    @Deprecated   // use edu.wpi.first.wpiutil.math.MathUtil.clamp()
     public static double limit(double x, double min, double max) {
         return Math.max(min, Math.min(x, max));
     }
-
+    @Deprecated   // use edu.wpi.first.wpiutil.math.MathUtil.clamp()
     public static int limit(int x, int min, int max) {
         return Math.max(min, Math.min(x, max));
     }

@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 package frc.robot.subsystems.ifx;
 
+import frc.robot.subsystems.DrivePreferences;
+
 /**
  * All you should need for working with physical units and the drive train.
  */
@@ -30,5 +32,9 @@ public interface VelocityDrive extends Odometry {
     // recommend reading these at init() or each frame
     public double getMaxVelocity();  //ft/s
     public double getMaxRotation();  //deg/s ccw positive
+
+    // allow control of prefs
+    public void setDrivePreferences(DrivePreferences pref);
+    public DrivePreferences getDrivePreferences();
 
 }

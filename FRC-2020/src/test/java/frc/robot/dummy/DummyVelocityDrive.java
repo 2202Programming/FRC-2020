@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import frc.robot.subsystems.DrivePreferences;
 import frc.robot.subsystems.ifx.Shifter;
 import frc.robot.subsystems.ifx.VelocityDrive;
 
@@ -99,6 +100,18 @@ public class DummyVelocityDrive implements VelocityDrive {
 
   @Override
   public DifferentialDriveWheelSpeeds getCommandedWheelSpeeds() {
+    return null;
+  }
+
+  @Override
+  public void setDrivePreferences(DrivePreferences pref) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public DrivePreferences getDrivePreferences() {
+    // TODO Auto-generated method stub
     return null;
   }
 

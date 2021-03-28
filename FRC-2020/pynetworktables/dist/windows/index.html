@@ -94,7 +94,24 @@
             </p>
             <p>
               <frc-number-field label="Robot speed ft/s" source-key="/Shuffleboard/DriversChoice/Robot Speeds/feet-per-sec"></frc-number-field>
+              <frc-number-slider
+              source-provider="NetworkTables"
+              label="Robot speed ft/s"
+              min="0"
+              max="20"
+              block-increment="0.1"
+              source-key="/shuffleboard/driversChoice/robotSpeeds/feet-per-sec"
+              name="Max Speed ft/s"
+          ></frc-number-slider>
               <frc-number-field label="Robot rot deg/s" source-key="/Shuffleboard/DriversChoice/Robot Speeds/deg-per-sec"></frc-number-field>
+              <frc-number-slider
+              source-provider="NetworkTables"
+              min="0"
+              max="360"
+              block-increment="0.1"
+              source-key="/shuffleboard/driversChoice/robotSpeeds/deg-per-sec"
+              name="Max Rot d/s"
+          ></frc-number-slider>
             </p>
            </fieldset>
            <fieldset class="scheduler-border">
@@ -134,6 +151,7 @@
             <frc-robot-command label="MagZone3" class="wider-button"  source-key="/Shuffleboard/Match/MagZone3"></frc-robot-command>
             <frc-robot-command label="MagZone4" class="wider-button"  source-key="/Shuffleboard/Match/MagZone4"></frc-robot-command>
           </p>
+
 
           </fieldset>
 

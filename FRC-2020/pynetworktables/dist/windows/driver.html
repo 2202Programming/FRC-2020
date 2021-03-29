@@ -38,10 +38,10 @@
           <h1>
             Team 2202
           </h1>
-          <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
         </div>
-        <br>
     <br>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border" id="cameras">Cameras</legend>
         <div class="container-fluid">
             <div class="row">
               <div class="col-sm-6">
@@ -53,6 +53,17 @@
                 <p>Limelight</p>
               </div>
             </div>
+    </fieldset>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border" id="cameras">Commands</legend>
+      <frc-robot-command label="LimelightToggle" class="super-wide-button"  source-key="/Shuffleboard/Match/LimelightToggle"></frc-robot-command>
+      <frc-toggle-button label="MagZone1" class="super-wide-button" source-key="/Commands/MagZone1"></frc-toggle-button>
+      <frc-toggle-button label="MagZone2" class="super-wide-button" source-key="/Commands/MagZone2"></frc-toggle-button>
+      <frc-toggle-button label="MagZone3" class="super-wide-button" source-key="/Commands/MagZone3"></frc-toggle-button>
+      <frc-toggle-button label="MagZone4" class="super-wide-button" source-key="/Commands/MagZone4"></frc-toggle-button>
+    </fieldset>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border" id="cameras">Direction</legend>
             <div class="row">
               <div class="col-sm-6 bg-light">
                 <frc-differential-drivebase source-key="/Drivetrain"></frc-differential-drivebase>
@@ -65,6 +76,11 @@
               </div>
             </div>
           </div>
+    </fieldset>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border" id="cameras">Gamepad</legend>
+      <frc-sim-joystick></frc-sim-joystick>
+    </fieldset>
           <br>
           <br>
       </frc-dashboard>

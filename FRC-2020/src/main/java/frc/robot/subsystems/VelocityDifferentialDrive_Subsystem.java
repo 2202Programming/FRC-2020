@@ -148,12 +148,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   // preferences to use, switch between driver and tracking trajectory
   DrivePreferences m_pref;
 
-
   // Calculated based on desired low-gear max ft/s - UX may update
   double maxFPS_High; // <input>
   double maxFPS_Low; // using HIGH gear max RPM
   double maxRPM_High; // max motor RPM low & high
-  double maxDPS; // max rotation in deg/sec around Z axis
+  //double maxDPS; // max rotation in deg/sec around Z axis
 
   // drivetrain & gear objects
   final DifferentialDrive dDrive;
@@ -275,8 +274,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // compute max RPM for motors for high and low gears
     //var dp = RobotContainer.getInstance().getDriverPreferences();
 
-    maxDPS =  DriveTrain.driverPreferences.maxRotRate;
-    maxFPS_High = DriveTrain.driverPreferences.maxVelocity;
+   // maxDPS =  m_pref.maxRotRate;
+    maxFPS_High = m_pref.maxVelocity;
     maxRPM_High = (maxFPS_High / K_high_fps_rpm);
     maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
 
@@ -284,10 +283,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // which could happen with a slow user choice.
     maxFPS_Low = (maxFPS_Low > maxFPS_High) ? maxFPS_High : maxFPS_Low;
 
-    // check we can hit max requested speed in high gear
-    if (maxRPM_High > DriveTrain.motorMaxRPM) {
-      System.out.println("Warning: maxFPS not reachable. maxFPS= " + (DriveTrain.motorMaxRPM * K_high_fps_rpm));
-    }
+    checkMaxRPM();
   }
 
   // Process any Dashboard events
@@ -295,6 +291,27 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // don't worry about which event, grab them all
     calcSpeedSettings();
   }
+
+  double calcLowSpeedSetting() {   
+    double maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
+    // don't allow Motor RPM to let low speed be faster than high speed
+    // which could happen with a slow user choice.
+    maxFPS_Low = (maxFPS_Low > m_pref.maxVelocity) ? m_pref.maxVelocity : maxFPS_Low;
+
+    return maxFPS_Low;
+  }
+
+  void checkMaxRPM() {
+     // compute max RPM for motors for high and low gears
+    double maxRPM_High = (m_pref.maxVelocity/ K_high_fps_rpm);
+    
+    // check we can hit max requested speed in high gear
+    if (maxRPM_High > DriveTrain.motorMaxRPM) {
+      m_pref.maxVelocity = (DriveTrain.motorMaxRPM * K_high_fps_rpm);
+      System.out.println("Warning: maxFPS not reachable. maxVelocity = " + m_pref.maxVelocity);
+    }
+  }
+
 
   /**
    * hides some of the ugly setup for our collection of controllers
@@ -527,8 +544,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     var ws = new DifferentialDriveWheelSpeeds(velLeft, velRight);
     var cs = drive_kinematics.toChassisSpeeds(ws);
     cs.omegaRadiansPerSecond += (Math.PI / 180.0) * rps;  //
-    cs.omegaRadiansPerSecond = signed_clamp(cs.omegaRadiansPerSecond, (maxDPS*Math.PI/180.0));
-    cs.vxMetersPerSecond = signed_clamp(cs.vxMetersPerSecond, getMaxSpeed(m_currentGear));
+    cs.omegaRadiansPerSecond = signed_clamp(cs.omegaRadiansPerSecond, (getMaxRotation()*Math.PI/180.0));
+    cs.vxMetersPerSecond = signed_clamp(cs.vxMetersPerSecond,getMaxVelocity());
 
     ws = drive_kinematics.toWheelSpeeds(cs);
     
@@ -917,16 +934,14 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     return m_pref;
   }
 
-
-
   @Override
   public double getMaxVelocity() {
-    return this.maxFPS_High;
+    return m_pref.maxVelocity;
   }
 
   @Override
   public double getMaxRotation() {
-    return this.maxDPS;
+    return m_pref.maxRotRate;
   }
 
 

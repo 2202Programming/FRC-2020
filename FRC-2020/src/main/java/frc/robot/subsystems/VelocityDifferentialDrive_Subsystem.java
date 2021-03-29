@@ -303,8 +303,16 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     frontLeft.follow(leftController);
 
     // configure lead controller's pid
-    DriveTrain.driverPreferences.rpmPID.copyTo(leftPID, KpidSlot);
-    DriveTrain.driverPreferences.rpmPID.copyTo(rightPID, KpidSlot);
+    //DriveTrain.driverPreferences.rpmPID.copyTo(leftPID, KpidSlot);
+    //DriveTrain.driverPreferences.rpmPID.copyTo(rightPID, KpidSlot);
+    // configure lead controller's pid for driver & tracker
+    DriveTrain.driverPreferences.rpmPID.copyTo(leftPID, DriveTrain.driverPreferences.pidSlot);
+    DriveTrain.driverPreferences.rpmPID.copyTo(rightPID, DriveTrain.driverPreferences.pidSlot);
+
+    //tracker
+    DriveTrain.trackerPreferences.rpmPID.copyTo(leftPID, DriveTrain.trackerPreferences.pidSlot);
+    DriveTrain.trackerPreferences.rpmPID.copyTo(rightPID, DriveTrain.trackerPreferences.pidSlot);
+
 
     // master controller have faster CAN Timing
     setMasterControlerTiming(leftController);

@@ -164,6 +164,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   // Save our commanded wheelspeeds and current speeds
   final DifferentialDriveWheelSpeeds m_commandedWheelSpeeds = new DifferentialDriveWheelSpeeds();
+  final DifferentialDriveWheelSpeeds m_cmd_wheelSpeeds = new DifferentialDriveWheelSpeeds();
+  final ChassisSpeeds m_cmd_chassisSpeed = new ChassisSpeeds();
 
   // measurements, taken in periodic(), robot coordinates
   final DifferentialDriveWheelSpeeds m_wheelSpeeds = new DifferentialDriveWheelSpeeds();
@@ -490,7 +492,17 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // limit vel to max for the gear ratio
     double vcmd = signed_clamp(velFps, m_pref.maxVelocity);
     double rps = signed_clamp(rotDps + m_heading_compensator.get(), m_pref.maxRotRate);
-   /// rps = rps + m_heading_compensator.get();
+   
+    // Save chassis command speeds after clamp
+    m_cmd_chassisSpeed.omegaRadiansPerSecond = rps*(Math.PI/180.0);
+    m_cmd_chassisSpeed.vxMetersPerSecond = vcmd;
+
+    // convert chassis --> wheel speeds (fts)
+    var ws = calcWheelSpeeds(m_cmd_chassisSpeed, m_cmd_wheelSpeeds);
+
+    // compute each wheel, pos rpm moves forward, pos turn is CCW, [rpm]
+    double vl_rpmX = applyDeadZone(ws.leftMetersPerSecond*kGR,  RPM_DZ); // turn left, +CCW, slows left wheel
+    double vr_rpmX = applyDeadZone(ws.rightMetersPerSecond*kGR, RPM_DZ); // turn left, +CCW, speeds right wheel
 
     double rpm = kGR * vcmd; // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
     // [mo-rpm/ ft/s] [rad/deg] [ft] [deg/s] = [mo-rpm/ ft/s] * [ft/s] = mo-rpm
@@ -503,8 +515,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // save commanded wheel speeds - [ft/s]
     m_commandedWheelSpeeds.leftMetersPerSecond = vl_rpm/kGR; // not meters, we use ft/s 
     m_commandedWheelSpeeds.rightMetersPerSecond = vr_rpm/kGR;
+
     // issue all commands to the hardware
-    output(vl_rpm, vr_rpm, coastMode);
+    output(vl_rpmX, vr_rpmX, coastMode);
   }
 
   /**

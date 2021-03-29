@@ -484,16 +484,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     double maxSpeed = getMaxSpeed(m_currentGear);
 
     // limit vel to max for the gear ratio
-    double vcmd = signed_clamp(velFps, maxSpeed);
+    double vcmd = signed_clamp(velFps, m_pref.maxVelocity);
+    double rps = signed_clamp(rotDps + m_heading_compensator.get(), m_pref.maxRotRate);
+   /// rps = rps + m_heading_compensator.get();
+
     double rpm = kGR * vcmd; // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
-
-    /**
-     * Rotation controls
-     */
-    // Convert to rad/s split between each wheel
-    double rps = signed_clamp(rotDps, maxDPS);
-    rps = rps + m_heading_compensator.get();
-
     // [mo-rpm/ ft/s] [rad/deg] [ft] [deg/s] = [mo-rpm/ ft/s] * [ft/s] = mo-rpm
     double vturn_rpm = kGR * (Math.PI / 180.0) * (0.5 * WheelAxleDistance) * rps;
 

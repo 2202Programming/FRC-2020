@@ -148,12 +148,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   // preferences to use, switch between driver and tracking trajectory
   DrivePreferences m_pref;
 
-  // Calculated based on desired low-gear max ft/s - UX may update
- //////double maxFPS_High; // <input>
-  /////ouble maxFPS_Low; // using HIGH gear max RPM
-  double maxRPM_High; // max motor RPM low & high
-  //double maxDPS; // max rotation in deg/sec around Z axis
-
   // drivetrain & gear objects
   final DifferentialDrive dDrive;
   final Shifter gearbox;
@@ -271,13 +265,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   void calcSpeedSettings() {
-    // compute max RPM for motors for high and low gears
-    //var dp = RobotContainer.getInstance().getDriverPreferences();
-
-   // maxDPS =  m_pref.maxRotRate;
-    ///maxFPS_High = m_pref.maxVelocity;
-    ///maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
-
     calcLowSpeedSetting();
     checkMaxRPM();
   }
@@ -530,6 +517,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @param velRight [length/s] positive movee forward
    */
   public void velocityTankDrive(double velLeft, double velRight) {
+    m_cmd_wheelSpeeds.leftMetersPerSecond = velLeft; // not meters, we use ft/s
+    m_cmd_wheelSpeeds.rightMetersPerSecond = velRight;
+    var cs = calcChassisSpeeds(m_cmd_wheelSpeeds, m_cmd_chassisSpeed);
+    velocityArcadeDrive(cs.vxMetersPerSecond, cs.omegaRadiansPerSecond*(Math.PI/180));
+/********
     // Spark Max uses RPM for velocity closed loop mode
     // so we need to convert ft/s to RPM command which is dependent
     // on the gear ratio.
@@ -554,6 +546,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     double rpm_r = kGR * ws.rightMetersPerSecond;
     // scale to rpm and ouput to contollers, no coast mode
     output(rpm_l, rpm_r, false);
+  ****/
   }
 
   /**

@@ -635,7 +635,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return max speed in ft/s
    */
   public double getMaxSpeed(Gear gear) {
-    return (gear == Gear.HIGH) ? maxFPS_High : maxFPS_Low;
+    return (gear == Gear.HIGH) ? m_pref.maxVelocity : calcLowSpeedSetting();
   }
 
   public double getLeftPos() {

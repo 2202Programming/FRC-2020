@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpiutil.math.MathUtil;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;
 import frc.robot.Constants.DriveTrain;
@@ -49,7 +50,6 @@ import frc.robot.subsystems.ifx.Shifter.Gear;
 import frc.robot.subsystems.ifx.VelocityDrive;
 import frc.robot.subsystems.ifx.VoltageDrive;
 import frc.robot.subsystems.util.MonitoredSubsystemBase;
-import frc.robot.util.misc.MathUtil;
 
 public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     implements Logger, DualDrive, VelocityDrive, VoltageDrive, DashboardUpdate {
@@ -392,7 +392,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return
    */
   public double adjustFeedForward(final double deltaFF) {
-    arbFeedFwd = MathUtil.limit((arbFeedFwd + deltaFF), 0.0, ARBIT_FEEDFWD_MAX_VOLT);
+    arbFeedFwd = MathUtil.clamp((arbFeedFwd + deltaFF), 0.0, ARBIT_FEEDFWD_MAX_VOLT);
     return arbFeedFwd;
   }
 
@@ -404,7 +404,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return
    */
   public double adjustAccelerationLimit(final double deltaRate) {
-    slewRateLimit = MathUtil.limit((slewRateLimit + deltaRate), 0.0, DriveTrain.slewRateMax);
+    slewRateLimit = MathUtil.clamp ((slewRateLimit + deltaRate), 0.0, DriveTrain.slewRateMax);
     // Just set the ramp limit on the masters
     leftController.setOpenLoopRampRate(slewRateLimit);
     rightController.setOpenLoopRampRate(slewRateLimit);
@@ -423,7 +423,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
    * @return
    */
   public int adjustCurrentLimit(final int deltaCurrent) {
-    smartCurrentLimit = MathUtil.limit(smartCurrentLimit + deltaCurrent, 0, DriveTrain.smartCurrentMax);
+    smartCurrentLimit = MathUtil.clamp(smartCurrentLimit + deltaCurrent, 0, DriveTrain.smartCurrentMax);
     for (final CANSparkMax c : controllers) {
       // smart current limit
       c.setSmartCurrentLimit(smartCurrentLimit);
@@ -483,14 +483,14 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     double maxSpeed = getMaxSpeed(m_currentGear);
 
     // limit vel to max for the gear ratio
-    double vcmd = Math.copySign(MathUtil.limit(Math.abs(velFps), 0.0, maxSpeed), velFps);
+    double vcmd = Math.copySign(MathUtil.clamp(Math.abs(velFps), 0.0, maxSpeed), velFps);
     double rpm = kGR * vcmd; // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
 
     /**
      * Rotation controls
      */
     // Convert to rad/s split between each wheel
-    double rps = Math.copySign(MathUtil.limit(Math.abs(rotDps), 0.0, maxDPS), rotDps);
+    double rps = Math.copySign(MathUtil.clamp(Math.abs(rotDps), 0.0, maxDPS), rotDps);
     rps = rps + m_heading_compensator.get();
 
     // [mo-rpm/ ft/s] [rad/deg] [ft] [deg/s] = [mo-rpm/ ft/s] * [ft/s] = mo-rpm
@@ -528,10 +528,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     var ws = new DifferentialDriveWheelSpeeds(velLeft, velRight);
     var cs = drive_kinematics.toChassisSpeeds(ws);
     cs.omegaRadiansPerSecond += (Math.PI / 180.0) * rps;  //
-    cs.omegaRadiansPerSecond = Math.copySign(MathUtil.limit(Math.abs(cs.omegaRadiansPerSecond), 0.0, 
+    cs.omegaRadiansPerSecond = Math.copySign(MathUtil.clamp(Math.abs(cs.omegaRadiansPerSecond), 0.0, 
                   (maxDPS*Math.PI/180.0)), cs.omegaRadiansPerSecond);
     cs.vxMetersPerSecond = Math.copySign(
-          MathUtil.limit(Math.abs(cs.vxMetersPerSecond), 0.0, getMaxSpeed(m_currentGear)),  cs.vxMetersPerSecond);
+          MathUtil.clamp(Math.abs(cs.vxMetersPerSecond), 0.0, getMaxSpeed(m_currentGear)),  cs.vxMetersPerSecond);
 
     ws = drive_kinematics.toWheelSpeeds(cs);
     

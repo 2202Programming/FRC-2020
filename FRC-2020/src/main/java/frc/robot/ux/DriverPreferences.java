@@ -66,9 +66,9 @@ public class DriverPreferences {
    * @param pref
    */
   void setup(String groupName, DrivePreferences pref) {
-      createDoubleTableEntry(groupName+"/deg-per-sec", pref.maxRotRate, pref::setMaxRotation );
-      createDoubleTableEntry(groupName+"/feet-per-sec", pref.maxVelocity, pref::setMaxVelocity);
-      createDoubleTableEntry(groupName+"/slew-rate", pref.maxVelocity, pref::setSlewRateLimit );
+      createDoubleTableEntry(groupName+"/deg-per-sec",  pref.maxRotRate,    pref::setMaxRotation );
+      createDoubleTableEntry(groupName+"/feet-per-sec", pref.maxVelocity,   pref::setMaxVelocity );
+      createDoubleTableEntry(groupName+"/slew-rate",    pref.slewRateLimit, pref::setSlewRateLimit );
     }
   
   NetworkTableEntry createDoubleTableEntry(String name, double initValue, DoubleConsumer f) {

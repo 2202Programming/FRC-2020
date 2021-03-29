@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
@@ -483,14 +484,14 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     double maxSpeed = getMaxSpeed(m_currentGear);
 
     // limit vel to max for the gear ratio
-    double vcmd = Math.copySign(MathUtil.clamp(Math.abs(velFps), 0.0, maxSpeed), velFps);
+    double vcmd = signed_clamp(velFps, maxSpeed);
     double rpm = kGR * vcmd; // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
 
     /**
      * Rotation controls
      */
     // Convert to rad/s split between each wheel
-    double rps = Math.copySign(MathUtil.clamp(Math.abs(rotDps), 0.0, maxDPS), rotDps);
+    double rps = signed_clamp(rotDps, maxDPS);
     rps = rps + m_heading_compensator.get();
 
     // [mo-rpm/ ft/s] [rad/deg] [ft] [deg/s] = [mo-rpm/ ft/s] * [ft/s] = mo-rpm
@@ -528,10 +529,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     var ws = new DifferentialDriveWheelSpeeds(velLeft, velRight);
     var cs = drive_kinematics.toChassisSpeeds(ws);
     cs.omegaRadiansPerSecond += (Math.PI / 180.0) * rps;  //
-    cs.omegaRadiansPerSecond = Math.copySign(MathUtil.clamp(Math.abs(cs.omegaRadiansPerSecond), 0.0, 
-                  (maxDPS*Math.PI/180.0)), cs.omegaRadiansPerSecond);
-    cs.vxMetersPerSecond = Math.copySign(
-          MathUtil.clamp(Math.abs(cs.vxMetersPerSecond), 0.0, getMaxSpeed(m_currentGear)),  cs.vxMetersPerSecond);
+    cs.omegaRadiansPerSecond = signed_clamp(cs.omegaRadiansPerSecond, (maxDPS*Math.PI/180.0));
+    cs.vxMetersPerSecond = signed_clamp(cs.vxMetersPerSecond, getMaxSpeed(m_currentGear));
 
     ws = drive_kinematics.toWheelSpeeds(cs);
     
@@ -931,5 +930,34 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   public double getMaxRotation() {
     return this.maxDPS;
   }
+
+
+  double signed_clamp(double x, double max) {
+    return Math.copySign(MathUtil.clamp(Math.abs(x), 0.0, max), x);
+  }
+
+  /**
+   * Chassis Speeds --> Wheelspeeds    
+   */
+  DifferentialDriveWheelSpeeds calcWheelSpeeds(final ChassisSpeeds cs, final DifferentialDriveWheelSpeeds ws)  {
+    double tw = drive_kinematics.trackWidthMeters; 
+    ws.leftMetersPerSecond = cs.vxMetersPerSecond - tw / 2.0 * cs.omegaRadiansPerSecond;
+    ws.rightMetersPerSecond = cs.vxMetersPerSecond + tw / 2.0 * cs.omegaRadiansPerSecond;
+    return ws;
+  }
+
+  /**
+   *  WheelSpeeds --> ChassisSpeed
+   * @return cs object given 
+   */
+  ChassisSpeeds calcChassisSpeeds(final DifferentialDriveWheelSpeeds ws, final ChassisSpeeds cs){
+    double tw = drive_kinematics.trackWidthMeters;
+    cs.vyMetersPerSecond = 0.0;
+    cs.vxMetersPerSecond = (ws.leftMetersPerSecond + ws.rightMetersPerSecond) / 2.0;
+    cs.omegaRadiansPerSecond = (ws.rightMetersPerSecond - ws.leftMetersPerSecond) / tw;
+    return cs;
+  }
+
+
 
 }

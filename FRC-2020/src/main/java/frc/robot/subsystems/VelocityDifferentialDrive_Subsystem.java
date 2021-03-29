@@ -149,8 +149,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   DrivePreferences m_pref;
 
   // Calculated based on desired low-gear max ft/s - UX may update
-  double maxFPS_High; // <input>
-  double maxFPS_Low; // using HIGH gear max RPM
+ //////double maxFPS_High; // <input>
+  /////ouble maxFPS_Low; // using HIGH gear max RPM
   double maxRPM_High; // max motor RPM low & high
   //double maxDPS; // max rotation in deg/sec around Z axis
 
@@ -275,14 +275,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     //var dp = RobotContainer.getInstance().getDriverPreferences();
 
    // maxDPS =  m_pref.maxRotRate;
-    maxFPS_High = m_pref.maxVelocity;
-    maxRPM_High = (maxFPS_High / K_high_fps_rpm);
-    maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
+    ///maxFPS_High = m_pref.maxVelocity;
+    ///maxFPS_Low = (DriveTrain.motorMaxRPM * K_low_fps_rpm);
 
-    // don't allow Motor RPM to let low speed be faster than high speed
-    // which could happen with a slow user choice.
-    maxFPS_Low = (maxFPS_Low > maxFPS_High) ? maxFPS_High : maxFPS_Low;
-
+    calcLowSpeedSetting();
     checkMaxRPM();
   }
 
@@ -647,16 +643,16 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   }
 
   public double getLeftVel(final boolean normalized) {
-    return (normalized) ? (m_wheelSpeeds.leftMetersPerSecond / maxFPS_High) : m_wheelSpeeds.leftMetersPerSecond;
+    return (normalized) ? (m_wheelSpeeds.leftMetersPerSecond / m_pref.maxVelocity) : m_wheelSpeeds.leftMetersPerSecond;
   }
 
   public double getRightVel(final boolean normalized) {
-    return (normalized) ? (m_wheelSpeeds.rightMetersPerSecond / maxFPS_High) : m_wheelSpeeds.rightMetersPerSecond;
+    return (normalized) ? (m_wheelSpeeds.rightMetersPerSecond / m_pref.maxVelocity) : m_wheelSpeeds.rightMetersPerSecond;
   }
 
   public double getAvgVelocity(final boolean normalized) {
     double vel = 0.5 * (m_wheelSpeeds.leftMetersPerSecond + m_wheelSpeeds.rightMetersPerSecond);
-    return (normalized) ? (vel / maxFPS_High) : vel;
+    return (normalized) ? (vel / m_pref.maxVelocity) : vel;
   }
 
   public DriveSetPoints getVelocitySetpoints() {

@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import static com.revrobotics.CANSparkMaxLowLevel.MotorType.kBrushless;
-import static frc.robot.Constants.RobotPhysical.WheelAxleDistance;
 import static frc.robot.Constants.RobotPhysical.WheelDiameter;
 import static frc.robot.Constants.RobotPhysical.WheelWearLeft;
 import static frc.robot.Constants.RobotPhysical.WheelWearRight;
@@ -487,7 +486,6 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
     // [s/min] / [ft /wheel-rev] / [motor-rev / wheel-rev] = [motor-rpm / ft/s]
     double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();
-    double maxSpeed = getMaxSpeed(m_currentGear);
 
     // limit vel to max for the gear ratio
     double vcmd = signed_clamp(velFps, m_pref.maxVelocity);
@@ -501,23 +499,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     var ws = calcWheelSpeeds(m_cmd_chassisSpeed, m_cmd_wheelSpeeds);
 
     // compute each wheel, pos rpm moves forward, pos turn is CCW, [rpm]
-    double vl_rpmX = applyDeadZone(ws.leftMetersPerSecond*kGR,  RPM_DZ); // turn left, +CCW, slows left wheel
-    double vr_rpmX = applyDeadZone(ws.rightMetersPerSecond*kGR, RPM_DZ); // turn left, +CCW, speeds right wheel
-
-    double rpm = kGR * vcmd; // [rpm-mo / rpm-wheel] [rpm/rps] [ft/s] / [ft/rev]
-    // [mo-rpm/ ft/s] [rad/deg] [ft] [deg/s] = [mo-rpm/ ft/s] * [ft/s] = mo-rpm
-    double vturn_rpm = kGR * (Math.PI / 180.0) * (0.5 * WheelAxleDistance) * rps;
-
-    // compute each wheel, pos rpm moves forward, pos turn is CCW
-    double vl_rpm = applyDeadZone(rpm - vturn_rpm, RPM_DZ); // turn left, +CCW, slows left wheel
-    double vr_rpm = applyDeadZone(rpm + vturn_rpm, RPM_DZ); // turn left, +CCW, speeds right wheel
-    
-    // save commanded wheel speeds - [ft/s]
-    m_commandedWheelSpeeds.leftMetersPerSecond = vl_rpm/kGR; // not meters, we use ft/s 
-    m_commandedWheelSpeeds.rightMetersPerSecond = vr_rpm/kGR;
+    double vl_rpm = applyDeadZone(ws.leftMetersPerSecond*kGR,  RPM_DZ); // turn left, +CCW, slows left wheel
+    double vr_rpm = applyDeadZone(ws.rightMetersPerSecond*kGR, RPM_DZ); // turn left, +CCW, speeds right wheel
 
     // issue all commands to the hardware
-    output(vl_rpmX, vr_rpmX, coastMode);
+    output(vl_rpm, vr_rpm, coastMode);
   }
 
   /**
@@ -608,8 +594,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
       if (sp_rpm.left == 0.0)   arbffVoltsLeft = 0.0;
       if (sp_rpm.right == 0.0)  arbffVoltsRight = 0.0;
 
-      leftPID.setReference(sp_rpm.left, ControlType.kVelocity, KpidSlot, arbffVoltsLeft, ArbFFUnits.kVoltage);
-      rightPID.setReference(sp_rpm.right, ControlType.kVelocity, KpidSlot, arbffVoltsRight, ArbFFUnits.kVoltage);
+      leftPID.setReference(sp_rpm.left, ControlType.kVelocity, m_pref.pidSlot, arbffVoltsLeft, ArbFFUnits.kVoltage);
+      rightPID.setReference(sp_rpm.right, ControlType.kVelocity, m_pref.pidSlot, arbffVoltsRight, ArbFFUnits.kVoltage);
     }
     shiftGears();
     dDrive.feed();

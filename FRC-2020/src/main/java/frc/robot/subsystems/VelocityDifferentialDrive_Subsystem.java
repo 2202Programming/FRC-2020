@@ -241,8 +241,12 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     K_low_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.LOW) / 60; // rpm/60 rps
     K_high_fps_rpm = K_ft_per_rev * gearbox.getGearRatio(Gear.HIGH) / 60;
 
+    //calibrate chassis encoders
     leftChassisEncoder.setDistancePerPulse(kFeetPerPulse);
     rightChassisEncoder.setDistancePerPulse(kFeetPerPulse);
+
+    // default to Driver's preferences
+    setDrivePreferences(DriveTrain.driverPreferences);
 
     // Speed setting may be updated via UX, but set defaults
     calcSpeedSettings();

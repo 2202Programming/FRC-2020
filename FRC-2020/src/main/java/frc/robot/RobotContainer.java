@@ -28,6 +28,7 @@ import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.challenge.GalacticSearch;
 import frc.robot.commands.challenge.InterstellarAccuracy;
 import frc.robot.commands.drive.GyroHeadingCompensator;
+import frc.robot.commands.drive.LimeLightTargetCompensator;
 import frc.robot.commands.drive.ResetPosition;
 import frc.robot.commands.drive.shift.GearToggleCmd;
 import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
@@ -166,23 +167,21 @@ public class RobotContainer {
 
   private void configureButtonBindings(DriverControls dc) {
     // Drivers buttons
-    ///dc.bind(Id.Driver, XboxButton.A).whenPressed(new InvertDriveControls(dc)); 
-    dc.bind(Id.Driver, XboxButton.B).whenPressed(new auto_cmd_group(dc, driveTrain, intake, limelight, lidar));
+    dc.bind(Id.Driver, XboxButton.A).whenPressed(new LimeLightTargetCompensator()); 
+    //dc.bind(Id.Driver, XboxButton.B).whenPressed(new auto_cmd_group(dc, driveTrain, intake, limelight, lidar));
     dc.bind(Id.Driver, XboxButton.X).whenPressed(new toggleLED(limelight));
-    dc.bind(Id.Driver, XboxButton.Y).whenPressed(new ToggleAutoShiftCmd(gearShifter));
+    //dc.bind(Id.Driver, XboxButton.Y).whenPressed(new ToggleAutoShiftCmd(gearShifter));
     //dc.bind(Id.Driver, XboxButton.RB).whenPressed(new InstantCommand( () -> {return;} ));  //placeholder, do nothing
-    dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(gearShifter));
+    //dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(gearShifter));
 
-    //go from current position to stored position
+    //go from current position to stored position, store current position with POV_DOWN
     dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));
-
-    //store current position
     dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState).withName("Save State"));
 
     //toggle auto shooting mode
     dc.bind(Id.Driver, XboxButton.R3).whenPressed(new InstantCommand(intake::toggleAutoShootingMode).withName("AS-Mode-WIP") );
     
-    //auto path testing
+    //auto path testing - VELOCITY model
     dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
 
@@ -205,10 +204,11 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));   
 
-    //auto path testing
+    //auto path testing - VOLTAGE model
     dc.bind(Id.Assistant, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
     dc.bind(Id.Assistant, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
 
+    //quiet simulation mode warnings about no sideboard attached.
     if (!RobotBase.isSimulation()){
     // Switchboard
       dc.bind(Id.SwitchBoard, SBButton.Sw21).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone1));
@@ -216,7 +216,7 @@ public class RobotContainer {
       dc.bind(Id.SwitchBoard, SBButton.Sw23).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
       dc.bind(Id.SwitchBoard, SBButton.Sw24).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
 
-      //auto path testing on sideboard  row 3
+      //auto path testing on sideboard - VELOCITY model
       dc.bind(Id.SwitchBoard, SBButton.Sw11).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
       dc.bind(Id.SwitchBoard, SBButton.Sw13).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
     }

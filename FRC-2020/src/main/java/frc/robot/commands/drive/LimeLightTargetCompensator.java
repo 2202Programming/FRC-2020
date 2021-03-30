@@ -15,8 +15,8 @@ import frc.robot.subsystems.VelocityDifferentialDrive_Subsystem;
 public class LimeLightTargetCompensator extends CommandBase {
   
   // code stolen from auto_limelightTurnToShoot
-  final double max_rot_rate = 5.0; // [deg/sec]
-  final double Kap = 0.015, Kai = 0.00001, Kad = 3.0; //angle drive PIDs
+  final double max_rot_rate = 10.0; // [deg/sec]
+  final double Kap = 0.015, Kai = 0.00001, Kad = 3.0; //angle drive PID
   final double angleToleranceDeg = 1.0;
 
   final VelocityDifferentialDrive_Subsystem drive;
@@ -45,7 +45,7 @@ public class LimeLightTargetCompensator extends CommandBase {
     init_rotation = drive.getPose().getRotation();
     anglePIDController.reset();
     anglePIDController.setSetpoint(0);
-    anglePIDController.setTolerance(angleToleranceDeg, 0.5);
+    anglePIDController.setTolerance(angleToleranceDeg, 0.5);  //[deg,  deg/s]
 
     drive.setHeadingCompensator(this::correction);
   }

@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.robot.Constants.RobotPhysical;
@@ -60,26 +61,45 @@ public class ConvertRecordingToTrajectory {
   // used to calc dt and vel
   double prev_vel = 0;
   double prev_time = 0.0;
+  double prev_x=-999;
+  double prev_y=-999;
+  Rotation2d prev_th;
 
   public void processRecording() {
     states.clear();
     prev_vel = 0.0;
     prev_time = 0.0;
+    prev_x = lines.get(0).robot_pose.getX();
+    prev_y = lines.get(0).robot_pose.getY();
+    prev_th = lines.get(0).robot_pose.getRotation();
+
     lines.forEach(r ->
     {
       double time = round4(r.time);
       double dt = time - prev_time;
-      var chassis = kinematics.toChassisSpeeds(r.meas_speed);
-      double vel = chassis.vxMetersPerSecond; 
-      double accel = (dt > 0.001) ? (vel -prev_vel)/dt : 0.0;
-      double curv = chassis.omegaRadiansPerSecond / chassis.vxMetersPerSecond;
-      states.add(new Trajectory.State(round4(time), 
+
+      //Skip short frames
+      if (dt < .005) {
+        //measured wheel speeds - but they lag
+        var chassis = kinematics.toChassisSpeeds(r.meas_speed);
+
+        // use X/Y to calculate vel
+        double vx = (r.robot_pose.getX() - prev_x)/dt;
+        double vy = (r.robot_pose.getY() - prev_y)/dt;
+        double vel_th = Math.atan2(vy, vx);
+        double vel_mag = Math.sqrt(vx*vx + vy*vy);
+
+        double vel = chassis.vxMetersPerSecond; 
+        double accel = (dt > 0.001) ? (vel -prev_vel)/dt : 0.0;
+        double curv = chassis.omegaRadiansPerSecond / chassis.vxMetersPerSecond;
+        states.add(new Trajectory.State(round4(time), 
           round4(vel), 
           round4(accel), r.robot_pose, 
           round4(curv)));
 
-      prev_time = time;
-      prev_vel = vel;
+        prev_time = time;
+        prev_vel = vel;
+      }
     });
 
     // to do - decimate and filter the states

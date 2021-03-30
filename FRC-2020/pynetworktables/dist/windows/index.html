@@ -334,7 +334,7 @@
           <div class="col-sm-6 bg-light">
             <frc-differential-drivebase source-key="/Drivetrain" style="margin-top: 20px;"></frc-differential-drivebase>
             <frc-gyro source-key="/Sensors/yaw_navx" precision="2" style="margin-bottom: 20px;"></frc-gyro>
-            <frc-gyro source-key="/Sensors/yaw_xrs450" precision="2" style="margin-bottom: 20px;"></frc-gyro>
+            <!-- <frc-gyro source-key="/Sensors/yaw_xrs450" precision="2" style="margin-bottom: 20px;"></frc-gyro> -->
           </div>
           <div class="col-sm-3">
             <div>
@@ -359,21 +359,12 @@
               <p>Lidar right: <frc-number-label source-key="/Lidar/Right"></frc-number-label></p>
               <p>Lidar anlge: <frc-number-label source-key="/Lidar/Angle"></frc-number-label></p>
               <p>Lidar valid: <frc-boolean-label source-key="/Lidar/Valid"></frc-boolean-label></p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-3">
-            <h4>Limelight</h4>
-            <p>Limelight X: <frc-number-label source-key="/limelight/tx"></frc-number-label></p>
-            <p>Limelight Y: <frc-number-label source-key="/limelight/ty"></frc-number-label></p>
-            <p>Limelight Area: <frc-number-label source-key="/limelight/ta"></frc-number-label></p>
-            <p>Limelight Valid: <frc-number-label source-key="/limelight/tv"></frc-number-label></p>
-            <p>Limelight LEDs: <frc-number-label source-key="/limelight/ledMode"></frc-number-label></p>
-          </div>
-          <div class="col-sm-3">
-            <h4>Modes</h4>
-            <p>Mode: <frc-label source-key="/Shuffleboard/DriversChoice/DriveCmd/DriverMode/active"></frc-label></p>
-            <p>Path: <frc-label source-key="/Shuffleboard/Match/AutoPath/PathChooser/active"></frc-label></p>
+              <h4>Limelight</h4>
+              <p>Limelight X: <frc-number-label source-key="/limelight/tx"></frc-number-label></p>
+              <p>Limelight Y: <frc-number-label source-key="/limelight/ty"></frc-number-label></p>
+              <p>Limelight Area: <frc-number-label source-key="/limelight/ta"></frc-number-label></p>
+              <p>Limelight Valid: <frc-number-label source-key="/limelight/tv"></frc-number-label></p>
+              <p>Limelight LEDs: <frc-number-label source-key="/limelight/ledMode"></frc-number-label></p>
           </div>
         </div>
       </div>

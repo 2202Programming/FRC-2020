@@ -38,10 +38,10 @@
           <h1>
             Team 2202
           </h1>
-          <frc-basic-fms-info source-key="/FMSInfo"></frc-basic-fms-info>
         </div>
-        <br>
     <br>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border" id="cameras">Cameras</legend>
         <div class="container-fluid">
             <div class="row">
               <div class="col-sm-6">
@@ -53,37 +53,63 @@
                 <p>Magazine</p>
               </div>
             </div>
+    </fieldset>
+    <fieldset class="scheduler-border">
+      <legend class="scheduler-border" id="intake">Intake</legend>
             <div class="row">
               <div class="col-sm-3">
                 <h4>Intake/Shooter</h4>
                 <p>Magazine angle: <frc-number-label source-key="/Magazine/MagazineAngle"></frc-number-label></p>
                 <p>PC Count: <frc-number-label source-key="/Magazine/PCCount"></frc-number-label></p>
-                <p>Shooter Upper RPM: <frc-number-label source-key="/Shooter/UpperRPM"></frc-number-label></p>
-                <p>Shooter Lower RPM: <frc-number-label source-key="/Shooter/LowerRPM"></frc-number-label></p>
+                <p>Shooter Upper RPM: <frc-number-label source-key="/Shooter/UpperRPM/value"></frc-number-label></p>
+                <p>Shooter Lower RPM: <frc-number-label source-key="/Shooter/LowerRPM/value"></frc-number-label></p>
+                <p>Shooter Auto On: <frc-boolean-box
+                    webbit-id="frc-boolean-box"
+                    slot=""
+                    source-provider="NetworkTables"
+                    from-properties="[]"
+                    default-color="black"
+                    true-color="green"
+                    false-color="red"
+                    label=""
+                    class="draggable"
+                    data-x="0"
+                    data-y="0"
+                    style="width: 100px; height: 26px; transform: translate(5px, 10px);"
+                    source-key="/Shooter/ShootingAutoMode"
+                  ></frc-boolean-box>
+                </p>
               </div>
-              <div class="col-sm-6">
-                <h4>Balls in Magazine:</h4>
-                <style>
-                  .with-styles::part(box) {
-                    border-radius: 50%;
-                    border: 1px solid black;
-                    color: white;
-                    width: 50px;
-                    height: 50px;
-                    margin: 5px;
-                    padding: 5px;
-                  }
-                </style>
-                <frc-boolean-box source-key="/Magazine/BallOne/value" class="with-styles" true-color="yellow" false-color="white" value>
-                </frc-boolean-box>
-                <frc-boolean-box source-key="/Magazine/BallTwo/value" class="with-styles" true-color="yellow" false-color="white" value>
-                </frc-boolean-box>
-                <frc-boolean-box  source-key="/Magazine/BallThree/value" class="with-styles" true-color="yellow" false-color="white" value>
-                </frc-boolean-box>
-              </div>
-            </div>
+                <div class="col-sm-6">
+                  <h4>Balls in Magazine:</h4>
+                  <style>
+                    .with-styles::part(box) {
+                      border-radius: 50%;
+                      border: 1px solid black;
+                      color: white;
+                      width: 50px;
+                      height: 50px;
+                      margin: 5px;
+                      padding: 5px;
+                    }
+                  </style>
+                  <frc-boolean-box source-key="/Magazine/BallOne/value" class="with-styles" true-color="yellow" false-color="white" value>
+                  </frc-boolean-box>
+                  <frc-boolean-box source-key="/Magazine/BallTwo/value" class="with-styles" true-color="yellow" false-color="white" value>
+                  </frc-boolean-box>
+                  <frc-boolean-box  source-key="/Magazine/BallThree/value" class="with-styles" true-color="yellow" false-color="white" value>
+                  </frc-boolean-box>
+                </div>
+                <div class="col-sm-3">
+                  <frc-toggle-button label="Three PC" class="super-wide-button" source-key="/Commands/runThreePC"></frc-toggle-button>
+                  <frc-toggle-button label="Zero PC" class="super-wide-button" source-key="/Commands/runZeroPC"></frc-toggle-button>
+                </div>
           </div>
+          </fieldset>
+          <fieldset class="scheduler-border">
+            <legend class="scheduler-border" id="gamepad">Gamepad</legend>
           <frc-sim-joystick source-key="joystick/1" gamepad="1"></frc-sim-joystick>
+          </fieldset>
 
           <br>
           <br>

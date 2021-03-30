@@ -37,9 +37,9 @@
           <br>
           <div>
           <a href="#intake" ><img src="./images/intake.jpg" style="width: 300px; margin: 0;" class="intake"></a>
-          <a href="#path"><img src="./images/path.png" style="width: 300px; margin: 0;"></a>
-          <a href="#direction"><img src="./images/direction.png" style="width: 300px; margin: 0;"></a>
-          <a href="#data"><img src="./images/data.png" style="width: 300px; margin: 0;"></a>
+          <a href="#path"><img src="./images/path.png" style="width: 300px; margin: 0;" class="path"></a>
+          <a href="#direction"><img src="./images/direction.png" style="width: 300px; margin: 0;" class="direction"></a>
+          <a href="#data"><img src="./images/data.png" style="width: 300px; margin: 0;" class="data"></a>
           <a href="#cameras"><img src="/images/camera.png" style="width: 300px; margin: 0;" class="camera"></a>
         </div>
            <frc-source-tree></frc-source-tree>
@@ -54,7 +54,7 @@
             </div>
 
           <fieldset class="scheduler-border">
-            <legend class="scheduler-border" id="intake">Driving Commands</legend>
+            <legend class="scheduler-border" id="driving_commands">Driving Commands</legend>
             <frc-toggle-button label="runMatchReady" class="super-wide-button" source-key="/Commands/runMatchReady"></frc-toggle-button>
             <frc-toggle-button label="Mag Calibrate" class="super-wide-button" source-key="/Commands/MagCalibrate"></frc-toggle-button> 
             <frc-toggle-button label="MagZone1" class="super-wide-button" source-key="/Commands/MagZone1"></frc-toggle-button>
@@ -63,7 +63,7 @@
             <frc-toggle-button label="MagZone4" class="super-wide-button" source-key="/Commands/MagZone4"></frc-toggle-button>
           </fieldset>
           <fieldset class="scheduler-border">
-            <legend class="scheduler-border" id="intake">All Commands</legend>
+            <legend class="scheduler-border" id="all_commands">All Commands</legend>
             <frc-toggle-button label="runMatchReady" class="super-wide-button" source-key="/Commands/runMatchReady"></frc-toggle-button>
             <frc-toggle-button label="Three PC" class="super-wide-button" source-key="/Commands/runThreePC"></frc-toggle-button>
             <frc-toggle-button label="Zero PC" class="super-wide-button" source-key="/Commands/runZeroPC"></frc-toggle-button>
@@ -173,7 +173,7 @@
 
            </fieldset>
            <fieldset class="scheduler-border">
-            <legend class="scheduler-border" id="intake">Testing Area</legend>
+            <legend class="scheduler-border" id="testing">Testing Area</legend>
             <frc-robot-subsystem source-key="/LiveWindow/Magazine" name="Magazine Subsystem"></frc-robot-subsystem>
             
             <p><frc-networktables-connection></frc-networktables-connection></p>
@@ -612,6 +612,36 @@ customElements.define('frc-boolean-label', BooleanLabel);
           },
           function() {
               $(this).attr("src", "/images/intake.jpg");
+          }                         
+      );                  
+  });
+  $(function() {
+      $(".path").hover(
+          function() {
+              $(this).attr("src", "/images/path_shine.gif");
+          },
+          function() {
+              $(this).attr("src", "/images/path.png");
+          }                         
+      );                  
+  });
+  $(function() {
+      $(".direction").hover(
+          function() {
+              $(this).attr("src", "/images/direction_shine.gif");
+          },
+          function() {
+              $(this).attr("src", "/images/direction.png");
+          }                         
+      );                  
+  });
+  $(function() {
+      $(".data").hover(
+          function() {
+              $(this).attr("src", "/images/data_shine.gif");
+          },
+          function() {
+              $(this).attr("src", "/images/data.png");
           }                         
       );                  
   });

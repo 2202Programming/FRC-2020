@@ -239,8 +239,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     leftChassisEncoder.setDistancePerPulse(kFeetPerPulse);
     rightChassisEncoder.setDistancePerPulse(kFeetPerPulse);
 
-    // default to Driver's preferences
+    // default to Driver's preferences, set callback for when values change
     setDrivePreferences(DriveTrain.driverPreferences);
+    DriveTrain.driverPreferences.setChangeCallback(this::onChangeDrivePreferences);
+    DriveTrain.trackerPreferences.setChangeCallback(this::onChangeDrivePreferences);
 
     // Speed setting may be updated via UX, but set defaults
     calcSpeedSettings();
@@ -855,7 +857,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     /***
     LinearSystem<N2, N2, N2> drivetrainPlant = LinearSystemId.identifyDrivetrainSystem(
         RamseteProfile.kvVoltSecondsPerFoot, RamseteProfile.kaVoltSecondsSquaredPerFoot, 1.5, // kvVoltSecondsPerRadian,
-                                                                                              // //TODO: find real
+                                                                                              //
                                                                                               // numbers
         0.3); // kaVoltSecondsSquaredPerRadian);
 
@@ -906,7 +908,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   public void setDrivePreferences( DrivePreferences prefs) {
     m_pref = prefs;
+    processDrivePreferences();
+  }
 
+  void processDrivePreferences() {
     // Just set the ramp limit on the masters
     leftController.setOpenLoopRampRate(m_pref.slewRateLimit);
     rightController.setOpenLoopRampRate(m_pref.slewRateLimit);
@@ -918,6 +923,15 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // check m_pref.maxVelocity
     ///  checkMaxRPM();
   }
+
+  public void onChangeDrivePreferences(DrivePreferences pref) {
+    // if the pref we are using changed, some values need updating
+    // otherwise it will get picked up when selected.
+    if (pref == m_pref) {
+      processDrivePreferences();
+    }
+  }
+
 
   public DrivePreferences getDrivePreferences() {
     return m_pref;

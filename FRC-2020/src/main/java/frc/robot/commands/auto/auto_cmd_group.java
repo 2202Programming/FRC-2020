@@ -91,10 +91,10 @@ public class auto_cmd_group extends SequentialCommandGroup {
         if (positionCode == 0) {
             addCommands(new DriveOffLine(drive, -0.9).withTimeout(3.7));
         }
-        //TODO: Make this more legit
+        //TO DO: Make this more legit
         else if (highMode) {
             addCommands(
-                    //TODO: Replace with lidar or limelight to get exact shooting distance
+                    //TO DO: Replace with lidar or limelight to get exact shooting distance
                     new DriveOffLine(drive, 0.8).withTimeout(2.7),
                     new IntakePosition(intake, Direction.Down),
                     new WaitCommand(0.7),

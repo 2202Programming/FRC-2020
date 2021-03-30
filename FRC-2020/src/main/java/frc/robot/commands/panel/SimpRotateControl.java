@@ -41,7 +41,7 @@ public class SimpRotateControl extends CommandBase {
   public void initialize() {
     cp.resetEncoder();
     //cp.extendArm();
-    //TODO: See if we need to delay starting the motor after extending
+  
     cp.setSpeed(WHEEL_SPEED);
   }
 

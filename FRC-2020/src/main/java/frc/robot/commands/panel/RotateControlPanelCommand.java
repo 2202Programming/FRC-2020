@@ -30,7 +30,7 @@ public class RotateControlPanelCommand extends CommandBase {
     private Color_Subsystem detector;
     // private String init_color;
     // private String final_color;
-    // private String[] colorOrder = null; //TODO: get color order of control panel
+    // private String[] colorOrder = null; //TO DO: get color order of control panel
 
     public RotateControlPanelCommand(int num_rotations, Control_Panel panel, Color_Subsystem detector) {
         numRotationsNeeded = num_rotations;

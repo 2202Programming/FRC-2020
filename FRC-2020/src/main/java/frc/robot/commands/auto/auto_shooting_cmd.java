@@ -22,7 +22,7 @@ public class auto_shooting_cmd extends SequentialCommandGroup {
    *   Need to set this up to do the right checks at init or execute(), not construction.
    *   Intent makes sense, just not at construction.
    * 
-   *  TODO:  fix command order and exection timing.
+   *  TO DO:  fix command order and exection timing.
    */
 
   private final Intake_Subsystem intake;

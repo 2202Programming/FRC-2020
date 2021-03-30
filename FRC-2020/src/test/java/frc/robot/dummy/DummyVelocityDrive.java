@@ -105,13 +105,11 @@ public class DummyVelocityDrive implements VelocityDrive {
 
   @Override
   public void setDrivePreferences(DrivePreferences pref) {
-    // TODO Auto-generated method stub
-
   }
 
   @Override
   public DrivePreferences getDrivePreferences() {
-    // TODO Auto-generated method stub
+
     return null;
   }
 

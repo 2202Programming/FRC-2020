@@ -22,8 +22,6 @@ import frc.robot.subsystems.ifx.VoltageDrive;
  * It seems like there should be a more direct way to create the command 
  * and schedule it.  This command is really an instant that creates the pathing
  * and then schedules it.  Why the indirection???
- * 
- * TODO:figure this out.
  */
 
 public class auto_drivePath_cmd extends CommandBase {

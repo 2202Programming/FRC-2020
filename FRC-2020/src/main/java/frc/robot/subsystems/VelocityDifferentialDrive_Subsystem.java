@@ -202,6 +202,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     m_field_chassis = new Field2d();
     SendableRegistry.add(m_field_chassis, "Field_chassis");
     m_field = new Field2d();
+    setHeadingCompensator(null);
 
     // save scaling factors, they are required to use SparkMax in Vel mode
     gearbox = gear;
@@ -209,7 +210,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
     // get the nav sensor subsystem for odometry reporting
     nav = RobotContainer.getInstance().sensors;
-    setHeadingCompensator(null);
+   
 
     // direct networktables logging
     table = NetworkTableInstance.getDefault().getTable("Drivetrain");
@@ -487,7 +488,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // on the gear ratio.
 
     // [s/min] / [ft /wheel-rev] / [motor-rev / wheel-rev] = [motor-rpm / ft/s]
-    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio();
+    double kGR = (60.0 / K_ft_per_rev) / gearbox.getGearRatio(m_currentGear);
 
     // limit vel to max for the gear ratio
     double vcmd = signed_clamp(velFps, m_pref.maxVelocity);
@@ -562,6 +563,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     if (null == headingDotComp) {
       m_heading_compensator = this::defaultHeadingCompensator;
     }
+    else m_heading_compensator = headingDotComp;
   }
 
   /**
@@ -695,11 +697,11 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   /**
    * Shifter controls encapsulation
    */
-  public void shiftUp() {
+  public void reqShiftUp() {
     requestedGear = Gear.HIGH;
   }
 
-  public void shiftDown() {
+  public void reqShiftDown() {
     requestedGear = Gear.LOW;
   }
 
@@ -973,7 +975,34 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     cs.omegaRadiansPerSecond = (ws.rightMetersPerSecond - ws.leftMetersPerSecond) / tw;
     return cs;
   }
+/****
+  @Override
+  public boolean isAutoShiftEnabled() {
+    return m_autoShift;
+  }
 
+  @Override
+  public boolean enableAutoShift() {
+    m_autoShift = true;
+    return m_autoShift;
+  }
 
+  @Override
+  public boolean disableAutoShift() {
+    m_autoShift = false;
+    return m_autoShift;
+  }
+
+  @Override
+  public double getGearRatio(Gear g) {
+    return gearbox.getGearRatio(g);
+  }
+
+  @Override
+  public double getGearRatio() {
+    return gearbox.getGearRatio();
+  }
+
+*/
 
 }

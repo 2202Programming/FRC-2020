@@ -16,7 +16,7 @@ public class LimeLightTargetCompensator extends CommandBase {
   
   // code stolen from auto_limelightTurnToShoot
   final double max_rot_rate = 10.0; // [deg/sec]
-  final double Kap = 0.015, Kai = 0.00001, Kad = 3.0; //angle drive PID
+  final double Kap = 0.015, Kai = 0.000001, Kad = 1.0; //angle drive PID
   final double angleToleranceDeg = 1.0;
 
   final VelocityDifferentialDrive_Subsystem drive;
@@ -46,6 +46,7 @@ public class LimeLightTargetCompensator extends CommandBase {
     anglePIDController.reset();
     anglePIDController.setSetpoint(0);
     anglePIDController.setTolerance(angleToleranceDeg, 0.5);  //[deg,  deg/s]
+    limelight.enableLED();
 
     drive.setHeadingCompensator(this::correction);
   }

@@ -52,7 +52,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
     this.dc = dc;
     this.drive = driveTrain;
     this.shifter = shifter;
-
+    
     addRequirements(driveTrain);
   }
 
@@ -77,7 +77,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
     if ((vel > shiftUpSpeed) && // (velCmd >= vel) &&
         (shifter.getCurrentGear() == Gear.LOW)) {
       if (++timeWantingUp >= minTimeInZone) {
-        shifter.shiftUp();
+        drive.reqShiftUp();
         resetTimeInZone();
       }
     }
@@ -86,7 +86,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
     if ((vel < shiftDownSpeed) && // (velCmd <= vel) &&
         (shifter.getCurrentGear() == Gear.HIGH)) {
       if (timeWantingDown++ >= minTimeInZone) {
-        shifter.shiftDown();
+        drive.reqShiftDown();
         resetTimeInZone();
       }
     }

@@ -113,4 +113,14 @@ public class DummyVelocityDrive implements VelocityDrive {
     return null;
   }
 
+  @Override
+  public void reqShiftUp() {
+
+  }
+
+  @Override
+  public void reqShiftDown() {
+
+  }
+
 }

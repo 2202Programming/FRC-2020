@@ -208,9 +208,9 @@ public final class Constants {
         }
 
         // shifter settings
-        public static final int shiftCount = 5;       // frames to wait on vel measurement
+        public static final int shiftCount = 150;       // frames to wait on vel measurement
         public static final double vShiftLow = 1.5;   // ft/sec shift to low
-        public static final double vShiftHigh = 6.8;  // ft/sec shift to high
+        public static final double vShiftHigh = 99; // no auto to high 6.8;  // ft/sec shift to high
 
         // Other constraints
         public static final int smartCurrentMax = 60;  //amps in SparkMax, max setting

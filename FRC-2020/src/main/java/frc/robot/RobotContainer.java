@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.InterstellarSettings;
-import frc.robot.commands.toggleLED;
 import frc.robot.commands.auto.auto_drivePath_cmd;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
@@ -29,6 +28,7 @@ import frc.robot.commands.challenge.InterstellarAccuracy;
 import frc.robot.commands.drive.GyroHeadingCompensator;
 import frc.robot.commands.drive.LimeLightTargetCompensator;
 import frc.robot.commands.drive.ResetPosition;
+import frc.robot.commands.drive.shift.GearSetCmd;
 import frc.robot.commands.generic.PositionRecorder;
 import frc.robot.commands.intake.IntakePosition;
 import frc.robot.commands.intake.IntakePosition.Direction;
@@ -57,6 +57,7 @@ import frc.robot.subsystems.hid.XboxButton;
 import frc.robot.subsystems.hid.XboxPOV;
 import frc.robot.subsystems.ifx.DriverControls;
 import frc.robot.subsystems.ifx.DriverControls.Id;
+import frc.robot.subsystems.ifx.Shifter.Gear;
 import frc.robot.subsystems.util.WebCommands;
 import frc.robot.util.misc.StateMemory;
 import frc.robot.ux.Dashboard;
@@ -113,6 +114,8 @@ public class RobotContainer {
     //setup the dashboard programatically, creates any choosers, screens
     dashboard = new Dashboard(this);
 
+    gearShifter.enableAutoShift();
+
     webCommands = new WebCommands(driveTrain, dashboard, intake, state, magazine, limelight);
 
     //panel = new Control_Panel();
@@ -163,12 +166,13 @@ public class RobotContainer {
 
   private void configureButtonBindings(DriverControls dc) {
     // Drivers buttons
-    dc.bind(Id.Driver, XboxButton.A).whenPressed(new LimeLightTargetCompensator()); 
+    dc.bind(Id.Driver, XboxButton.A).whileHeld(new LimeLightTargetCompensator()); 
     //dc.bind(Id.Driver, XboxButton.B).whenPressed(new auto_cmd_group(dc, driveTrain, intake, limelight, lidar));
-    dc.bind(Id.Driver, XboxButton.X).whenPressed(new toggleLED(limelight));
+    //dc.bind(Id.Driver, XboxButton.X).whenPressed(new toggleLED(limelight));
     //dc.bind(Id.Driver, XboxButton.Y).whenPressed(new ToggleAutoShiftCmd(gearShifter));
     //dc.bind(Id.Driver, XboxButton.RB).whenPressed(new InstantCommand( () -> {return;} ));  //placeholder, do nothing
-    //dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearToggleCmd(gearShifter));
+    dc.bind(Id.Driver, XboxButton.LB).whenPressed(new GearSetCmd(driveTrain, Gear.HIGH));
+    dc.bind(Id.Driver, XboxButton.RB).whenPressed(new GearSetCmd(driveTrain, Gear.LOW));
 
     //go from current position to stored position, store current position with POV_DOWN
     dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));

@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.InterstellarSettings;
 import frc.robot.commands.toggleLED;
-import frc.robot.commands.auto.auto_cmd_group;
 import frc.robot.commands.auto.auto_drivePath_cmd;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
@@ -30,8 +29,6 @@ import frc.robot.commands.challenge.InterstellarAccuracy;
 import frc.robot.commands.drive.GyroHeadingCompensator;
 import frc.robot.commands.drive.LimeLightTargetCompensator;
 import frc.robot.commands.drive.ResetPosition;
-import frc.robot.commands.drive.shift.GearToggleCmd;
-import frc.robot.commands.drive.shift.ToggleAutoShiftCmd;
 import frc.robot.commands.generic.PositionRecorder;
 import frc.robot.commands.intake.IntakePosition;
 import frc.robot.commands.intake.IntakePosition.Direction;
@@ -63,7 +60,6 @@ import frc.robot.subsystems.ifx.DriverControls.Id;
 import frc.robot.subsystems.util.WebCommands;
 import frc.robot.util.misc.StateMemory;
 import frc.robot.ux.Dashboard;
-import frc.robot.ux.DriverPreferences;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -273,18 +269,10 @@ public class RobotContainer {
     };
 
   }
-
-  public DriverPreferences getDriverPreferences() { 
-    if (dashboard != null) {
-      return dashboard.getDriverPreferences();
-    }
-    return null;
-    }
     /**
      * getTrajectory
      * 
      * Any trajectory file in the paths folder is loaded at powerup to save time.
-     * This method will re
      * 
      * @param trajName
      * @return loaded trajectory object

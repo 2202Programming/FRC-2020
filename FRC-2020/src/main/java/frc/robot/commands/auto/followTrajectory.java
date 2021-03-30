@@ -26,25 +26,24 @@ public class followTrajectory extends CommandBase {
   static NetworkTableEntry nt_closedLoop=null;
   
   static {
-    initSmartDashboard();
+    initDashboard();
   }
 
   final VelocityDrive drive;
   DrivePreferences orig_prefs;
-
   SendableChooser<Trajectory> chooser = null;
 
-  //
   Trajectory trajectory;
   RamseteCommand ramsete;
   RamseteController rsController;
   DifferentialDriveKinematics kinematics;
   long startTime;
 
-  // Ramsete constants - todo wire to ux
-  double beta = 0.12; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft; for beta .001 is out of control
-  //JR notes - 0.05, 0.1 look similar to 0.18.  2.0 is out of control
-  double zeta = 0.8; //larger more damping 0.99, 0.9, 0.8 look similar.  20 is crazy, so is 2
+  // Ramsete constants 
+  static double s_beta = 0.12; // larger more aggressive convergence [r/ft]^2  2.0 [r/m]^2 --> .18 r/ft; 
+                            // for beta .001 is out of control
+                            // JR notes - 0.05, 0.1 look similar to 0.18.  2.0 is out of control
+  static double s_zeta = 0.8; //larger more damping 0.99, 0.9, 0.8 look similar.  20 is crazy, so is 2
 
   Pose2d poseTolerance = new Pose2d(.1, .1, Rotation2d.fromDegrees(1.0));
 
@@ -84,7 +83,7 @@ public class followTrajectory extends CommandBase {
       drive.resetOdometry(trajectory.getInitialPose());
 
       // construct new Ramsete
-      rsController = new RamseteController(this.beta, this.zeta);
+      rsController = new RamseteController(s_beta, s_zeta);
       rsController.setTolerance(poseTolerance);
       ramsete = new RamseteCommand(trajectory, drive::getPose, // odmetry package in drive
           rsController, // outer loop non-linear controller (follower)
@@ -117,7 +116,7 @@ public class followTrajectory extends CommandBase {
     if (ramsete != null)
       ramsete.end(interrupted);
     System.out.println("***FollowTrajectory time (ms) = " + (RobotController.getFPGATime() - startTime)/1000.0);
-    System.out.println("***Beta = " + beta + ", Zeta = " + zeta);  
+    System.out.println("***beta = " + s_beta + ", Zeta = " + s_zeta);  
   }
 
   // Returns true when the command should end.
@@ -136,10 +135,19 @@ public class followTrajectory extends CommandBase {
     closedLoop = cl;
   }
 
-  static void initSmartDashboard() {
+  static void initDashboard() {
     if (nt_closedLoop != null) return;
     ShuffleboardTab tab = Shuffleboard.getTab("Position Recorder");
     nt_closedLoop = tab.add("ClosedLoop Traj", closedLoop).withWidget("Toggle Button").getEntry();
     nt_closedLoop.addListener((EntryNotification e)-> setClosedLoop(e.value.getBoolean()), EntryListenerFlags.kUpdate|EntryListenerFlags.kNew);
   }
+
+  // accessors for config - used when the controller is initialized
+  public static void setBeta(double beta) { 
+    s_beta = beta; }
+  public static void setZeta(double zeta) { 
+    s_zeta = zeta; }
+  public static double getBeta() { return s_beta; }
+  public static double getZeta() { return s_zeta; }
+
 }

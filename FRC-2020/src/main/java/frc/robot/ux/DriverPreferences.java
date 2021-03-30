@@ -18,9 +18,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveTrain;
 import frc.robot.RobotContainer;
+import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.drive.ArcadeVelDriveCmd;
 import frc.robot.commands.drive.TankVelDriveCmd;
 import frc.robot.subsystems.DrivePreferences;
+
 
 /** Add your docs here. */
 public class DriverPreferences {
@@ -54,11 +56,13 @@ public class DriverPreferences {
     // create controls for drive train preferences driver and tracker
     setup("Driver Speeds", DriveTrain.driverPreferences);
     setup("Tracker Speeds", DriveTrain.trackerPreferences);
+
+    createDoubleTableEntry("Ramsete/Beta", followTrajectory.getBeta(), followTrajectory::setBeta);
+    createDoubleTableEntry("Ramsete/Zeta", followTrajectory.getZeta(), followTrajectory::setZeta);
   }
 
   // Accessors for getting values
   public SendableChooser<CommandBase> getCommandChooser() { return driveChoices; }
-
 
   /**
    * helper function to create ux for DrivePreference 

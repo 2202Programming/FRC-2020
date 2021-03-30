@@ -92,7 +92,7 @@
               <frc-combo-box name="Select AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser"></frc-combo-box>
               <frc-text-field label="Active AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser/active" readonly></frc-text-area>
             </p>
-            <table> <tr><th><h4>Driver Settings</h4></th>   <th><h4>Tracker Settings</h4></th></tr>
+            <table> <tr><th><h4>Driver Settings</h4></th>   <th><h4>Tracker Settings</h4></th> <th><h4>Ramsete Settings</h4></th></tr>
             <tr>
             <td class="col">
               <div class="col-sm-6">
@@ -167,6 +167,33 @@
                   name="Max Rot d/s">
                 </frc-number-slider>
               </div>
+
+              
+            <td class="col">
+              <div class="col-sm-6">
+                <frc-number-field label="Ramsete Beta" source-key="/DriverPrefs/Ramsete/Beta"></frc-number-field>
+                <frc-number-slider
+                  source-provider="NetworkTables"
+                  min="0.0"
+                  max="1.0"
+                  block-increment="0.05"
+                  source-key="/DriverPrefs/Ramsete/Beta"
+                  name="Beta">
+                </frc-number-slider>
+              </div>
+
+              <div class="col-sm-6">
+                <frc-number-field label="Ramsete Zeta" source-key="/DriverPrefs/Ramsete/Zeta"></frc-number-field>
+                <frc-number-slider
+                  source-provider="NetworkTables"
+                  min="0"
+                  max="1.5"
+                  block-increment="0.1"
+                  source-key="/DriverPrefs/Ramsete/Zeta"
+                  name="Zeta">
+                </frc-number-slider>
+              </div>
+
             </td>
             </tr>
             </table>

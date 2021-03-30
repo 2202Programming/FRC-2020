@@ -92,7 +92,7 @@
               <frc-combo-box name="Select AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser"></frc-combo-box>
               <frc-text-field label="Active AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser/active" readonly></frc-text-area>
             </p>
-            <table> <tr><th>Driver Settings</th>   <th>Tracker Settings</th></tr>
+            <table> <tr><th><h4>Driver Settings</h4></th>   <th><h4>Tracker Settings</h4></th></tr>
             <tr>
             <td class="col">
               <div class="col-sm-6">
@@ -283,7 +283,7 @@
                     ></frc-boolean-box>
                   </p>
                 </div>
-                  <div class="col-sm-6">
+                  <div class="col-sm-4">
                     <h4>Balls in Magazine:</h4>
                     <style>
                       .with-styles::part(box) {
@@ -303,9 +303,23 @@
                     <frc-boolean-box  source-key="/Magazine/BallThree/value" class="with-styles" true-color="yellow" false-color="white" value>
                     </frc-boolean-box>
                   </div>
-                  <div class="col-sm-3">
+                  <div class="col-sm-5">
                     <frc-toggle-button label="Three PC" class="super-wide-button" source-key="/Commands/runThreePC"></frc-toggle-button>
                     <frc-toggle-button label="Zero PC" class="super-wide-button" source-key="/Commands/runZeroPC"></frc-toggle-button>
+                    <frc-toggle-button label="Mag Calibrate" class="super-wide-button" source-key="/Commands/MagCalibrate"></frc-toggle-button> 
+                    <frc-toggle-button label="MagZone1" class="super-wide-button" source-key="/Commands/MagZone1"></frc-toggle-button>
+                    <frc-toggle-button label="MagZone2" class="super-wide-button" source-key="/Commands/MagZone2"></frc-toggle-button>
+                    <frc-toggle-button label="MagZone3" class="super-wide-button" source-key="/Commands/MagZone3"></frc-toggle-button>
+                    <frc-toggle-button label="MagZone4" class="super-wide-button" source-key="/Commands/MagZone4"></frc-toggle-button>
+                    <frc-robot-command label="IntakeToggle" class="super-wide-button"  source-key="/Shuffleboard/Match/IntakeToggle"></frc-robot-command>
+                    <frc-robot-command label="IntakeRev" class="super-wide-button"  source-key="/Shuffleboard/Match/IntakeRev"></frc-robot-command>
+                    <frc-robot-command label="ToggleIntakePose" class="super-wide-button"  source-key="/Shuffleboard/Match/ToggleIntakePose"></frc-robot-command>
+                    <frc-robot-command label="Mag Calibrate" class="super-wide-button" source-key="/Shuffleboard/Match/Calibrate MagAngle"></frc-robot-command>
+                    <frc-robot-command label="MagLow" class="wider-button"  source-key="/Shuffleboard/Match/MagLow"></frc-robot-command>
+                    <frc-robot-command label="MagHigh" class="wider-button"  source-key="/Shuffleboard/Match/MagHigh"></frc-robot-command>
+                    <frc-robot-command label="MagOff" class="wider-button"  source-key="/Shuffleboard/Match/MagOff"></frc-robot-command>
+                    <frc-robot-command label="MagOn" class="wider-button"  source-key="/Shuffleboard/Match/MagOn"></frc-robot-command>
+                    <frc-robot-command label="MagLock" class="wider-button"  source-key="/Shuffleboard/Match/MagLock"></frc-robot-command>
                   </div>
               </div>
             </div>

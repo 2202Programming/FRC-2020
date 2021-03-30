@@ -92,7 +92,9 @@
               <frc-combo-box name="Select AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser"></frc-combo-box>
               <frc-text-field label="Active AutoCommand:" source-key="/Shuffleboard/Match/Autonomous Command/AutoChooser/active" readonly></frc-text-area>
             </p>
-            <div class="row">
+            <table> <tr><th>Driver Settings</th>   <th>Tracker Settings</th></tr>
+            <tr>
+            <td class="col">
               <div class="col-sm-6">
                 <frc-number-field label="Driver speed ft/s" source-key="/DriverPrefs/Driver Speeds/feet-per-sec"></frc-number-field>
                 <frc-number-slider
@@ -116,8 +118,6 @@
                   name="Max Rot d/s">
                 </frc-number-slider>
               </div>
-            </div>
-            <div class="row">
               <div class="col-sm-6">
                 <frc-number-field label="Driver slew-rate [s]" source-key="/DriverPrefs/Driver Speeds/slew-rate"></frc-number-field>
                 <frc-number-slider
@@ -128,7 +128,9 @@
                   source-key="/DriverPrefs/Driver Speeds/slew-rate"
                   name="Max Rot d/s">
                 </frc-number-slider>
-              </div>
+              </div> 
+            </td> 
+            <td class="col">
               <div class="col-sm-6">
                 <frc-number-field label="Tracker speed ft/s" source-key="/DriverPrefs/Tracker Speeds/feet-per-sec"></frc-number-field>
                 <frc-number-slider
@@ -141,8 +143,7 @@
                     name="Max Speed ft/s">
                 </frc-number-slider>
               </div>
-            </div>
-            <div class="row">
+           
               <div class="col-sm-6">
                 <frc-number-field label="Tracker rot deg/s" source-key="/DriverPrefs/Tracker Speeds/deg-per-sec"></frc-number-field>
                 <frc-number-slider
@@ -166,11 +167,9 @@
                   name="Max Rot d/s">
                 </frc-number-slider>
               </div>
-            </div>
-
-
-
-
+            </td>
+            </tr>
+            </table>
 
            </fieldset>
            <fieldset class="scheduler-border">

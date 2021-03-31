@@ -523,7 +523,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     m_cmd_wheelSpeeds.leftMetersPerSecond = velLeft; // not meters, we use ft/s
     m_cmd_wheelSpeeds.rightMetersPerSecond = velRight;
     var cs = calcChassisSpeeds(m_cmd_wheelSpeeds, m_cmd_chassisSpeed);
-    velocityArcadeDrive(cs.vxMetersPerSecond, cs.omegaRadiansPerSecond*(Math.PI/180));
+    velocityArcadeDrive(cs.vxMetersPerSecond, cs.omegaRadiansPerSecond*(180/Math.PI));
 /********
     // Spark Max uses RPM for velocity closed loop mode
     // so we need to convert ft/s to RPM command which is dependent

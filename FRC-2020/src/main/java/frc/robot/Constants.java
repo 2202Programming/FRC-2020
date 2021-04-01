@@ -219,7 +219,7 @@ public final class Constants {
         // Acceleration limits
         public static final double slewRateMax = 2;      //sec limits adjusting slewrate 
 
-        public static final boolean safetyEnabled = true; 
+        public static final boolean safetyEnabled = false; 
     }
 
     public static final class Shooter {

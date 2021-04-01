@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.robot.Constants.RobotPhysical;
@@ -63,7 +62,7 @@ public class ConvertRecordingToTrajectory {
   double prev_time = 0.0;
   double prev_x=-999;
   double prev_y=-999;
-  Rotation2d prev_th;
+  double prev_th;
 
   public void processRecording() {
     states.clear();
@@ -71,7 +70,7 @@ public class ConvertRecordingToTrajectory {
     prev_time = 0.0;
     prev_x = lines.get(0).robot_pose.getX();
     prev_y = lines.get(0).robot_pose.getY();
-    prev_th = lines.get(0).robot_pose.getRotation();
+    prev_th = lines.get(0).robot_pose.getRotation().getRadians();
 
     lines.forEach(r ->
     {
@@ -82,23 +81,30 @@ public class ConvertRecordingToTrajectory {
       if (dt < .005) {
         //measured wheel speeds - but they lag
         var chassis = kinematics.toChassisSpeeds(r.meas_speed);
+        double vel = chassis.vxMetersPerSecond;
+        double curv = chassis.omegaRadiansPerSecond / chassis.vxMetersPerSecond;
 
+        //Instead used the pose which is based on encoder and heading integrated into field position
         // use X/Y to calculate vel
         double vx = (r.robot_pose.getX() - prev_x)/dt;
         double vy = (r.robot_pose.getY() - prev_y)/dt;
-        double vel_th = Math.atan2(vy, vx);
-        double vel_mag = Math.sqrt(vx*vx + vy*vy);
+        double th = Math.atan2(vy, vx);
+        double vel_ = Math.hypot(vx, vy);
+        double d_th =  diff_modulo(th, prev_th, Math.PI/2.0)/dt;       
 
-        double vel = chassis.vxMetersPerSecond; 
-        double accel = (dt > 0.001) ? (vel -prev_vel)/dt : 0.0;
-        double curv = chassis.omegaRadiansPerSecond / chassis.vxMetersPerSecond;
+        double accel = (vel_ - prev_vel)/dt;
+        //curvature doesn't make sense for zero vel.
+        double curv2 = (vel_ > 1E-5) ?  d_th /vel_  : 0.0;
+       
         states.add(new Trajectory.State(round4(time), 
-          round4(vel), 
+          round4(vel_), 
           round4(accel), r.robot_pose, 
-          round4(curv)));
+          round4(curv2)));
 
+        // save prev for next cycle
+        prev_th = th;
         prev_time = time;
-        prev_vel = vel;
+        prev_vel = vel_;
       }
     });
 
@@ -169,5 +175,19 @@ public class ConvertRecordingToTrajectory {
   double round4(double v) {
    return  (double)Math.round(v * 10000d) / 10000d;
   }
+
+
+  public static double diff_modulo(double a1, double a0, double mod ) {
+    double delta = a1 - a0;
+    
+    if (delta > mod) {
+      delta = delta - 2*mod; 
+    }
+    else if ( delta < -mod) {
+      delta = 2*mod + delta;
+    }
+    return delta;
+  }
+
 
 }

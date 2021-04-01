@@ -78,6 +78,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
         (shifter.getCurrentGear() == Gear.LOW)) {
       if (++timeWantingUp >= minTimeInZone) {
         drive.reqShiftUp();
+        drive.setBrakeMode(false);  // no brakes in high gear, save our carpets
         resetTimeInZone();
       }
     }
@@ -88,8 +89,12 @@ public class ArcadeVelDriveCmd extends CommandBase {
       if (timeWantingDown++ >= minTimeInZone) {
         drive.reqShiftDown();
         resetTimeInZone();
+        drive.setBrakeMode(true);
       }
     }
+
+    checkCoastMode(cmd, vel);
+
   }
 
   @SuppressWarnings("unused")
@@ -128,7 +133,8 @@ public class ArcadeVelDriveCmd extends CommandBase {
     // read controls in normalize units +/- 1.0, scale to physical units
     velCmd = dc.getVelocity() * vMax;
     rotCmd = dc.getRotation() * rotMax;
-   
+    rotCmd = applyDeadband(rotCmd, 1.0, rotMax);   // put control on this
+
     // implement auto-shift if it is enabled
     if (shifter.isAutoShiftEnabled()) { 
       // handles all the shift up/down requests based on time in the zone.
@@ -142,4 +148,28 @@ public class ArcadeVelDriveCmd extends CommandBase {
   public boolean isFinished() {
     return false;
   }
+
+
+
+/**
+     * Returns 0.0 if the given value is within the specified range around zero. The
+     * remaining range between the deadband and max.
+     *
+     * @param value    value to clip
+     * @param deadband range around zero
+     */
+    public static double applyDeadband(final double value, double deadband, double max) {
+      if (Math.abs(value) > deadband) {
+          if (value > 0.0) {
+              return (value - deadband) / (max - deadband);
+          } else {
+              return (value + deadband) / (max - deadband);
+          }
+      } else {
+          return 0.0;
+      }
+  }
+
+
+
 }

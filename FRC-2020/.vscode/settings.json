@@ -25,7 +25,8 @@
       "workingDirectory": "${workspaceFolder}",
       "vmArgs": [
         "-Djava.library.path=${workspaceFolder};${workspaceFolder}/build/tmp/jniExtractDir;${workspaceFolder}/build/tmp/expandedArchives",
-        "-Dfile.encoding=UTF-8"
+        "-Dfile.encoding=UTF-8",
+        "-enableassertions"
       ],
       "env": {
         "PATH" : "${workspaceFolder}/build/tmp/jniExtractDir;${workspaceFolder}/build/tmp/expandedArchives",

@@ -123,4 +123,8 @@ public class DummyVelocityDrive implements VelocityDrive {
 
   }
 
+  @Override
+  public void setBrakeMode(boolean brakeOn) {
+  }
+
 }

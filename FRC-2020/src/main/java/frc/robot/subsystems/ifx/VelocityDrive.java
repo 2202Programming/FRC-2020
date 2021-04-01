@@ -31,6 +31,8 @@ public interface VelocityDrive extends Odometry {
     public void reqShiftUp();
     public void reqShiftDown();
 
+    public void setBrakeMode(boolean brakeOn);
+
     // expose the drive train's max speed and rate because UX may update it
     // recommend reading these at init() or each frame
     public double getMaxVelocity();  //ft/s

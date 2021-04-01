@@ -58,7 +58,7 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   final double Kleft = 1.0;
   final double Kright = -1.0;
   final boolean KInvertMotor = true; // convention required in robot characterization
-  final IdleMode KIdleMode = IdleMode.kBrake;
+  IdleMode KIdleMode = IdleMode.kBrake;
   final double Kgyro = -1.0; // ccw is positive, just like geometry class
 
   // Chassis Encoder
@@ -707,6 +707,13 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
 
   public Gear getCurrentGear() {
     return gearbox.getCurrentGear();
+  }
+
+  @Override
+  public void setBrakeMode(boolean brakeOn) {
+    KIdleMode = brakeOn ? IdleMode.kBrake : IdleMode.kCoast;
+    leftController.setIdleMode(KIdleMode);
+    rightController.setIdleMode(KIdleMode);
   }
 
   public void log() {

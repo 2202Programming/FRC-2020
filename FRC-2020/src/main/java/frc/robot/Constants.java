@@ -203,8 +203,8 @@ public final class Constants {
           trackerPreferences.pidSlot = 1;
           trackerPreferences.rpmPID =  new PIDFController(0.000155, 0.0, 200.0, Kff);
           trackerPreferences.slewRateLimit = 0.1;   //[s]  time to max output
-          trackerPreferences.maxRotRate =  60.0;    //[deg/s]
-          trackerPreferences.maxVelocity = 5.0;     //[ft/s]
+          trackerPreferences.maxRotRate =  130.0;    //[deg/s]
+          trackerPreferences.maxVelocity = 7.0;     //[ft/s]
         }
 
         // shifter settings

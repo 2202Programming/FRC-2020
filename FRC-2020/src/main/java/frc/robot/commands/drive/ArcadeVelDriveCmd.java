@@ -161,9 +161,9 @@ public class ArcadeVelDriveCmd extends CommandBase {
     public static double applyDeadband(final double value, double deadband, double max) {
       if (Math.abs(value) > deadband) {
           if (value > 0.0) {
-              return (value - deadband) / (max - deadband);
+              return max * (value - deadband) / (max - deadband);
           } else {
-              return (value + deadband) / (max - deadband);
+              return max * (value + deadband) / (max - deadband);
           }
       } else {
           return 0.0;

@@ -27,11 +27,16 @@ public class GearSetCmd extends InstantCommand {
   public void initialize() {
    
    // if (m_shifter.getCurrentGear() == m_desiredGear) return;
-    if (m_desiredGear == Gear.HIGH)
+    if (m_desiredGear == Gear.HIGH) {
+      
       m_drive.reqShiftUp();
+      m_drive.setBrakeMode(false);
+    }
     else 
-      m_drive.reqShiftDown();
-    
+      {
+        m_drive.reqShiftDown();
+        m_drive.setBrakeMode(true);
+      }
   }
 
 }

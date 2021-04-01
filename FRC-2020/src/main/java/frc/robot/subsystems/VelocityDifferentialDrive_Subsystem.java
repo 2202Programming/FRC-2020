@@ -712,8 +712,9 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   @Override
   public void setBrakeMode(boolean brakeOn) {
     KIdleMode = brakeOn ? IdleMode.kBrake : IdleMode.kCoast;
-    leftController.setIdleMode(KIdleMode);
-    rightController.setIdleMode(KIdleMode);
+    for (final CANSparkMax c : controllers) {
+      c.setIdleMode(KIdleMode);
+    }
   }
 
   public void log() {

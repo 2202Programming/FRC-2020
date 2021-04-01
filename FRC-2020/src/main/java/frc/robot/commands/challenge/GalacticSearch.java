@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.intake.IntakePosition;
@@ -53,7 +54,8 @@ public class GalacticSearch extends SequentialCommandGroup {
       this.addCommands(
         new InstantCommand( ()->  { magazine.setPC(0); } ),
         new IntakePosition(intake, Direction.Down),
-        new IntakePower(intake, Power.On, 0.5),
+        new IntakePower(intake, Power.On, 0.5), 
+        new WaitCommand(0.75),
         new followTrajectory(drive, startTraj).andThen(new PrintCommand("GS-Start trajectory done.")), 
         new ConditionalCommand(
             // on true, magEmpty, found nothing do blue

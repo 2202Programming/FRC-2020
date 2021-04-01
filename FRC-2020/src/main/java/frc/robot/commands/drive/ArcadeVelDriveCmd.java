@@ -99,6 +99,13 @@ public class ArcadeVelDriveCmd extends CommandBase {
 
   @SuppressWarnings("unused")
   private void checkCoastMode(double absCmd, double absVel) {
+    if (shifter.getCurrentGear() == Gear.LOW) {
+      //no coast mode in low gear
+      timeWantingCoast = 0;
+      drive.setCoastMode(false);
+      return;
+    }
+
     // see if we can coast, using abs vel
     if ((absCmd < absVel) && (rotCmd == 0.0 )) {
       if (++timeWantingCoast > minTimeEnterCoast)

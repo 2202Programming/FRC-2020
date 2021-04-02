@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.InterstellarSettings;
 import frc.robot.RobotContainer;
 import frc.robot.commands.auto.followTrajectory;
@@ -26,6 +25,7 @@ import frc.robot.commands.intake.IntakePosition.Direction;
 import frc.robot.commands.intake.IntakePower;
 import frc.robot.commands.intake.IntakePower.Power;
 import frc.robot.commands.intake.MagazineAngle;
+import frc.robot.commands.intake.MagazineCaptureCmd;
 import frc.robot.commands.intake.Shoot;
 import frc.robot.commands.intake.ShooterWarmUp;
 import frc.robot.subsystems.Intake_Subsystem;
@@ -96,7 +96,6 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     var cmd = new SequentialCommandGroup();
     var cfg = (start) ? config : reverse_config; // start goes forward, others are reverse on traj #1
     cmd.addCommands(
-      new InstantCommand(limelight::enableLED), 
       // ready the shooter
       new ShooterWarmUp(ss), 
       new MagazineAngle(intake, ss),
@@ -115,8 +114,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
       new MagazineAngle(intake, 35.0),              //need to be at a reasonable angle for intake
       new IntakePower(intake, Power.On, 0.5),
       new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)),
-      new WaitUntilCommand( magazine::isMagFull).withTimeout(10.0));
-
+      new MagazineCaptureCmd(intake, 3));
     return cmd;
   }
 

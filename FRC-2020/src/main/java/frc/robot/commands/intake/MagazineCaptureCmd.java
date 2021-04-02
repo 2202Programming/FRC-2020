@@ -28,6 +28,7 @@ public class MagazineCaptureCmd extends CommandBase {
   };
 
   State state = State.WaitingForPC;
+  int pcCount = -1;
 
   /** Creates a new MagazineCaptureCmd. */
   public MagazineCaptureCmd(Intake_Subsystem intake) {
@@ -35,6 +36,12 @@ public class MagazineCaptureCmd extends CommandBase {
     this.intake = intake;
     addRequirements(mag);
   }
+
+  public MagazineCaptureCmd(Intake_Subsystem intake, int pcCount) {
+    this(intake); this.mag = intake.getMagazine();
+    this.pcCount = pcCount;  
+  }
+
 
   // Called when the command is initially scheduled.
   @Override
@@ -96,6 +103,8 @@ public class MagazineCaptureCmd extends CommandBase {
   // This is a default command, it shouldn't end but could get pre-empted
   @Override
   public boolean isFinished() {
-    return false;
+    //normal default cmd case
+    if (this.pcCount == -1 ) return false;
+    return mag.isMagFull();
   }
 }

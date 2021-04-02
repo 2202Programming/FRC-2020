@@ -26,6 +26,7 @@ import frc.robot.commands.intake.IntakePower;
 import frc.robot.commands.intake.IntakePower.Power;
 import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.MagazineCaptureCmd;
+//import frc.robot.commands.intake.MagazineCaptureCmd;
 import frc.robot.commands.intake.Shoot;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
@@ -102,7 +103,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
       new followTrajectory(drive, computeTrajectory(startpose, shootpose, cfg)),
       // Build the Shoot and return to Introduction zone sequence
       new ParallelDeadlineGroup(
-            new Shoot(ss).withTimeout(6.0),        // deadline on shoot, times out just in case
+            new Shoot(ss).withTimeout(10.0),        // deadline on shoot, times out just in case
             new MagazineAngle(intake, ss),         // adjust if not there
             new LimeLightTargetCompensator(),      // never finishes, stopped when group is done.
             new TankVelDriveCmd(drive, 0.0, 0.0)   // never finishes, feeds watchdog, uses LL compensator   
@@ -111,9 +112,11 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
       //head back and get more power cells
       //new InstantCommand(limelight::disableLED),
       new MagazineAngle(intake, 35.0),              //need to be at a reasonable angle for intake
-      new IntakePower(intake, Power.On, 0.5),
       new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)),
-      new MagazineCaptureCmd(intake, 3));
+      new IntakePower(intake, Power.On, 0.5),
+      new InstantCommand(() -> {  magazine.setPC(0);}),
+      new MagazineCaptureCmd(intake, 3)
+     );
     return cmd;
   }
 

@@ -1,7 +1,5 @@
 package frc.robot.ux;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 //import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -10,21 +8,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.Constants;
-import frc.robot.Constants.InterstellarSettings;
 import frc.robot.RobotContainer;
-import frc.robot.commands.MatchReadyCmd;
-import frc.robot.commands.toggleLED;
-import frc.robot.commands.auto.auto_drivePath_cmd;
-import frc.robot.commands.auto.goToPose;
-import frc.robot.commands.drive.ResetPosition;
-import frc.robot.commands.intake.IntakePosition;
-import frc.robot.commands.intake.IntakePower;
-import frc.robot.commands.intake.MagazineAngle;
-import frc.robot.commands.intake.MagazineBeltAdjust;
-import frc.robot.commands.intake.MagazineCalibrate;
-import frc.robot.commands.intake.SetPowerCellCount;
 
 /**
  * Dashboard
@@ -71,28 +55,28 @@ public class Dashboard {
     m_drivers = new DriverPreferences(driverTab);
 
      // Shuffleboard runnable Commands - Soft buttons
-     matchTab.add("Match Ready", new MatchReadyCmd());
-     matchTab.add("Zero PC", new SetPowerCellCount(0) );
-     matchTab.add("Three PC", new SetPowerCellCount(3) );
-     matchTab.add("Calibrate MagAngle", new MagazineCalibrate());
-     matchTab.add("ResetPose", new ResetPosition(rc.driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
-     matchTab.add("DrivePath", new auto_drivePath_cmd(rc.driveTrain, m_autopaths.getChooser()));
-     matchTab.add("MagLow", new MagazineAngle(rc.intake, Constants.ShooterOnCmd.dataLow));
-     matchTab.add("MagHigh", new MagazineAngle(rc.intake, Constants.ShooterOnCmd.dataHigh));
-     matchTab.add("ToggleIntakePose", new IntakePosition(rc.intake, IntakePosition.Direction.Toggle));
-     matchTab.add("GoToPose", new goToPose(rc.driveTrain, rc.state));
-     matchTab.add("SavePose", new InstantCommand(rc.state::saveRobotState));
-     matchTab.add("ToggleAutoShoot", new InstantCommand(rc.intake::toggleAutoShootingMode));
-     matchTab.add("MagOff", new MagazineBeltAdjust(rc.magazine, false, 0.0));
-     matchTab.add("MagOn", new MagazineBeltAdjust(rc.magazine, true, 0.4));
-     matchTab.add("IntakeRev", new IntakePower(rc.intake, IntakePower.Power.ReverseOn, 0.5));
-     matchTab.add("IntakeToggle", new IntakePower(rc.intake, IntakePower.Power.Toggle, 0.5));
-     matchTab.add("LimelightToggle", new toggleLED(rc.limelight));
-     matchTab.add("MagLock", new InstantCommand(rc.intake.getMagazine().getMagPositioner()::lock));
-     matchTab.add("MagZone1", new MagazineAngle(rc.intake, InterstellarSettings.ssZone1));
-     matchTab.add("MagZone2", new MagazineAngle(rc.intake, InterstellarSettings.ssZone2));
-     matchTab.add("MagZone3", new MagazineAngle(rc.intake, InterstellarSettings.ssZone3));
-     matchTab.add("MagZone4", new MagazineAngle(rc.intake, InterstellarSettings.ssZone4));
+    //  matchTab.add("Match Ready", new MatchReadyCmd());
+    //  matchTab.add("Zero PC", new SetPowerCellCount(0) );
+    //  matchTab.add("Three PC", new SetPowerCellCount(3) );
+    //  matchTab.add("Calibrate MagAngle", new MagazineCalibrate());
+    //  matchTab.add("ResetPose", new ResetPosition(rc.driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
+    //  matchTab.add("DrivePath", new auto_drivePath_cmd(rc.driveTrain, m_autopaths.getChooser()));
+    //  matchTab.add("MagLow", new MagazineAngle(rc.intake, Constants.ShooterOnCmd.dataLow));
+    //  matchTab.add("MagHigh", new MagazineAngle(rc.intake, Constants.ShooterOnCmd.dataHigh));
+    //  matchTab.add("ToggleIntakePose", new IntakePosition(rc.intake, IntakePosition.Direction.Toggle));
+    //  matchTab.add("GoToPose", new goToPose(rc.driveTrain, rc.state));
+    //  matchTab.add("SavePose", new InstantCommand(rc.state::saveRobotState));
+    //  matchTab.add("ToggleAutoShoot", new InstantCommand(rc.intake::toggleAutoShootingMode));
+    //  matchTab.add("MagOff", new MagazineBeltAdjust(rc.magazine, false, 0.0));
+    //  matchTab.add("MagOn", new MagazineBeltAdjust(rc.magazine, true, 0.4));
+    //  matchTab.add("IntakeRev", new IntakePower(rc.intake, IntakePower.Power.ReverseOn, 0.5));
+    //  matchTab.add("IntakeToggle", new IntakePower(rc.intake, IntakePower.Power.Toggle, 0.5));
+    //  matchTab.add("LimelightToggle", new toggleLED(rc.limelight));
+    //  matchTab.add("MagLock", new InstantCommand(rc.intake.getMagazine().getMagPositioner()::lock));
+    //  matchTab.add("MagZone1", new MagazineAngle(rc.intake, InterstellarSettings.ssZone1));
+    //  matchTab.add("MagZone2", new MagazineAngle(rc.intake, InterstellarSettings.ssZone2));
+    //  matchTab.add("MagZone3", new MagazineAngle(rc.intake, InterstellarSettings.ssZone3));
+    //  matchTab.add("MagZone4", new MagazineAngle(rc.intake, InterstellarSettings.ssZone4));
 
   }
 

@@ -74,6 +74,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   private NetworkTable table;
   private NetworkTableEntry nt_velLeft;
   private NetworkTableEntry nt_velRight;
+  private NetworkTableEntry nt_speedLeft;
+  private NetworkTableEntry nt_speedRight;
   private NetworkTableEntry nt_velChassisLeft;
   private NetworkTableEntry nt_velChassisRight;
   private NetworkTableEntry nt_posLeft;
@@ -216,6 +218,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     table = NetworkTableInstance.getDefault().getTable("Drivetrain");
     nt_velLeft = table.getEntry("VelLeft/value");
     nt_velRight = table.getEntry("VelRight/value");
+    nt_speedLeft = table.getEntry("Left Motor Speed");
+    nt_speedRight = table.getEntry("Right Motor Speed");
     nt_velChassisLeft = table.getEntry("VelChassisLeft");
     nt_velChassisRight = table.getEntry("VelChassisRight");
     nt_posLeft = table.getEntry("PosLeft");
@@ -731,6 +735,8 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
     // encoder vel and positions
     nt_velLeft.setDouble(m_wheelSpeeds.leftMetersPerSecond); // ft/s
     nt_velRight.setDouble(m_wheelSpeeds.rightMetersPerSecond); // ft/s
+    nt_speedLeft.setDouble(m_wheelSpeeds.leftMetersPerSecond); // ft/s
+    nt_speedRight.setDouble(m_wheelSpeeds.rightMetersPerSecond); // ft/s
     nt_posLeft.setDouble(m_posLeft);
     nt_posRight.setDouble(m_posRight);
 

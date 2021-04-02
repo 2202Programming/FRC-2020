@@ -21,6 +21,8 @@ import frc.robot.RobotContainer;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.drive.LimeLightTargetCompensator;
 import frc.robot.commands.drive.TankVelDriveCmd;
+import frc.robot.commands.intake.IntakePosition;
+import frc.robot.commands.intake.IntakePosition.Direction;
 import frc.robot.commands.intake.IntakePower;
 import frc.robot.commands.intake.IntakePower.Power;
 import frc.robot.commands.intake.MagazineAngle;
@@ -75,8 +77,9 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     Command leg5 = build_leg(IntroPose, Zone4Pose, InterstellarSettings.ssZone4, false);
 
     this.addCommands(new InstantCommand(() -> {
-      magazine.setPC(3);
-    }), leg1, leg2, leg3, leg4, leg5);
+      magazine.setPC(3);}),
+      new IntakePosition(intake, Direction.Down),
+      leg1, leg2, leg3, leg4, leg5);
 
   }
 
@@ -109,7 +112,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
       
       //head back and get more power cells
       //new InstantCommand(limelight::disableLED),
-      new MagazineAngle(intake, 40.0),              //need to be at a reasonable angle for intake
+      new MagazineAngle(intake, 35.0),              //need to be at a reasonable angle for intake
       new IntakePower(intake, Power.On, 0.5),
       new followTrajectory(drive, computeTrajectory(shootpose, IntroPose, config)),
       new WaitUntilCommand( magazine::isMagFull).withTimeout(10.0));

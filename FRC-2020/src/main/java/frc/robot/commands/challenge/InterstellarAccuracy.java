@@ -27,7 +27,6 @@ import frc.robot.commands.intake.IntakePower.Power;
 import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.MagazineCaptureCmd;
 import frc.robot.commands.intake.Shoot;
-import frc.robot.commands.intake.ShooterWarmUp;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.subsystems.Limelight_Subsystem;
@@ -97,7 +96,7 @@ public class InterstellarAccuracy extends SequentialCommandGroup {
     var cfg = (start) ? config : reverse_config; // start goes forward, others are reverse on traj #1
     cmd.addCommands(
       // ready the shooter
-      new ShooterWarmUp(ss), 
+      //new ShooterWarmUp(ss), 
       new MagazineAngle(intake, ss),
       //drive to the shoot position
       new followTrajectory(drive, computeTrajectory(startpose, shootpose, cfg)),

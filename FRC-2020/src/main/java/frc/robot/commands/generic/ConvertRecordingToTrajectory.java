@@ -79,8 +79,8 @@ public class ConvertRecordingToTrajectory {
 
       //Skip short frames
       if (dt < .005) {
-        //measured wheel speeds - but they lag
-        var chassis = kinematics.toChassisSpeeds(r.meas_speed);
+        //measured wheel speeds - but they lag - didn't work well
+        ///var chassis = kinematics.toChassisSpeeds(r.meas_speed);
         ///double vel = chassis.vxMetersPerSecond;
         ///double curv = chassis.omegaRadiansPerSecond / chassis.vxMetersPerSecond;
 

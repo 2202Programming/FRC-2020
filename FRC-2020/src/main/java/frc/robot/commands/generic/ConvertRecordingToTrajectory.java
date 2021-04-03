@@ -81,8 +81,8 @@ public class ConvertRecordingToTrajectory {
       if (dt < .005) {
         //measured wheel speeds - but they lag
         var chassis = kinematics.toChassisSpeeds(r.meas_speed);
-        double vel = chassis.vxMetersPerSecond;
-        double curv = chassis.omegaRadiansPerSecond / chassis.vxMetersPerSecond;
+        ///double vel = chassis.vxMetersPerSecond;
+        ///double curv = chassis.omegaRadiansPerSecond / chassis.vxMetersPerSecond;
 
         //Instead used the pose which is based on encoder and heading integrated into field position
         // use X/Y to calculate vel

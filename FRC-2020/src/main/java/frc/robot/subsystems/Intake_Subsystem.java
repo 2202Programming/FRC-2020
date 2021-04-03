@@ -200,8 +200,8 @@ public class Intake_Subsystem extends MonitoredSubsystemBase implements Logger {
    * 
    */
   public Intake_Subsystem() {
-    // Construct the magazine, keep references to it an positioner
-    magazine = new Magazine_Subsystem(this);
+    // Construct the magazine, keep references to it and positioner
+    magazine = new Magazine_Subsystem();
     positioner = magazine.getMagPositioner();
 
     SendableRegistry.setName(this,"Intake", "shooter");

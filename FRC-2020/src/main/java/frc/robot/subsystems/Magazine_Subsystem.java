@@ -95,10 +95,6 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
   private NetworkTableEntry nt_ballThree;
   private int NT_update = 0;
 
-  private boolean ballOne = false;
-  private boolean ballTwo = false;
-  private boolean ballThree = false;
-
   /**
    * MagazinePositioner_Subsystem
    * 
@@ -181,17 +177,34 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
     private NetworkTableEntry nt_len_strap;
     private NetworkTableEntry nt_encoder;
     private NetworkTableEntry nt_encoder_sp;
-     private NetworkTableEntry nt_angle_pot_calib;
+    private NetworkTableEntry nt_angle_pot_calib;
 
+
+    /**
+     * 
+     * MagazinePostioner 
+     * 
+     * Controls the angle of the magazine using winch motor working 
+     * against spring lifts.  A pawl is used to lock the position
+     * for power off to prevent unwinding or when you want to shoot 
+     * from a fixed angle.
+     * 
+     * Moving down, the pawl will "click" moving up requires the pawl to be
+     * unloaded (down move) and the released.
+     * 
+     * A linear -yo-yo pot is used to calibrate the initial position, then
+     * the angle is controled by the SparkMax position control.
+     * 
+     */
 
     MagazinePositioner() {
       SendableRegistry.setName(anglePot, this.getName(), "YoYoPot");
 
-      // configure sparkmax motor
+      // configure sparkmax controller
       angleMotor.restoreFactoryDefaults(false);
       angleMotor.setInverted(kInverted);
       angleMotor.setIdleMode(IdleMode.kBrake);
-      angleMotor.setSmartCurrentLimit(5); // DPL - testing this for stall protection
+      angleMotor.setSmartCurrentLimit(5);        // stall current limit
 
       // copy the sw pidvalues to the hardware
       posPIDvalues.copyTo(anglePID, kPosSlot);
@@ -334,8 +347,8 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
     }
 
     /**
-     * use velocity control to wind motor + speed increases angle - speed decreases
-     * angle
+     * Uses velocity control to wind motor, +speed increases angle, -speed decreases
+     * angle.
      * 
      * @param speed RPM of takeup pully
      */
@@ -357,8 +370,8 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
     }
 
     /**
-     * burp() - offload the pawl by moving in down direction. this must be
-     * controlled by a Command so movement logic can be done.
+     * burp() - offload the pawl by moving in down direction. This must be
+     * controlled by a Command so movement logic can be done over multiple frames.
      */
     public void burp() {
       final double inps = 0.3;
@@ -386,7 +399,6 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
      * @param lock true, engage lock false - leave it open
      */
     public void stopAndHold(boolean lock) {
-      // angleMotor.stopMotor(); //zero's motor current, idle mode hold only
       m_enc_pos = angleEncoder.getPosition();
       anglePID.setReference(m_enc_pos, ControlType.kPosition, kPosSlot);
       if (lock)
@@ -463,26 +475,36 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
   } // MagazinePositioner
 
 
-  /**
-   *  Belt controls
-   */
-  final int MAG_FULL_COUNT = 3;   //number of power cells
+  
+  
 
-  // magazine Belt
+  // magazine Belt and gate devices
   final Spark beltMotor = new Spark(PWM.MAGAZINE);
   final DigitalInput lightGate = new DigitalInput(DigitalIO.MAGAZINE_GATE);
-
-  // Intake and Mag must talk, keep a reference
-  Intake_Subsystem intake;
-  MagazinePositioner positioner;
+  
+  // magazine angle positioner
+  final MagazinePositioner positioner;
 
   // measurements update in periodic()
   int m_pcCount = 0;
   int NT_update_mag = 0;
-
-  /** Creates a new Magazine_subsystem. */
-  public Magazine_Subsystem(Intake_Subsystem intake) {
-    this.intake = intake;
+  
+  final int MAG_FULL_COUNT = 3;   //number of power cells
+  
+  /** Creates a new Magazine_subsystem. 
+   * 
+   * Magazine Belt and Angle controls
+   * 
+   * Controls the mag belt and power cell counting using a light gate.
+   * Most of the work is done in the MagazineCaptureCmd which runs as a default
+   * command for loading power cells. 
+   *
+   * The postioner moves the whole magazine up and down. Commands may take over the
+   * positioner sub-system or the belt
+   *
+   * 
+  */
+  public Magazine_Subsystem() {
     this.positioner = new MagazinePositioner();
 
     //direct networktables logging
@@ -493,10 +515,7 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
     nt_ballTwo = table.getEntry("BallTwo/value");
     nt_ballThree = table.getEntry("BallThree/value");
 
-    nt_pcCount.setNumber(m_pcCount);
-    nt_ballOne.setBoolean(ballOne);
-    nt_ballTwo.setBoolean(ballTwo);
-    nt_ballThree.setBoolean(ballThree);
+    pcUpdateNetworkTables();
 
     // fill out dashboard stuff - commented out to save bandwidth
     //SendableRegistry.setSubsystem(this, "Magazine");
@@ -537,45 +556,23 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
     return lightGate.get();
   }
 
-  public void setBallBooleans (){ //for webpage magic, need three separate booleans for the balls for some cool graphics
-    switch (m_pcCount) {
-      case 0:
-        ballOne = false;
-        ballTwo = false;
-        ballThree = false;
-        break;
-      case 1:
-        ballOne = true;
-        ballTwo = false;
-        ballThree = false;
-        break;
-      case 2:
-        ballOne = true;
-        ballTwo = true;
-        ballThree = false;
-        break;
-      case 3:
-        ballOne = true;
-        ballTwo = true;
-        ballThree = true;
-        break;
-    }
-    nt_ballOne.setBoolean(ballOne);
-    nt_ballTwo.setBoolean(ballTwo);
-    nt_ballThree.setBoolean(ballThree);
+  //for webpage magic, need three separate booleans for the balls for some cool graphics
+  public void pcUpdateNetworkTables() { 
+    nt_pcCount.setNumber(m_pcCount);
+    nt_ballOne.setBoolean((m_pcCount & 1) !=0);
+    nt_ballTwo.setBoolean((m_pcCount & 2) !=0);
+    nt_ballThree.setBoolean((m_pcCount & 3) !=0);
   }
 
   public void addPC() {
     m_pcCount++;
-    nt_pcCount.setNumber(m_pcCount);
-    setBallBooleans();
+    pcUpdateNetworkTables();
   }
 
   public void removePC() {
     if (m_pcCount > 0)
       m_pcCount--;
-      nt_pcCount.setNumber(m_pcCount);
-      setBallBooleans();
+      pcUpdateNetworkTables();
   }
 
   public int getPC() {
@@ -584,8 +581,7 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
 
   public void setPC(int c) {
     m_pcCount = (c >= 0  && c <= MAG_FULL_COUNT) ? c : 0;
-    nt_pcCount.setNumber(m_pcCount);
-    setBallBooleans();
+    pcUpdateNetworkTables();
   }
 
   public boolean isMagFull() {
@@ -601,7 +597,7 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
   }
 
   /**
-   *  Mostly for access in tests.
+   *  Access for tests and commands
    * 
    * @return positioner
    */
@@ -610,24 +606,24 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
   }
 
   /**
+   * calculate length of side given two lengths and opposite angle
    * 
    * @param b length
    * @param c length
    * @param a_deg
-   * @return   length for side a, given A, b, c
+   * @return  length for side a, given A, b, c
    */
   static double lawOfCosineLength( double b, double c, double a_deg) {
     return Math.sqrt(b*b + c*c - 2.0*b*c * Math.cos(Math.toRadians(a_deg)));
   }
 
   /**
-   *
-   * Note this could be sped up by pre-calc of constants in the expression.
+   *  calculate angle given lengths of triangle.
    *  
    * @param a length
    * @param b length
    * @param c length
-   * @return   angle of C, opposite side c
+   * @return  angle of C, opposite side c
    */
   static double lawOfCosineAngle(double a, double b, double c) {
      double cos = (a*a + b*b - c*c) / (2*a*b);

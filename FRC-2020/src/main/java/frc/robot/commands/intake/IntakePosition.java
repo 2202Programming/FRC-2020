@@ -42,7 +42,7 @@ public class IntakePosition extends CommandBase {
     if (m_direction_request == Direction.Toggle) {
       m_dir = m_intake.isIntakeUp() ? Direction.Down : Direction.Up;
     }
-    // if we are raising the intake, the Magazine must be lowered, so we have to
+    // if we are raising the intake, the Magazine position must be lowered, so we have to
     // wait for that.
     if (m_dir == Direction.Up && m_mag_postioner.get() > SAFE_INTAKE_ANGLE) {
       m_magToSafePostion.schedule();
@@ -54,7 +54,7 @@ public class IntakePosition extends CommandBase {
   public void execute() {
     switch (m_dir) {
       case Up:
-        // we may have to wair for mag to come down
+        // we may have to wait for mag to come down
         if (m_mag_postioner.get() > SAFE_INTAKE_ANGLE) {
           return;
         }

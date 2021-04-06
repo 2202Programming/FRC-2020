@@ -22,6 +22,7 @@ public class GalacticSearch extends SequentialCommandGroup {
   Trajectory startTraj;
   Trajectory blueTraj;
   Trajectory redTraj;
+  Trajectory BTraj;
 
   VelocityDrive drive;
   Intake_Subsystem intake;
@@ -37,20 +38,11 @@ public class GalacticSearch extends SequentialCommandGroup {
     addRequirements(drive);
    
     // paths get read in can be looked up by simple name
-    if (isA) {
+    if (isA) { //A run
       startTraj = rc.getTrajectory("SearchAStart");
       blueTraj = rc.getTrajectory("SearchABlue");
       redTraj = rc.getTrajectory("SearchARed");
-    } else {
-      startTraj =  rc.getTrajectory("SearchBStart");
-      blueTraj = rc.getTrajectory("SearchBBlue");
-      redTraj =  rc.getTrajectory("SearchBRed");
-    }
-    /**
-      *   Follow starting trajectory and then see if we found a PC.
-      *   Use a conditional Command to then execute either Red or Blue paths
-      *   based on what we found.
-      */
+
       this.addCommands(
         new InstantCommand( ()->  { magazine.setPC(0); } ),
         new IntakePosition(intake, Direction.Down),
@@ -59,13 +51,31 @@ public class GalacticSearch extends SequentialCommandGroup {
         new followTrajectory(drive, startTraj).andThen(new PrintCommand("GS-Start trajectory done.")), 
         new ConditionalCommand(
             // on true, magEmpty, found nothing do blue
-            new PrintCommand("GS-Blue Trajectory").andThen(new followTrajectory(drive, blueTraj)),  
+            new PrintCommand("GS-Blue Trajectory").andThen(new InstantCommand(intake::setGalacticPathIsBlue)).andThen(new followTrajectory(drive, blueTraj)),  
             // on False, found something do read
-            new PrintCommand("GS-found PC,Red Trajectory").andThen(new followTrajectory(drive, redTraj)),   
+            new PrintCommand("GS-found PC,Red Trajectory").andThen(new InstantCommand(intake::setGalacticPathIsRed)).andThen(new followTrajectory(drive, redTraj)),   
             magazine::isMagEmpty),         // conditional
         new IntakePower(intake, Power.Off, 0.0)
         
       );
 
+    } else { //B Run
+      if(intake.getGalacticPathIsRed()){ //A run was red
+        BTraj =  rc.getTrajectory("SearchBRed");
+      }
+      else { //A run was blue
+        BTraj = rc.getTrajectory("SearchBBlue");
+      }
+
+      this.addCommands(
+        new InstantCommand( ()->  { magazine.setPC(0); } ),
+        new IntakePosition(intake, Direction.Down),
+        new IntakePower(intake, Power.On, 0.5), //No need to wait for intake before moving
+        new followTrajectory(drive, BTraj),
+        new IntakePower(intake, Power.Off, 0.0)
+   
+      );
+      
+    }
   }
 }

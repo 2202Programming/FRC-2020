@@ -70,6 +70,7 @@ public class Intake_Subsystem extends MonitoredSubsystemBase implements Logger {
   private NetworkTableEntry nt_upperRPM;
   private NetworkTableEntry nt_lowerRPM;
   private NetworkTableEntry nt_autoShooterMode;
+  private NetworkTableEntry nt_galacticPath;
 
   // Intake
   final Spark intake_spark = new Spark(PWM.INTAKE);
@@ -212,7 +213,8 @@ public class Intake_Subsystem extends MonitoredSubsystemBase implements Logger {
     nt_upperRPM = table.getEntry("UpperRPM/value");
     nt_lowerRPM = table.getEntry("LowerRPM/value");
     nt_autoShooterMode = table.getEntry("ShootingAutoMode");
-   
+    nt_galacticPath = table.getEntry("GalacticPathIsRed");
+    table.getEntry("GalacticPathIsRed").setPersistent();
 
     // build out matrix to calculate FW RPM from [omega , Vel] for power cell
     VelToRPM.set(0, 0, Shooter.PCEffectiveRadius / Shooter.lowerFWConfig.flywheelRadius);
@@ -232,6 +234,18 @@ public class Intake_Subsystem extends MonitoredSubsystemBase implements Logger {
 
     // monitor if the  shooter rpm and angle is ready to shoot
     isAtGoal();
+  }
+
+  public void setGalacticPathIsRed(){
+    nt_galacticPath.setBoolean(true);
+  }
+
+  public void setGalacticPathIsBlue(){
+    nt_galacticPath.setBoolean(false);
+  }
+
+  public boolean getGalacticPathIsRed(){
+    return nt_galacticPath.getBoolean(false);
   }
 
   public void raiseIntake() {

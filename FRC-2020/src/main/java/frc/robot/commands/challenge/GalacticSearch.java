@@ -39,6 +39,7 @@ public class GalacticSearch extends SequentialCommandGroup {
    
     // paths get read in can be looked up by simple name
     if (isA) { //A run
+      System.out.println("***Running A path ***");
       startTraj = rc.getTrajectory("SearchAStart");
       blueTraj = rc.getTrajectory("SearchABlue");
       redTraj = rc.getTrajectory("SearchARed");
@@ -47,7 +48,7 @@ public class GalacticSearch extends SequentialCommandGroup {
         new InstantCommand( ()->  { magazine.setPC(0); } ),
         new IntakePosition(intake, Direction.Down),
         new IntakePower(intake, Power.On, 0.5), 
-        new WaitCommand(0.75),
+        new WaitCommand(0.25),
         new followTrajectory(drive, startTraj).andThen(new PrintCommand("GS-Start trajectory done.")), 
         new ConditionalCommand(
             // on true, magEmpty, found nothing do blue
@@ -60,18 +61,17 @@ public class GalacticSearch extends SequentialCommandGroup {
       );
 
     } else { //B Run
-      if(intake.getGalacticPathIsRed()){ //A run was red
-        BTraj =  rc.getTrajectory("SearchBRed");
-      }
-      else { //A run was blue
-        BTraj = rc.getTrajectory("SearchBBlue");
-      }
+      System.out.println("*** Running B path ***");
+
 
       this.addCommands(
         new InstantCommand( ()->  { magazine.setPC(0); } ),
         new IntakePosition(intake, Direction.Down),
         new IntakePower(intake, Power.On, 0.5), //No need to wait for intake before moving
-        new followTrajectory(drive, BTraj),
+        new ConditionalCommand(
+            new WaitCommand(0.25).andThen(new followTrajectory(drive, rc.getTrajectory("SearchBRed"))), 
+            new followTrajectory(drive, rc.getTrajectory("SearchBBlue")), 
+            intake::getGalacticPathIsRed),
         new IntakePower(intake, Power.Off, 0.0)
    
       );

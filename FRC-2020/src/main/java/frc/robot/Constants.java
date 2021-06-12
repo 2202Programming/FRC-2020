@@ -39,6 +39,9 @@ public final class Constants {
         public static final int PCM1 = 1; // default ID for PCM
         public static final int PCM2 = 2;
 
+        // Climber Talon  
+        public static final int CLIMBER_TALON = 15; //tbd
+
         //Shooter
         public static final int SHOOTER_UPPER_TALON = 18; 
         public static final int SHOOTER_LOWER_TALON = 19;
@@ -84,6 +87,10 @@ public final class Constants {
     public static final class PCM2 {
       public static final int MAG_LOCK = 0;
       public static final int MAG_UNLOCK = 1;
+
+      public static final int CLIMBER_EXTEND = 2;  //tbd
+      public static final int CLIMBER_RETRACT = 3; //tbd
+
     }
 
     // Intake

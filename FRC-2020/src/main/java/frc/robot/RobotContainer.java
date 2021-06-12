@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.InterstellarSettings;
+import frc.robot.commands.Climb;
 import frc.robot.commands.auto.auto_drivePath_cmd;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
@@ -42,6 +43,7 @@ import frc.robot.commands.intake.Shoot;
 import frc.robot.commands.test.path.CreateCircle;
 import frc.robot.commands.test.subsystem.MonitorDrivetrain;
 import frc.robot.commands.test.subsystem.VelocityStepTest;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.GearShifter;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Lidar_Subsystem;
@@ -89,6 +91,7 @@ public class RobotContainer {
   public final Log_Subsystem logSubsystem;
   public final Dashboard dashboard;
   public final Pdp_subsystem pdp;
+  public final Climber climber;
   public StateMemory state;
   final WebCommands webCommands;
   
@@ -110,6 +113,7 @@ public class RobotContainer {
     logSubsystem = new Log_Subsystem(10); // log every 10 frames - 200mS
     lidar = new Lidar_Subsystem(); 
     pdp = new Pdp_subsystem();
+    climber = new Climber();
     state = new StateMemory(driveTrain, intake);
 
     //setup the dashboard programatically, creates any choosers, screens
@@ -121,7 +125,7 @@ public class RobotContainer {
 
     //panel = new Control_Panel();
     //detector = new Color_Subsystem();
-    //climber = new ClimberSubsystem();
+    
     //cameraSubsystem = new CameraSubsystem();
 
     // default commands
@@ -136,8 +140,6 @@ public class RobotContainer {
     deviceMap.put("driveTrain", driveTrain);
     deviceMap.put("intake", intake);
     deviceMap.put("limelight", limelight);
-
-
 
     // Configure the button bindings
     configureButtonBindings(driverControls);
@@ -180,6 +182,14 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));
     dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState).withName("Save State"));
 
+    // Climber Commands
+    dc.bind(Id.Driver, XboxPOV.POV_RIGHT).whenPressed(
+      new InstantCommand(climber::extendArm).withName("ClimberExtendArm"));
+    dc.bind(Id.Driver, XboxPOV.POV_LEFT).whenPressed(
+      new InstantCommand(climber::retractArm).withName("ClimberRetractArm"));
+    dc.bind(Id.Driver, XboxButton.X).whileHeld(new Climb(Climb.Direction.UP));
+    dc.bind(Id.Driver, XboxButton.Y).whileHeld(new Climb(Climb.Direction.DOWN));
+    
     //toggle auto shooting mode
     dc.bind(Id.Driver, XboxButton.R3).whenPressed(new InstantCommand(intake::toggleAutoShootingMode).withName("AS-Mode-WIP") );
     

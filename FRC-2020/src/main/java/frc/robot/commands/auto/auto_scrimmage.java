@@ -35,9 +35,11 @@ public class auto_scrimmage extends SequentialCommandGroup {
     delayCode = (dc.getInitialButtons(Id.SwitchBoard) & 0x03);
 
     delay = startDelay[delayCode];
-    SmartDashboard.putNumber("Auto: Delay (secs)", delay + 3); // add 3 b/c the driveoffline takes 3 secs
+    SmartDashboard.putNumber("Auto: Delay (secs)", delay);
 
-    // Switch 5 Auto Mode - false  is simple shoot from starting position.  True assumes touching init line; shoots after delay then moves to trench to get more cells
+    // Switch 5 Auto Mode
+    // False  is simple shoot - delay, then shoot from starting position, then drive forward 1/2 a foot. 
+    // True assumes back bumper touching init line in line with port; shoots after delay then moves to trench to get more cells and then shoots again
     autoMode = ((dc.getInitialButtons(Id.SwitchBoard) & 0x10) >> 4 == 1) ? true : false;
     SmartDashboard.putBoolean("Auto: Mode", autoMode);
 

@@ -23,7 +23,7 @@ public class auto_scrimmage extends SequentialCommandGroup {
 
   // startup delay
   double[] startDelay = { 0.0, Constants.DELAY_A, Constants.DELAY_B, Constants.DELAY_C };
-  public static double MAG_ANGLE_1 = 20;
+  public static double MAG_ANGLE_1 = 37.25;
   public static double MAG_ANGLE_2 = 15;
 
   public auto_scrimmage(DriverControls dc, VelocityDifferentialDrive_Subsystem drive, Intake_Subsystem intake,
@@ -63,7 +63,7 @@ public class auto_scrimmage extends SequentialCommandGroup {
         new Shoot(), //assuming a straight shot in initial position
         new IntakePower(intake, Power.Toggle, 0.5), 
         new InstantCommand(limelight::enableLED),
-        new followTrajectory(drive, dashboard.getTrajectory("GoToTrenchFromCenter")), //go to trench, get 3 powercells
+        new followTrajectory(drive, dashboard.getTrajectory("paths/GoToTrenchFromCenter")), //go to trench, get 3 powercells
         new MagazineAngle(intake, MAG_ANGLE_2 /* magazine angle in degrees */),
         new auto_limelightTurnToShoot_cmd(drive, limelight, 1 /* speed */), 
         new Shoot(),

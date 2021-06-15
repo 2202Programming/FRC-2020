@@ -22,6 +22,7 @@ import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.InterstellarSettings;
 import frc.robot.commands.Climb;
 import frc.robot.commands.auto.auto_drivePath_cmd;
+import frc.robot.commands.auto.auto_scrimmage;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.challenge.Bounce;
@@ -150,6 +151,7 @@ public class RobotContainer {
     dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
     dashboard.addAutoCommand("Bounce", new Bounce());
     dashboard.addAutoCommand("Interstellar", new InterstellarAccuracy(4, 3));
+    dashboard.addAutoCommand("AutoSchrimmage", new auto_scrimmage(driverControls, driveTrain, intake, limelight, dashboard));
     
     //test commands
     CreateCircle circle = new CreateCircle(3, 2, -360);

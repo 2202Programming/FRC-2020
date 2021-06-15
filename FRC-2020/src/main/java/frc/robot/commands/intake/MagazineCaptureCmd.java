@@ -51,6 +51,7 @@ public class MagazineCaptureCmd extends CommandBase {
     if (mag.isMagFull()) {
       state = State.MagFull;
     }
+    System.out.println("***Magazine Auto-Capture Initialized");
   }
 
   // Called every time the scheduler runs while the command is scheduled.

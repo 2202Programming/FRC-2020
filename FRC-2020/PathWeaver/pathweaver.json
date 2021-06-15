@@ -3,7 +3,7 @@
   "exportUnit": "Same as Project",
   "maxVelocity": 7.5,
   "maxAcceleration": 3.0,
-  "wheelBase": 2.224,
-  "gameName": "Galactic Search B",
+  "trackWidth": 2.224,
+  "gameName": "Infinite Recharge",
   "outputDir": ""
 }

@@ -93,6 +93,7 @@ public class AutoPaths {
   void buildEntry(Path file) {
     Path fn = file.getName(file.getNameCount()-1);
     String key = fn.toString().split("\\.")[0]; 
+    System.out.println("**Key:" + key);
     Trajectory traj = loadTrajectory(fn.toString());
     pathChooser.addOption(key, traj);
     

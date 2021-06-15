@@ -157,8 +157,8 @@ public class Shoot extends CommandBase {
   @Override
   public boolean isFinished() {
     // done when nothing else to shoot
-    //return (magazine.getPC() == 0);
-    return false;
+    return (magazine.getPC() == 0);
+    //return false;
   }
 
 }

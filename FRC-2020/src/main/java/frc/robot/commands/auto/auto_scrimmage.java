@@ -10,6 +10,7 @@ import frc.robot.commands.intake.IntakePosition;
 import frc.robot.commands.intake.IntakePower;
 import frc.robot.commands.intake.IntakePower.Power;
 import frc.robot.commands.intake.MagazineAngle;
+import frc.robot.commands.intake.SetPowerCellCount;
 import frc.robot.commands.intake.Shoot;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
@@ -45,6 +46,7 @@ public class auto_scrimmage extends SequentialCommandGroup {
 
     if(autoMode) {
       addCommands(
+        new SetPowerCellCount(3), //assume we are starting with 3 in magazine
         new IntakePosition(intake, IntakePosition.Direction.Down), 
         new MagazineAngle(intake, MAG_ANGLE_1 /* magazine angle in degrees */), 
         new WaitCommand(delay), //delay to make sure we don't interact with alliance during shooting high goal
@@ -54,6 +56,7 @@ public class auto_scrimmage extends SequentialCommandGroup {
     } 
     else {
       addCommands(
+        new SetPowerCellCount(3), //assume we are starting with 3 in magazine
         new IntakePosition(intake, IntakePosition.Direction.Down), 
         new MagazineAngle(intake, MAG_ANGLE_1 /* magazine angle in degrees */),
         new WaitCommand(delay), //delay to make sure we don't interact with alliance during shooting high goal

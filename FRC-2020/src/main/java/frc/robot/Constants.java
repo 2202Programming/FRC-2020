@@ -40,7 +40,7 @@ public final class Constants {
         public static final int PCM2 = 2;
 
         // Climber Talon  
-        public static final int CLIMBER_TALON = 15; //tbd
+        public static final int CLIMBER_TALON = 14; 
 
         //Shooter
         public static final int SHOOTER_UPPER_TALON = 18; 
@@ -83,14 +83,15 @@ public final class Constants {
       public static final int MAGAZINE_ANGLE = 0;
     }
 
-    //Pnumatics control 2 -
+    //Pnumatics control 1 
+    public static final class PCM1 {
+        public static final int CLIMBER_EXTEND = 3;
+    }
+
+    //Pnumatics control 2 
     public static final class PCM2 {
       public static final int MAG_LOCK = 0;
       public static final int MAG_UNLOCK = 1;
-
-      public static final int CLIMBER_EXTEND = 2;  //tbd
-      public static final int CLIMBER_RETRACT = 3; //tbd
-
     }
 
     // Intake
@@ -104,7 +105,7 @@ public final class Constants {
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
 
 
-    // Control Panel Manipulator
+    // Control Panel Manipulator (unused)
     public static final int PANEL_LIMIT_SWITCH_CH = 0;
     public static final int PANEL_ROTATION_CANID = 12;// placeholderA
     public static final int PCM_ID = 1;

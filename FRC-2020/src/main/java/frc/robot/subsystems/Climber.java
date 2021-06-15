@@ -8,45 +8,53 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.Solenoid;
 import frc.robot.Constants.CAN;
-import frc.robot.Constants.PCM2;
+import frc.robot.Constants.PCM1;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.subsystems.util.MonitoredSubsystemBase;
 
 public class Climber extends  MonitoredSubsystemBase implements Logger {
 
   final double CLIMB_SPEED = .60;
+  final boolean EXTEND = true;
  
+ 
+  final WPI_TalonSRX motor = new WPI_TalonSRX(CAN.CLIMBER_TALON);  
   final TalonSRXConfiguration srxconfig = new TalonSRXConfiguration();
-  final WPI_TalonSRX motor = new WPI_TalonSRX(CAN.CLIMBER_TALON);     //this could be a generic motor controller...
-  final DoubleSolenoid solenoid = new DoubleSolenoid(CAN.PCM2, PCM2.CLIMBER_EXTEND, PCM2.CLIMBER_RETRACT);
+  final Solenoid solenoid = new Solenoid(CAN.PCM1, PCM1.CLIMBER_EXTEND);
   
   public Climber() {
-    retractArm();
+
+    // add some current limts to try to protext motor
+    motor.configFactoryDefault();
+    motor.configContinuousCurrentLimit(25); //amps (max is around 30 amps @ 12V)
+    motor.configPeakCurrentLimit(100);      //amps (130 is stated stall of redline on Andy Mark)
+    motor.configPeakCurrentDuration(200);   //mS   (wild guess)
+  
+
+    solenoid.clearAllPCMStickyFaults();
+    solenoid.set(!EXTEND);
     off();
   }
 
   @Override
-  public void monitored_periodic() {
-
-  }
+  public void monitored_periodic() {  }
 
   @Override
-  public void log() { 
-  }
+  public void log() {   }
 
   //Subsystem API 
   public void extendArm() {
-    solenoid.set(Value.kForward);
+    solenoid.set(EXTEND);
   }
 
   public void retractArm() {
-    solenoid.set(Value.kReverse);
+    solenoid.set(!EXTEND);
   }
+
   public boolean isExtended() {
-    return (solenoid.get() == Value.kForward);
+    return (solenoid.get() == EXTEND);
   }
 
   public void off() {

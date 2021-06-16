@@ -12,6 +12,7 @@ import frc.robot.commands.intake.IntakePower.Power;
 import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.SetPowerCellCount;
 import frc.robot.commands.intake.Shoot;
+import frc.robot.commands.intake.ShootWithCheck;
 import frc.robot.commands.intake.ShooterWarmUp;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Limelight_Subsystem;
@@ -24,8 +25,8 @@ public class auto_scrimmage extends SequentialCommandGroup {
 
   // startup delay
   double[] startDelay = { 0.0, Constants.DELAY_A, Constants.DELAY_B, Constants.DELAY_C };
-  public static double MAG_ANGLE_1 = 37.25;
-  public static double MAG_ANGLE_2 = 41.15;
+  public static double MAG_ANGLE_1 = 37.25; //from testing
+  public static double MAG_ANGLE_2 = 41.15; //from testing
 
   public auto_scrimmage(DriverControls dc, VelocityDifferentialDrive_Subsystem drive, Intake_Subsystem intake,
       Limelight_Subsystem limelight, Dashboard dashboard) {
@@ -52,7 +53,7 @@ public class auto_scrimmage extends SequentialCommandGroup {
         new IntakePosition(intake, IntakePosition.Direction.Down), 
         new MagazineAngle(intake, MAG_ANGLE_1 /* magazine angle in degrees */), 
         new WaitCommand(delay), //delay to make sure we don't interact with alliance during shooting high goal
-        new Shoot().withTimeout(7),
+        new ShootWithCheck().withTimeout(7),
         new followTrajectory(drive, dashboard.getTrajectory("DriveOffLine"))  //drive off line half a foot for points
         );
     } 
@@ -63,7 +64,7 @@ public class auto_scrimmage extends SequentialCommandGroup {
         new IntakePosition(intake, IntakePosition.Direction.Down), 
         new MagazineAngle(intake, MAG_ANGLE_1 /* magazine angle in degrees */),
         new WaitCommand(delay), //delay to make sure we don't interact with alliance during shooting high goal
-        new Shoot().withTimeout(5), //assuming a straight shot in initial position
+        new ShootWithCheck().withTimeout(5), //assuming a straight shot in initial position
         new ParallelCommandGroup(
           new IntakePower(intake, Power.Toggle, 0.5), 
           new InstantCommand(limelight::enableLED),
@@ -71,7 +72,7 @@ public class auto_scrimmage extends SequentialCommandGroup {
         ), //go to trench, get 3 powercells
         new MagazineAngle(intake, MAG_ANGLE_2 /* magazine angle in degrees */),
         //new auto_limelightTurnToShoot_cmd(drive, limelight, 1 /* speed */).withTimeout(1), 
-        new Shoot(),
+        new Shoot().withTimeout(5),
         new InstantCommand(limelight::disableLED)
         );
     }

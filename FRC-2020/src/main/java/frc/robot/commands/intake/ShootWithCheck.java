@@ -8,7 +8,7 @@ import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.subsystems.Magazine_Subsystem;
 
-public class Shoot extends CommandBase {
+public class ShootWithCheck extends CommandBase {
   //belt constants
   double SLOW_MAG_REVERSE = -0.8; // motor power
   double FAST_MAG_FORWARD =  1;   // motor power
@@ -40,7 +40,7 @@ public class Shoot extends CommandBase {
    * 
    * @param intake
    */
-  public Shoot() {
+  public ShootWithCheck() {
     this.intake = RobotContainer.getInstance().intake;
     this.magazine = intake.getMagazine();
     this.backupCount = (int) Math.floor(BACKUPSEC / DT); 
@@ -56,7 +56,7 @@ public class Shoot extends CommandBase {
    * @param intake
    * @param cmdData
    */
-  public Shoot(ShooterSettings ss) {
+  public ShootWithCheck(ShooterSettings ss) {
     this();
     this.shooterSettings = ss;
   }
@@ -157,8 +157,8 @@ public class Shoot extends CommandBase {
   @Override
   public boolean isFinished() {
     // done when nothing else to shoot
-    //return (magazine.getPC() == 0);
-    return false;
+    return (magazine.getPC() == 0);
+    //return false;
   }
 
 }

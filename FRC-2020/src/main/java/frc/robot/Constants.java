@@ -86,7 +86,9 @@ public final class Constants {
     //Pnumatics control 1 
     public static final class PCM1 {
         public static final int CLIMBER_EXTEND = 3;
-    }
+        public static final int CLIMBER_RETRACT = 2;
+
+      }
 
     //Pnumatics control 2 
     public static final class PCM2 {

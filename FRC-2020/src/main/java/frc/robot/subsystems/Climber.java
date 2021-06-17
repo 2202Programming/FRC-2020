@@ -8,7 +8,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.PCM1;
 import frc.robot.subsystems.ifx.Logger;
@@ -17,12 +18,13 @@ import frc.robot.subsystems.util.MonitoredSubsystemBase;
 public class Climber extends  MonitoredSubsystemBase implements Logger {
 
   final double CLIMB_SPEED = .60;
-  final boolean EXTEND = true;
- 
+  final DoubleSolenoid.Value EXTEND  = Value.kForward;
+  final DoubleSolenoid.Value RETRACT = Value.kReverse;
+  
  
   final WPI_TalonSRX motor = new WPI_TalonSRX(CAN.CLIMBER_TALON);  
   final TalonSRXConfiguration srxconfig = new TalonSRXConfiguration();
-  final Solenoid solenoid = new Solenoid(CAN.PCM1, PCM1.CLIMBER_EXTEND);
+  final DoubleSolenoid solenoid = new DoubleSolenoid(CAN.PCM1, PCM1.CLIMBER_EXTEND, PCM1.CLIMBER_RETRACT);
   
   public Climber() {
 
@@ -34,7 +36,7 @@ public class Climber extends  MonitoredSubsystemBase implements Logger {
   
 
     solenoid.clearAllPCMStickyFaults();
-    solenoid.set(!EXTEND);
+    solenoid.set(RETRACT);
     off();
   }
 
@@ -50,7 +52,7 @@ public class Climber extends  MonitoredSubsystemBase implements Logger {
   }
 
   public void retractArm() {
-    solenoid.set(!EXTEND);
+    solenoid.set(RETRACT);
   }
 
   public boolean isExtended() {
@@ -62,11 +64,11 @@ public class Climber extends  MonitoredSubsystemBase implements Logger {
   }
 
   public void climbUp() {
-    motor.set(ControlMode.PercentOutput, CLIMB_SPEED);
+    motor.set(ControlMode.PercentOutput, -CLIMB_SPEED);
   }
 
   public void climbDown() {
-    motor.set(ControlMode.PercentOutput, -CLIMB_SPEED);
+    motor.set(ControlMode.PercentOutput, CLIMB_SPEED);
   }
 
 }

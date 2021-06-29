@@ -211,6 +211,7 @@ public class RobotContainer {
     //Magazine Angle - POV hat
     dc.bind(Id.Assistant, XboxPOV.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));
     dc.bind(Id.Assistant, XboxPOV.POV_DOWN).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Down));
+    dc.bind(Id.Assistant, XboxPOV.POV_LEFT).whenPressed(new MagazineAngle(intake, Constants.Intake.MAG_UP_ANGLE)); //go all the way down
 
     //allow a manual lock on the positioner
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   

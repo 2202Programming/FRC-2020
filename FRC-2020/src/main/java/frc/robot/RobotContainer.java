@@ -21,10 +21,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.InterstellarSettings;
 import frc.robot.commands.Climb;
-import frc.robot.commands.auto.auto_drivePath_cmd;
 import frc.robot.commands.auto.auto_scrimmage;
 import frc.robot.commands.auto.followTrajectory;
-import frc.robot.commands.auto.goToPose;
 import frc.robot.commands.challenge.Bounce;
 import frc.robot.commands.challenge.GalacticSearch;
 import frc.robot.commands.challenge.InterstellarAccuracy;
@@ -181,7 +179,7 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.RB).whenPressed(new GearSetCmd(driveTrain, Gear.LOW));
 
     //go from current position to stored position, store current position with POV_DOWN
-    dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));
+    //dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));
     dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState).withName("Save State"));
 
     // Climber Commands
@@ -196,7 +194,7 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.R3).whenPressed(new InstantCommand(intake::toggleAutoShootingMode).withName("AS-Mode-WIP") );
     
     //auto path testing - VELOCITY model
-    dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
+    //dc.bind(Id.Driver, XboxButton.START).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
     dc.bind(Id.Driver, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
 
     // Assistant's buttons
@@ -219,7 +217,7 @@ public class RobotContainer {
     dc.bind(Id.Assistant, XboxButton.R3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::calibrate));   
 
     //auto path testing - VOLTAGE model
-    dc.bind(Id.Assistant, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
+    //dc.bind(Id.Assistant, XboxButton.START).whenPressed(new auto_drivePath_cmd(driveTrain, dashboard.getTrajectoryChooser()));
     dc.bind(Id.Assistant, XboxButton.BACK).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
 
     //quiet simulation mode warnings about no sideboard attached.
@@ -231,7 +229,7 @@ public class RobotContainer {
       dc.bind(Id.SwitchBoard, SBButton.Sw24).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
 
       //auto path testing on sideboard - VELOCITY model
-      dc.bind(Id.SwitchBoard, SBButton.Sw11).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
+      //dc.bind(Id.SwitchBoard, SBButton.Sw11).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));
       dc.bind(Id.SwitchBoard, SBButton.Sw13).whenPressed(new ResetPosition(driveTrain, new Pose2d(2.5, 2.5,new Rotation2d(0.0))));
     }
   }

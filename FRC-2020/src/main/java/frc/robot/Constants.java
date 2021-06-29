@@ -285,7 +285,7 @@ public final class Constants {
      * 
      */
     public static final class ShooterOnCmd {
-        public static final double VEL_TOL = 0.005;  
+        public static final double VEL_TOL = 0.02;  
         public static ShooterSettings dataHigh = new ShooterSettings(37.0, 0, 40.8, VEL_TOL);  //vel, rps, angle, tol
         public static ShooterSettings dataLow  = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
     }

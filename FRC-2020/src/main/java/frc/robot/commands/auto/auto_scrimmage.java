@@ -63,7 +63,7 @@ public class auto_scrimmage extends SequentialCommandGroup {
         new IntakePosition(intake, IntakePosition.Direction.Down), 
         new MagazineAngle(intake, MAG_ANGLE_1 /* magazine angle in degrees */),
         new WaitCommand(delay), //delay to make sure we don't interact with alliance during shooting high goal
-        new ShootWithCheck().withTimeout(5), //assuming a straight shot in initial position
+        new ShootWithCheck().withTimeout(7), //assuming a straight shot in initial position
         new ParallelCommandGroup(
           new IntakePower(intake, Power.Toggle, 0.5), 
           new InstantCommand(limelight::enableLED),

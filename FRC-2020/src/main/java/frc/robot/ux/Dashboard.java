@@ -22,6 +22,8 @@ import frc.robot.RobotContainer;
  */
 public class Dashboard {
 
+  Command m_defaultCommand;
+
   // create pre-defined dashboard tabs to organize for custom layouts
   ShuffleboardTab matchTab = Shuffleboard.getTab("Match");
   ShuffleboardTab driverTab = Shuffleboard.getTab("DriversChoice");
@@ -99,6 +101,9 @@ public class Dashboard {
   public DriverPreferences getDriverPreferences() {return m_drivers;}
   public Trajectory getTrajectory(String trajName) { return m_autopaths.get(trajName); }
   public Command getAutonomousCommand() { return m_autopaths.getAutonomousCommand(); }
+  public Command getDefaultCommand()  {return m_defaultCommand;}
+  public void setDefaultCommand(Command cmd) { m_defaultCommand = cmd; }
+  
 }
 
 

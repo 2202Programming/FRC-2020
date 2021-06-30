@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants.DriverPrefs;
 import frc.robot.Constants.InterstellarSettings;
 import frc.robot.commands.Climb;
+import frc.robot.commands.MatchReadyCmd;
 import frc.robot.commands.auto.auto_scrimmage;
 import frc.robot.commands.auto.followTrajectory;
 import frc.robot.commands.challenge.Bounce;
@@ -145,11 +146,16 @@ public class RobotContainer {
 
     // Setup AutoCommands
     //dashboard.addAutoCommand("match", new auto_cmd_group(driverControls, driveTrain, intake, limelight, lidar));
+    Command autoScrim = new auto_scrimmage(driverControls, driveTrain, intake, limelight, dashboard);
+    dashboard.addAutoCommand("AutoSchrimmage", autoScrim);
     dashboard.addAutoCommand("GalaticSearch A", new GalacticSearch(driveTrain, true));
     dashboard.addAutoCommand("GalaticSearch B", new GalacticSearch(driveTrain, false));
     dashboard.addAutoCommand("Bounce", new Bounce());
     dashboard.addAutoCommand("Interstellar", new InterstellarAccuracy(4, 3));
-    dashboard.addAutoCommand("AutoSchrimmage", new auto_scrimmage(driverControls, driveTrain, intake, limelight, dashboard));
+
+    //may override web selection - not tested
+    dashboard.setDefaultCommand(autoScrim);
+    
     
     //test commands
     CreateCircle circle = new CreateCircle(3, 2, -360);
@@ -179,8 +185,8 @@ public class RobotContainer {
     dc.bind(Id.Driver, XboxButton.RB).whenPressed(new GearSetCmd(driveTrain, Gear.LOW));
 
     //go from current position to stored position, store current position with POV_DOWN
-    //dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(new goToPose(driveTrain, state));
-    dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new InstantCommand(state::saveRobotState).withName("Save State"));
+    //dc.bind(Id.Driver, XboxPOV.POV_UP).whenPressed(UNUSED);
+    dc.bind(Id.Driver, XboxPOV.POV_DOWN).whenPressed(new MatchReadyCmd());
 
     // Climber Commands
     dc.bind(Id.Driver, XboxPOV.POV_RIGHT).whenPressed(
@@ -211,7 +217,7 @@ public class RobotContainer {
     //Magazine Angle - POV hat
     dc.bind(Id.Assistant, XboxPOV.POV_UP).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Up));
     dc.bind(Id.Assistant, XboxPOV.POV_DOWN).whileHeld(new MagazineAngle(intake, MagazineAngle.Direction.Down));
-    dc.bind(Id.Assistant, XboxPOV.POV_LEFT).whenPressed(new MagazineAngle(intake, Constants.Intake.MAG_UP_ANGLE)); //go all the way down
+    dc.bind(Id.Assistant, XboxPOV.POV_LEFT).whenPressed(new MagazineAngle(intake, Magazine_Subsystem.MIN_SOFT_STOP)); //go all the way down
 
     //allow a manual lock on the positioner
     dc.bind(Id.Assistant, XboxButton.L3).whenPressed(new InstantCommand( intake.getMagazine().getMagPositioner()::lock));   
@@ -262,7 +268,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-      return dashboard.getAutonomousCommand();
+      //  web select ==>return dashboard.getAutonomousCommand();
+      /* hard coded */  return dashboard.getDefaultCommand();
    }
 
   /**

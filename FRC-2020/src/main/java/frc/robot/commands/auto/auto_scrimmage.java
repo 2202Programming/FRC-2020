@@ -11,7 +11,6 @@ import frc.robot.commands.intake.IntakePower;
 import frc.robot.commands.intake.IntakePower.Power;
 import frc.robot.commands.intake.MagazineAngle;
 import frc.robot.commands.intake.SetPowerCellCount;
-import frc.robot.commands.intake.Shoot;
 import frc.robot.commands.intake.ShootWithCheck;
 import frc.robot.commands.intake.ShooterWarmUp;
 import frc.robot.subsystems.Intake_Subsystem;
@@ -72,7 +71,7 @@ public class auto_scrimmage extends SequentialCommandGroup {
         ), //go to trench, get 3 powercells
         new MagazineAngle(intake, MAG_ANGLE_2 /* magazine angle in degrees */),
         //new auto_limelightTurnToShoot_cmd(drive, limelight, 1 /* speed */).withTimeout(1), 
-        new Shoot().withTimeout(5),
+        //new Shoot().withTimeout(5),
         new InstantCommand(limelight::disableLED)
         );
     }

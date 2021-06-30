@@ -115,9 +115,9 @@ public final class Constants {
     public static final int PANEL_PISTON_REVERSE_PCM = 3;
 
     // Auto Delays - values to be adjusted later with testing
-    public static final double DELAY_A = 0.0;
-    public static final double DELAY_B = 2.0;
-    public static final double DELAY_C = 4.0;
+    public static final double DELAY_A = 1.0; //sideboard button 1 on
+    public static final double DELAY_B = 2.0; //sideboard button 2 on
+    public static final double DELAY_C = 4.0; //sideboard button 1 and 2 on
 
     // angle based on starting position
     public static final double ANGLE_A = 0;
@@ -285,14 +285,14 @@ public final class Constants {
      * 
      */
     public static final class ShooterOnCmd {
-        public static final double VEL_TOL = 0.02;  
+        public static final double VEL_TOL = 0.1;  
         public static ShooterSettings dataHigh = new ShooterSettings(37.0, 0, 40.8, VEL_TOL);  //vel, rps, angle, tol
         public static ShooterSettings dataLow  = new ShooterSettings(37.0, 0, 35.0, VEL_TOL);  //vel, rps, angle
     }
 
     // IA ShooterSettings
     public static final class InterstellarSettings {
-      public static final double VEL_TOL = 0.0025; 
+      public static final double VEL_TOL = 0.05; 
 
       // 2d target
      // public static ShooterSettings ssZone1 = new ShooterSettings(32.0, 5, 53.5, VEL_TOL);  //vel, rps, angle, tol

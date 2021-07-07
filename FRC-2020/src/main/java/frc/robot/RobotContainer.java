@@ -234,6 +234,7 @@ public class RobotContainer {
       dc.bind(Id.SwitchBoard, SBButton.Sw22).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone2));
       dc.bind(Id.SwitchBoard, SBButton.Sw23).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone3));
       dc.bind(Id.SwitchBoard, SBButton.Sw24).whenPressed(new MagazineAngle(intake, InterstellarSettings.ssZone4));
+      dc.bind(Id.SwitchBoard, SBButton.Sw25).whenPressed(new MagazineAngle(intake, Magazine_Subsystem.MIN_SOFT_STOP));
 
       //auto path testing on sideboard - VELOCITY model
       //dc.bind(Id.SwitchBoard, SBButton.Sw11).whenPressed(new followTrajectory(driveTrain, dashboard.getTrajectoryChooser()));

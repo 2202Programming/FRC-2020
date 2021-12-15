@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.wpiutil.math.MathUtil.clamp;
+import static edu.wpi.first.math.MathUtil.clamp;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
@@ -24,9 +24,9 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.util.sendable.SendableRegistry;
 import frc.robot.Constants.AnalogIn;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DigitalIO;

@@ -3,7 +3,7 @@ package frc.robot.util.misc;
 import java.util.function.DoubleSupplier;
 
 
-import edu.wpi.first.wpiutil.math.MathUtil;
+import edu.wpi.first.math.MathUtil;
 
 /**
  * LimitedIntegrator integrates input subject to rate limits

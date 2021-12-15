@@ -2,7 +2,7 @@ package frc.robot.subsystems.hid;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpiutil.math.MathUtil;
+import edu.wpi.first.math.MathUtil;
 
 public class ExpoShaper {
     // expo only works on normalize inputs

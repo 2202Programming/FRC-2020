@@ -7,7 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import frc.robot.Constants.CAN;
 import frc.robot.subsystems.ifx.Logger;
 import frc.robot.subsystems.util.MonitoredSubsystemBase;

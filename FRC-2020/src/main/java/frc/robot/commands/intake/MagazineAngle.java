@@ -9,7 +9,7 @@ import static frc.robot.subsystems.Magazine_Subsystem.MAX_SOFT_STOP;
 import static frc.robot.subsystems.Magazine_Subsystem.MIN_SOFT_STOP;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpiutil.math.MathUtil;
+import edu.wpi.first.math.MathUtil;
 import frc.robot.subsystems.Intake_Subsystem;
 import frc.robot.subsystems.Intake_Subsystem.ShooterSettings;
 import frc.robot.subsystems.Magazine_Subsystem.MagazinePositioner;

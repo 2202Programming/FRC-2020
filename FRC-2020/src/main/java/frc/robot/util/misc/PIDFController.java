@@ -5,8 +5,8 @@ import static frc.robot.Constants.DT;
 import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.revrobotics.CANPIDController;
 
-import edu.wpi.first.wpilibj.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.util.sendable.SendableBuilder;
 
 /**
  * PIDFController - extends current (2020) pidcontroller to include a feed

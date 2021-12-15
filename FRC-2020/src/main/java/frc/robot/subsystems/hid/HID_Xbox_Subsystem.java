@@ -94,18 +94,18 @@ public class HID_Xbox_Subsystem extends MonitoredSubsystemBase implements Driver
      */
     // Driver inputs for acade style in normalized units,
     // left Y-stick throttle (forward negative) right X-stick turn rate
-    velShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kLeft));
-    rotShaper = new ExpoShaper(rotExpo, () -> driver.getX(Hand.kRight)); 
+    velShaper = new ExpoShaper(velExpo, () -> driver.getLeftY());
+    rotShaper = new ExpoShaper(rotExpo, () -> driver.getRightX()); 
 
     // Tank drive Left/Right Y-axis used, forward stick is negative 
-    velLeftShaper = new ExpoShaper(velExpo,  () -> driver.getY(Hand.kLeft));
-    velRightShaper = new ExpoShaper(velExpo, () -> driver.getY(Hand.kRight));
+    velLeftShaper = new ExpoShaper(velExpo,  () -> driver.getLeftY());
+    velRightShaper = new ExpoShaper(velExpo, () -> driver.getRightY());
 
     // XYRot or Swerve Drive
     // Rotation on Left-X axis,  X-Y throttle on Right
-    velXShaper = new ExpoShaper(velExpo,  () -> driver.getX(Hand.kRight));   
-    velYShaper = new ExpoShaper(velExpo,  () -> driver.getY(Hand.kRight));
-    swRotShaper = new ExpoShaper(rotExpo, () -> driver.getX(Hand.kLeft));  
+    velXShaper = new ExpoShaper(velExpo,  () -> driver.getRightX());   
+    velYShaper = new ExpoShaper(velExpo,  () -> driver.getRightY());
+    swRotShaper = new ExpoShaper(rotExpo, () -> driver.getLeftX());  
 
     // add some deadzone in normalized coordinates
     rotShaper.setDeadzone(deadzone);

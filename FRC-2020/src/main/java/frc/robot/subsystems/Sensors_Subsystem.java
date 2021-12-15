@@ -18,7 +18,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import frc.robot.sim.AHRS_GyroSim;
 import frc.robot.subsystems.ifx.Logger;
@@ -259,7 +259,7 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
   }
 
 /**
-   * Return the heading of the robot as a {@link edu.wpi.first.wpilibj.geometry.Rotation2d}.
+   * Return the heading of the robot as a {@link edu.wpi.first.math.geometry.Rotation2d}.
    *
    * <p>The angle is continuous, that is it will continue from 360 to 361 degrees. This allows
    * algorithms that wouldn't want to see a discontinuity in the gyro output as it sweeps past from
@@ -271,7 +271,7 @@ public class Sensors_Subsystem extends MonitoredSubsystemBase implements Gyro, L
    * <p>This heading is based on integration of the returned rate from the gyro.
    *
    * @return the current heading of the robot as a {@link
-   *     edu.wpi.first.wpilibj.geometry.Rotation2d}.
+   *     edu.wpi.first.math.geometry.Rotation2d}.
    */
   @Override
   public Rotation2d getRotation2d() {

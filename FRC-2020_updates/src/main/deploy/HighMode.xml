@@ -1,0 +1,28 @@
+<SequenceGrp>
+    <Command name="frc.robot.commands.auto.DriveOffLine" withTimeout="2.7">
+        <Arg robotDevice="driveTrain" />
+        <Arg type="double" value=".8" />
+    </Command>
+    <Command name="frc.robot.commands.intake.ToggleIntakeRaised">
+        <Arg robotDevice="intake" />
+    </Command>
+    <Command name="edu.wpi.first.wpilibj2.command.WaitCommand">
+        <Arg type="double" value=".7" />
+    </Command>
+    <Command name="frc.robot.commands.intake.MagazineToggleCmd">
+        <Arg robotDevice="intake" />
+    </Command>
+    <Command name="edu.wpi.first.wpilibj2.command.WaitCommand">
+        <Arg type="double" value="1.2" />
+    </Command>
+    <Command name="frc.robot.commands.intake.ShooterOn" withTimeout="3">
+        <Arg robotDevice="intake" />
+        <Arg type="Data" value="frc.robot.Constants.ShooterOnCmd.data" />
+    </Command>
+    <Command name="frc.robot.commands.intake.MagazineToggleCmd">
+        <Arg robotDevice="intake" />
+    </Command>
+    <Command name="frc.robot.commands.intake.ToggleIntakeRaised">
+        <Arg robotDevice="intake" />
+    </Command>
+</SequenceGrp>

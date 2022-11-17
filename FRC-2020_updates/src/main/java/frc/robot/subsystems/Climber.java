@@ -10,7 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
-import edu.wpi.first.wpilibj.PneumaticsControlModule;
+//import edu.wpi.first.wpilibj.PneumaticsControlModule;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.PCM1;
@@ -39,7 +39,7 @@ public class Climber extends  MonitoredSubsystemBase implements Logger {
     motor.configPeakCurrentDuration(200);   //mS   (wild guess)
   
 
-    // solenoid.clearAllPCMStickyFaults(); TODO: is below the right fix?
+    
     solenoidHubExtend.clearStickyFaults();
     solenoidHubRetract.clearStickyFaults();
     solenoid.set(RETRACT);

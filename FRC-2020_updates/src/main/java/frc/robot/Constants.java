@@ -37,8 +37,8 @@ public final class Constants {
     public static final class CAN {
         // CAN ID for non-motor devices
         public static final int PDP = 0; // this must be 0
-        public static final PneumaticsModuleType PCM1 = PneumaticsModuleType.REVPH; // TODO: REV? default ID for PCM
-        public static final PneumaticsModuleType PCM2 = PneumaticsModuleType.REVPH; // TODO: Right type? Or REV?
+        public static final PneumaticsModuleType PCM1 = PneumaticsModuleType.REVPH; 
+        public static final PneumaticsModuleType PCM2 = PneumaticsModuleType.REVPH; 
 
         // Climber Talon  
         public static final int CLIMBER_TALON = 14; 

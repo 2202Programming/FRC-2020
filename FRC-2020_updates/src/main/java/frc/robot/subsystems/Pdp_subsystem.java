@@ -21,7 +21,7 @@ public class Pdp_subsystem extends MonitoredSubsystemBase implements Logger {
   private NetworkTableEntry nt_voltage;
 
   public Pdp_subsystem() {
-    pdp = new PowerDistribution(CAN.PDP, ModuleType.kCTRE); // TODO: CTRE or REV? Is this even the right class?
+    pdp = new PowerDistribution(CAN.PDP, ModuleType.kCTRE);
     table = NetworkTableInstance.getDefault().getTable("PDP");
     nt_voltage = table.getEntry("Voltage/value");
 

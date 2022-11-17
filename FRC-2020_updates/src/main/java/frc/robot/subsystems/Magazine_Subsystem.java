@@ -6,14 +6,14 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.math.MathUtil.clamp;
 
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANPIDController.ArbFFUnits;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.ControlType;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -143,8 +143,8 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
 
     // postion control devices
     final CANSparkMax angleMotor = new CANSparkMax(CAN.MAG_SMAX, MotorType.kBrushless);
-    final CANEncoder angleEncoder = angleMotor.getEncoder();
-    final CANPIDController anglePID = angleMotor.getPIDController();
+    final RelativeEncoder angleEncoder = angleMotor.getEncoder();
+    final SparkMaxPIDController anglePID = angleMotor.getPIDController();
     final AnalogInput anglePot = new AnalogInput(AnalogIn.MAGAZINE_ANGLE);
     final DoubleSolenoid solenoid = new DoubleSolenoid(CAN.PCM2, PCM2.MAG_LOCK, PCM2.MAG_UNLOCK);
 

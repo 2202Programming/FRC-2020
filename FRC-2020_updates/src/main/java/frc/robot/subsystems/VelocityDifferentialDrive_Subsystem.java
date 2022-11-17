@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANPIDController.ArbFFUnits;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
-import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.ControlType;
 
 import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTable;
@@ -128,10 +128,10 @@ public class VelocityDifferentialDrive_Subsystem extends MonitoredSubsystemBase
   // split left/right sides controller/encoder/pid
   final CANSparkMax leftController = backLeft;
   final CANSparkMax rightController = backRight;
-  final CANEncoder leftEncoder = leftController.getEncoder();
-  final CANEncoder rightEncoder = rightController.getEncoder();
-  final CANPIDController leftPID = leftController.getPIDController();
-  final CANPIDController rightPID = rightController.getPIDController();
+  final RelativeEncoder leftEncoder = leftController.getEncoder();
+  final RelativeEncoder rightEncoder = rightController.getEncoder();
+  final SparkMaxPIDController leftPID = leftController.getPIDController();
+  final SparkMaxPIDController rightPID = rightController.getPIDController();
 
   final Encoder leftChassisEncoder = new Encoder(DigitalIO.LEFT_CHASSIS_ENCODER_A, 
                                                  DigitalIO.LEFT_CHASSIS_ENCODER_B, kInvertChassisLeft);

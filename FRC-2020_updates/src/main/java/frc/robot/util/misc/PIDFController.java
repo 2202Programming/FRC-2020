@@ -3,7 +3,7 @@ package frc.robot.util.misc;
 import static frc.robot.Constants.DT;
 
 import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
-import com.revrobotics.CANPIDController;
+import com.revrobotics.SparkMaxPIDController;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -91,7 +91,7 @@ public class PIDFController extends PIDController {
      * @param slot  control slot on device
      */
 
-    public void copyTo(CANPIDController dest, int slot) {
+    public void copyTo(SparkMaxPIDController dest, int slot) {
       dest.setP(this.getP(), slot);
       dest.setI(this.getI(), slot);
       dest.setD(this.getD(), slot);

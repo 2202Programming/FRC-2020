@@ -7,7 +7,6 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Constants.INTAKE_DOWN_SOLENOID_PCM;
-import static frc.robot.Constants.INTAKE_PCM_CAN_ID;
 import static frc.robot.Constants.INTAKE_UP_SOLENOID_PCM;
 
 import com.ctre.phoenix.ErrorCode;

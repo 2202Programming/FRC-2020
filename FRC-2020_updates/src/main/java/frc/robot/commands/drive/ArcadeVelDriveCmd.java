@@ -69,7 +69,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
 
   void countTimeInShiftZone() {
     // use ABS of velocity
-    @SuppressWarnings("unused")
+   // @SuppressWarnings("unused")
     double cmd = Math.abs(velCmd);
     double vel = Math.abs(velAvg);
 
@@ -97,7 +97,7 @@ public class ArcadeVelDriveCmd extends CommandBase {
 
   }
 
-  @SuppressWarnings("unused")
+  //@SuppressWarnings("unused")
   private void checkCoastMode(double absCmd, double absVel) {
     if (shifter.getCurrentGear() == Gear.LOW) {
       //no coast mode in low gear

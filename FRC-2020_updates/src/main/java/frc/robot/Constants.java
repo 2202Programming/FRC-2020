@@ -37,8 +37,8 @@ public final class Constants {
     public static final class CAN {
         // CAN ID for non-motor devices
         public static final int PDP = 0; // this must be 0
-        public static final PneumaticsModuleType PCM1 = PneumaticsModuleType.REVPH; 
-        public static final PneumaticsModuleType PCM2 = PneumaticsModuleType.REVPH; 
+        public static final int PCM1 = 1;
+        public static final int PCM2 = 2;
 
         // Climber Talon  
         public static final int CLIMBER_TALON = 14; 
@@ -98,12 +98,12 @@ public final class Constants {
     }
 
     // Intake
-    public static final PneumaticsModuleType INTAKE_PCM_CAN_ID = CAN.PCM1;
+    // on  CAN.PCM1;
     public static final int INTAKE_UP_SOLENOID_PCM = 4;
     public static final int INTAKE_DOWN_SOLENOID_PCM = 5;
 
     // Gearshifter
-    public static final PneumaticsModuleType GEARSHIFT_PCM_CAN_ID = PneumaticsModuleType.REVPH;
+    // on CAN.PCM2 ??? we hope.
     public static final int GEARSHIFTUP_SOLENOID_PCM = 0;
     public static final int GEARSHIFTDOWN_SOLENOID_PCM = 1;
 

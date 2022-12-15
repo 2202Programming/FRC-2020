@@ -2,10 +2,11 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.GEARSHIFTDOWN_SOLENOID_PCM;
 import static frc.robot.Constants.GEARSHIFTUP_SOLENOID_PCM;
-import static frc.robot.Constants.GEARSHIFT_PCM_CAN_ID;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.CAN;
 import frc.robot.subsystems.ifx.Shifter;
 import frc.robot.subsystems.util.MonitoredSubsystemBase;
 
@@ -28,8 +29,8 @@ public class GearShifter extends MonitoredSubsystemBase implements Shifter {
         }
     }
 
-    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(GEARSHIFT_PCM_CAN_ID, GEARSHIFTUP_SOLENOID_PCM,
-            GEARSHIFTDOWN_SOLENOID_PCM);
+    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(CAN.PCM2, PneumaticsModuleType.CTREPCM, 
+            GEARSHIFTUP_SOLENOID_PCM,   GEARSHIFTDOWN_SOLENOID_PCM);
 
     // State, mirror solnoid
     private Solnoid curGear = Solnoid.LOW_GEAR;

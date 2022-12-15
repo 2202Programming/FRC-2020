@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticHub;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 //import edu.wpi.first.wpilibj.PneumaticsControlModule;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.Constants.CAN;
@@ -26,7 +27,7 @@ public class Climber extends  MonitoredSubsystemBase implements Logger {
  
   final WPI_TalonSRX motor = new WPI_TalonSRX(CAN.CLIMBER_TALON);  
   final TalonSRXConfiguration srxconfig = new TalonSRXConfiguration();
-  final DoubleSolenoid solenoid = new DoubleSolenoid(CAN.PCM1, PCM1.CLIMBER_EXTEND, PCM1.CLIMBER_RETRACT);
+  final DoubleSolenoid solenoid = new DoubleSolenoid(CAN.PCM1, PneumaticsModuleType.REVPH, PCM1.CLIMBER_EXTEND, PCM1.CLIMBER_RETRACT);
   final PneumaticHub solenoidHubExtend = new PneumaticHub(PCM1.CLIMBER_EXTEND);
   final PneumaticHub solenoidHubRetract = new PneumaticHub(PCM1.CLIMBER_RETRACT);
   

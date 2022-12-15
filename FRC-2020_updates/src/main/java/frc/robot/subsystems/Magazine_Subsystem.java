@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -146,7 +147,7 @@ public class Magazine_Subsystem extends MonitoredSubsystemBase {
     final RelativeEncoder angleEncoder = angleMotor.getEncoder();
     final SparkMaxPIDController anglePID = angleMotor.getPIDController();
     final AnalogInput anglePot = new AnalogInput(AnalogIn.MAGAZINE_ANGLE);
-    final DoubleSolenoid solenoid = new DoubleSolenoid(CAN.PCM2, PCM2.MAG_LOCK, PCM2.MAG_UNLOCK);
+      final DoubleSolenoid solenoid = new DoubleSolenoid(CAN.PCM2, PneumaticsModuleType.REVPH, PCM2.MAG_LOCK, PCM2.MAG_UNLOCK);
 
     // measurements updated in periodic 
     double m_apv = 0;            // angle pot avg voltage, safety()

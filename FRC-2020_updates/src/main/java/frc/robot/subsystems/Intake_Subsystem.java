@@ -74,7 +74,7 @@ public class Intake_Subsystem extends MonitoredSubsystemBase implements Logger {
 
   // Intake
   final Spark intake_spark = new Spark(PWM.INTAKE);
-  final DoubleSolenoid intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, INTAKE_UP_SOLENOID_PCM, INTAKE_DOWN_SOLENOID_PCM);
+  final DoubleSolenoid intakeSolenoid = new DoubleSolenoid(CAN.PCM1, PneumaticsModuleType.CTREPCM, INTAKE_UP_SOLENOID_PCM, INTAKE_DOWN_SOLENOID_PCM);
 
   // Magazine is used for a few controls 
   final Magazine_Subsystem magazine;
